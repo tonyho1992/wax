@@ -166,7 +166,7 @@ OpenLayers.Layer.StyleWriter = OpenLayers.Class(OpenLayers.Layer.Grid, {
      */
     addTile: function(bounds, position) {
         return new OpenLayers.Tile.Image(this, position, bounds,
-                                         null, this.tileSize);
+            null, this.tileSize);
     },
 
     /* APIMethod: setMap
