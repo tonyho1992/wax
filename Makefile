@@ -1,0 +1,2 @@
+doc:
+	docco control/*.js

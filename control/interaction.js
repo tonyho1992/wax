@@ -1,3 +1,5 @@
+// An interaction toolkit for tiles that implement the
+// [MBTiles UTFGrid spec](https://github.com/mapbox/mbtiles-spec)
 var StyleWriterUtil = {
   // url-safe base64 encoding for mapfile urls in tile urls
   encode_base64: function(data) {
@@ -39,11 +41,9 @@ var StyleWriterUtil = {
   }
 };
 
-/**
- * Class: OpenLayers.Control.StyleWriterInteraction
- * Inherits from:
- *  - <OpenLayers.Control>
- */
+// Class: OpenLayers.Control.StyleWriterInteraction
+// Inherits from:
+// - <OpenLayers.Control>
 OpenLayers.Control.Interaction =
     OpenLayers.Class(OpenLayers.Control, {
     feature: {},
@@ -84,19 +84,12 @@ OpenLayers.Control.Interaction =
       };
     },
 
+    // Add handlers to the map
     setMap: function(map) {
       this.handlers.hover.setMap(map);
       this.handlers.click.setMap(map);
       OpenLayers.Control.prototype.setMap.apply(this, arguments);
       this.activate();
-      // Respond to new layers  for new layers so we can load keymap
-      var that = this;
-      map.events.on({addlayer: function(e) {
-        if (e.layer.CLASS_NAME === 'OpenLayers.Layer.StyleWriter' &&
-          typeof e.layer.keymap === 'string') {
-          that.loadKeymap(e.layer);
-        }
-      }});
     },
 
     activate: function() {
@@ -121,16 +114,15 @@ OpenLayers.Control.Interaction =
         return;
       }
       else {
-        var offset = [
-          Math.floor((sevt.pX - $(tile.imgDiv).offset().left) / this.tileRes),
-          Math.floor((sevt.pY - $(tile.imgDiv).offset().top) / this.tileRes)];
-        var key = grid.grid[offset[1]].charCodeAt(offset[0]);
+        var key = grid.grid[
+           Math.floor((sevt.pX - $(tile.imgDiv).offset().left) / this.tileRes)].charCodeAt(
+           Math.floor((sevt.pY - $(tile.imgDiv).offset().top) / this.tileRes));
 
+        // See: Encoding IDs
         (key >= 93) && key--;
         (key >= 35) && key--;
         key -= 32;
 
-        console.log(grid.keys[key]);
         return grid.keys[key];
       }
     },
@@ -163,6 +155,8 @@ OpenLayers.Control.Interaction =
       return tiles;
     },
 
+    // Simplistically derive the URL of interaction data from a tile
+    // TODO: make correct, handle non-png types.
     tileDataUrl: function(tile) {
       return tile.url.replace('png', 'grid.json');
     },
@@ -194,6 +188,7 @@ OpenLayers.Control.Interaction =
       );
     },
 
+    // React to a click mouse event
     getInfoForClick: function(evt) {
       var layers = this.viableLayers();
       var sevt = StyleWriterUtil.makeEvent(evt);
@@ -209,6 +204,8 @@ OpenLayers.Control.Interaction =
       }
     },
 
+    // React to a hover mouse event, by finding all tiles,
+    // finding features, and calling `this.callbacks[]`
     getInfoForHover: function(evt) {
       var layers = this.viableLayers();
       var sevt = StyleWriterUtil.makeEvent(evt);
@@ -218,6 +215,8 @@ OpenLayers.Control.Interaction =
 
       for (var t = 0; t < tiles.length; t++) {
         var code_string = StyleWriterUtil.fString(tiles[t].url);
+        // This features has already been loaded, or
+        // is currently being requested.
         if (this.archive[code_string]) {
           feature = this.getGridFeature(sevt, tiles[t]);
           if (feature) {
@@ -233,7 +232,7 @@ OpenLayers.Control.Interaction =
             this.feature[t] = null;
           }
         } else {
-          // TODO: figure out better way to do hover-sim
+          // Request this feature
           this.callbacks['out']({}, tiles[t].layer);
           this.feature[t] = null;
           if (!this.archive[code_string]) {
@@ -241,6 +240,8 @@ OpenLayers.Control.Interaction =
               this.archive[code_string] = true;
               this.target.hoverRequest = this.reqTile(tiles[t]);
             } catch (err) {
+              // If jsonp fails with an exception, reset the archive
+              // so that it can be retried.
               this.archive[code_string] = false;
             }
           }
@@ -248,22 +249,12 @@ OpenLayers.Control.Interaction =
       }
     },
 
+    // Load retrieved data into this.archive, which 
+    // contains grid objects indexed by code_string
+    // - @param {Object} data
+    // - @param {String} code_string
     readDone: function(data, code_string) {
         this.archive[code_string] = data;
-    },
-
-    loadKeymap: function(layer) {
-      $.jsonp({
-        'url': layer.keymap,
-        context: this,
-        success: function(data) {
-          if (typeof data !== 'undefined') {
-            layer.keymap = layer.options.keymap = data;
-          }
-        },
-        error: function() {},
-        callback: 'keymapCallback'
-      });
     },
 
     CLASS_NAME: 'OpenLayers.Control.Interaction'

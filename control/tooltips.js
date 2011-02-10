@@ -1,6 +1,3 @@
-/**
- * Implementation of Drupal behavior.
- */
 Drupal.behaviors.openlayers_plus_behavior_tooltips = function(context) {
   Drupal.OpenLayersTooltips.attach(context);
 };

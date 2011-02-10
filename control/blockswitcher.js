@@ -1,7 +1,4 @@
-// var OpenLayersPlusBlockswitcher = {};
-/**
- * Initializes the blockswitcher and attaches to DOM elements.
- */
+// Initializes the blockswitcher and attaches to DOM elements.
 var OpenLayersPlusBlockswitcher = function(opts, overlay_style) {
     if (opts == null) {
         return;
@@ -30,9 +27,7 @@ var OpenLayersPlusBlockswitcher = function(opts, overlay_style) {
       return false;
     };
 
-    /**
-     * Redraws the blockswitcher to reflect the current state of layers.
-     */
+    // Redraws the blockswitcher to reflect the current state of layers.
     this.redraw = function() {
       if (this.needsRedraw()) {
         // Clear out previous layers
@@ -113,9 +108,7 @@ var OpenLayersPlusBlockswitcher = function(opts, overlay_style) {
       }
     };
 
-    /**
-     * Click handler that activates or deactivates a layer.
-     */
+    // Click handler that activates or deactivates a layer.
     this.layerClick = function(element) {
       var layer = $(element).data('layer');
       if (layer.isBaseLayer) {
@@ -141,14 +134,12 @@ var OpenLayersPlusBlockswitcher = function(opts, overlay_style) {
       }
     };
 
-    /**
-      * Parameters:
-      * styleMap {OpenLayers.StyleMap}
-      *
-      * Returns:
-      * {Object} An object with css properties and values that can be applied to an element
-      *
-      */
+    // Parameters:
+    // styleMap {OpenLayers.StyleMap}
+    //
+    // Returns:
+    // - {Object} An object with css properties and values that can be 
+    // applied to an element
     this.styleMapToCSS = function(styleMap) {
       css = {};
       default_style = styleMap.styles['default'].defaultStyle;
