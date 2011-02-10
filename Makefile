@@ -1,2 +1,2 @@
 doc:
-	docco control/*.js
+	docco control/*.js lib/openlayers_wax.js

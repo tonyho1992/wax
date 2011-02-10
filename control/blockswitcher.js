@@ -14,13 +14,18 @@ var OpenLayersPlusBlockswitcher = function(opts, overlay_style) {
     });
 
     this.needsRedraw = function() {
-      if (!this.layerStates || !this.layerStates.length || (this.map.layers.length != this.layerStates.length)) {
+      if (!this.layerStates ||
+          !this.layerStates.length ||
+          (this.map.layers.length != this.layerStates.length)) {
         return true;
       }
       for (var i = 0, len = this.layerStates.length; i < len; i++) {
         var layerState = this.layerStates[i];
         var layer = this.map.layers[i];
-        if ((layerState.name != layer.name) || (layerState.inRange != layer.inRange) || (layerState.id != layer.id) || (layerState.visibility != layer.visibility)) {
+        if ((layerState.name != layer.name) ||
+            (layerState.inRange != layer.inRange) ||
+            (layerState.id != layer.id) ||
+            (layerState.visibility != layer.visibility)) {
           return true;
         }
       }
@@ -44,7 +49,12 @@ var OpenLayersPlusBlockswitcher = function(opts, overlay_style) {
         this.layerStates = new Array(len);
         for (var i = 0; i < len; i++) {
           var layerState = this.map.layers[i];
-          this.layerStates[i] = {'name': layerState.name, 'visibility': layerState.visibility, 'inRange': layerState.inRange, 'id': layerState.id};
+          this.layerStates[i] = {
+              name: layerState.name,
+              visibility: layerState.visibility,
+              inRange: layerState.inRange,
+              id: layerState.id
+          };
         }
 
         var layers = this.map.layers.slice();
@@ -52,8 +62,10 @@ var OpenLayersPlusBlockswitcher = function(opts, overlay_style) {
           var layer = layers[i];
           var baseLayer = layer.isBaseLayer;
           if (layer.displayInLayerSwitcher) {
-            // Only check a baselayer if it is *the* baselayer, check data layers if they are visible
-            var checked = baseLayer ? (layer === this.map.baseLayer) : layer.getVisibility();
+            // Only check a baselayer if it is *the* baselayer, 
+            // check data layers if they are visible
+            var checked = baseLayer ?
+                (layer === this.map.baseLayer) : layer.getVisibility();
 
             // Create input element
             var inputType = (baseLayer) ? 'radio' : this.overlay_style;
@@ -61,12 +73,15 @@ var OpenLayersPlusBlockswitcher = function(opts, overlay_style) {
             var inputElem = $('.factory .' + inputType, this.blockswitcher).clone();
 
             // Append to container
-            var container = baseLayer ? $('.layers.base', this.blockswitcher) : $('.layers.data', this.blockswitcher);
+            var container = baseLayer ?
+                $('.layers.base', this.blockswitcher) :
+                $('.layers.data', this.blockswitcher);
             container.show();
             $('.layers-content', container).append(inputElem);
 
             // Set label text
-            $('label', inputElem).append((layer.title !== undefined) ? layer.title : layer.name);
+            $('label', inputElem).append((layer.title !== undefined)
+                ? layer.title : layer.name);
 
             // Add states and click handler
             if (baseLayer) {
@@ -143,7 +158,8 @@ var OpenLayersPlusBlockswitcher = function(opts, overlay_style) {
     this.styleMapToCSS = function(styleMap) {
       css = {};
       default_style = styleMap.styles['default'].defaultStyle;
-      if (default_style.fillColor === 'transparent' && typeof default_style.externalGraphic != 'undefined') {
+      if (default_style.fillColor === 'transparent' &&
+          typeof default_style.externalGraphic != 'undefined') {
         css['background-image'] = 'url(' + default_style.externalGraphic + ')';
         css['background-repeat'] = 'no-repeat';
         css['background-color'] = 'transparent';
@@ -161,11 +177,12 @@ var OpenLayersPlusBlockswitcher = function(opts, overlay_style) {
 
     this.redraw();
 
+    // Keep the blockswitcher up to date when the map is changed.
     this.map.events.on({
-        'addlayer': this.redraw,
-        'changelayer': this.redraw,
-        'removelayer': this.redraw,
-        'changebaselayer': this.redraw,
+        addlayer: this.redraw,
+        changelayer: this.redraw,
+        removelayer: this.redraw,
+        changebaselayer: this.redraw,
         scope: this
     });
 };

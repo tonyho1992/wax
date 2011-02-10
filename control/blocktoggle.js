@@ -1,8 +1,6 @@
 var OpenLayersPlusBlocktoggle = {};
 
-/**
- * Initializes the blocktoggle and attaches to DOM elements.
- */
+// Initializes the blocktoggle and attaches to DOM elements.
 OpenLayersPlusBlocktoggle.attach = function(context) {
   var data = $(context).data('openlayers');
 
@@ -64,12 +62,10 @@ OpenLayersPlusBlocktoggle.attach = function(context) {
   }
 };
 
-/**
- * Checks if the layer state has changed since the last redraw() call.
- *
- * Returns:
- * {Boolean} The layer state changed since the last redraw() call.
- */
+// Checks if the layer state has changed since the last redraw() call.
+//
+// Returns:
+// - {Boolean} The layer state changed since the last redraw() call.
 OpenLayersPlusBlocktoggle.needsRedraw = function() {
   return (
     (this.a_vis == 
@@ -79,9 +75,7 @@ OpenLayersPlusBlocktoggle.needsRedraw = function() {
     $(this).find('.openlayers-blocktoggle-b').hasClass('activated')) ? 1 : 0);
 };
 
-/**
- * Redraws the blocktoggle to reflect the current state of layers.
- */
+// Redraws the blocktoggle to reflect the current state of layers.
 OpenLayersPlusBlocktoggle.redraw = function() {
   if (this.needsRedraw()) {
     this.a_vis = this.layer_a.visibility;

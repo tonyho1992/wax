@@ -37,14 +37,18 @@ OpenLayersPermalink.addQuery = function(href, delimiter) {
     if (!processed) {
       var data = $(this).data('openlayers');
       if (data.openlayers) {
-        // If there is a permalink control present, attempt to persist layer settings when clicking through.
+        // If there is a permalink control present, attempt to persist 
+        // layer settings when clicking through.
         for (var i in data.openlayers.controls) {
-          if (data.openlayers.controls[i].CLASS_NAME == 'OpenLayers.Control.PermalinkPlus') {
-            var params = OpenLayers.Util.getParameterString(data.openlayers.controls[i].createParams());
+          if (data.openlayers.controls[i].CLASS_NAME ==
+            'OpenLayers.Control.PermalinkPlus') {
+            var params = OpenLayers.Util
+                .getParameterString(data.openlayers.controls[i].createParams());
             params = params.split('&');
             var url = href.split(delimiter);
             for (var key in params) {
-              if (params[key].split('=')[0] == 'layers' || params[key].split('=')[0] == 'baseLayers' ) {
+              if (params[key].split('=')[0] == 'layers' ||
+                  params[key].split('=')[0] == 'baseLayers' ) {
                 if (url[1]) {
                   url[1] += '&' + params[key];
                 }
@@ -62,10 +66,9 @@ OpenLayersPermalink.addQuery = function(href, delimiter) {
   return href;
 };
 
-OpenLayers.Control.ArgParserPlus = OpenLayers.Class(OpenLayers.Control.ArgParser, {
-  /**
-   * Alternative to OpenLayers.Utils.getParameters() that uses the URL hash.
-   */
+OpenLayers.Control.ArgParserPlus = OpenLayers.Class(
+    OpenLayers.Control.ArgParser, {
+  // Alternative to OpenLayers.Utils.getParameters() that uses the URL hash.
   getParameters: function() {
     // Parse out parameters portion of url string
     var paramsString = window.location.hash.substring(1);
@@ -121,10 +124,12 @@ OpenLayers.Control.ArgParserPlus = OpenLayers.Class(OpenLayers.Control.ArgParser
       var args = this.getParameters();
       // Be careful to set layer first, to not trigger unnecessary layer loads
       if (args.layers) {
-        this.layers = typeof(args.layers) === 'string' ? this.layers = [args.layers] : args.layers;
+        this.layers = typeof(args.layers) === 'string' ?
+            this.layers = [args.layers] : args.layers;
       }
       if (args.baseLayers) {
-        this.baseLayers = typeof(args.baseLayers) === 'string' ? this.baseLayers = [args.baseLayers] : args.baseLayers;
+        this.baseLayers = typeof(args.baseLayers) === 'string' ?
+            this.baseLayers = [args.baseLayers] : args.baseLayers;
       }
       if (this.layers || this.baseLayers) {
         // when we add a new layer, set its visibility
@@ -147,9 +152,7 @@ OpenLayers.Control.ArgParserPlus = OpenLayers.Class(OpenLayers.Control.ArgParser
     }
   },
 
-  /**
-   * Override of configureLayers().
-   */
+  // Override of `configureLayers()`.
   configureLayers: function() {
     this.map.events.unregister('addlayer', this, this.configureLayers);
 
@@ -198,12 +201,11 @@ OpenLayers.Control.ArgParserPlus = OpenLayers.Class(OpenLayers.Control.ArgParser
   CLASS_NAME: "OpenLayers.Control.ArgParserPlus"
 });
 
-OpenLayers.Control.PermalinkPlus = OpenLayers.Class(OpenLayers.Control.Permalink, {
+OpenLayers.Control.PermalinkPlus = OpenLayers.Class(
+  OpenLayers.Control.Permalink, {
   argParserClass: OpenLayers.Control.ArgParserPlus,
 
-  /**
-   * Override of updateLink().
-   */
+  // Override of `updateLink()`.
   updateLink: function() {
     var href = this.base;
     if (href.indexOf('#') != -1) {
@@ -213,9 +215,7 @@ OpenLayers.Control.PermalinkPlus = OpenLayers.Class(OpenLayers.Control.Permalink
     this.element.href = href;
   },
 
-  /**
-   * Override of createParams(). Generates smarter layer/baselayer query string.
-   */
+  // Override of `createParams()`. Generates smarter layer/baselayer query string.
   createParams: function(center, zoom, layers) {
     center = center || this.map.getCenter();
 
