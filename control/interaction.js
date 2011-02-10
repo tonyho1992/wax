@@ -62,23 +62,25 @@ OpenLayers.Control.Interaction =
       this.handlers = {
         hover: new OpenLayers.Handler.Hover(
           this, {
-            'move': this.cancelHover,
-            'pause': this.getInfoForHover
+            move: this.cancelHover,
+            pause: this.getInfoForHover
           },
+          // Be nice to IE, making it determine interaction
+          // every 40ms instead of 10ms
           OpenLayers.Util.extend(this.handlerOptions.hover || {}, {
-            'delay': ($.browser.msie) ? 40 : 10
+            delay: ($.browser.msie) ? 40 : 10
           })
         ),
         click: new OpenLayers.Handler.Click(
           this, {
-            'click': this.getInfoForClick
+            click: this.getInfoForClick
         })
       };
 
       this.callbacks = {
-          'out': StyleWriterTooltips.unselect,
-          'over': StyleWriterTooltips.select,
-          'click': StyleWriterTooltips.click
+          out: StyleWriterTooltips.unselect,
+          over: StyleWriterTooltips.select,
+          click: StyleWriterTooltips.click
       };
     },
 
@@ -122,8 +124,14 @@ OpenLayers.Control.Interaction =
         var offset = [
           Math.floor((sevt.pX - $(tile.imgDiv).offset().left) / this.tileRes),
           Math.floor((sevt.pY - $(tile.imgDiv).offset().top) / this.tileRes)];
-        var key = grid[offset[1]] && grid[offset[1]][offset[0]];
-        return tile.layer.options.keymap[key];
+        var key = grid.grid[offset[1]].charCodeAt(offset[0]);
+
+        (key >= 93) && key--;
+        (key >= 35) && key--;
+        key -= 32;
+
+        console.log(grid.keys[key]);
+        return grid.keys[key];
       }
     },
 
@@ -139,7 +147,10 @@ OpenLayers.Control.Interaction =
              (divpos.left < sevt.pX) &&
             ((divpos.left + 256) > sevt.pX));
           if (found) {
-            gridpos = {x: x, y: y};
+            gridpos = {
+                x: x,
+                y: y
+            };
           }
         }
       }
@@ -161,7 +172,9 @@ OpenLayers.Control.Interaction =
       return $.jsonp({
         'url': this.tileDataUrl(tile),
         context: this,
-        success: this.readDone,
+        success: function(data) {
+            return this.readDone(data, StyleWriterUtil.fString(tile.url));
+        },
         error: function() {},
         callback: StyleWriterUtil.fString(tile.url),
         callbackParameter: 'callback'
@@ -235,10 +248,8 @@ OpenLayers.Control.Interaction =
       }
     },
 
-    readDone: function(data) {
-        // TODO: update.
-        this.archive[data.code_string] =
-          StyleWriterUtil.decompressRLE(data.features);
+    readDone: function(data, code_string) {
+        this.archive[code_string] = data;
     },
 
     loadKeymap: function(layer) {
