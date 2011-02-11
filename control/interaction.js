@@ -46,6 +46,32 @@ var StyleWriterUtil = {
   }
 };
 
+// Create a new formatter from an object in the form
+//
+//     { formatter: "function(obj, data) { ... }" }
+function Formatter(obj) {
+    // Prevent against just any input being used.
+    if (obj.formatter && typeof obj.formatter === 'string') {
+        try {
+            // Ugly, dangerous use of eval.
+            eval('this.f = ' + obj.formatter);
+        } catch (e) {
+            // Syntax errors in formatter
+            console && console.log(e);
+        }
+    }
+}
+
+// Wrap the given formatter function in order to
+// catch exceptions that it may throw.
+Formatter.prototype.format = function(options, data) {
+    try {
+        this.f(options, data);
+    } catch (e) {
+        console && console.log(e);
+    }
+};
+
 // Class: OpenLayers.Control.StyleWriterInteraction
 // Inherits from:
 // - <OpenLayers.Control>
