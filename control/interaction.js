@@ -83,6 +83,7 @@ OpenLayers.Control.Interaction =
     handlers: null,
     hoverRequest: null,
     archive: {},
+    keymap: {},
     tileRes: 4,
 
     initialize: function(options) {
@@ -150,18 +151,22 @@ OpenLayers.Control.Interaction =
         return;
       } else {
         var key = grid.grid[
-           Math.floor((sevt.pX - $(tile.imgDiv).offset().left) / this.tileRes)].charCodeAt(
-           Math.floor((sevt.pY - $(tile.imgDiv).offset().top) / this.tileRes));
+           Math.floor((sevt.pY - $(tile.imgDiv).offset().top) / this.tileRes)
+        ].charCodeAt(
+           Math.floor((sevt.pX - $(tile.imgDiv).offset().left) / this.tileRes)
+        );
 
         // See: Encoding IDs
         (key >= 93) && key--;
         (key >= 35) && key--;
         key -= 32;
 
+        var km = this.keymap;
+
         // If this layers formatter hasn't been loaded yet,
         // download and load it now.
         this.reqFormatter(tile, function(formatter) {
-            callback(formatter.format(sevt, grid.keys[key]));
+            callback(formatter.format({ format: 'full' }, km[grid.keys[key]]));
         });
       }
     },
@@ -232,13 +237,17 @@ OpenLayers.Control.Interaction =
     // - @param {Object} data
     // - @param {String} code_string
     readDone: function(data, code_string) {
-        this.archive[code_string] = data;
+        this.archive[code_string] = data.grid;
+        for (var i in data.grid_data) {
+            this.keymap[i] = data.grid_data[i];
+        }
     },
 
     // Request and save a formatter, calling `formatterReqDone` when finished.
     reqFormatter: function(tile, callback) {
       if (tile.layer.formatter) {
         callback(tile.layer.formatter);
+        return;
       }
       return $.jsonp({
         'url': this.formatterUrl(tile),
