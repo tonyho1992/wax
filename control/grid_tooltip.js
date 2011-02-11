@@ -2,6 +2,8 @@ StyleWriterTooltips = {};
 
 StyleWriterTooltips.click = function(feature) {
   var html = '';
+  // TODO: without name + description, we aren't doing this yet.
+  /*
   if (feature.name) {
     html += feature.name;
   }
@@ -20,6 +22,7 @@ StyleWriterTooltips.click = function(feature) {
     window.location = href;
     return false;
   }
+  */
   return;
 };
 
