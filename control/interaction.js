@@ -1,5 +1,9 @@
 // An interaction toolkit for tiles that implement the
 // [MBTiles UTFGrid spec](https://github.com/mapbox/mbtiles-spec)
+//
+// Requires:
+// - jQuery
+// - jquery-jsonp
 var StyleWriterUtil = {
   // url-safe base64 encoding for mapfile urls in tile urls
   encode_base64: function(data) {
@@ -32,6 +36,7 @@ var StyleWriterUtil = {
     };
   },
   // Generate a function-safe string from a URL string
+  // TODO: rewrite
   fString: function(src) {
     if (!src) return;
     var pts = src.split('/').slice(-4)
@@ -108,12 +113,15 @@ OpenLayers.Control.Interaction =
       );
     },
 
+    // Given an event with a location and a tile (from getTileStack),
+    // grab the feature (currently the key) if it exists - otherwise,
+    // return undefined.
     getGridFeature: function(sevt, tile) {
       var grid = this.archive[StyleWriterUtil.fString(tile.url)];
-      if (grid === true) { // is downloading
+      if (grid === true) {
+        // If the grid is currently downloading, return undefined.
         return;
-      }
-      else {
+      } else {
         var key = grid.grid[
            Math.floor((sevt.pX - $(tile.imgDiv).offset().left) / this.tileRes)].charCodeAt(
            Math.floor((sevt.pY - $(tile.imgDiv).offset().top) / this.tileRes));
@@ -127,10 +135,17 @@ OpenLayers.Control.Interaction =
       }
     },
 
+    // Get an Array of the stack of tiles under the mouse.
+    // This operates with pixels only, since there's no way
+    // to bubble through an element which is sitting on the map
+    // (like an SVG overlay).
+    //
+    // If no tiles are under the mouse, returns an empty array.
     getTileStack: function(layers, sevt) {
       var found = false;
       var gridpos = {};
       var tiles = [];
+      // All of these loops break once found is made true.
       for (var x = 0; x < layers[0].grid.length && !found; x++) {
         for (var y = 0; y < layers[0].grid[x].length && !found; y++) {
           var divpos = $(layers[0].grid[x][y].imgDiv).offset();
@@ -158,7 +173,7 @@ OpenLayers.Control.Interaction =
     // Simplistically derive the URL of interaction data from a tile
     // TODO: make correct, handle non-png types.
     tileDataUrl: function(tile) {
-      return tile.url.replace('png', 'grid.json');
+      return tile.url.replace(/png$/, 'grid.json');
     },
 
     // Request and save a tile
@@ -249,7 +264,7 @@ OpenLayers.Control.Interaction =
       }
     },
 
-    // Load retrieved data into this.archive, which 
+    // Load retrieved data into this.archive, which
     // contains grid objects indexed by code_string
     // - @param {Object} data
     // - @param {String} code_string
