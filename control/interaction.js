@@ -228,6 +228,7 @@ OpenLayers.Control.Interaction =
     // The callback on `reqTile` -
     // Load retrieved data into this.archive, which
     // contains grid objects indexed by code_string
+    //
     // - @param {Object} data
     // - @param {String} code_string
     readDone: function(data, code_string) {
@@ -252,6 +253,7 @@ OpenLayers.Control.Interaction =
     },
 
     // The callback on `reqTile` -
+    //
     // - @param {Object} data
     // - @param {String} layer
     formatterReadDone: function(data, layer, callback) {
