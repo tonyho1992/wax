@@ -161,7 +161,6 @@ OpenLayers.Control.Interaction =
         // If this layers formatter hasn't been loaded yet,
         // download and load it now.
         this.reqFormatter(tile, function(formatter) {
-            console.log(formatter.format(sevt, grid.keys[key]));
             callback(formatter.format(sevt, grid.keys[key]));
         });
       }

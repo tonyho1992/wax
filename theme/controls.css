@@ -27,7 +27,7 @@ div.map div.openlayers-tooltip {
     position:absolute;
     background:#383830;
     left:10px;
-    top:10px;
+    top:50px;
     padding:5px 10px;
     max-width:300px;
     }

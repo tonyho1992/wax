@@ -31,19 +31,10 @@ StyleWriterTooltips.getToolTip = function(feature, context, index) {
   if (tooltip.size() === 0) {
       tooltip = $("<div class='openlayers-tooltip openlayers-tooltip-" +
           index + 
-          "'><div class='openlayers-tooltip-name'></div>" +
-          "<div class='openlayers-tooltip-description'></div>" +
-          "</div>");
+          "'>" +
+          "</div>").html(feature);
       $(context).append(tooltip);
   }
-  /*
-  $('div.openlayers-tooltip-name', tooltip)
-    .html(feature.name || '');
-    */
-  $('div.openlayers-tooltip-name', tooltip)
-    .html(feature.name || '');
-  $('div.openlayers-tooltip-description', tooltip)
-    .html(feature.description || '');
 
   // Hide any active tooltips for layers beneath this one.
   for (var i = (index - 1); i > 0; i--) {
