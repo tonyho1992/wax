@@ -22,6 +22,23 @@
   margin-right:5px;
   }
 
+div.map div.openlayers-tooltip {
+    z-index:999999;
+    position:absolute;
+    background:#383830;
+    left:10px;
+    top:10px;
+    padding:5px 10px;
+    max-width:300px;
+    }
+
+  .openlayers-tooltip-name {
+    font-weight:bold;
+    color:#fff;
+    }
+
+  .openlayers-tooltip-description { font-size:11px; }
+
 /**
  * Blockswitcher ======================================================
  */
@@ -35,10 +52,6 @@
 
 .openlayers-blockswitcher input.form-radio,
 .openlayers-blockswitcher input.form-checkbox { margin-right:5px; }
-
-div.map {
-  position:relative;
-  }
 
 div.map #block-openlayers_plus-blockswitcher {
   position:absolute;

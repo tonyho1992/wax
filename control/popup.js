@@ -1,3 +1,5 @@
+/**
+ * TODO: unported
 Drupal.behaviors.openlayers_plus_behavior_popup = function(context) {
   var data = $(context).data('openlayers');
   if (data && data.map.behaviors.openlayers_plus_behavior_popup) {
@@ -154,4 +156,4 @@ Drupal.openlayers_plus_behavior_popup = {
     $('.openlayers-popupbox:not(.popup)', context).fadeOut('fast', function() { $(this).remove(); });
   }
 };
-
+*/

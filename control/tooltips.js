@@ -1,3 +1,5 @@
+/**
+ * TODO: unported
 Drupal.behaviors.openlayers_plus_behavior_tooltips = function(context) {
   Drupal.OpenLayersTooltips.attach(context);
 };
@@ -95,3 +97,4 @@ Drupal.OpenLayersTooltips.positionedSelect = function(feature) {
 Drupal.OpenLayersTooltips.unselect = function(feature) {
   $(feature.layer.map.div).children('div.openlayers-tooltip').fadeOut('fast', function() { $(this).remove(); });
 };
+*/
