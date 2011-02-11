@@ -210,7 +210,7 @@ OpenLayers.Control.Interaction =
 
     // Simplistically derive the URL of interaction data from a tile URL
     tileDataUrl: function(tile) {
-      return tile.url.replace(/(png|jpg|jpeg)$/, 'grid.json');
+      return tile.url.replace(/(.png|.jpg|.jpeg)/, '.grid.json');
     },
 
     // Simplistically derive the URL of the formatter function from a tile URL
