@@ -66,7 +66,7 @@ function Formatter(obj) {
 // catch exceptions that it may throw.
 Formatter.prototype.format = function(options, data) {
     try {
-        this.f(options, data);
+        return this.f(options, data);
     } catch (e) {
         console && console.log(e);
     }
@@ -142,7 +142,8 @@ OpenLayers.Control.Interaction =
     // Given an event with a location and a tile (from getTileStack),
     // grab the feature (currently the key) if it exists - otherwise,
     // return undefined.
-    getGridFeature: function(sevt, tile) {
+    getGridFeature: function(sevt, tile, callback) {
+      callback = $.proxy(callback, this);
       var grid = this.archive[StyleWriterUtil.fString(tile.url)];
       if (grid === true) {
         // If the grid is currently downloading, return undefined.
@@ -157,7 +158,12 @@ OpenLayers.Control.Interaction =
         (key >= 35) && key--;
         key -= 32;
 
-        return grid.keys[key];
+        // If this layers formatter hasn't been loaded yet,
+        // download and load it now.
+        this.reqFormatter(tile, function(formatter) {
+            console.log(formatter.format(sevt, grid.keys[key]));
+            callback(formatter.format(sevt, grid.keys[key]));
+        });
       }
     },
 
@@ -196,24 +202,62 @@ OpenLayers.Control.Interaction =
       return tiles;
     },
 
-    // Simplistically derive the URL of interaction data from a tile
-    // TODO: make correct, handle non-png types.
+    // Simplistically derive the URL of interaction data from a tile URL
     tileDataUrl: function(tile) {
-      return tile.url.replace(/png$/, 'grid.json');
+      return tile.url.replace(/(png|jpg|jpeg)$/, 'grid.json');
     },
 
-    // Request and save a tile
+    // Simplistically derive the URL of the formatter function from a tile URL
+    formatterUrl: function(tile) {
+      return tile.url.replace(/\d+\/\d+\/\d+\.\w+/, 'formatter.json');
+    },
+
+    // Request and save a tile, calling `reqDone` when finished.
     reqTile: function(tile) {
       return $.jsonp({
         'url': this.tileDataUrl(tile),
         context: this,
         success: function(data) {
-            return this.readDone(data, StyleWriterUtil.fString(tile.url));
+          return this.readDone(data, StyleWriterUtil.fString(tile.url));
         },
         error: function() {},
         callback: StyleWriterUtil.fString(tile.url),
         callbackParameter: 'callback'
       });
+    },
+
+    // The callback on `reqTile` -
+    // Load retrieved data into this.archive, which
+    // contains grid objects indexed by code_string
+    // - @param {Object} data
+    // - @param {String} code_string
+    readDone: function(data, code_string) {
+        this.archive[code_string] = data;
+    },
+
+    // Request and save a formatter, calling `formatterReqDone` when finished.
+    reqFormatter: function(tile, callback) {
+      if (tile.layer.formatter) {
+        callback(tile.layer.formatter);
+      }
+      return $.jsonp({
+        'url': this.formatterUrl(tile),
+        context: this,
+        success: function(data) {
+          return this.formatterReadDone(data, tile.layer, callback);
+        },
+        error: function() {},
+        callback: StyleWriterUtil.fString(tile.url),
+        callbackParameter: 'callback'
+      });
+    },
+
+    // The callback on `reqTile` -
+    // - @param {Object} data
+    // - @param {String} layer
+    formatterReadDone: function(data, layer, callback) {
+        layer.formatter = new Formatter(data);
+        callback(layer.formatter);
     },
 
     // Get all interactable layers
@@ -230,6 +274,7 @@ OpenLayers.Control.Interaction =
     },
 
     // React to a click mouse event
+    // This is the `pause` handler attached to the map.
     getInfoForClick: function(evt) {
       var layers = this.viableLayers();
       var sevt = StyleWriterUtil.makeEvent(evt);
@@ -239,14 +284,16 @@ OpenLayers.Control.Interaction =
       for (var t = 0; t < tiles.length; t++) {
         var code_string = StyleWriterUtil.fString(tiles[t].url);
         if (this.archive[code_string]) {
-          feature = this.getGridFeature(sevt, tiles[t]);
-          feature && this.callbacks['click'](feature, tiles[t].layer);
+          this.getGridFeature(sevt, tiles[t], function(feature) { 
+              feature && this.callbacks['click'](feature, tiles[t].layer);
+          });
         }
       }
     },
 
     // React to a hover mouse event, by finding all tiles,
     // finding features, and calling `this.callbacks[]`
+    // This is the `click` handler attached to the map.
     getInfoForHover: function(evt) {
       var layers = this.viableLayers();
       var sevt = StyleWriterUtil.makeEvent(evt);
@@ -259,19 +306,22 @@ OpenLayers.Control.Interaction =
         // This features has already been loaded, or
         // is currently being requested.
         if (this.archive[code_string]) {
-          feature = this.getGridFeature(sevt, tiles[t]);
-          if (feature) {
-            if (feature !== this.feature[t]) {
-              this.feature[t] = feature;
-              this.callbacks['out'](feature, tiles[t].layer, sevt);
+            this.getGridFeature(sevt, tiles[t], function(feature) {
               if (feature) {
-                this.callbacks['over'](feature, tiles[t].layer, sevt);
+                if (feature !== this.feature[t]) {
+                  this.feature[t] = feature;
+                  this.callbacks['out'](feature, tiles[t].layer, sevt);
+                  if (feature) {
+                    this.callbacks['over'](feature, tiles[t].layer, sevt);
+                  }
+                }
+              } else {
+                if (tiles[t]) {
+                    this.callbacks['out'](feature, tiles[t].layer, sevt);
+                    this.feature[t] = null;
+                }
               }
-            }
-          } else {
-            this.callbacks['out'](feature, tiles[t].layer, sevt);
-            this.feature[t] = null;
-          }
+            });
         } else {
           // Request this feature
           this.callbacks['out']({}, tiles[t].layer);
@@ -288,14 +338,6 @@ OpenLayers.Control.Interaction =
           }
         }
       }
-    },
-
-    // Load retrieved data into this.archive, which
-    // contains grid objects indexed by code_string
-    // - @param {Object} data
-    // - @param {String} code_string
-    readDone: function(data, code_string) {
-        this.archive[code_string] = data;
     },
 
     CLASS_NAME: 'OpenLayers.Control.Interaction'
