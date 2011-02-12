@@ -52,15 +52,15 @@ StyleWriterTooltips.getToolTip = function(feature, context, index) {
 
 StyleWriterTooltips.select = function(feature, layer, evt) {
   var index = $.inArray(layer, layer.map.layers);
-  var tooltip = StyleWriterTooltips.getToolTip(feature, layer.map.div, index);
-  $(layer.map.div).css('cursor', 'pointer');
+  var tooltip = StyleWriterTooltips.getToolTip(feature, layer.map.viewPortDiv, index);
+  $(layer.map.viewPortDiv).css('cursor', 'pointer');
 };
 
 StyleWriterTooltips.unselect = function(feature, layer) {
   var index = $.inArray(layer, layer.map.layers);
 
-  $(layer.map.div).css('cursor', 'default');
-  $(layer.map.div).children('div.openlayers-tooltip-' + index)
+  $(layer.map.viewPortDiv).css('cursor', 'default');
+  $(layer.map.viewPortDiv).children('div.openlayers-tooltip-' + index)
     .addClass('removed')
     .fadeOut('fast', function() { $(this).remove(); });
 

@@ -169,6 +169,8 @@ OpenLayers.Control.Interaction =
           this.reqFormatter(tile, function(formatter) {
               callback(formatter.format({ format: 'full' }, km[grid.keys[key]]));
           });
+        } else {
+          callback(null);
         }
         else {
           callback(null);
@@ -213,7 +215,7 @@ OpenLayers.Control.Interaction =
 
     // Simplistically derive the URL of interaction data from a tile URL
     tileDataUrl: function(tile) {
-      return tile.url.replace(/(png|jpg|jpeg)$/, 'grid.json');
+      return tile.url.replace(/(.png|.jpg|.jpeg)/, '.grid.json');
     },
 
     // Simplistically derive the URL of the formatter function from a tile URL
@@ -322,19 +324,14 @@ OpenLayers.Control.Interaction =
         // is currently being requested.
         if (this.archive[code_string]) {
             this.getGridFeature(sevt, tiles[t], function(feature) {
-              if (feature) {
-                if (feature !== this.feature[t]) {
-                  this.feature[t] = feature;
-                  this.callbacks['out'](feature, tiles[t].layer, sevt);
-                  if (feature) {
-                    this.callbacks['over'](feature, tiles[t].layer, sevt);
-                  }
-                }
-              } else {
-                if (tiles[t]) {
-                    this.callbacks['out'](feature, tiles[t].layer, sevt);
-                    this.feature[t] = null;
-                }
+              if (!tiles[t]) return;
+              if (feature && this.feature[t] !== feature) {
+                this.feature[t] = feature;
+                this.callbacks['out'](feature, tiles[t].layer, sevt);
+                this.callbacks['over'](feature, tiles[t].layer, sevt);
+              } else if (!feature) {
+                this.feature[t] = null;
+                this.callbacks['out'](feature, tiles[t].layer, sevt);
               }
             });
         } else {
