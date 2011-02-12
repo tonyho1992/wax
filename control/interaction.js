@@ -170,6 +170,9 @@ OpenLayers.Control.Interaction =
               callback(formatter.format({ format: 'full' }, km[grid.keys[key]]));
           });
         }
+        else {
+          callback(null);
+        }
       }
     },
 
