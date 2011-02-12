@@ -321,19 +321,14 @@ OpenLayers.Control.Interaction =
         // is currently being requested.
         if (this.archive[code_string]) {
             this.getGridFeature(sevt, tiles[t], function(feature) {
-              if (feature) {
-                if (feature !== this.feature[t]) {
-                  this.feature[t] = feature;
-                  this.callbacks['out'](feature, tiles[t].layer, sevt);
-                  if (feature) {
-                    this.callbacks['over'](feature, tiles[t].layer, sevt);
-                  }
-                }
-              } else {
-                if (tiles[t]) {
-                    this.callbacks['out'](feature, tiles[t].layer, sevt);
-                    this.feature[t] = null;
-                }
+              if (!tiles[t]) return;
+              if (feature && this.feature[t] !== feature) {
+                this.feature[t] = feature;
+                this.callbacks['out'](feature, tiles[t].layer, sevt);
+                this.callbacks['over'](feature, tiles[t].layer, sevt);
+              } else if (!feature) {
+                this.feature[t] = null;
+                this.callbacks['out'](feature, tiles[t].layer, sevt);
               }
             });
         } else {
