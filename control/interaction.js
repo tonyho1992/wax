@@ -169,6 +169,8 @@ OpenLayers.Control.Interaction =
           this.reqFormatter(tile, function(formatter) {
               callback(formatter.format({ format: 'full' }, km[grid.keys[key]]));
           });
+        } else {
+          callback(null);
         }
       }
     },
