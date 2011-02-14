@@ -172,9 +172,6 @@ OpenLayers.Control.Interaction =
         } else {
           callback(null);
         }
-        else {
-          callback(null);
-        }
       }
     },
 
