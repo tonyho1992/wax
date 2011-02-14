@@ -1,34 +1,82 @@
-var OpenLayersPlusLegend = function(opts) {
-    if (opts == null) {
-        return;
-    }
-    var self = this;
-    this.map = $(opts).data('map');
+// Class: OpenLayers.Control.Legend
+// Inherits from:
+// - <OpenLayers.Control>
+OpenLayers.Control.Legend = OpenLayers.Class(OpenLayers.Control, {
+    CLASS_NAME: 'OpenLayers.Control.Legend',
+    container: null,
+    attached: false,
 
-    this.setLegend = function(layer) {
+    initialize: function(options) {
+        options = options || {};
+        this.container = options.container || null;
+        OpenLayers.Control.prototype.initialize.apply(this, [options || {}]);
+    },
+
+    activate: function() {
+        // Append an OL legends container div if not provided.
+        if (!this.container) {
+            this.container = $('<div class="openlayers-legends"></div>');
+            this.attached = true;
+            $(this.map.viewPortDiv).append(this.container);
+        }
+        for (var i = 0; i < this.map.layers.length; i++) {
+            var layer = this.map.layers[i];
+            this.setLegend(layer);
+            layer.events.register('visibilitychanged', layer, this.setLegend);
+        }
+        return OpenLayers.Control.prototype.activate.apply(this, arguments);
+    },
+
+    deactivate: function() {
+        // Tear down OL legends container.
+        if (this.attached) {
+            this.container.remove();
+            delete this.container;
+        }
+        return OpenLayers.Control.prototype.deactivate.apply(this, arguments);
+    },
+
+    setLegend: function(layer) {
         // The layer param may vary based on the context from which we are called.
-        layer = layer.object ? layer.object : layer;
-        if ('legend' in layer) {
-            var legend_content = layer.legend || 'your mother';
-            var legends = $('div.openlayers-legends', self.map.div);
-            if (layer.visibility && !('legendDiv' in layer)) {
-                layer.legendDiv = $("<div class='openlayers-legend'></div>").append(legend_content);
-                legends.append(layer.legendDiv);
-            }
-            else if (!layer.visibility && ('legendDiv' in layer)) {
-                layer.legendDiv.remove();
-                delete layer.legendDiv;
-            }
-            $(opts).trigger('openlayersPlusLegendChange');
-        }
-    };
+        layer = layer.object || layer;
+        var url = this.legendUrl(layer);
 
-    for (i in this.map.layers) {
-        var layer = this.map.layers[i];
-        if (!$('div.openlayers-legends', self.map.div).size()) {
-            $(self.map.div).append("<div class='openlayers-legends'></div>");
+        if ('legend' in layer) {
+            this.render(layer, layer.legend);
+        } else if (url) {
+            return $.jsonp({
+                'url': url,
+                context: this,
+                success: function(data) {
+                    if (data && data.legend) {
+                        layer.legend = data.legend;
+                        this.render(layer, layer.legend);
+                    }
+                },
+                error: function() {},
+                callback: layer.layername, // @TODO make callback safe
+                callbackParameter: 'callback'
+            });
         }
-        layer.events.register('visibilitychanged', layer, self.setLegend);
-        self.setLegend(layer);
+    },
+
+    render: function(layer, legend) {
+        // Layer is visible but so is legend. Do nothing.
+        if (layer.visibility && ('legendDiv' in layer)) return;
+        // Hide legend if layer is no longer visible.
+        if (!layer.visibility && ('legendDiv' in layer)) {
+            layer.legendDiv.remove();
+            delete layer.legendDiv;
+            return;
+        }
+        layer.legendDiv = $("<div class='openlayers-legend'></div>").append(legend);
+        this.container.append(layer.legendDiv);
+    },
+
+    // Generate the legend URL from the layer tile URL.
+    legendUrl: function(layer) {
+        var url = layer.getURL(new OpenLayers.Bounds());
+        return url.replace(/\d+\/\d+\/\d+\.\w+/, 'legend.json');
     }
-};
+});
+
