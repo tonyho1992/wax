@@ -5,7 +5,7 @@
 OpenLayersWax.BoundsTransform = OpenLayers.Class(OpenLayers.Bounds, {
     initialize: function(left, bottom, right, top, from, to) {
         OpenLayers.Bounds.prototype.initialize.call(this, left, bottom, right, top);
-        this.transform().transform(
+        this.transform(
             new OpenLayers.Projection(from),
             new OpenLayers.Projection(to)
         );
