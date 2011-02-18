@@ -1,77 +1,9 @@
 // An interaction toolkit for tiles that implement the
 // [MBTiles UTFGrid spec](https://github.com/mapbox/mbtiles-spec)
 //
-// Requires:
-// - jQuery
-// - jquery-jsonp
-var StyleWriterUtil = {
-  // url-safe base64 encoding for mapfile urls in tile urls
-  encode_base64: function(data) {
-    var out = '', c1, c2, c3, e1, e2, e3, e4;
-    var tab = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij' +
-        'klmnopqrstuvwxyz0123456789+/=';
-    for (var i = 0; i < data.length; ) {
-       c1 = data.charCodeAt(i++);
-       c2 = data.charCodeAt(i++);
-       c3 = data.charCodeAt(i++);
-       e1 = c1 >> 2;
-       e2 = ((c1 & 3) << 4) + (c2 >> 4);
-       e3 = ((c2 & 15) << 2) + (c3 >> 6);
-       e4 = c3 & 63;
-       if (isNaN(c2))
-         e3 = e4 = 64;
-       else if (isNaN(c3))
-         e4 = 64;
-       out += tab.charAt(e1) + tab.charAt(e2) + tab.charAt(e3) + tab.charAt(e4);
-    }
-    return out;
-  },
-  // Create a cross-browser event object
-  makeEvent: function(evt) {
-    return {
-      target: evt.target || evt.srcElement,
-      pX: evt.pageX || evt.clientX,
-      pY: evt.pageY || evt.clientY,
-      evt: evt
-    };
-  },
-  // Generate a function-safe string from a URL string
-  // TODO: rewrite
-  fString: function(src) {
-    if (!src) return;
-    var pts = src.split('/').slice(-4)
-        .join('_').replace(/=/g, '_').split('.');
-    pts.pop();
-    return pts.pop();
-  }
-};
-
 // Create a new formatter from an object in the form
 //
 //     { formatter: "function(obj, data) { ... }" }
-function Formatter(obj) {
-    // Prevent against just any input being used.
-    if (obj.formatter && typeof obj.formatter === 'string') {
-        try {
-            // Ugly, dangerous use of eval.
-            eval('this.f = ' + obj.formatter);
-        } catch (e) {
-            // Syntax errors in formatter
-            console && console.log(e);
-        }
-    }
-}
-
-// Wrap the given formatter function in order to
-// catch exceptions that it may throw.
-Formatter.prototype.format = function(options, data) {
-    try {
-        return this.f(options, data);
-    } catch (e) {
-        console && console.log(e);
-    }
-};
-
 // Class: OpenLayers.Control.StyleWriterInteraction
 // Inherits from:
 // - <OpenLayers.Control>
@@ -140,41 +72,6 @@ OpenLayers.Control.Interaction =
       );
     },
 
-    // Given an event with a location and a tile (from getTileStack),
-    // grab the feature (currently the key) if it exists - otherwise,
-    // return undefined.
-    getGridFeature: function(sevt, tile, callback) {
-      callback = $.proxy(callback, this);
-      var grid = this.archive[StyleWriterUtil.fString(tile.url)];
-      if (grid === true) {
-        // If the grid is currently downloading, return undefined.
-        return;
-      } else {
-        var key = grid.grid[
-           Math.floor((sevt.pY - $(tile.imgDiv).offset().top) / this.tileRes)
-        ].charCodeAt(
-           Math.floor((sevt.pX - $(tile.imgDiv).offset().left) / this.tileRes)
-        );
-
-        // See: Encoding IDs
-        (key >= 93) && key--;
-        (key >= 35) && key--;
-        key -= 32;
-
-        var km = this.keymap;
-
-        // If this layers formatter hasn't been loaded yet,
-        // download and load it now.
-        if (grid.keys[key]) {
-          this.reqFormatter(tile, function(formatter) {
-              callback(formatter.format({ format: 'full' }, km[grid.keys[key]]));
-          });
-        } else {
-          callback(null);
-        }
-      }
-    },
-
     // Get an Array of the stack of tiles under the mouse.
     // This operates with pixels only, since there's no way
     // to bubble through an element which is sitting on the map
@@ -220,20 +117,6 @@ OpenLayers.Control.Interaction =
       return tile.url.replace(/\d+\/\d+\/\d+\.\w+/, 'formatter.json');
     },
 
-    // Request and save a tile, calling `reqDone` when finished.
-    reqTile: function(tile) {
-      return $.jsonp({
-        'url': this.tileDataUrl(tile),
-        context: this,
-        success: function(data) {
-          return this.readDone(data, StyleWriterUtil.fString(tile.url));
-        },
-        error: function() {},
-        callback: StyleWriterUtil.fString(tile.url),
-        callbackParameter: 'callback'
-      });
-    },
-
     // The callback on `reqTile` -
     // Load retrieved data into this.archive, which
     // contains grid objects indexed by code_string
@@ -247,23 +130,6 @@ OpenLayers.Control.Interaction =
         }
     },
 
-    // Request and save a formatter, calling `formatterReqDone` when finished.
-    reqFormatter: function(tile, callback) {
-      if (tile.layer.formatter) {
-        callback(tile.layer.formatter);
-        return;
-      }
-      return $.jsonp({
-        'url': this.formatterUrl(tile),
-        context: this,
-        success: function(data) {
-          return this.formatterReadDone(data, tile.layer, callback);
-        },
-        error: function() {},
-        callback: StyleWriterUtil.fString(tile.url),
-        callbackParameter: 'callback'
-      });
-    },
 
     // The callback on `reqTile` -
     //
