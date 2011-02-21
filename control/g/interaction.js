@@ -34,8 +34,7 @@ var inTile = function(sevt, xy) {
 var makeInteraction = function(map) {
   var gm = new GridManager();
   var f = null;
-  var options = { format: 'teaser' };
-  google.maps.event.addListener(map, 'mousemove', function(evt) {
+  var find = function(map, evt) {
     var found = false;
     var interaction_grid = calculateGrid(map);
     for (var i = 0; i < interaction_grid.length && !found; i++) {
@@ -43,27 +42,40 @@ var makeInteraction = function(map) {
           var found = interaction_grid[i];
       }
     }
-    if (found) {
-      gm.getGrid($(found.tile).attr('src'), function(g) {
-        if (g) {
-          var feature = g.getFeature(
-            evt.pixel.x + $(map.d).offset().left,
-            evt.pixel.y + $(map.d).offset().top,
-            found.tile,
-            options
-          );
-          if (feature !== f) {
-            MapTooltips.unselect(feature, $(map.d).parent(), 0);
-            MapTooltips.select(feature, $(map.d).parent(), 0);
-            f = feature;
-          }
+    return found;
+  };
+  google.maps.event.addListener(map, 'mousemove', function(evt) {
+    var options = { format: 'teaser' };
+    var found = find(map, evt);
+    if (!found) return;
+    gm.getGrid($(found.tile).attr('src'), function(g) {
+        if (!g) return;
+        var feature = g.getFeature(
+          evt.pixel.x + $(map.d).offset().left,
+          evt.pixel.y + $(map.d).offset().top,
+          found.tile,
+          options
+        );
+        if (feature !== f) {
+          MapTooltips.unselect(feature, $(map.d), 0);
+          MapTooltips.select(feature, $(map.d), 0);
+          f = feature;
         }
-      });
-    }
+    });
   });
-  /*
-  google.maps.event.addListener(map, 'bounds_changed', function(evt) {
-    invalidateGrid(map);
+  google.maps.event.addListener(map, 'click', function(evt) {
+    var options = { format: 'full' };
+    var found = find(map, evt);
+    if (!found) return;
+    gm.getGrid($(found.tile).attr('src'), function(g) {
+        if (!g) return;
+        var feature = g.getFeature(
+          evt.pixel.x + $(map.d).offset().left,
+          evt.pixel.y + $(map.d).offset().top,
+          found.tile,
+          options
+        );
+        feature && MapTooltips.click(feature, $(map.d), 0);
+    });
   });
-  */
 };
