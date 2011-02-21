@@ -156,11 +156,11 @@ OpenLayers.Control.Interaction =
                   if (!tiles[t]) return;
                   if (feature && that.feature !== feature) {
                     this.feature = feature;
-                    that.callbacks['out'] (feature, tiles[t].layer.map.viewPortDiv, t, sevt);
-                    that.callbacks['over'](feature, tiles[t].layer.map.viewPortDiv, t, sevt);
+                    that.callbacks['out'] (feature, tiles[t].layer.map.viewPortDiv, t);
+                    that.callbacks['over'](feature, tiles[t].layer.map.viewPortDiv, t);
                   } else if (!feature) {
                     this.feature[t] = null;
-                    that.callbacks['out'](feature, tiles[t].layer.map.viewPortDiv, sevt);
+                    that.callbacks['out'](feature, tiles[t].layer.map.viewPortDiv);
                   }
                 }
             } else {

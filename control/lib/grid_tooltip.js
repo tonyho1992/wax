@@ -1,12 +1,12 @@
-StyleWriterTooltips = {};
+MapTooltips = {};
 
-StyleWriterTooltips.click = function(feature) {
+MapTooltips.click = function(feature) {
   var html = '';
   // TODO: without name + description, we aren't doing this yet.
   return;
 };
 
-StyleWriterTooltips.getToolTip = function(feature, context, index) {
+MapTooltips.getToolTip = function(feature, context, index) {
   var tooltip = $('div.openlayers-tooltip-' +
     index +
     ':not(.removed)',
@@ -30,12 +30,12 @@ StyleWriterTooltips.getToolTip = function(feature, context, index) {
   return tooltip;
 };
 
-StyleWriterTooltips.select = function(feature, div, layer_id, evt) {
-  var tooltip = StyleWriterTooltips.getToolTip(feature, div, layer_id);
+MapTooltips.select = function(feature, div, layer_id) {
+  var tooltip = MapTooltips.getToolTip(feature, div, layer_id);
   $(div).css('cursor', 'pointer');
 };
 
-StyleWriterTooltips.unselect = function(feature, div, layer_id) {
+MapTooltips.unselect = function(feature, div, layer_id) {
   $(div).css('cursor', 'default');
   $(div).children('div.openlayers-tooltip-' + layer_id)
     .addClass('removed')

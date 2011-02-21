@@ -38,9 +38,8 @@ MbMapType.prototype.getTileUrl = function(coord, z) {
     // Y coordinate is flipped in Mapbox, compared to Google
     // Simplistic predictable hashing
     return 'http://'
-        + ['a', 'b', 'c', 'd'][(coord.x + coord.y) % 4]
-        + '.tile.mapbox.com/1.0.0/' + // options.tileset
-        'world-light'
+        + 'localhost:9000/1.0.0/' + // options.tileset
+        'inter_10c67f'
         + '/' + z
         + '/' + coord.x
         + '/' + Math.abs(coord.y - (Math.pow(2, z) - 1)) + '.png';
