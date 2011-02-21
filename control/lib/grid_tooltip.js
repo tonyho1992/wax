@@ -1,8 +1,9 @@
 MapTooltips = {};
 
-MapTooltips.click = function(feature) {
-  var html = '';
-  // TODO: without name + description, we aren't doing this yet.
+MapTooltips.click = function(feature, context, index) {
+  $('div.maputil-popup', $(context)).remove();
+  var popup = $("<div class='maputil-popup'></div>").html(feature);
+  $(context).append(popup);
   return;
 };
 

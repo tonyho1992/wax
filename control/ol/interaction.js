@@ -133,7 +133,7 @@ OpenLayers.Control.Interaction =
         this.gm.getGrid(tiles[t].url, function(g) {
           if (!g) return;
           var feature = g.getFeature(sevt.pX, sevt.pY, tiles[t].imgDiv, options);
-          feature && that.callbacks['click'](feature, tiles[t].layer);
+          feature && that.callbacks['click'](feature, tiles[t].layer.map.viewPortDiv, t);
         });
       }
     },

@@ -33,6 +33,17 @@
   max-width:300px;
   }
 
+.maputil-popup {
+  z-index:999999;
+  position:absolute;
+  background:#333;
+  color:#fff;
+  padding:10px;
+  left:10px;
+  top:10px;
+  max-width:300px;
+  }
+
 /**
  * Blockswitcher ======================================================
  */
