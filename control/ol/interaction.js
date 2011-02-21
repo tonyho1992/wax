@@ -1,22 +1,16 @@
 // An interaction toolkit for tiles that implement the
 // [MBTiles UTFGrid spec](https://github.com/mapbox/mbtiles-spec)
 //
-// Create a new formatter from an object in the form
-//
-//     { formatter: "function(obj, data) { ... }" }
 // Class: OpenLayers.Control.StyleWriterInteraction
 // Inherits from:
 // - <OpenLayers.Control>
 OpenLayers.Control.Interaction =
     OpenLayers.Class(OpenLayers.Control, {
     feature: {},
-    format: null,
     handlerOptions: null,
     handlers: null,
-    hoverRequest: null,
-    archive: {},
-    keymap: {},
-    tileRes: 4,
+
+    gm: new GridManager(),
 
     initialize: function(options) {
       options = options || {};
@@ -56,6 +50,7 @@ OpenLayers.Control.Interaction =
       this.activate();
     },
 
+    // boilerplate
     activate: function() {
       if (!this.active) {
         this.handlers.hover.activate();
@@ -66,6 +61,7 @@ OpenLayers.Control.Interaction =
       );
     },
 
+    // boilerplate
     deactivate: function() {
       return OpenLayers.Control.prototype.deactivate.apply(
         this, arguments
@@ -107,39 +103,6 @@ OpenLayers.Control.Interaction =
       return tiles;
     },
 
-    // Simplistically derive the URL of interaction data from a tile URL
-    tileDataUrl: function(tile) {
-      return tile.url.replace(/(.png|.jpg|.jpeg)/, '.grid.json');
-    },
-
-    // Simplistically derive the URL of the formatter function from a tile URL
-    formatterUrl: function(tile) {
-      return tile.url.replace(/\d+\/\d+\/\d+\.\w+/, 'formatter.json');
-    },
-
-    // The callback on `reqTile` -
-    // Load retrieved data into this.archive, which
-    // contains grid objects indexed by code_string
-    //
-    // - @param {Object} data
-    // - @param {String} code_string
-    readDone: function(data, code_string) {
-        this.archive[code_string] = data.grid;
-        for (var i in data.grid_data) {
-            this.keymap[i] = data.grid_data[i];
-        }
-    },
-
-
-    // The callback on `reqTile` -
-    //
-    // - @param {Object} data
-    // - @param {String} layer
-    formatterReadDone: function(data, layer, callback) {
-        layer.formatter = new Formatter(data);
-        callback(layer.formatter);
-    },
-
     // Get all interactable layers
     viableLayers: function() {
       if (this._viableLayers) return this._viableLayers;
@@ -157,12 +120,12 @@ OpenLayers.Control.Interaction =
     // This is the `pause` handler attached to the map.
     getInfoForClick: function(evt) {
       var layers = this.viableLayers();
-      var sevt = StyleWriterUtil.makeEvent(evt);
+      var sevt = this.makeEvent(evt);
       var tiles = this.getTileStack(this.viableLayers(), sevt);
       var feature = null;
       this.target = sevt.target;
       for (var t = 0; t < tiles.length; t++) {
-        var code_string = StyleWriterUtil.fString(tiles[t].url);
+        var code_string = StyleWriterUtil.hashString(tiles[t].url);
         if (this.archive[code_string]) {
           this.getGridFeature(sevt, tiles[t], function(feature) { 
               feature && this.callbacks['click'](feature, tiles[t].layer);
@@ -176,44 +139,37 @@ OpenLayers.Control.Interaction =
     // This is the `click` handler attached to the map.
     getInfoForHover: function(evt) {
       var layers = this.viableLayers();
-      var sevt = StyleWriterUtil.makeEvent(evt);
+      var sevt = this.gm.makeEvent(evt);
       var tiles = this.getTileStack(this.viableLayers(), sevt);
-      var feature = null;
+      var feature = null,
+          g = null;
       this.target = sevt.target;
+      var that = this;
 
       for (var t = 0; t < tiles.length; t++) {
-        var code_string = StyleWriterUtil.fString(tiles[t].url);
         // This features has already been loaded, or
         // is currently being requested.
-        if (this.archive[code_string]) {
-            this.getGridFeature(sevt, tiles[t], function(feature) {
-              if (!tiles[t]) return;
-              if (feature && this.feature[t] !== feature) {
-                this.feature[t] = feature;
-                this.callbacks['out'](feature, tiles[t].layer, sevt);
-                this.callbacks['over'](feature, tiles[t].layer, sevt);
-              } else if (!feature) {
-                this.feature[t] = null;
-                this.callbacks['out'](feature, tiles[t].layer, sevt);
-              }
-            });
-        } else {
-          // Request this feature
-          this.callbacks['out']({}, tiles[t].layer);
-          this.feature[t] = null;
-          if (!this.archive[code_string]) {
-            try {
-              this.archive[code_string] = true;
-              this.target.hoverRequest = this.reqTile(tiles[t]);
-            } catch (err) {
-              // If jsonp fails with an exception, reset the archive
-              // so that it can be retried.
-              this.archive[code_string] = false;
+        this.gm.getGrid(tiles[t].url, function(g) {
+            if (g) {
+                var feature = g.getFeature(sevt.pX, sevt.pY, tiles[t].imgDiv);
+                if (feature) {
+                  if (!tiles[t]) return;
+                  if (feature && that.feature !== feature) {
+                    this.feature = feature;
+                    that.callbacks['out'] (feature, tiles[t].layer.map.viewPortDiv, t, sevt);
+                    that.callbacks['over'](feature, tiles[t].layer.map.viewPortDiv, t, sevt);
+                  } else if (!feature) {
+                    this.feature[t] = null;
+                    that.callbacks['out'](feature, tiles[t].layer.map.viewPortDiv, sevt);
+                  }
+                }
+            } else {
+              // Request this feature
+              // TODO(tmcw) re-add layer
+              that.callbacks['out']({}, tiles[t].layer.map.viewPortDiv, t);
             }
-          }
-        }
+        });
       }
     },
-
     CLASS_NAME: 'OpenLayers.Control.Interaction'
 });

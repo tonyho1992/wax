@@ -1,75 +1,148 @@
-// Requires:
-// - jQuery
-// - jquery-jsonp
-var GridUtil = {
-  // Create a cross-browser event object
-  makeEvent: function(evt) {
-    return {
-      target: evt.target || evt.srcElement,
-      pX: evt.pageX || evt.clientX,
-      pY: evt.pageY || evt.clientY,
-      evt: evt
-    };
-  },
-  // Generate a function-safe string from a URL string
-  // TODO: rewrite
-  fString: function(src) {
-    if (!src) return;
-    var pts = src.split('/').slice(-4)
-        .join('_').replace(/=/g, '_').split('.');
-    pts.pop();
-    return pts.pop();
-  }
-  getGridFeature: function(sevt, tile, callback) {
-    callback = $.proxy(callback, this);
-    var grid = this.archive[StyleWriterUtil.fString(tile.url)];
-    if (grid === true) {
-      // If the grid is currently downloading, return undefined.
-      return;
-    } else {
-      var key = grid.grid[
-         Math.floor((sevt.pY - $(tile.imgDiv).offset().top) / this.tileRes)
-      ].charCodeAt(
-         Math.floor((sevt.pX - $(tile.imgDiv).offset().left) / this.tileRes)
-      );
+function GridInstance(grid_tile, formatter) {
+    this.grid_tile = grid_tile;
+    this.formatter = formatter;
+    this.tileRes = 4;
+}
 
-      // See: Encoding IDs
-      (key >= 93) && key--;
-      (key >= 35) && key--;
-      key -= 32;
+GridInstance.prototype.resolveCode = function(key) {
+  // See: Encoding IDs
+  (key >= 93) && key--;
+  (key >= 35) && key--;
+  key -= 32;
+  return key;
+};
 
-      var km = this.keymap;
+GridInstance.prototype.getFeature = function(x, y, tile_element) {
+  var key = this.grid_tile.grid.grid[
+     Math.floor((y - $(tile_element).offset().top) / this.tileRes)
+  ].charCodeAt(
+     Math.floor((x - $(tile_element).offset().left) / this.tileRes)
+  );
 
-      // If this layers formatter hasn't been loaded yet,
-      // download and load it now.
-      if (grid.keys[key]) {
-        this.reqFormatter(tile, function(formatter) {
-            callback(formatter.format({ format: 'full' }, km[grid.keys[key]]));
-        });
-      } else {
-        callback(null);
-      }
-    }
-  },
-  // Request and save a formatter, calling `formatterReqDone` when finished.
-  reqFormatter: function(tile, callback) {
-    if (tile.layer.formatter) {
-      callback(tile.layer.formatter);
-      return;
-    }
-    return $.jsonp({
-      'url': this.formatterUrl(tile),
-      context: this,
-      success: function(data) {
-        return this.formatterReadDone(data, tile.layer, callback);
-      },
-      error: function() {},
-      callback: StyleWriterUtil.fString(tile.url),
-      callbackParameter: 'callback'
-    });
+  key = this.resolveCode(key);
+
+  // If this layers formatter hasn't been loaded yet,
+  // download and load it now.
+  if (this.grid_tile.grid.keys[key]) {
+    return this.formatter.format({ format: 'full' }, this.grid_tile.grid_data[this.grid_tile.grid.keys[key]]);
   }
 };
 
+// GridManager
+// -----------
+//
+// Interface:
+//
+// var g = new GridManager();
+//
+// if (var grid = g.getGrid(g.gridUrl(grid_url))) {
+//   grid.getFeature(x, y);
+// }
+function GridManager() {
+    this.grid_tiles = {};
+    this.key_maps = {};
+    this.formatters = {};
+}
+
+GridManager.prototype.getGrid = function(url, callback) {
+  var that = this;
+  // TODO(tmcw) automatically determine layer_id
+  var formatter = this.getFormatter(this.formatterUrl(url), function(f) {
+      var grid_tile = that.grid_tiles[url];
+      // downloaded
+      if (grid_tile) {
+        callback(new GridInstance(grid_tile, f));
+      // not locked
+      } else if (grid_tile !== false) {
+        that.grid_tiles[url] = false;
+        $.jsonp({
+          url: that.tileDataUrl(url),
+          context: this,
+          success: function(data) {
+            return that.readDone(data, url);
+          },
+          error: function() {},
+          callback: 'grid',
+          callbackParameter: 'callback'
+        });
+        callback(false);
+      // locked
+      } else {
+        callback(false);
+      }
+  });
+};
+
+// Generate a function-safe string from a URL string
+GridManager.prototype.hashString = function(src) {
+    /*
+  if (!src) return;
+  var pts = src.split('/').slice(-4).join('_');
+      .join('_').replace(/=/g, '_').split('.');
+  pts.pop();
+
+  return pts.pop();
+  */
+};
+
+// Create a cross-browser event object
+GridManager.prototype.makeEvent = function(evt) {
+  return {
+    target: evt.target || evt.srcElement,
+    pX: evt.pageX || evt.clientX,
+    pY: evt.pageY || evt.clientY,
+    evt: evt
+  };
+};
+
+GridManager.prototype.tileDataUrl = function(url) {
+  return url.replace(/(.png|.jpg|.jpeg)/, '.grid.json');
+};
+
+// Simplistically derive the URL of the formatter function from a tile URL
+GridManager.prototype.formatterUrl = function(url) {
+  return url.replace(/\d+\/\d+\/\d+\.\w+/, 'formatter.json');
+};
+
+// Request and save a formatter, calling `formatterReqDone` when finished.
+GridManager.prototype.getFormatter = function(formatter_url, callback) {
+  if (this.formatters[formatter_url]) {
+    callback(this.formatters[formatter_url]);
+    return;
+  }
+  return $.jsonp({
+    url: formatter_url,
+    context: this,
+    success: function(data) {
+      return this.formatterReadDone(data, formatter_url, callback);
+    },
+    error: function() {},
+    callback: 'grid',
+    // callback: this.hashString(formatter_url),
+    callbackParameter: 'callback'
+  });
+};
+
+// Load retrieved data into this.archive, which
+// contains grid objects indexed by code_string
+//
+// - @param {Object} data
+// - @param {String} code_string
+GridManager.prototype.readDone = function(data, code_string) {
+    this.grid_tiles[code_string] = data;
+};
+
+// The callback on `reqTile` -
+//
+// - @param {Object} data
+// - @param {String} layer
+GridManager.prototype.formatterReadDone = function(data, url, callback) {
+    this.formatters[url] = new Formatter(data);
+    callback(this.formatters[url]);
+};
+
+// Formatter
+// ---------
 function Formatter(obj) {
     // Prevent against just any input being used.
     if (obj.formatter && typeof obj.formatter === 'string') {

@@ -30,7 +30,7 @@ var inTile = function(sevt, xy) {
 };
 
 var makeInteraction = function(map) {
-  map.interaction_grid = [];
+  var gm = new GridManager();
   google.maps.event.addListener(map, 'mousemove', function(evt) {
     var found = false;
     calculateGrid(map);
@@ -40,7 +40,7 @@ var makeInteraction = function(map) {
       }
     }
     if (found) {
-      console.log(found);
+      GridUtil.req;
     }
   });
   google.maps.event.addListener(map, 'bounds_changed', function(evt) {

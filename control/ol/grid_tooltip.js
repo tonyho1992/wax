@@ -3,26 +3,6 @@ StyleWriterTooltips = {};
 StyleWriterTooltips.click = function(feature) {
   var html = '';
   // TODO: without name + description, we aren't doing this yet.
-  /*
-  if (feature.name) {
-    html += feature.name;
-  }
-  if (feature.description) {
-    html += feature.description;
-  }
-  var link;
-  if ($(html).is('a')) {
-    link = $(html);
-  }
-  else if ($(html).children('a').size() > 0) {
-    link = $(html).children('a')[0];
-  }
-  if (link) {
-    var href = $(link).attr('href');
-    window.location = href;
-    return false;
-  }
-  */
   return;
 };
 
@@ -50,27 +30,18 @@ StyleWriterTooltips.getToolTip = function(feature, context, index) {
   return tooltip;
 };
 
-StyleWriterTooltips.select = function(feature, layer, evt) {
-  var index = $.inArray(layer, layer.map.layers);
-  var tooltip = StyleWriterTooltips.getToolTip(feature, layer.map.viewPortDiv, index);
-  $(layer.map.viewPortDiv).css('cursor', 'pointer');
+StyleWriterTooltips.select = function(feature, div, layer_id, evt) {
+  var tooltip = StyleWriterTooltips.getToolTip(feature, div, layer_id);
+  $(div).css('cursor', 'pointer');
 };
 
-StyleWriterTooltips.unselect = function(feature, layer) {
-  var index = $.inArray(layer, layer.map.layers);
-
-  $(layer.map.viewPortDiv).css('cursor', 'default');
-  $(layer.map.viewPortDiv).children('div.openlayers-tooltip-' + index)
+StyleWriterTooltips.unselect = function(feature, div, layer_id) {
+  $(div).css('cursor', 'default');
+  $(div).children('div.openlayers-tooltip-' + layer_id)
     .addClass('removed')
     .fadeOut('fast', function() { $(this).remove(); });
 
   // Iterate through any active tooltips on layers beneath this one and show
   // the highest one found.
-  for (var i = (index - 1); i > 0; i--) {
-    var fallback = $('div.openlayers-tooltip-' + i + ':not(.removed)');
-    if (fallback.size() > 0) {
-      fallback.removeClass('hidden').show();
-      break;
-    }
-  }
+  $('div.openlayers-tooltip:first').removeClass('hidden').show();
 };
