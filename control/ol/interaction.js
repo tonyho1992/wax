@@ -82,9 +82,10 @@ OpenLayers.Control.Interaction =
       for (var x = 0; x < layers[0].grid.length && !found; x++) {
         for (var y = 0; y < layers[0].grid[x].length && !found; y++) {
           var divpos = $(layers[0].grid[x][y].imgDiv).offset();
-          found = ((divpos.top < sevt.pY) &&
+          found = divpos &&
+            ((divpos.top < sevt.pY) &&
             ((divpos.top + 256) > sevt.pY) &&
-             (divpos.left < sevt.pX) &&
+            (divpos.left < sevt.pX) &&
             ((divpos.left + 256) > sevt.pX));
           if (found) {
             gridpos = {
