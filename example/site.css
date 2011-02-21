@@ -4,7 +4,7 @@ body {
   color: #444;
   }
 
-.openlayers-tooltip {
+.maputil-tooltip {
   z-index:999999;
   position:absolute;
   background:#333;

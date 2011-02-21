@@ -36,9 +36,9 @@ OpenLayers.Control.Interaction =
       };
 
       this.callbacks = {
-          out: StyleWriterTooltips.unselect,
-          over: StyleWriterTooltips.select,
-          click: StyleWriterTooltips.click
+          out:   MapTooltips.unselect,
+          over:  MapTooltips.select,
+          click: MapTooltips.click
       };
     },
 
@@ -160,13 +160,17 @@ OpenLayers.Control.Interaction =
                     that.callbacks['over'](feature, tiles[t].layer.map.viewPortDiv, t);
                   } else if (!feature) {
                     this.feature[t] = null;
-                    that.callbacks['out'](feature, tiles[t].layer.map.viewPortDiv);
+                    that.callbacks['out'](feature, tiles[t].layer.map.viewPortDiv, t);
                   }
-                }
-            } else {
-              // Request this feature
-              // TODO(tmcw) re-add layer
-              that.callbacks['out']({}, tiles[t].layer.map.viewPortDiv, t);
+                } else {
+                  // Request this feature
+                  // TODO(tmcw) re-add layer
+                  if (tiles[t]) {
+                    that.callbacks['out']({}, tiles[t].layer.map.viewPortDiv, t);
+                  } else {
+                    that.callbacks['out']({}, false, t);
+                  }
+               }
             }
         });
       }

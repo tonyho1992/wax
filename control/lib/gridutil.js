@@ -1,11 +1,18 @@
+// GridInstance
+// ------------
+// GridInstances are queryable, fully-formed
+// objects for acquiring features from events.
 function GridInstance(grid_tile, formatter) {
     this.grid_tile = grid_tile;
     this.formatter = formatter;
     this.tileRes = 4;
 }
 
+// Resolve the UTF-8 encoding stored in grids to simple
+// number values.
+// See the [utfgrid section of the mbtiles spec](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md) 
+// for details.
 GridInstance.prototype.resolveCode = function(key) {
-  // See: Encoding IDs
   (key >= 93) && key--;
   (key >= 35) && key--;
   key -= 32;
@@ -28,34 +35,31 @@ GridInstance.prototype.getFeature = function(x, y, tile_element) {
   // If this layers formatter hasn't been loaded yet,
   // download and load it now.
   if (this.grid_tile.grid.keys[key]) {
-    return this.formatter.format({ format: 'full' }, this.grid_tile.grid_data[this.grid_tile.grid.keys[key]]);
+    return this.formatter.format({ format: 'full' },
+      this.grid_tile.grid_data[this.grid_tile.grid.keys[key]]);
   }
 };
 
 // GridManager
 // -----------
-//
-// Interface:
-//
-// var g = new GridManager();
-//
-// if (var grid = g.getGrid(g.gridUrl(grid_url))) {
-//   grid.getFeature(x, y);
-// }
+// Generally one GridManager will be used per map.
 function GridManager() {
     this.grid_tiles = {};
     this.key_maps = {};
     this.formatters = {};
 }
 
+// Get a grid - calls `callback` with either a `GridInstance`
+// object or false. Behind the scenes, this calls `getFormatter`
+// and gets grid data, and tries to avoid re-downloading either.
 GridManager.prototype.getGrid = function(url, callback) {
   var that = this;
   var formatter = this.getFormatter(this.formatterUrl(url), function(f) {
       var grid_tile = that.grid_tiles[url];
-      // downloaded
+      // If formatter & grid are finished, callback with `GridInstance`
       if (grid_tile) {
         callback(new GridInstance(grid_tile, f));
-      // not locked
+      // The grid isn't downloading, so start a download request
       } else if (grid_tile !== false) {
         that.grid_tiles[url] = false;
         $.jsonp({
@@ -69,23 +73,11 @@ GridManager.prototype.getGrid = function(url, callback) {
           callbackParameter: 'callback'
         });
         callback(false);
-      // locked
+      // The grid is downloading - just exit.
       } else {
         callback(false);
       }
   });
-};
-
-// Generate a function-safe string from a URL string
-GridManager.prototype.hashString = function(src) {
-    /*
-  if (!src) return;
-  var pts = src.split('/').slice(-4).join('_');
-      .join('_').replace(/=/g, '_').split('.');
-  pts.pop();
-
-  return pts.pop();
-  */
 };
 
 // Create a cross-browser event object
@@ -98,6 +90,7 @@ GridManager.prototype.makeEvent = function(evt) {
   };
 };
 
+// Simplistically derive the URL of the grid data endpoint from a tile URL
 GridManager.prototype.tileDataUrl = function(url) {
   return url.replace(/(.png|.jpg|.jpeg)/, '.grid.json');
 };
@@ -107,7 +100,7 @@ GridManager.prototype.formatterUrl = function(url) {
   return url.replace(/\d+\/\d+\/\d+\.\w+/, 'formatter.json');
 };
 
-// Request and save a formatter, calling `formatterReqDone` when finished.
+// Request and save a formatter, calling `formatterReadDone` when finished.
 GridManager.prototype.getFormatter = function(formatter_url, callback) {
   if (this.formatters[formatter_url]) {
     callback(this.formatters[formatter_url]);
@@ -121,7 +114,6 @@ GridManager.prototype.getFormatter = function(formatter_url, callback) {
     },
     error: function() {},
     callback: 'grid',
-    // callback: this.hashString(formatter_url),
     callbackParameter: 'callback'
   });
 };

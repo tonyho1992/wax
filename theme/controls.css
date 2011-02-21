@@ -22,7 +22,7 @@
   margin-right:5px;
   }
 
-.openlayers-tooltip {
+.maputil-tooltip {
   z-index:999999;
   position:absolute;
   background:#333;
