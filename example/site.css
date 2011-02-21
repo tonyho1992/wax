@@ -1,8 +1,8 @@
 body {
-    font: 12px/15px "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-    background: #eee;
-    color: #444;
-}
+  font: 12px/15px "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  background: #eee;
+  color: #444;
+  }
 
 .openlayers-tooltip {
   z-index:999999;
@@ -14,4 +14,3 @@ body {
   top:10px;
   max-width:300px;
   }
-

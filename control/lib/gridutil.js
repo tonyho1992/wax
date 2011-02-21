@@ -13,6 +13,10 @@ GridInstance.prototype.resolveCode = function(key) {
 };
 
 GridInstance.prototype.getFeature = function(x, y, tile_element) {
+  if (Math.floor((y - $(tile_element).offset().top) / this.tileRes) > 256 ||
+    Math.floor((x - $(tile_element).offset().left) / this.tileRes) > 256) return;
+
+
   var key = this.grid_tile.grid.grid[
      Math.floor((y - $(tile_element).offset().top) / this.tileRes)
   ].charCodeAt(
@@ -46,7 +50,6 @@ function GridManager() {
 
 GridManager.prototype.getGrid = function(url, callback) {
   var that = this;
-  // TODO(tmcw) automatically determine layer_id
   var formatter = this.getFormatter(this.formatterUrl(url), function(f) {
       var grid_tile = that.grid_tiles[url];
       // downloaded

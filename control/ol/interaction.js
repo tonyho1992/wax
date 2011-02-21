@@ -127,7 +127,7 @@ OpenLayers.Control.Interaction =
       for (var t = 0; t < tiles.length; t++) {
         var code_string = StyleWriterUtil.hashString(tiles[t].url);
         if (this.archive[code_string]) {
-          this.getGridFeature(sevt, tiles[t], function(feature) { 
+          this.getGridFeature(sevt, tiles[t], function(feature) {
               feature && this.callbacks['click'](feature, tiles[t].layer);
           });
         }

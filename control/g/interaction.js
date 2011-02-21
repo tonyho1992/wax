@@ -8,7 +8,9 @@ var calculateGrid = function(map) {
     return {
         xy: {
             left: e_offset.left - start_offset.left,
-            top:  e_offset.top - start_offset.top
+            top: e_offset.top - start_offset.top
+            // left: e_offset.left,
+            // top:  e_offset.top
         },
         tile: interactive_tiles[t]
     };
@@ -21,7 +23,7 @@ var invalidateGrid = function(map) {
 };
 
 var inTile = function(sevt, xy) {
-    if  ((xy.top < sevt.y) &&
+    if ((xy.top < sevt.y) &&
         ((xy.top + 256) > sevt.y) &&
          (xy.left < sevt.x) &&
         ((xy.left + 256) > sevt.x)) {
@@ -41,16 +43,18 @@ var makeInteraction = function(map) {
       }
     }
     if (found) {
-        gm.getGrid($(found.tile).attr('src'), function(g) {
-          if (g) {
-            var feature = g.getFeature(evt.pixel.x, evt.pixel.y, found.tile);
-            if (feature !== f) {
-              MapTooltips.unselect(feature, $(map.d).parent(), 0);
-              MapTooltips.select(feature, $(map.d).parent(), 0);
-              f = feature;
-            }
+      gm.getGrid($(found.tile).attr('src'), function(g) {
+        if (g) {
+          var feature = g.getFeature(evt.pixel.x + $(map.d).offset().left,
+            evt.pixel.y + $(map.d).offset().top,
+            found.tile);
+          if (feature !== f) {
+            MapTooltips.unselect(feature, $(map.d).parent(), 0);
+            MapTooltips.select(feature, $(map.d).parent(), 0);
+            f = feature;
           }
-        });
+        }
+      });
     }
   });
   /*
