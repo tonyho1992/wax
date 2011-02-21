@@ -34,6 +34,7 @@ var inTile = function(sevt, xy) {
 var makeInteraction = function(map) {
   var gm = new GridManager();
   var f = null;
+  var options = { format: 'teaser' };
   google.maps.event.addListener(map, 'mousemove', function(evt) {
     var found = false;
     var interaction_grid = calculateGrid(map);
@@ -45,9 +46,12 @@ var makeInteraction = function(map) {
     if (found) {
       gm.getGrid($(found.tile).attr('src'), function(g) {
         if (g) {
-          var feature = g.getFeature(evt.pixel.x + $(map.d).offset().left,
+          var feature = g.getFeature(
+            evt.pixel.x + $(map.d).offset().left,
             evt.pixel.y + $(map.d).offset().top,
-            found.tile);
+            found.tile,
+            options
+          );
           if (feature !== f) {
             MapTooltips.unselect(feature, $(map.d).parent(), 0);
             MapTooltips.select(feature, $(map.d).parent(), 0);

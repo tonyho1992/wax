@@ -120,18 +120,21 @@ OpenLayers.Control.Interaction =
     // React to a click mouse event
     // This is the `pause` handler attached to the map.
     getInfoForClick: function(evt) {
+      var options = { format: 'full' };
       var layers = this.viableLayers();
-      var sevt = this.makeEvent(evt);
+      var sevt = this.gm.makeEvent(evt);
       var tiles = this.getTileStack(this.viableLayers(), sevt);
-      var feature = null;
+      var feature = null,
+          g = null;
       this.target = sevt.target;
+      var that = this;
+
       for (var t = 0; t < tiles.length; t++) {
-        var code_string = StyleWriterUtil.hashString(tiles[t].url);
-        if (this.archive[code_string]) {
-          this.getGridFeature(sevt, tiles[t], function(feature) {
-              feature && this.callbacks['click'](feature, tiles[t].layer);
-          });
-        }
+        this.gm.getGrid(tiles[t].url, function(g) {
+          if (!g) return;
+          var feature = g.getFeature(sevt.pX, sevt.pY, tiles[t].imgDiv, options);
+          feature && that.callbacks['click'](feature, tiles[t].layer);
+        });
       }
     },
 
@@ -139,6 +142,7 @@ OpenLayers.Control.Interaction =
     // finding features, and calling `this.callbacks[]`
     // This is the `click` handler attached to the map.
     getInfoForHover: function(evt) {
+      var options = { format: 'teaser' };
       var layers = this.viableLayers();
       var sevt = this.gm.makeEvent(evt);
       var tiles = this.getTileStack(this.viableLayers(), sevt);
@@ -152,7 +156,7 @@ OpenLayers.Control.Interaction =
         // is currently being requested.
         this.gm.getGrid(tiles[t].url, function(g) {
             if (g) {
-                var feature = g.getFeature(sevt.pX, sevt.pY, tiles[t].imgDiv);
+                var feature = g.getFeature(sevt.pX, sevt.pY, tiles[t].imgDiv, options);
                 if (feature) {
                   if (!tiles[t]) return;
                   if (feature && that.feature !== feature) {

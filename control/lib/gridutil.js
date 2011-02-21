@@ -19,7 +19,7 @@ GridInstance.prototype.resolveCode = function(key) {
   return key;
 };
 
-GridInstance.prototype.getFeature = function(x, y, tile_element) {
+GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
   if (Math.floor((y - $(tile_element).offset().top) / this.tileRes) > 256 ||
     Math.floor((x - $(tile_element).offset().left) / this.tileRes) > 256) return;
 
@@ -35,8 +35,10 @@ GridInstance.prototype.getFeature = function(x, y, tile_element) {
   // If this layers formatter hasn't been loaded yet,
   // download and load it now.
   if (this.grid_tile.grid.keys[key]) {
-    return this.formatter.format({ format: 'full' },
-      this.grid_tile.grid_data[this.grid_tile.grid.keys[key]]);
+    return this.formatter.format(
+      options,
+      this.grid_tile.grid_data[this.grid_tile.grid.keys[key]]
+    );
   }
 };
 
