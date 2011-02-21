@@ -1,23 +1,15 @@
 MapTooltips = {};
 
-MapTooltips.click = function(feature, context, index) {
-  $('div.maputil-popup', $(context)).remove();
-  var popup = $("<div class='maputil-popup'></div>").html(feature);
-  $(context).append(popup);
-  return;
-};
-
 MapTooltips.getToolTip = function(feature, context, index) {
-  var tooltip = $('div.maputil-tooltip-' +
+  var tooltip = $(context).children('div.maputil-tooltip-' +
     index +
-    ':not(.removed)',
-    $(context));
+    ':not(.removed)');
   if (tooltip.size() === 0) {
-      tooltip = $("<div class='maputil-tooltip maputil-tooltip-" +
-          index + 
-          "'>" +
-          "</div>").html(feature);
-      $(context).append(tooltip);
+    tooltip = $("<div class='maputil-tooltip maputil-tooltip-" +
+      index +
+      "'>" +
+      "</div>").html(feature);
+    $(context).append(tooltip);
   }
 
   // Hide any active tooltips for layers beneath this one.
@@ -31,18 +23,38 @@ MapTooltips.getToolTip = function(feature, context, index) {
   return tooltip;
 };
 
-MapTooltips.select = function(feature, div, layer_id) {
-  var tooltip = MapTooltips.getToolTip(feature, div, layer_id);
-  $(div).css('cursor', 'pointer');
+MapTooltips.click = function(feature, context, index) {
+  var tooltip = MapTooltips.getToolTip(feature, context, index);
+  var close = $('<a href="#close" class="close">Close</a>');
+  close.click(function() {
+    tooltip
+      .addClass('removed')
+      .fadeOut('fast', function() { $(this).remove(); });
+    return false;
+  });
+  tooltip
+    .addClass('popup')
+    .html(feature)
+    .append(close);
 };
 
-MapTooltips.unselect = function(feature, div, layer_id) {
-  $(div).css('cursor', 'default');
-  $(div).children('div.maputil-tooltip-' + layer_id)
+MapTooltips.select = function(feature, context, layer_id) {
+  MapTooltips.getToolTip(feature, context, layer_id);
+  $(context).css('cursor', 'pointer');
+};
+
+MapTooltips.unselect = function(feature, context, layer_id) {
+  $(context)
+    .css('cursor', 'default')
+    .children('div.maputil-tooltip-' + layer_id + ':not(.popup)')
     .addClass('removed')
     .fadeOut('fast', function() { $(this).remove(); });
 
   // Iterate through any active tooltips on layers beneath this one and show
   // the highest one found.
-  $('div.maputil-tooltip:first').removeClass('hidden').show();
+  $(context)
+    .children('div.maputil-tooltip:first')
+    .removeClass('hidden')
+    .show();
 };
+
