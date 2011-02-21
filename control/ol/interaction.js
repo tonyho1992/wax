@@ -159,12 +159,12 @@ OpenLayers.Control.Interaction =
                 var feature = g.getFeature(sevt.pX, sevt.pY, tiles[t].imgDiv, options);
                 if (feature) {
                   if (!tiles[t]) return;
-                  if (feature && that.feature !== feature) {
-                    this.feature = feature;
+                  if (feature && that.feature[t] !== feature) {
+                    that.feature[t] = feature;
                     that.callbacks['out'] (feature, tiles[t].layer.map.viewPortDiv, t);
                     that.callbacks['over'](feature, tiles[t].layer.map.viewPortDiv, t);
                   } else if (!feature) {
-                    this.feature[t] = null;
+                    that.feature[t] = null;
                     that.callbacks['out'](feature, tiles[t].layer.map.viewPortDiv, t);
                   }
                 } else {
