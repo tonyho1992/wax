@@ -100,7 +100,7 @@ wax.GridManager.prototype.makeEvent = function(evt) {
 
 // Simplistically derive the URL of the grid data endpoint from a tile URL
 wax.GridManager.prototype.tileDataUrl = function(url) {
-  return url.replace(/(.png|.jpg|.jpeg)/, '.grid.json');
+  return url.replace(/(.png|.jpg|.jpeg)(\d*)/, '.grid.json');
 };
 
 // Simplistically derive the URL of the formatter function from a tile URL
