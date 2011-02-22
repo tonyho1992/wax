@@ -120,7 +120,9 @@ wax.GridManager.prototype.getFormatter = function(formatter_url, callback) {
     success: function(data) {
       return this.formatterReadDone(data, formatter_url, callback);
     },
-    error: function() {},
+    error: function() {
+      return this.formatterReadDone({}, formatter_url, callback);
+    },
     callback: 'grid',
     callbackParameter: 'callback'
   });
@@ -156,6 +158,8 @@ wax.Formatter = function(obj) {
             // Syntax errors in formatter
             console && console.log(e);
         }
+    } else {
+        this.f = function() {};
     }
 }
 
