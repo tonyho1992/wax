@@ -38,7 +38,7 @@ wax.g.inTile = function(sevt, xy) {
     }
 };
 
-wax.g.makeInteraction = function(map) {
+wax.g.Interaction = function(map) {
   var gm = new wax.GridManager();
   var f = null;
   var find = function(map, evt) {

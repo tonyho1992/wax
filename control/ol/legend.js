@@ -1,7 +1,11 @@
-// Class: OpenLayers.Control.Legend
-// Inherits from:
-// - <OpenLayers.Control>
-OpenLayers.Control.Legend = OpenLayers.Class(OpenLayers.Control, {
+// Wax: Legend Control
+// -------------------
+
+// Wax header
+var wax = wax || {};
+wax.ol = wax.ol || {};
+
+wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
     CLASS_NAME: 'OpenLayers.Control.Legend',
     container: null,
     attached: false,

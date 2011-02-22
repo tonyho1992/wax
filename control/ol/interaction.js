@@ -1,10 +1,10 @@
+// Wax header
+var wax = wax || {};
+wax.ol = wax.ol || {};
+
 // An interaction toolkit for tiles that implement the
 // [MBTiles UTFGrid spec](https://github.com/mapbox/mbtiles-spec)
-//
-// Class: OpenLayers.Control.StyleWriterInteraction
-// Inherits from:
-// - <OpenLayers.Control>
-OpenLayers.Control.Interaction =
+wax.ol.Interaction =
     OpenLayers.Class(OpenLayers.Control, {
     feature: {},
     handlerOptions: null,
@@ -180,5 +180,5 @@ OpenLayers.Control.Interaction =
         });
       }
     },
-    CLASS_NAME: 'OpenLayers.Control.Interaction'
+    CLASS_NAME: 'wax.ol.Interaction'
 });

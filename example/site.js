@@ -18,5 +18,5 @@ $(window).load(function() {
     // Add the MapBox logo to the map
     mbLogo(map);
 
-    wax.g.makeInteraction(map);
+    wax.g.Interaction(map);
 });

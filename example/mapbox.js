@@ -5,9 +5,8 @@
 var wax = wax || {};
 wax.g = wax.g || {};
 
-
 // MapBox connector for Google Maps API v3.
-function mbLogo(map) {
+wax.g.mapBoxLogo = function(map) {
     var logoDiv = document.createElement('DIV');
     logoDiv.innerHTML = '<a href="http://mapbox.com">'
         + '<img src="http://mapbox-js.s3.amazonaws.com/img/mapbox.png"></a>';
@@ -17,9 +16,9 @@ function mbLogo(map) {
 
 wax.g.MapType = function() {
     this.interactive = true;
-}
+};
 
-wax.g.MapType.prototype.tileSize = new google.maps.Size(256,256);
+wax.g.MapType.prototype.tileSize = new google.maps.Size(256, 256);
 wax.g.MapType.prototype.maxZoom = 19;
 
 wax.g.MapType.prototype.getTile = function(coord, zoom, ownerDocument) {
@@ -52,5 +51,5 @@ wax.g.MapType.prototype.getTileUrl = function(coord, z) {
         + '/' + Math.abs(coord.y - (Math.pow(2, z) - 1)) + '.png';
 };
 
-wax.g.MapType.prototype.name = "Raw MB";
-wax.g.MapType.prototype.alt = "world light";
+wax.g.MapType.prototype.name = 'Raw MB';
+wax.g.MapType.prototype.alt = 'world light';

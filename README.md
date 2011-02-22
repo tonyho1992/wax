@@ -5,15 +5,20 @@ implementation of the [MBTiles interaction specification](https://github.com/map
 
 ## Controls
 
-* Tooltips
+* `wax.tooltip`
 
 #### OpenLayers
 
-* Interaction
+* `wax.ol.Interaction`
+* `wax.ol.BoundsTransform`
+* `wax.ol.Legend`
+* `wax.ol.ZoomOnLoad`
 
 #### Google Maps API v3
 
-* Interaction
+* `wax.g.Interaction`
+* `wax.g.MapType`
+* `wax.g.mapBoxLogo`
 
 #### Lib
 
