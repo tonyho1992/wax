@@ -1,5 +1,12 @@
-// MapBox connector for Google Maps API v3.
+// Wax for Google Maps API v3
+// --------------------------
 
+// Wax header
+var wax = wax || {};
+wax.g = wax.g || {};
+
+
+// MapBox connector for Google Maps API v3.
 function mbLogo(map) {
     var logoDiv = document.createElement('DIV');
     logoDiv.innerHTML = '<a href="http://mapbox.com">'
@@ -8,14 +15,14 @@ function mbLogo(map) {
         .push(logoDiv);
 };
 
-function MbMapType() {
+wax.g.MapType = function() {
     this.interactive = true;
 }
 
-MbMapType.prototype.tileSize = new google.maps.Size(256,256);
-MbMapType.prototype.maxZoom = 19;
+wax.g.MapType.prototype.tileSize = new google.maps.Size(256,256);
+wax.g.MapType.prototype.maxZoom = 19;
 
-MbMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
+wax.g.MapType.prototype.getTile = function(coord, zoom, ownerDocument) {
   // TODO: handle out-of-map tiles
   var div = ownerDocument.createElement('DIV');
   div.style.width = this.tileSize.width + 'px';
@@ -29,12 +36,12 @@ MbMapType.prototype.getTile = function(coord, zoom, ownerDocument) {
   return div;
 };
 
-MbMapType.prototype.releaseTile = function(tile) {
+wax.g.MapType.prototype.releaseTile = function(tile) {
     // TODO: expire cache data.
     tile.parentNode.removeChild(tile);
 };
 
-MbMapType.prototype.getTileUrl = function(coord, z) {
+wax.g.MapType.prototype.getTileUrl = function(coord, z) {
     // Y coordinate is flipped in Mapbox, compared to Google
     // Simplistic predictable hashing
     return 'http://'
@@ -45,9 +52,5 @@ MbMapType.prototype.getTileUrl = function(coord, z) {
         + '/' + Math.abs(coord.y - (Math.pow(2, z) - 1)) + '.png';
 };
 
-MbMapType.prototype.getThing = function(coord, z) {
-    return 'true';
-};
-
-MbMapType.prototype.name = "Raw MB";
-MbMapType.prototype.alt = "world light";
+wax.g.MapType.prototype.name = "Raw MB";
+wax.g.MapType.prototype.alt = "world light";

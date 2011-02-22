@@ -3,8 +3,7 @@
 
 // Wax header
 var wax = wax || {};
-
-wax.g = {};
+wax.g = wax.g || {};
 
 wax.g.calculateGrid = function(map) {
   if (map.interaction_grid) return;

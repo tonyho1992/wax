@@ -1,6 +1,6 @@
 var map;
 $(window).load(function() {
-    var l = new MbMapType();
+    var l = new wax.g.MapType();
     map = new google.maps.Map(
         document.getElementById("google-canvas"), {
             center: new google.maps.LatLng(0, 0),
