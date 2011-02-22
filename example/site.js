@@ -16,7 +16,7 @@ $(window).load(function() {
     map.setMapTypeId('mb');
 
     // Add the MapBox logo to the map
-    mbLogo(map);
+    wax.g.mapBoxLogo(map);
 
     wax.g.Interaction(map);
 });
