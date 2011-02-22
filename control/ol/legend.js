@@ -19,7 +19,7 @@ wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
     activate: function() {
         // Append an OL legends container div if not provided.
         if (!this.container) {
-            this.container = $('<div class="openlayers-legends"></div>');
+            this.container = $('<div class="wax-legends"></div>');
             this.attached = true;
             $(this.map.viewPortDiv).append(this.container);
         }
@@ -73,7 +73,7 @@ wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
             delete layer.legendDiv;
             return;
         }
-        layer.legendDiv = $("<div class='openlayers-legend'></div>").append(legend);
+        layer.legendDiv = $("<div class='wax-legend'></div>").append(legend);
         this.container.append(layer.legendDiv);
     },
 
