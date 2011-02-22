@@ -24,7 +24,7 @@ GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
     Math.floor((x - $(tile_element).offset().left) / this.tileRes) > 256) return;
 
 
-  var key = this.grid_tile.grid.grid[
+  var key = this.grid_tile.grid[
      Math.floor((y - $(tile_element).offset().top) / this.tileRes)
   ].charCodeAt(
      Math.floor((x - $(tile_element).offset().left) / this.tileRes)
@@ -34,10 +34,10 @@ GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
 
   // If this layers formatter hasn't been loaded yet,
   // download and load it now.
-  if (this.grid_tile.grid.keys[key]) {
+  if (this.grid_tile.keys[key]) {
     return this.formatter.format(
       options,
-      this.grid_tile.grid_data[this.grid_tile.grid.keys[key]]
+      this.grid_tile.data[this.grid_tile.keys[key]]
     );
   }
 };
