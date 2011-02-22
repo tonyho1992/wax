@@ -4,6 +4,12 @@ body {
   color: #444;
   }
 
+.interactive-pre {
+  font-size: 4px;
+  line-height: 4px;
+  letter-spacing: 2px;
+  }
+
 .maputil-tooltip {
   z-index:999999;
   position:absolute;
