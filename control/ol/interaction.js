@@ -10,7 +10,7 @@ OpenLayers.Control.Interaction =
     handlerOptions: null,
     handlers: null,
 
-    gm: new GridManager(),
+    gm: new wax.GridManager(),
 
     initialize: function(options) {
       options = options || {};
@@ -36,9 +36,9 @@ OpenLayers.Control.Interaction =
       };
 
       this.callbacks = {
-          out:   MapTooltips.unselect,
-          over:  MapTooltips.select,
-          click: MapTooltips.click
+          out:   wax.tooltip.unselect,
+          over:  wax.tooltip.select,
+          click: wax.tooltip.click
       };
     },
 

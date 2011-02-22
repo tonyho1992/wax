@@ -1,4 +1,4 @@
-# map-utils
+# wax
 
 Tools for improving web maps. These are currently designed for [OpenLayers](http://openlayers.org/).
 

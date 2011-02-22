@@ -1,4 +1,12 @@
-var calculateGrid = function(map) {
+// Wax for Google Maps API v3
+// --------------------------
+
+// Wax header
+var wax = wax || {};
+
+wax.g = {};
+
+wax.g.calculateGrid = function(map) {
   if (map.interaction_grid) return;
   var interactive_tiles = $('.interactive-div-' + map.getZoom() + ' img', map.d);
   var start_offset = $(map.d).offset();
@@ -18,11 +26,11 @@ var calculateGrid = function(map) {
   return tiles;
 };
 
-var invalidateGrid = function(map) {
+wax.g.invalidateGrid = function(map) {
   map.interaction_grid = false;
 };
 
-var inTile = function(sevt, xy) {
+wax.g.inTile = function(sevt, xy) {
     if ((xy.top < sevt.y) &&
         ((xy.top + 256) > sevt.y) &&
          (xy.left < sevt.x) &&
@@ -31,14 +39,14 @@ var inTile = function(sevt, xy) {
     }
 };
 
-var makeInteraction = function(map) {
-  var gm = new GridManager();
+wax.g.makeInteraction = function(map) {
+  var gm = new wax.GridManager();
   var f = null;
   var find = function(map, evt) {
     var found = false;
-    var interaction_grid = calculateGrid(map);
+    var interaction_grid = wax.g.calculateGrid(map);
     for (var i = 0; i < interaction_grid.length && !found; i++) {
-      if (inTile(evt.pixel, interaction_grid[i].xy)) {
+      if (wax.g.inTile(evt.pixel, interaction_grid[i].xy)) {
           var found = interaction_grid[i];
       }
     }
@@ -57,8 +65,8 @@ var makeInteraction = function(map) {
           options
         );
         if (feature !== f) {
-          MapTooltips.unselect(feature, $(map.d), 0);
-          MapTooltips.select(feature, $(map.d), 0);
+          wax.tooltip.unselect(feature, $(map.d), 0);
+          wax.tooltip.select(feature, $(map.d), 0);
           f = feature;
         }
     });
@@ -75,7 +83,7 @@ var makeInteraction = function(map) {
           found.tile,
           options
         );
-        feature && MapTooltips.click(feature, $(map.d), 0);
+        feature && wax.tooltip.click(feature, $(map.d), 0);
     });
   });
 };

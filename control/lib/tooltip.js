@@ -1,8 +1,13 @@
-MapTooltips = {};
+// Wax GridUtil
+// ------------
+
+// Wax header
+var wax = wax || {};
+wax.tooltip = {};
 
 // Get the active tooltip for a layer or create a new one if no tooltip exists.
 // Hide any tooltips on layers underneath this one.
-MapTooltips.getToolTip = function(feature, context, index) {
+wax.tooltip.getToolTip = function(feature, context, index) {
     var tooltip = $(context).children('div.maputil-tooltip-' +
         index +
         ':not(.removed)');
@@ -24,8 +29,8 @@ MapTooltips.getToolTip = function(feature, context, index) {
 
 // Expand a tooltip to be a "popup". Suspends all other tooltips from being
 // shown until this popup is closed or another popup is opened.
-MapTooltips.click = function(feature, context, index) {
-    var tooltip = MapTooltips.getToolTip(feature, context, index);
+wax.tooltip.click = function(feature, context, index) {
+    var tooltip = wax.tooltip.getToolTip(feature, context, index);
     var close = $('<a href="#close" class="close">Close</a>');
     close.click(function() {
         tooltip
@@ -40,14 +45,14 @@ MapTooltips.click = function(feature, context, index) {
 };
 
 // Show a tooltip.
-MapTooltips.select = function(feature, context, layer_id) {
-    MapTooltips.getToolTip(feature, context, layer_id);
+wax.tooltip.select = function(feature, context, layer_id) {
+    wax.tooltip.getToolTip(feature, context, layer_id);
     $(context).css('cursor', 'pointer');
 };
 
 // Hide all tooltips on this layer and show the first hidden tooltip on the
 // highest layer underneath if found.
-MapTooltips.unselect = function(feature, context, layer_id) {
+wax.tooltip.unselect = function(feature, context, layer_id) {
     $(context)
         .css('cursor', 'default')
         .children('div.maputil-tooltip-' + layer_id + ':not(.popup)')
@@ -58,4 +63,3 @@ MapTooltips.unselect = function(feature, context, layer_id) {
         .removeClass('hidden')
         .show();
 };
-
