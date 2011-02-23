@@ -19,4 +19,5 @@ $(window).load(function() {
     wax.g.mapBoxLogo(map);
 
     wax.g.Interaction(map);
+    wax.g.Legend(map);
 });
