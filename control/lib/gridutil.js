@@ -55,6 +55,7 @@ wax.GridManager = function () {
     this.grid_tiles = {};
     this.key_maps = {};
     this.formatters = {};
+    this.locks = {};
 }
 
 // Get a grid - calls `callback` with either a `GridInstance`
@@ -110,17 +111,26 @@ wax.GridManager.prototype.formatterUrl = function(url) {
 
 // Request and save a formatter, calling `formatterReadDone` when finished.
 wax.GridManager.prototype.getFormatter = function(formatter_url, callback) {
+  // Formatter is cached.
   if (typeof this.formatters[formatter_url] !== 'undefined') {
     callback(this.formatters[formatter_url]);
     return;
   }
+
+  // Request for this formatter has already started. Let it finish.
+  if (this.locks[formatter_url]) return false;
+
+  // Request the formatter, setting a lock and releasing when finished.
+  this.locks[formatter_url] = true;
   return $.jsonp({
     url: formatter_url,
     context: this,
     success: function(data) {
+      this.locks[formatter_url] = false;
       return this.formatterReadDone(data, formatter_url, callback);
     },
     error: function() {
+      this.locks[formatter_url] = false;
       return this.formatterReadDone({}, formatter_url, callback);
     },
     callback: 'grid',
