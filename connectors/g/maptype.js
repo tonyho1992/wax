@@ -14,12 +14,14 @@ wax.g.mapBoxLogo = function(map) {
         .push(logoDiv);
 };
 
-wax.g.MapType = function() {
+wax.g.MapType = function(name, alt, maxZoom) {
     this.interactive = true;
+    this.name = name;
+    this.alt = alt;
+    this.maxZoom = maxZoom;
 };
 
 wax.g.MapType.prototype.tileSize = new google.maps.Size(256, 256);
-wax.g.MapType.prototype.maxZoom = 19;
 
 wax.g.MapType.prototype.getTile = function(coord, zoom, ownerDocument) {
   // TODO: handle out-of-map tiles
@@ -50,6 +52,3 @@ wax.g.MapType.prototype.getTileUrl = function(coord, z) {
         + '/' + coord.x
         + '/' + Math.abs(coord.y - (Math.pow(2, z) - 1)) + '.png';
 };
-
-wax.g.MapType.prototype.name = 'Raw MB';
-wax.g.MapType.prototype.alt = 'world light';
