@@ -40,7 +40,7 @@ wax.Legend.prototype.show = function(url) {
                 (data && data.legend) && (render(data.legend));
             },
             error: function() {
-                (data && data.legend) && (render(false));
+                render(false);
             }
         });
     }
