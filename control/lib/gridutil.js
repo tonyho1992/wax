@@ -108,6 +108,8 @@ wax.GridManager = function () {
 wax.GridManager.prototype.getGrid = function(url, callback) {
     var that = this;
     that.getFormatter(that.formatterUrl(url), function(f) {
+        if (!f) return callback(false);
+
         wax.request.get(that.tileDataUrl(url), function(t) {
             callback(new wax.GridInstance(t, f));
         });
