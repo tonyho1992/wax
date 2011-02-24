@@ -1,22 +1,22 @@
 // likely shortcuts:
-// @c instead of @chain
+// @chain instead of @chainhain
 // single-arguments can be just string
 $(function() {
 var gmap = {
     'wax': [{
-        '@n': ['google.maps.Map', [
+        '@new': ['google.maps.Map', [
                 [{
-                    '@c': [
+                    '@chain': [
                         ['document.getElementById', ['gmap']]
                     ]
                 }],
                 [{
                     center: [{
-                        '@n': ['google.maps.LatLng', [0, 0]]
+                        '@new': ['google.maps.LatLng', [0, 0]]
                     }],
                     zoom: 2,
                     mapTypeId: [{
-                        '@l': 'google.maps.MapTypeId.ROADMAP'
+                        '@literal': 'google.maps.MapTypeId.ROADMAP'
                     }]
                 }]
             ]
@@ -26,13 +26,13 @@ var gmap = {
 
 var poly = {
     'wax': [{
-        '@c': [
+        '@chain': [
             ['org.polymaps.map', []],
             ['container', [{
-                '@c': [
+                '@chain': [
                     ['document.getElementById', ['pmap']],
                     ['appendChild', [{
-                            '@c': [
+                            '@chain': [
                                 ['org.polymaps.svg', ['svg']]
                             ]
                         }]
@@ -40,12 +40,12 @@ var poly = {
                 ]
             }]],
             ['add', [{
-                '@c': [
+                '@chain': [
                     ['org.polymaps.interact', []],
                 ]
             }]],
             ['add', [{
-                '@c': [
+                '@chain': [
                     ['org.polymaps.image', []],
                     ['url', ["http://a.tile.cloudmade.com"
                         + "/1a1b06b230af4efdbb989ea99e9841af" // http://cloudmade.com/register
@@ -57,10 +57,10 @@ var poly = {
 
 var open = {
     'wax': [{
-        '@c': [{
-            '@n': ['OpenLayers.Map', ['olmap', [{
+        '@chain': [{
+            '@new': ['OpenLayers.Map', ['olmap', [{
                 'maxExtent': [{
-                    '@n': ["OpenLayers.Bounds", [
+                    '@new': ["OpenLayers.Bounds", [
                         -20037508.34,
                         -20037508.34,
                         20037508.34,
@@ -71,21 +71,22 @@ var open = {
                 "theme": "http://mapbox-js.s3.amazonaws.com/ol/2.8/mapbox.css",
                 "maxResolution": 1.40625,
                 "projection": [{
-                    "@n": ["OpenLayers.Projection", ["EPSG:900913"]]
+                    "@new": ["OpenLayers.Projection", ["EPSG:900913"]]
                 }],
                 "displayProjection": [{
-                    '@n': ["OpenLayers.Projection", ["EPSG:900913"]]
+                    '@new': ["OpenLayers.Projection", ["EPSG:900913"]]
                 }],
                 "units": "m"
             }]]]
         },
-        ['addLayer', [{
-                '@n': ['OpenLayers.Layer.TMS', ['Test Layer', 
+        {
+            '@inject': ['addLayer', [{
+                '@new': ['OpenLayers.Layer.TMS', ['Test Layer', 
                     'http://a.tile.mapbox.com/', [{
                         "layername": 'world-light',
                         "type": 'png',
                         "projection": [{
-                            "@n": ["OpenLayers.Projection", ["EPSG:900913"]]
+                            "@new": ["OpenLayers.Projection", ["EPSG:900913"]]
                         }],
                         "serverResolutions": [[
                             156543.0339,78271.51695,39135.758475,19567.8792375,9783.93961875,
@@ -102,7 +103,7 @@ var open = {
                             1.19432856674,0.597164283371
                         ]],
                         'maxExtent': [{
-                            '@n': ["OpenLayers.Bounds", [
+                            '@new': ["OpenLayers.Bounds", [
                                 -20037508.34,
                                 -20037508.34,
                                 20037508.34,
@@ -113,13 +114,15 @@ var open = {
                     }]
                     ]]
             }]]
+        },
+        ['zoomTo', [3]]
     ]
 }]};
 
 OpenLayers.ImgPath = "http://js.mapbox.com/theme/dark/";
 
-wax.Wax.reify(gmap.wax);
-wax.Wax.reify(poly.wax);
+// wax.Wax.reify(gmap.wax);
+// wax.Wax.reify(poly.wax);
 console.log(wax.Wax.reify(open.wax));
 
 });
