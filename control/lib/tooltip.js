@@ -8,18 +8,18 @@ wax.tooltip = {};
 // Get the active tooltip for a layer or create a new one if no tooltip exists.
 // Hide any tooltips on layers underneath this one.
 wax.tooltip.getToolTip = function(feature, context, index) {
-    var tooltip = $(context).children('div.maputil-tooltip-' +
+    var tooltip = $(context).children('div.wax-tooltip-' +
         index +
         ':not(.removed)');
     if (tooltip.size() === 0) {
-        tooltip = $("<div class='maputil-tooltip maputil-tooltip-" +
+        tooltip = $("<div class='wax-tooltip wax-tooltip-" +
             index +
             "'>" +
             "</div>").html(feature);
         $(context).append(tooltip);
     }
     for (var i = (index - 1); i > 0; i--) {
-        var fallback = $('div.maputil-tooltip-' + i + ':not(.removed)');
+        var fallback = $('div.wax-tooltip-' + i + ':not(.removed)');
         if (fallback.size() > 0) {
             fallback.addClass('hidden').hide();
         }
@@ -39,15 +39,18 @@ wax.tooltip.click = function(feature, context, index) {
         return false;
     });
     tooltip
-        .addClass('popup')
+        .addClass('wax-popup')
         .html(feature)
         .append(close);
 };
 
 // Show a tooltip.
 wax.tooltip.select = function(feature, context, layer_id) {
+    if (!feature) return;
+
     wax.tooltip.getToolTip(feature, context, layer_id);
     $(context).css('cursor', 'pointer');
+    $('div', context).css('cursor', 'pointer');
 };
 
 // Hide all tooltips on this layer and show the first hidden tooltip on the
@@ -55,11 +58,13 @@ wax.tooltip.select = function(feature, context, layer_id) {
 wax.tooltip.unselect = function(feature, context, layer_id) {
     $(context)
         .css('cursor', 'default')
-        .children('div.maputil-tooltip-' + layer_id + ':not(.popup)')
+        .children('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
         .addClass('removed')
         .fadeOut('fast', function() { $(this).remove(); });
+    $('div', context).css('cursor', 'default');
+
     $(context)
-        .children('div.maputil-tooltip:first')
+        .children('div.wax-tooltip:first')
         .removeClass('hidden')
         .show();
 };

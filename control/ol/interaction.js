@@ -170,6 +170,7 @@ wax.ol.Interaction =
                 } else {
                   // Request this feature
                   // TODO(tmcw) re-add layer
+                  that.feature[t] = null;
                   if (tiles[t]) {
                     that.callbacks['out']({}, tiles[t].layer.map.viewPortDiv, t);
                   } else {

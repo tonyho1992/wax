@@ -1,28 +1,17 @@
-/**
- * Legend =============================================================
- */
-.openlayers-legends {
+.wax-legends {
   position:absolute;
-  left:5px;
-  bottom:5px;
-  z-index:3000;
+  left:10px;
+  bottom:10px;
+  z-index:999999;
   }
 
-.openlayers-legends .legend {
-  background:#fff;
-  -moz-border-radius:3px;
-  -webkit-border-radius:3px;
+.wax-legends .wax-legend {
+  padding:10px;
+  background:#333;
+  color:#fff;
   }
 
-.openlayers-legends .swatch {
-  float:left;
-  display:block;
-  width:15px;
-  height:15px;
-  margin-right:5px;
-  }
-
-.maputil-tooltip {
+.wax-tooltip {
   z-index:999999;
   position:absolute;
   background:#333;
@@ -33,7 +22,7 @@
   max-width:300px;
   }
 
-.maputil-tooltip .close {
+.wax-tooltip .close {
   display:block;
   position:absolute;
   top:0px;

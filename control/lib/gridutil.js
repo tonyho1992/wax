@@ -65,10 +65,10 @@ wax.GridManager.prototype.getGrid = function(url, callback) {
   var formatter = this.getFormatter(this.formatterUrl(url), function(f) {
       var grid_tile = that.grid_tiles[url];
       // If formatter & grid are finished, callback with `GridInstance`
-      if (grid_tile) {
+      if (f && grid_tile) {
         callback(new wax.GridInstance(grid_tile, f));
       // The grid isn't downloading, so start a download request
-      } else if (grid_tile !== false) {
+      } else if (f && grid_tile !== false) {
         that.grid_tiles[url] = false;
         $.jsonp({
           url: that.tileDataUrl(url),
@@ -100,17 +100,17 @@ wax.GridManager.prototype.makeEvent = function(evt) {
 
 // Simplistically derive the URL of the grid data endpoint from a tile URL
 wax.GridManager.prototype.tileDataUrl = function(url) {
-  return url.replace(/(.png|.jpg|.jpeg)/, '.grid.json');
+  return url.replace(/(.png|.jpg|.jpeg)(\d*)/, '.grid.json');
 };
 
 // Simplistically derive the URL of the formatter function from a tile URL
 wax.GridManager.prototype.formatterUrl = function(url) {
-  return url.replace(/\d+\/\d+\/\d+\.\w+/, 'formatter.json');
+  return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
 };
 
 // Request and save a formatter, calling `formatterReadDone` when finished.
 wax.GridManager.prototype.getFormatter = function(formatter_url, callback) {
-  if (this.formatters[formatter_url]) {
+  if (typeof this.formatters[formatter_url] !== 'undefined') {
     callback(this.formatters[formatter_url]);
     return;
   }
@@ -120,7 +120,9 @@ wax.GridManager.prototype.getFormatter = function(formatter_url, callback) {
     success: function(data) {
       return this.formatterReadDone(data, formatter_url, callback);
     },
-    error: function() {},
+    error: function() {
+      return this.formatterReadDone({}, formatter_url, callback);
+    },
     callback: 'grid',
     callbackParameter: 'callback'
   });
@@ -140,7 +142,11 @@ wax.GridManager.prototype.readDone = function(data, code_string) {
 // - @param {Object} data
 // - @param {String} layer
 wax.GridManager.prototype.formatterReadDone = function(data, url, callback) {
-    this.formatters[url] = new wax.Formatter(data);
+    if (data && data.formatter) {
+        this.formatters[url] = new wax.Formatter(data);
+    } else {
+        this.formatters[url] = false;
+    }
     callback(this.formatters[url]);
 };
 
@@ -156,6 +162,8 @@ wax.Formatter = function(obj) {
             // Syntax errors in formatter
             console && console.log(e);
         }
+    } else {
+        this.f = function() {};
     }
 }
 
