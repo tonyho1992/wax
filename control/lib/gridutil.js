@@ -4,6 +4,50 @@
 // Wax header
 var wax = wax || {};
 
+// Request
+// -------
+// Request data cache. `callback(data)` where `data` is the response data.
+wax.request = {
+    cache: {},
+    locks: {},
+    promises: {},
+    get: function(url, callback) {
+        // Cache hit.
+        if (this.cache[url]) {
+            return callback(this.cache[url]);
+        // Cache miss.
+        } else {
+            this.promises[url] = this.promises[url] || [];
+            this.promises[url].push(callback);
+            // Lock hit.
+            if (this.locks[url]) return;
+            // Request.
+            var that = this;
+            this.locks[url] = true;
+            $.jsonp({
+                url: url,
+                context: this,
+                callback: 'grid',
+                callbackParameter: 'callback',
+                success: function(data) {
+                    that.locks[url] = false;
+                    that.cache[url] = data;
+                    for (var i = 0; i < that.promises[url].length; i++) {
+                        that.promises[url][i](that.cache[url]);
+                    }
+                },
+                error: function() {
+                    that.locks[url] = false;
+                    that.cache[url] = null;
+                    for (var i = 0; i < that.promises[url].length; i++) {
+                        that.promises[url][i](that.cache[url]);
+                    }
+                }
+            });
+        }
+    }
+}
+
 // GridInstance
 // ------------
 // GridInstances are queryable, fully-formed
@@ -62,31 +106,12 @@ wax.GridManager = function () {
 // object or false. Behind the scenes, this calls `getFormatter`
 // and gets grid data, and tries to avoid re-downloading either.
 wax.GridManager.prototype.getGrid = function(url, callback) {
-  var that = this;
-  var formatter = this.getFormatter(this.formatterUrl(url), function(f) {
-      var grid_tile = that.grid_tiles[url];
-      // If formatter & grid are finished, callback with `GridInstance`
-      if (f && grid_tile) {
-        callback(new wax.GridInstance(grid_tile, f));
-      // The grid isn't downloading, so start a download request
-      } else if (f && grid_tile !== false) {
-        that.grid_tiles[url] = false;
-        $.jsonp({
-          url: that.tileDataUrl(url),
-          context: this,
-          success: function(data) {
-            return that.readDone(data, url);
-          },
-          error: function() {},
-          callback: 'grid',
-          callbackParameter: 'callback'
+    var that = this;
+    that.getFormatter(that.formatterUrl(url), function(f) {
+        wax.request.get(that.tileDataUrl(url), function(t) {
+            callback(new wax.GridInstance(t, f));
         });
-        callback(false);
-      // The grid is downloading - just exit.
-      } else {
-        callback(false);
-      }
-  });
+    });
 };
 
 // Create a cross-browser event object
@@ -109,55 +134,23 @@ wax.GridManager.prototype.formatterUrl = function(url) {
   return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
 };
 
-// Request and save a formatter, calling `formatterReadDone` when finished.
-wax.GridManager.prototype.getFormatter = function(formatter_url, callback) {
+// Request and save a formatter, passed to `callback()` when finished.
+wax.GridManager.prototype.getFormatter = function(url, callback) {
+  var that = this;
   // Formatter is cached.
-  if (typeof this.formatters[formatter_url] !== 'undefined') {
-    callback(this.formatters[formatter_url]);
-    return;
-  }
-
-  // Request for this formatter has already started. Let it finish.
-  if (this.locks[formatter_url]) return false;
-
-  // Request the formatter, setting a lock and releasing when finished.
-  this.locks[formatter_url] = true;
-  return $.jsonp({
-    url: formatter_url,
-    context: this,
-    success: function(data) {
-      this.locks[formatter_url] = false;
-      return this.formatterReadDone(data, formatter_url, callback);
-    },
-    error: function() {
-      this.locks[formatter_url] = false;
-      return this.formatterReadDone({}, formatter_url, callback);
-    },
-    callback: 'grid',
-    callbackParameter: 'callback'
-  });
-};
-
-// Load retrieved data into this.archive, which
-// contains grid objects indexed by code_string
-//
-// - @param {Object} data
-// - @param {String} code_string
-wax.GridManager.prototype.readDone = function(data, code_string) {
-    this.grid_tiles[code_string] = data;
-};
-
-// The callback on `reqTile` -
-//
-// - @param {Object} data
-// - @param {String} layer
-wax.GridManager.prototype.formatterReadDone = function(data, url, callback) {
-    if (data && data.formatter) {
-        this.formatters[url] = new wax.Formatter(data);
-    } else {
-        this.formatters[url] = false;
-    }
+  if (typeof this.formatters[url] !== 'undefined') {
     callback(this.formatters[url]);
+    return;
+  } else {
+    wax.request.get(url, function(data) {
+        if (data && data.formatter) {
+            that.formatters[url] = new wax.Formatter(data);
+        } else {
+            that.formatters[url] = false;
+        }
+        callback(that.formatters[url]);
+    });
+  }
 };
 
 // Formatter
