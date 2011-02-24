@@ -46,8 +46,11 @@ wax.tooltip.click = function(feature, context, index) {
 
 // Show a tooltip.
 wax.tooltip.select = function(feature, context, layer_id) {
+    if (!feature) return;
+
     wax.tooltip.getToolTip(feature, context, layer_id);
     $(context).css('cursor', 'pointer');
+    $('div', context).css('cursor', 'pointer');
 };
 
 // Hide all tooltips on this layer and show the first hidden tooltip on the
@@ -58,6 +61,8 @@ wax.tooltip.unselect = function(feature, context, layer_id) {
         .children('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
         .addClass('removed')
         .fadeOut('fast', function() { $(this).remove(); });
+    $('div', context).css('cursor', 'default');
+
     $(context)
         .children('div.wax-tooltip:first')
         .removeClass('hidden')
