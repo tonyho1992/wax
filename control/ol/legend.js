@@ -33,11 +33,13 @@ wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
     },
 
     setLegend: function() {
+        var urls = [];
         for (var i = 0; i < this.map.layers.length; i++) {
             var layer = this.map.layers[i],
                 url = layer.getURL(new OpenLayers.Bounds());
-            (layer.visibility && this.legend.show(url)) || this.legend.hide(url);
+            (layer.visibility) && urls.push(url);
         }
+        this.legend.render(urls);
     }
 });
 

@@ -12,9 +12,10 @@ wax.Legend = function(context, container) {
     $(this.context).append(this.container);
 };
 
-wax.Legend.prototype.show = function(url) {
+wax.Legend.prototype.render = function(urls) {
+    this.container.empty();
+
     var that = this;
-    var url = this.legendUrl(url);
     var render = function(content) {
         if (!content) {
             that.legends[url] = false;
@@ -25,29 +26,12 @@ wax.Legend.prototype.show = function(url) {
             that.container.append(that.legends[url]);
         }
     };
-
-    if (this.legends[url] === false) {
-        return;
-    } else if (this.legends[url]) {
-        this.legends[url].show();
-    } else {
-        $.jsonp({
-            'url': url,
-            context: this,
-            callback: 'grid',
-            callbackParameter: 'callback',
-            success: function(data) {
-                (data && data.legend) && (render(data.legend));
-            },
-            error: function() {
-                render(false);
-            }
+    for (var i = 0; i < urls.length; i++) {
+        var url = this.legendUrl(urls[i]);
+        wax.request.get(url, function(data) {
+            (data && data.legend) && (render(data.legend));
         });
     }
-};
-
-wax.Legend.prototype.hide = function(url) {
-    this.legends[url] && this.legends[url].hide();
 };
 
 wax.Legend.prototype.legendUrl = function(url) {
