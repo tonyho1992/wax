@@ -22,8 +22,19 @@ implementation of the [MBTiles interaction specification](https://github.com/map
 
 #### Lib
 
-* `openlayers_wax`, a JSON-powered object instantiator
 * `jquery.jsonp-2.1.4.js`, [from jquery-jsonp](http://code.google.com/p/jquery-jsonp/)
+
+#### Records
+
+The main usage of mapping frameworks through Wax is via records. Records are pure JSON objects that have a 1:1 representation with function Javascript code, but, unlike imperative code, can be stored and manipulated as configuration. Records are tested with [polymaps](http://polymaps.org), [openlayers](http://openlayers.org/) and Google Maps API v3, but the system (`/lib/record.js`) is generalized beyond mapping tools of any sort, to exist as a basic Javascript AST interpreter.
+
+Currently records support three control techniques:
+
+* `@new` instantiates objects
+* `@chain` runs functions, changing the value of `this` with each run
+* `@inject` runs a function in a `@chain` without changing the reference to `this`
+
+These three techniques (with arbitrary levels of nesting), are sufficient to construct maps in each mapping framework.
 
 ## Notes
 
