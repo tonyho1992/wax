@@ -155,7 +155,7 @@ wax.ol.Interaction =
         // This features has already been loaded, or
         // is currently being requested.
         this.gm.getGrid(tiles[t].url, function(g) {
-            if (g) {
+            if (g && tiles[t].imgDiv) {
                 var feature = g.getFeature(sevt.pX, sevt.pY, tiles[t].imgDiv, options);
                 if (feature) {
                   if (!tiles[t]) return;
