@@ -1,4 +1,4 @@
-# wax
+# Wax
 
 Tools for improving web maps. The centerpiece of the code is a client 
 implementation of the [MBTiles interaction specification](https://github.com/mapbox/mbtiles-spec).
@@ -39,13 +39,28 @@ Currently records support several control techniques:
 
 These techniques (with arbitrary levels of nesting), are sufficient to construct maps in each mapping framework.
 
-## Notes
+## Requirements
 
-This module does not provide thorough theming or accessory images.
+* [jQuery](http://jquery.com/) - tested with 1.5
+* (build only) [UglifyJS](https://github.com/mishoo/UglifyJS/)
 
-## Changelog
+## Building
+
+* Requires [UglifyJS](https://github.com/mishoo/UglifyJS/)
+
+Make the combined & minified OpenLayers & Google Maps libraries:
+
+    make build
+
+## Includes
+
+Wax includes two libraries in `/lib` which are included in builds
+
+* [underscore.js](http://documentcloud.github.com/underscore/) (MIT)
+* [jquery-jsonp](http://code.google.com/p/jquery-jsonp/) (MIT)
 
 ## Authors
 
 - Tom MacWright (tmcw)
+- Young Hahn (yhahn)
 - Will White (willwhite)
