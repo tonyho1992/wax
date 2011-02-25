@@ -104,8 +104,8 @@ var open = { 'wax':
 
 OpenLayers.ImgPath = "http://js.mapbox.com/theme/dark/";
 
-wax.Wax.reify(gmap.wax);
-wax.Wax.reify(open.wax);
-wax.Wax.reify(poly.wax);
+wax.Record(gmap.wax);
+wax.Record(open.wax);
+wax.Record(poly.wax);
 
 });

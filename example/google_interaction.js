@@ -17,5 +17,5 @@ $(function() {
         ['@chain Interaction'],
         ['@chain Legend']
     ];
-    wax.Wax.reify(map);
+    wax.Record(map);
 });
