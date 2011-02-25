@@ -1,3 +1,4 @@
+// Google Maps Interaction Example
 var map;
 $(window).load(function() {
     var l = new wax.g.MapType();
@@ -8,7 +9,8 @@ $(window).load(function() {
             mapTypeControlOptions: {
                 mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'mapbox']
             }
-    });
+        }
+    );
 
     map.mapTypes.set('mb', l);
 

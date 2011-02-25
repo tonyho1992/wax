@@ -14,11 +14,12 @@ wax.g.mapBoxLogo = function(map) {
         .push(logoDiv);
 };
 
-wax.g.MapType = function(name, alt, maxZoom) {
+wax.g.MapType = function(options) {
     this.interactive = true;
-    this.name = name;
-    this.alt = alt;
-    this.maxZoom = maxZoom;
+    this.name = options.name || '';
+    this.alt = options.alt || '';
+    this.maxZoom = options.maxZoom : 18;
+    this.minZoom = options.minZoom : 0;
 };
 
 wax.g.MapType.prototype.tileSize = new google.maps.Size(256, 256);
