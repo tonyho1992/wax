@@ -22,6 +22,7 @@ wax.g.MapType = function(options) {
     this.minZoom = options.minZoom || 0;
     this.baseUrl = options.baseUrl ||
         'http://a.tile.mapbox.com/1.0.0/world-light';
+    this.blankImage = options.blankImage || '';
 
     // non-configurable options
     this.interactive = true;
@@ -47,6 +48,7 @@ wax.g.MapType.prototype.releaseTile = function(tile) {
 // Get a tile url, based on x, y coordinates and a z value.
 wax.g.MapType.prototype.getTileUrl = function(coord, z) {
     // Y coordinate is flipped in Mapbox, compared to Google
-    return this.baseUrl + '/' + z +
-        '/' + coord.x + '/' + Math.abs(coord.y - (Math.pow(2, z) - 1)) + '.png';
+    var flipped_y = Math.abs(coord.y - (Math.pow(2, z) - 1));
+    return (coord.x >= 0 && flipped_y >= 0) ? (this.baseUrl + '/' + z +
+        '/' + coord.x + '/' + flipped_y + '.png') : this.blankImage;
 };

@@ -5,28 +5,27 @@
 var wax = wax || {};
 wax.g = wax.g || {};
 
+// Since Google Maps obscures mouseover events, grids need to calculated
+// in order to simulate them, and eventually do multi-layer interaction.
 wax.g.calculateGrid = function(map) {
   if (map.interaction_grid) return;
+  // Get all 'marked' tiles, added by the `wax.g.MapType` layer.
   var interactive_tiles = $('.interactive-div-' + map.getZoom() + ' img', map.d);
   var start_offset = $(map.d).offset();
-  // Naive implementation - optimize soon.
+  // Return an array of objects which have the **relative** offset of
+  // each tile, with a reference to the tile object in `tile`, since the API
+  // returns evt coordinates as relative to the map object.
   var tiles = $(interactive_tiles).map(function(t) {
     var e_offset = $(interactive_tiles[t]).offset();
     return {
         xy: {
             left: e_offset.left - start_offset.left,
             top: e_offset.top - start_offset.top
-            // left: e_offset.left,
-            // top:  e_offset.top
         },
         tile: interactive_tiles[t]
     };
   });
   return tiles;
-};
-
-wax.g.invalidateGrid = function(map) {
-  map.interaction_grid = false;
 };
 
 wax.g.inTile = function(sevt, xy) {
