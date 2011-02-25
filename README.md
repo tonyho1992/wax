@@ -62,6 +62,12 @@ Wax includes two libraries in `/lib` which are included in builds
 * [underscore.js](http://documentcloud.github.com/underscore/) (MIT)
 * [jquery-jsonp](http://code.google.com/p/jquery-jsonp/) (MIT)
 
+## Changelog
+
+#### 1.0.0
+
+* Initial release
+
 ## Authors
 
 - Tom MacWright (tmcw)
