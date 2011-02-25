@@ -96,7 +96,8 @@ wax.g.Legend = function(map) {
     google.maps.event.addListener(map, 'idle', function() {
         if (url) return;
         var img = $('.interactive-div-' + map.getZoom() + ' img:first', map.d);
-        img && (url = img.attr('src')) && legend.show(url);
+        // TODO(yhahn): legend no longer has a show method?
+        // img && (url = img.attr('src')) && legend.show(url);
     });
 };
 

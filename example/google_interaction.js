@@ -17,9 +17,6 @@ $(window).load(function() {
     // Set the default map to world light
     map.setMapTypeId('mb');
 
-    // Add the MapBox logo to the map
-    wax.g.mapBoxLogo(map);
-
     wax.g.Interaction(map);
     wax.g.Legend(map);
 });
