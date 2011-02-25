@@ -15,8 +15,7 @@ implementation of the [MBTiles interaction specification](https://github.com/map
 
 #### Google Maps API v3
 
-* `wax.g.Interaction`
-* `wax.g.Legend`
+* `wax.g.Controls`
 * `wax.g.MapType`
 * `wax.g.mapBoxLogo`
 
