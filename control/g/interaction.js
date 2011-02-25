@@ -86,17 +86,3 @@ wax.g.Interaction = function(map) {
   });
 };
 
-wax.g.Legend = function(map) {
-    var legend = new wax.Legend($(map.d)),
-        url = null;
-
-    // Ideally we would use the 'tilesloaded' event here. This doesn't seem to
-    // work so we use the much less appropriate 'idle' event.
-    google.maps.event.addListener(map, 'idle', function() {
-        if (url) return;
-        var img = $('.interactive-div-' + map.getZoom() + ' img:first', map.d);
-        // TODO(yhahn): legend no longer has a show method?
-        // img && (url = img.attr('src')) && legend.show(url);
-    });
-};
-
