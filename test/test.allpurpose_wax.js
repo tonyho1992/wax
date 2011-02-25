@@ -4,7 +4,7 @@
 $(function() {
 var gmap = { 'wax':
     ['@new google.maps.Map',
-        ['@inject document.getElementById', 'gmap'],
+        ['@call document.getElementById', 'gmap'],
         {
             center: [ '@new google.maps.LatLng', 0, 0 ],
             zoom: 2,
