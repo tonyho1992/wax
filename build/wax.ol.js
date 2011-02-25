@@ -410,7 +410,6 @@ wax.Record = function(obj, context) {
         }
     }
 };
-
 //     Underscore.js 1.1.4
 //     (c) 2011 Jeremy Ashkenas, DocumentCloud Inc.
 //     Underscore is freely distributable under the MIT license.
@@ -1696,9 +1695,10 @@ wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
     setLegend: function() {
         var urls = [];
         for (var i = 0; i < this.map.layers.length; i++) {
-            var layer = this.map.layers[i],
-                url = layer.getURL(new OpenLayers.Bounds());
-            (layer.visibility) && urls.push(url);
+            var layer = this.map.layers[i];
+            if (layer && layer.getURL && layer.visibility) {
+                urls.push(layer.getURL(new OpenLayers.Bounds()));
+            }
         }
         this.legend.render(urls);
     }

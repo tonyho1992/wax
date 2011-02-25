@@ -410,7 +410,6 @@ wax.Record = function(obj, context) {
         }
     }
 };
-
 //     Underscore.js 1.1.4
 //     (c) 2011 Jeremy Ashkenas, DocumentCloud Inc.
 //     Underscore is freely distributable under the MIT license.
