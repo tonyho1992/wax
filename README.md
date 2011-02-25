@@ -48,6 +48,10 @@ These techniques (with arbitrary levels of nesting), are sufficient to construct
 
 * Requires [UglifyJS](https://github.com/mishoo/UglifyJS/)
 
+Install mainline UglifyJS:
+
+    npm install https://github.com/mishoo/UglifyJS/tarball/master
+
 Make the combined & minified OpenLayers & Google Maps libraries:
 
     make build
