@@ -6,17 +6,17 @@ implementation of the [MBTiles interaction specification](https://github.com/map
 ## Controls
 
 * `wax.tooltip`
+* `wax.legend`
 
 #### OpenLayers
 
 * `wax.ol.Interaction`
-* `wax.ol.BoundsTransform`
 * `wax.ol.Legend`
-* `wax.ol.ZoomOnLoad`
 
 #### Google Maps API v3
 
 * `wax.g.Interaction`
+* `wax.g.Legend`
 * `wax.g.MapType`
 * `wax.g.mapBoxLogo`
 
@@ -28,13 +28,16 @@ implementation of the [MBTiles interaction specification](https://github.com/map
 
 The main usage of mapping frameworks through Wax is via records. Records are pure JSON objects that have a 1:1 representation with function Javascript code, but, unlike imperative code, can be stored and manipulated as configuration. Records are tested with [polymaps](http://polymaps.org), [openlayers](http://openlayers.org/) and Google Maps API v3, but the system (`/lib/record.js`) is generalized beyond mapping tools of any sort, to exist as a basic Javascript AST interpreter.
 
-Currently records support three control techniques:
+Currently records support several control techniques:
 
 * `@new` instantiates objects
 * `@chain` runs functions, changing the value of `this` with each run
 * `@inject` runs a function in a `@chain` without changing the reference to `this`
+* `@call` runs a function from the global scope changing the value of `this`
+* `@literal` allows an object attribute to be referenced
+* `@group` runs a set of record statements (e.g. using the keywords above) in order
 
-These three techniques (with arbitrary levels of nesting), are sufficient to construct maps in each mapping framework.
+These techniques (with arbitrary levels of nesting), are sufficient to construct maps in each mapping framework.
 
 ## Notes
 
