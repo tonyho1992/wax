@@ -310,7 +310,7 @@ wax.Record = function(obj, context) {
         args = args.length ? wax.Record(args) : [];
 
         // real browsers
-        if (!$.browser.ie) {
+        if (!$.browser.msie) {
             obj = Object.create(fn_obj[1].prototype);
             fn_obj[1].apply(obj, args);
         // lord have mercy on your soul.
@@ -319,9 +319,9 @@ wax.Record = function(obj, context) {
                 case 0: obj = new fn_obj[1](); break;
                 case 1: obj = new fn_obj[1](args[0]); break;
                 case 2: obj = new fn_obj[1](args[0], args[1]); break;
-                case 3: obj = new fn_obj[1](args[0], args[1], args[3]); break;
-                case 4: obj = new fn_obj[1](args[0], args[1], args[3], args[4]); break;
-                case 5: obj = new fn_obj[1](args[0], args[1], args[3], args[4], args[5]); break;
+                case 3: obj = new fn_obj[1](args[0], args[1], args[2]); break;
+                case 4: obj = new fn_obj[1](args[0], args[1], args[2], args[3]); break;
+                case 5: obj = new fn_obj[1](args[0], args[1], args[2], args[3], args[4]); break;
                 default: break;
             }
         }
@@ -340,21 +340,21 @@ wax.Record = function(obj, context) {
         }
     };
     var isKeyword = function(string) {
-        return _.isString(string) && ([
+        return _.isString(string) && (_.indexOf([
             '@new',
             '@call',
             '@literal',
             '@chain',
             '@inject',
             '@group'
-        ].indexOf(string.split(' ')[0]) !== -1);
+        ], string.split(' ')[0]) !== -1);
     };
     var altersContext = function(string) {
-        return _.isString(string) && ([
+        return _.isString(string) && (_.indexOf([
             '@new',
             '@call',
             '@chain'
-        ].indexOf(string.split(' ')[0]) !== -1);
+        ], string.split(' ')[0]) !== -1);
     };
     var getStatement = function(obj) {
         if (_.isArray(obj) && obj[0] && isKeyword(obj[0])) {
