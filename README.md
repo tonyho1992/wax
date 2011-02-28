@@ -64,6 +64,11 @@ Wax includes two libraries in `/lib` which are included in builds
 
 ## Changelog
 
+#### 1.0.1
+
+* `make ext` added for downloading and installing external libraries needed to use examples.
+* Bug fixes for legend, IE compatibility
+
 #### 1.0.0
 
 * Initial release
