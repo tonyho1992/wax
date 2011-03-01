@@ -15,7 +15,7 @@ wax.g.Controls = function(map) {
 wax.g.Controls.prototype.calculateGrid = function() {
     if (this.map.interaction_grid) return;
     // Get all 'marked' tiles, added by the `wax.g.MapType` layer.
-    var interactive_tiles = $('.interactive-div-' + this.map.getZoom() + ' img', this.map.d);
+    var interactive_tiles = $('div.interactive-div-' + this.map.getZoom() + ' img', this.map.d);
     var start_offset = $(this.map.d).offset();
     // Return an array of objects which have the **relative** offset of
     // each tile, with a reference to the tile object in `tile`, since the API
@@ -102,7 +102,7 @@ wax.g.Controls.prototype.Legend = function() {
     // work so we use the much less appropriate 'idle' event.
     google.maps.event.addListener(this.map, 'idle', function() {
         if (url) return;
-        var img = $('.interactive-div-' + that.map.getZoom() + ' img:first', that.map.d);
+        var img = $('div.interactive-div-' + that.map.getZoom() + ' img:first', that.map.d);
         img && (url = img.attr('src')) && legend.render([url]);
     });
     return this;
