@@ -70,14 +70,21 @@ wax.GridInstance.prototype.resolveCode = function(key) {
 };
 
 wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
-  if (Math.floor((y - $(tile_element).offset().top) / this.tileRes) > 256 ||
-    Math.floor((x - $(tile_element).offset().left) / this.tileRes) > 256) return;
-
+  if (tile_element.left && tile_element.top) {
+      var tileX = tile_element.left,
+          tileY = tile_element.top;
+  } else {
+      var $tile_element = $(tile_element);
+      var tileX = $tile_element.offset().left;
+          tileY = $tile_element.offset().top;
+  }
+  if (Math.floor((y - tileY) / this.tileRes) > 256 ||
+    Math.floor((x - tileX) / this.tileRes) > 256) return;
 
   var key = this.grid_tile.grid[
-     Math.floor((y - $(tile_element).offset().top) / this.tileRes)
+     Math.floor((y - tileY) / this.tileRes)
   ].charCodeAt(
-     Math.floor((x - $(tile_element).offset().left) / this.tileRes)
+     Math.floor((x - tileX) / this.tileRes)
   );
 
   key = this.resolveCode(key);
@@ -128,7 +135,7 @@ wax.GridManager.prototype.makeEvent = function(evt) {
 
 // Simplistically derive the URL of the grid data endpoint from a tile URL
 wax.GridManager.prototype.tileDataUrl = function(url) {
-  return url.replace(/(.png|.jpg|.jpeg)(\d*)/, '.grid.json');
+  return url.replace(/(\.png|\.jpg|\.jpeg)(\d*)/, '.grid.json');
 };
 
 // Simplistically derive the URL of the formatter function from a tile URL
