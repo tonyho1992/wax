@@ -13,7 +13,11 @@ wax.p.Controls = function(map) {
 wax.p.Controls.prototype.calculateGrid = function(p) {
     var transform = $('g.layer', this.container).attr('transform');
     var tileSize = p.tileSize();
-    var offset = transform.animVal.getItem(0).matrix;
+    var container_left = $(this.container).offset().left;
+    var container_top = $(this.container).offset().top;
+    var centerpoint = transform.animVal.getItem(0).matrix;
+    var centerpoint_left = centerpoint.e + container_left;
+    var centerpoint_top  = centerpoint.f + container_top;
     var ratio = (transform.animVal.numberOfItems == 2) ? transform.animVal.getItem(1).matrix.a : 1;
     var interactive_tiles = $('image', this.container);
     var tiles = $(interactive_tiles).map(function(t) {
@@ -21,8 +25,10 @@ wax.p.Controls.prototype.calculateGrid = function(p) {
         var e_offset = $interactive_tile.offset();
         return {
             xy: {
-                left: e_offset.left,
-                top: e_offset.top
+                left: ((e_offset.left * (ratio)) + (centerpoint_left * (1 - ratio) *
+                    (e_offset.left > centerpoint_left) ? 1 : -1)),
+                top:  ((e_offset.top * (ratio))  + (centerpoint_top * (1 - ratio) *
+                    (e_offset.top > centerpoint_top) ? 1 : -1)),
             },
             size: {
                 width: tileSize.x * ratio,
