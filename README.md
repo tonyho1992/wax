@@ -64,6 +64,10 @@ Wax includes two libraries in `/lib` which are included in builds
 
 ## Changelog
 
+#### 1.0.2
+
+* Bug fixes for Firefox 3
+
 #### 1.0.1
 
 * `make ext` added for downloading and installing external libraries needed to use examples.
