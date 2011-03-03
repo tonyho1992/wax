@@ -41,9 +41,27 @@ These techniques (with arbitrary levels of nesting), are sufficient to construct
 ## Requirements
 
 * [jQuery](http://jquery.com/) - tested with 1.5
+* (docs only) [docco](https://github.com/jashkenas/docco)
 * (build only) [UglifyJS](https://github.com/mishoo/UglifyJS/)
 
-## Building
+## Usage Examples
+
+Samples of usage can be found in examples/. These depend on localizing copies of each API code.
+
+To set up the examples first run:
+
+    make ext
+
+Then check out the example html files.
+
+
+## Building library
+
+For wax users, a minified library is already provided in build/.
+
+But for developers you can rebuild a minified library by running:
+
+    make build
 
 * Requires [UglifyJS](https://github.com/mishoo/UglifyJS/)
 
@@ -53,7 +71,18 @@ Install mainline UglifyJS:
 
 Make the combined & minified OpenLayers & Google Maps libraries:
 
+    rm -r build
     make build
+
+## Building docs
+
+Wax uses docco for documention. Install it like:
+
+    npm install docco
+    
+Make the docs:
+
+    make doc
 
 ## Includes
 
