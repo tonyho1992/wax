@@ -107,3 +107,13 @@ wax.g.Controls.prototype.Legend = function() {
     });
     return this;
 };
+
+wax.g.Controls.prototype.Embedder = function(script_id) {
+    $(this.map.d).prepend($('<input type="text" class="embed-src" />')
+        .css({
+            'z-index': '9999999999',
+            'position': 'relative'
+        })
+        .val("<div id='" + script_id + "'>" + $('#' + script_id).html() + "</div>"));
+    return this;
+};
