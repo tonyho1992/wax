@@ -93,6 +93,10 @@ Wax includes two libraries in `/lib` which are included in builds
 
 ## Changelog
 
+#### 1.0.3
+
+* Embedder functionality for Google Maps and OpenLayers
+
 #### 1.0.2
 
 * Bug fixes for Firefox 3
