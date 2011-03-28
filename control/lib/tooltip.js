@@ -16,7 +16,9 @@ wax.tooltip.getToolTip = function(feature, context, index) {
             index +
             "'>" +
             "</div>").html(feature);
-        $(context).append(tooltip);
+        if (!$(context).trigger('addedtooltip', [tooltip, context])) {
+            $(context).append(tooltip);
+        }
     }
     for (var i = (index - 1); i > 0; i--) {
         var fallback = $('div.wax-tooltip-' + i + ':not(.removed)');
@@ -60,7 +62,7 @@ wax.tooltip.unselect = function(feature, context, layer_id) {
         .css('cursor', 'default')
         .children('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
         .addClass('removed')
-        .fadeOut('fast', function() { $(this).remove(); });
+        .remove();
     $('div', context).css('cursor', 'default');
 
     $(context)
