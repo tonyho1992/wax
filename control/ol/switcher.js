@@ -17,7 +17,7 @@ wax.ol.Switcher = OpenLayers.Class(OpenLayers.Control, {
     layerClick: function(evt) {
       var element = evt.currentTarget;
       var layer = $(element).data('layer');
-      $('.layers.data .layers-content .activated').removeClass('activated');
+      $('a.active', this.$element).removeClass('active');
       $.each(this.map.getLayersBy('isBaseLayer', false),
         function() {
           if (this.CLASS_NAME !== 'OpenLayers.Layer.Vector.RootContainer' &&
@@ -27,7 +27,7 @@ wax.ol.Switcher = OpenLayers.Class(OpenLayers.Control, {
         }
       );
       layer.setVisibility(true);
-      $(element).addClass('activated');
+      $(element).addClass('active');
     },
 
     needsRedraw: function() {
@@ -91,10 +91,11 @@ wax.ol.Switcher = OpenLayers.Class(OpenLayers.Control, {
                 .data('layer', layer)
                 .attr('disabled', !layer.inRange);
                 if (checked) {
-                  $layer_element.addClass('activated');
+                  $layer_element.addClass('active');
                 }
             }
             this.$element.append($layer_element);
+            this.$element.trigger('layeradded', $layer_element);
           }
         }
     },
