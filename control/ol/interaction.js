@@ -16,6 +16,7 @@ wax.ol.Interaction =
       options = options || {};
       options.handlerOptions = options.handlerOptions || {};
       OpenLayers.Control.prototype.initialize.apply(this, [options || {}]);
+      $(document).bind('mousemove', $.proxy(this.getInfoForHover, this));
 
       this.handlers = {
         hover: new OpenLayers.Handler.Hover(
@@ -42,32 +43,6 @@ wax.ol.Interaction =
       };
     },
 
-    // Add handlers to the map
-    setMap: function(map) {
-      this.handlers.hover.setMap(map);
-      this.handlers.click.setMap(map);
-      OpenLayers.Control.prototype.setMap.apply(this, arguments);
-      this.activate();
-    },
-
-    // boilerplate
-    activate: function() {
-      if (!this.active) {
-        this.handlers.hover.activate();
-        this.handlers.click.activate();
-      }
-      return OpenLayers.Control.prototype.activate.apply(
-        this, arguments
-      );
-    },
-
-    // boilerplate
-    deactivate: function() {
-      return OpenLayers.Control.prototype.deactivate.apply(
-        this, arguments
-      );
-    },
-
     // Get an Array of the stack of tiles under the mouse.
     // This operates with pixels only, since there's no way
     // to bubble through an element which is sitting on the map
@@ -75,31 +50,22 @@ wax.ol.Interaction =
     //
     // If no tiles are under the mouse, returns an empty array.
     getTileStack: function(layers, sevt) {
-      var found = false;
-      var gridpos = {};
       var tiles = [];
       // All of these loops break once found is made true.
-      for (var x = 0; x < layers[0].grid.length && !found; x++) {
-        for (var y = 0; y < layers[0].grid[x].length && !found; y++) {
-          var divpos = $(layers[0].grid[x][y].imgDiv).offset();
-          found = divpos &&
-            ((divpos.top < sevt.pY) &&
-            ((divpos.top + 256) > sevt.pY) &&
-            (divpos.left < sevt.pX) &&
-            ((divpos.left + 256) > sevt.pX));
-          if (found) {
-            gridpos = {
-                x: x,
-                y: y
-            };
+      layerfound: for (var j = 0; j < layers.length; j++) {
+          for (var x = 0; x < layers[j].grid.length; x++) {
+              for (var y = 0; y < layers[j].grid[x].length; y++) {
+                  var divpos = $(layers[j].grid[x][y].imgDiv).offset();
+                  if (divpos &&
+                      ((divpos.top < sevt.pageY) &&
+                      ((divpos.top + 256) > sevt.pageY) &&
+                      (divpos.left < sevt.pageX) &&
+                      ((divpos.left + 256) > sevt.pageX))) {
+                      tiles.push(layers[j].grid[x][y]);
+                      continue layerfound;
+                  }
+              }
           }
-        }
-      }
-      if (found) {
-        for (var j = 0; j < layers.length; j++) {
-          layers[j].grid[gridpos.x] && layers[j].grid[gridpos.x][gridpos.y] &&
-            tiles.push(layers[j].grid[gridpos.x][gridpos.y]);
-        }
       }
       return tiles;
     },
@@ -122,11 +88,9 @@ wax.ol.Interaction =
     getInfoForClick: function(evt) {
       var options = { format: 'full' };
       var layers = this.viableLayers();
-      var sevt = this.gm.makeEvent(evt);
-      var tiles = this.getTileStack(this.viableLayers(), sevt);
+      var tiles = this.getTileStack(this.viableLayers(), evt);
       var feature = null,
           g = null;
-      this.target = sevt.target;
       var that = this;
 
       for (var t = 0; t < tiles.length; t++) {
@@ -144,11 +108,9 @@ wax.ol.Interaction =
     getInfoForHover: function(evt) {
       var options = { format: 'teaser' };
       var layers = this.viableLayers();
-      var sevt = this.gm.makeEvent(evt);
-      var tiles = this.getTileStack(this.viableLayers(), sevt);
+      var tiles = this.getTileStack(this.viableLayers(), evt);
       var feature = null,
           g = null;
-      this.target = sevt.target;
       var that = this;
 
       for (var t = 0; t < tiles.length; t++) {
@@ -156,7 +118,7 @@ wax.ol.Interaction =
         // is currently being requested.
         this.gm.getGrid(tiles[t].url, function(g) {
             if (g && tiles[t]) {
-                var feature = g.getFeature(sevt.pX, sevt.pY, tiles[t].imgDiv, options);
+                var feature = g.getFeature(evt.pageX, evt.pageY, tiles[t].imgDiv, options);
                 if (feature) {
                   if (!tiles[t]) return;
                   if (feature && that.feature[t] !== feature) {
