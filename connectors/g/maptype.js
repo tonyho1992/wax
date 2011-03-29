@@ -27,21 +27,33 @@ wax.g.MapType = function(options) {
     // non-configurable options
     this.interactive = true;
     this.tileSize = new google.maps.Size(256, 256);
+
+    // DOM element cache
+    this.cache = {};
 };
 
 // Get a tile element from a coordinate, zoom level, and an ownerDocument.
 wax.g.MapType.prototype.getTile = function(coord, zoom, ownerDocument) {
-  return $('<div></div>')
+    var key = zoom + '/' + coord.x + '/' + coord.y;
+    this.cache[key] = this.cache[key] || $('<div></div>')
         .addClass('interactive-div-' + zoom)
-        .width(256).height(256).append(
-            $('<img />').attr('src', this.getTileUrl(coord, zoom))
-            .width(256).height(256))[0];
+        .width(256).height(256)
+        .data('gTileKey', key)
+        .append(
+            $('<img />')
+            .width(256).height(256)
+            .attr('src', this.getTileUrl(coord, zoom))
+            .error(function() { $(this).hide() })
+        )[0];
+    return this.cache[key];
 };
 
 // Remove a tile that has fallen out of the map's viewport.
 //
-// TODO: expire cache data.
+// TODO: expire cache data in the gridmanager.
 wax.g.MapType.prototype.releaseTile = function(tile) {
+    var key = $(tile).data('gTileKey');
+    this.cache[key] && delete this.cache[key];
     $(tile).remove();
 };
 
