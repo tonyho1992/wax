@@ -48,7 +48,11 @@ wax.g.MapType.prototype.releaseTile = function(tile) {
 // Get a tile url, based on x, y coordinates and a z value.
 wax.g.MapType.prototype.getTileUrl = function(coord, z) {
     // Y coordinate is flipped in Mapbox, compared to Google
-    var flipped_y = Math.abs(coord.y - (Math.pow(2, z) - 1));
-    return (coord.x >= 0 && flipped_y >= 0) ? (this.baseUrl + '/' + z +
-        '/' + coord.x + '/' + flipped_y + '.png') : this.blankImage;
+    var mod = Math.pow(2, z),
+        y = (mod - 1) - coord.y,
+        x = (coord.x % mod);
+        x = (x < 0) ? (coord.x % mod) + mod : x;
+    return (y >= 0)
+        ? (this.baseUrl + '/' + z + '/' + x + '/' + y + '.png')
+        : this.blankImage;
 };
