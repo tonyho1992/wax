@@ -1428,7 +1428,7 @@ wax.tooltip.getToolTip = function(feature, context, index) {
             index +
             "'>" +
             "</div>").html(feature);
-        if (!$(context).trigger('addedtooltip', [tooltip, context])) {
+        if (!$(context).triggerHandler('addedtooltip', [tooltip, context])) {
             $(context).append(tooltip);
         }
     }
@@ -1492,6 +1492,17 @@ wax.g = wax.g || {};
 // Controls constructor.
 wax.g.Controls = function(map) {
     this.map = map;
+
+    // Find the map div reference. Munging of the google maps codebase makes
+    // the key to this reference unpredictable, hence we iterate to find.
+    this.mapDiv = false;
+    for (var key in map) {
+        // IE safe check for whether object is a DOM element.
+        if (map[key] && map[key].nodeType > 0) {
+            this.mapDiv = map[key];
+            break;
+        }
+    }
 };
 
 // Since Google Maps obscures mouseover events, grids need to calculated
@@ -1499,8 +1510,8 @@ wax.g.Controls = function(map) {
 wax.g.Controls.prototype.calculateGrid = function() {
     if (this.map.interaction_grid) return;
     // Get all 'marked' tiles, added by the `wax.g.MapType` layer.
-    var interactive_tiles = $('div.interactive-div-' + this.map.getZoom() + ' img', this.map.d);
-    var start_offset = $(this.map.d).offset();
+    var interactive_tiles = $('div.interactive-div-' + this.map.getZoom() + ' img', this.mapDiv);
+    var start_offset = $(this.mapDiv).offset();
     // Return an array of objects which have the **relative** offset of
     // each tile, with a reference to the tile object in `tile`, since the API
     // returns evt coordinates as relative to the map object.
@@ -1547,14 +1558,14 @@ wax.g.Controls.prototype.Interaction = function() {
     gm.getGrid($(found.tile).attr('src'), function(g) {
         if (!g) return;
         var feature = g.getFeature(
-          evt.pixel.x + $(that.map.d).offset().left,
-          evt.pixel.y + $(that.map.d).offset().top,
+          evt.pixel.x + $(that.mapDiv).offset().left,
+          evt.pixel.y + $(that.mapDiv).offset().top,
           found.tile,
           options
         );
         if (feature !== f) {
-          wax.tooltip.unselect(feature, $(that.map.d), 0);
-          wax.tooltip.select(feature, $(that.map.d), 0);
+          wax.tooltip.unselect(feature, $(that.mapDiv), 0);
+          wax.tooltip.select(feature, $(that.mapDiv), 0);
           f = feature;
         }
     });
@@ -1566,12 +1577,12 @@ wax.g.Controls.prototype.Interaction = function() {
     gm.getGrid($(found.tile).attr('src'), function(g) {
         if (!g) return;
         var feature = g.getFeature(
-          evt.pixel.x + $(that.map.d).offset().left,
-          evt.pixel.y + $(that.map.d).offset().top,
+          evt.pixel.x + $(that.mapDiv).offset().left,
+          evt.pixel.y + $(that.mapDiv).offset().top,
           found.tile,
           options
         );
-        feature && wax.tooltip.click(feature, $(that.map.d), 0);
+        feature && wax.tooltip.click(feature, $(that.mapDiv), 0);
     });
   });
   return this;
@@ -1579,21 +1590,21 @@ wax.g.Controls.prototype.Interaction = function() {
 
 wax.g.Controls.prototype.Legend = function() {
     var that = this,
-        legend = new wax.Legend($(this.map.d)),
+        legend = new wax.Legend($(this.mapDiv)),
         url = null;
 
     // Ideally we would use the 'tilesloaded' event here. This doesn't seem to
     // work so we use the much less appropriate 'idle' event.
     google.maps.event.addListener(this.map, 'idle', function() {
         if (url) return;
-        var img = $('div.interactive-div-' + that.map.getZoom() + ' img:first', that.map.d);
+        var img = $('div.interactive-div-' + that.map.getZoom() + ' img:first', that.mapDiv);
         img && (url = img.attr('src')) && legend.render([url]);
     });
     return this;
 };
 
 wax.g.Controls.prototype.Embedder = function(script_id) {
-    $(this.map.d).prepend($('<input type="text" class="embed-src" />')
+    $(this.mapDiv).prepend($('<input type="text" class="embed-src" />')
         .css({
             'z-index': '9999999999',
             'position': 'relative'

@@ -1428,7 +1428,7 @@ wax.tooltip.getToolTip = function(feature, context, index) {
             index +
             "'>" +
             "</div>").html(feature);
-        if (!$(context).trigger('addedtooltip', [tooltip, context])) {
+        if (!$(context).triggerHandler('addedtooltip', [tooltip, context])) {
             $(context).append(tooltip);
         }
     }
