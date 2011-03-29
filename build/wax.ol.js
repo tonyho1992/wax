@@ -302,7 +302,11 @@ wax.Record = function(obj, context) {
         var ret = _.reduce(head.split('.'), function(part, segment) {
             return [part[1] || part[0], part[1] ? part[1][segment] : part[0][segment]];
         }, [cur || window, null]);
-        return ret;
+        if (ret[0] && ret[1]) {
+            return ret;
+        } else {
+            throw head + ' not found.';
+        }
     };
     var makeObject = function(fn_name, args) {
         var fn_obj = getFunction(fn_name),
@@ -395,7 +399,7 @@ wax.Record = function(obj, context) {
         case '@call':
             return runFunction(statement.subject, statement.object, null);
         }
-    } else if (typeof obj === 'object') {
+    } else if (obj !== null && typeof obj === 'object') {
         var keys = _.keys(obj);
         for (i = 0; i < keys.length; i++) {
             var key = keys[i];
@@ -1248,14 +1252,21 @@ wax.GridInstance.prototype.resolveCode = function(key) {
 };
 
 wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
-  if (Math.floor((y - $(tile_element).offset().top) / this.tileRes) > 256 ||
-    Math.floor((x - $(tile_element).offset().left) / this.tileRes) > 256) return;
-
+  if (tile_element.left && tile_element.top) {
+      var tileX = tile_element.left,
+          tileY = tile_element.top;
+  } else {
+      var $tile_element = $(tile_element);
+      var tileX = $tile_element.offset().left;
+          tileY = $tile_element.offset().top;
+  }
+  if (Math.floor((y - tileY) / this.tileRes) > 256 ||
+    Math.floor((x - tileX) / this.tileRes) > 256) return;
 
   var key = this.grid_tile.grid[
-     Math.floor((y - $(tile_element).offset().top) / this.tileRes)
+     Math.floor((y - tileY) / this.tileRes)
   ].charCodeAt(
-     Math.floor((x - $(tile_element).offset().left) / this.tileRes)
+     Math.floor((x - tileX) / this.tileRes)
   );
 
   key = this.resolveCode(key);
@@ -1306,7 +1317,7 @@ wax.GridManager.prototype.makeEvent = function(evt) {
 
 // Simplistically derive the URL of the grid data endpoint from a tile URL
 wax.GridManager.prototype.tileDataUrl = function(url) {
-  return url.replace(/(.png|.jpg|.jpeg)(\d*)/, '.grid.json');
+  return url.replace(/(\.png|\.jpg|\.jpeg)(\d*)/, '.grid.json');
 };
 
 // Simplistically derive the URL of the formatter function from a tile URL
@@ -1417,7 +1428,9 @@ wax.tooltip.getToolTip = function(feature, context, index) {
             index +
             "'>" +
             "</div>").html(feature);
-        $(context).append(tooltip);
+        if (!$(context).trigger('addedtooltip', [tooltip, context])) {
+            $(context).append(tooltip);
+        }
     }
     for (var i = (index - 1); i > 0; i--) {
         var fallback = $('div.wax-tooltip-' + i + ':not(.removed)');
@@ -1461,7 +1474,7 @@ wax.tooltip.unselect = function(feature, context, layer_id) {
         .css('cursor', 'default')
         .children('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
         .addClass('removed')
-        .fadeOut('fast', function() { $(this).remove(); });
+        .remove();
     $('div', context).css('cursor', 'default');
 
     $(context)
@@ -1469,6 +1482,35 @@ wax.tooltip.unselect = function(feature, context, layer_id) {
         .removeClass('hidden')
         .show();
 };
+// Wax header
+var wax = wax || {};
+wax.ol = wax.ol || {};
+
+// An interaction toolkit for tiles that implement the
+// [MBTiles UTFGrid spec](https://github.com/mapbox/mbtiles-spec)
+wax.ol.Embedder =
+    OpenLayers.Class(OpenLayers.Control, {
+    initialize: function(options) {
+      options = options || {};
+      OpenLayers.Control.prototype.initialize.apply(this, [options || {}]);
+    },
+
+    // Add handlers to the map
+    setMap: function(map) {
+      if ($('#' + this.el + '-script').length) {
+        OpenLayers.Control.prototype.setMap.apply(this, arguments);
+        $(map.div).prepend($('<input type="text" class="embed-src" />')
+          .css({
+              'z-index': '9999999999',
+              'position': 'relative'
+          })
+          .val("<div id='" + this.el + "-script'>" + $('#' + this.el + '-script').html() + "</div>"));
+      }
+      this.activate();
+    },
+
+    CLASS_NAME: 'wax.ol.Embedder'
+});
 // Wax header
 var wax = wax || {};
 wax.ol = wax.ol || {};
@@ -1483,60 +1525,22 @@ wax.ol.Interaction =
 
     gm: new wax.GridManager(),
 
-    initialize: function(options) {
-      options = options || {};
-      options.handlerOptions = options.handlerOptions || {};
-      OpenLayers.Control.prototype.initialize.apply(this, [options || {}]);
-
-      this.handlers = {
-        hover: new OpenLayers.Handler.Hover(
-          this, {
-            move: this.cancelHover,
-            pause: this.getInfoForHover
-          },
-          // Be nice to IE, making it determine interaction
-          // every 40ms instead of 10ms
-          OpenLayers.Util.extend(this.handlerOptions.hover || {}, {
-            delay: ($.browser.msie) ? 40 : 10
-          })
-        ),
-        click: new OpenLayers.Handler.Click(
-          this, {
-            click: this.getInfoForClick
-        })
-      };
-
-      this.callbacks = {
-          out:   wax.tooltip.unselect,
-          over:  wax.tooltip.select,
-          click: wax.tooltip.click
-      };
-    },
-
-    // Add handlers to the map
     setMap: function(map) {
-      this.handlers.hover.setMap(map);
-      this.handlers.click.setMap(map);
-      OpenLayers.Control.prototype.setMap.apply(this, arguments);
-      this.activate();
+        $(map.div).bind('mousemove', $.proxy(this.getInfoForHover, this));
+        $(map.div).bind('click', $.proxy(this.getInfoForClick, this));
+        OpenLayers.Control.prototype.setMap.apply(this, arguments);
     },
 
-    // boilerplate
-    activate: function() {
-      if (!this.active) {
-        this.handlers.hover.activate();
-        this.handlers.click.activate();
-      }
-      return OpenLayers.Control.prototype.activate.apply(
-        this, arguments
-      );
-    },
+    initialize: function(options) {
+        this.options = options || {};
+        this.clickAction = this.options.clickAction || 'full';
+        OpenLayers.Control.prototype.initialize.apply(this, [this.options || {}]);
 
-    // boilerplate
-    deactivate: function() {
-      return OpenLayers.Control.prototype.deactivate.apply(
-        this, arguments
-      );
+        this.callbacks = {
+            out:   wax.tooltip.unselect,
+            over:  wax.tooltip.select,
+            click: wax.tooltip.click
+        };
     },
 
     // Get an Array of the stack of tiles under the mouse.
@@ -1546,111 +1550,107 @@ wax.ol.Interaction =
     //
     // If no tiles are under the mouse, returns an empty array.
     getTileStack: function(layers, sevt) {
-      var found = false;
-      var gridpos = {};
-      var tiles = [];
-      // All of these loops break once found is made true.
-      for (var x = 0; x < layers[0].grid.length && !found; x++) {
-        for (var y = 0; y < layers[0].grid[x].length && !found; y++) {
-          var divpos = $(layers[0].grid[x][y].imgDiv).offset();
-          found = divpos &&
-            ((divpos.top < sevt.pY) &&
-            ((divpos.top + 256) > sevt.pY) &&
-            (divpos.left < sevt.pX) &&
-            ((divpos.left + 256) > sevt.pX));
-          if (found) {
-            gridpos = {
-                x: x,
-                y: y
-            };
-          }
+        var tiles = [];
+        layerfound: for (var j = 0; j < layers.length; j++) {
+            for (var x = 0; x < layers[j].grid.length; x++) {
+                for (var y = 0; y < layers[j].grid[x].length; y++) {
+                    var divpos = $(layers[j].grid[x][y].imgDiv).offset();
+                    if (divpos &&
+                        ((divpos.top < sevt.pageY) &&
+                         ((divpos.top + 256) > sevt.pageY) &&
+                         (divpos.left < sevt.pageX) &&
+                         ((divpos.left + 256) > sevt.pageX))) {
+                        tiles.push(layers[j].grid[x][y]);
+                    continue layerfound;
+                    }
+                }
+            }
         }
-      }
-      if (found) {
-        for (var j = 0; j < layers.length; j++) {
-          layers[j].grid[gridpos.x] && layers[j].grid[gridpos.x][gridpos.y] &&
-            tiles.push(layers[j].grid[gridpos.x][gridpos.y]);
-        }
-      }
-      return tiles;
+        return tiles;
     },
 
     // Get all interactable layers
     viableLayers: function() {
-      if (this._viableLayers) return this._viableLayers;
-      return this._viableLayers = $(this.map.layers).filter(
-        function(i) {
-          // TODO: make better indication of whether
-          // this is an interactive layer
-          return (this.map.layers[i].visibility === true) &&
-            (this.map.layers[i].CLASS_NAME === 'OpenLayers.Layer.TMS');
+        if (this._viableLayers) return this._viableLayers;
+        return this._viableLayers = $(this.map.layers).filter(
+            function(i) {
+            // TODO: make better indication of whether
+            // this is an interactive layer
+            return (this.map.layers[i].visibility === true) &&
+                (this.map.layers[i].CLASS_NAME === 'OpenLayers.Layer.TMS');
         }
-      );
+        );
     },
 
     // React to a click mouse event
     // This is the `pause` handler attached to the map.
     getInfoForClick: function(evt) {
-      var options = { format: 'full' };
-      var layers = this.viableLayers();
-      var sevt = this.gm.makeEvent(evt);
-      var tiles = this.getTileStack(this.viableLayers(), sevt);
-      var feature = null,
-          g = null;
-      this.target = sevt.target;
-      var that = this;
+        var layers = this.viableLayers();
+        var tiles = this.getTileStack(this.viableLayers(), evt);
+        var feature = null,
+        g = null;
+        var that = this;
 
-      for (var t = 0; t < tiles.length; t++) {
-        this.gm.getGrid(tiles[t].url, function(g) {
-          if (!g) return;
-          var feature = g.getFeature(sevt.pX, sevt.pY, tiles[t].imgDiv, options);
-          feature && that.callbacks['click'](feature, tiles[t].layer.map.viewPortDiv, t);
-        });
-      }
+        for (var t = 0; t < tiles.length; t++) {
+            this.gm.getGrid(tiles[t].url, function(g) {
+                if (!g) return;
+                var feature = g.getFeature(evt.pageX, evt.pageY, tiles[t].imgDiv, {
+                    format: that.clickAction
+                });
+                if (feature) {
+                    switch (that.clickAction) {
+                        case 'full':
+                            that.callbacks['click'](feature, tiles[t].layer.map.viewPortDiv, t);
+                        break;
+                        case 'location':
+                            window.location = feature;
+                        break;
+                    }
+                }
+            });
+        }
     },
 
     // React to a hover mouse event, by finding all tiles,
     // finding features, and calling `this.callbacks[]`
     // This is the `click` handler attached to the map.
     getInfoForHover: function(evt) {
-      var options = { format: 'teaser' };
-      var layers = this.viableLayers();
-      var sevt = this.gm.makeEvent(evt);
-      var tiles = this.getTileStack(this.viableLayers(), sevt);
-      var feature = null,
-          g = null;
-      this.target = sevt.target;
-      var that = this;
+        var options = { format: 'teaser' };
+        var layers = this.viableLayers();
+        var tiles = this.getTileStack(this.viableLayers(), evt);
+        var feature = null,
+        g = null;
+        var that = this;
 
-      for (var t = 0; t < tiles.length; t++) {
-        // This features has already been loaded, or
-        // is currently being requested.
-        this.gm.getGrid(tiles[t].url, function(g) {
-            if (g && tiles[t]) {
-                var feature = g.getFeature(sevt.pX, sevt.pY, tiles[t].imgDiv, options);
-                if (feature) {
-                  if (!tiles[t]) return;
-                  if (feature && that.feature[t] !== feature) {
-                    that.feature[t] = feature;
-                    that.callbacks['out'] (feature, tiles[t].layer.map.viewPortDiv, t);
-                    that.callbacks['over'](feature, tiles[t].layer.map.viewPortDiv, t);
-                  } else if (!feature) {
-                    that.feature[t] = null;
-                    that.callbacks['out'](feature, tiles[t].layer.map.viewPortDiv, t);
-                  }
-                } else {
-                  // Request this feature
-                  // TODO(tmcw) re-add layer
-                  that.feature[t] = null;
-                  if (tiles[t]) {
-                    that.callbacks['out']({}, tiles[t].layer.map.viewPortDiv, t);
-                  } else {
-                    that.callbacks['out']({}, false, t);
-                  }
-               }
-            }
-        });
-      }
+        for (var t = 0; t < tiles.length; t++) {
+            // This features has already been loaded, or
+            // is currently being requested.
+            this.gm.getGrid(tiles[t].url, function(g) {
+                if (g && tiles[t]) {
+                    var feature = g.getFeature(evt.pageX, evt.pageY, tiles[t].imgDiv, options);
+                    if (feature) {
+                        if (!tiles[t]) return;
+                        if (feature && that.feature[t] !== feature) {
+                            that.feature[t] = feature;
+                            that.callbacks['out'] (feature, tiles[t].layer.map.viewPortDiv, t);
+                            that.callbacks['over'](feature, tiles[t].layer.map.viewPortDiv, t);
+                        } else if (!feature) {
+                            that.feature[t] = null;
+                            that.callbacks['out'](feature, tiles[t].layer.map.viewPortDiv, t);
+                        }
+                    } else {
+                        // Request this feature
+                        // TODO(tmcw) re-add layer
+                        that.feature[t] = null;
+                        if (tiles[t]) {
+                            that.callbacks['out']({}, tiles[t].layer.map.viewPortDiv, t);
+                        } else {
+                            that.callbacks['out']({}, false, t);
+                        }
+                    }
+                }
+            });
+        }
     },
     CLASS_NAME: 'wax.ol.Interaction'
 });
@@ -1700,3 +1700,117 @@ wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
     }
 });
 
+// Wax: Legend Control
+// -------------------
+
+// Wax header
+var wax = wax || {};
+wax.ol = wax.ol || {};
+
+wax.ol.Switcher = OpenLayers.Class(OpenLayers.Control, {
+    CLASS_NAME: 'wax.ol.Switcher',
+
+    initialize: function(options) {
+        this.$element = $(options.e);
+        this.options = options || {};
+        OpenLayers.Control.prototype.initialize.apply(this, [options || {}]);
+    },
+
+    layerClick: function(evt) {
+      var element = evt.currentTarget;
+      var layer = $(element).data('layer');
+      $('a.active', this.$element).removeClass('active');
+      $.each(this.map.getLayersBy('isBaseLayer', false),
+        function() {
+          if (this.CLASS_NAME !== 'OpenLayers.Layer.Vector.RootContainer' &&
+             this.displayInLayerSwitcher) {
+            this.setVisibility(false);
+          }
+        }
+      );
+      layer.setVisibility(true);
+      $(element).addClass('active');
+    },
+
+    needsRedraw: function() {
+        if (!this.layerStates || this.layerStates.length || (this.map.layers.length != this.layerStates.length)) {
+            return true;
+        }
+        for (var i = 0, len = this.layerStates.length; i < len; i++) {
+            var layerState = this.layerStates[i];
+            var layer = this.map.layers[i];
+            if ((layerState.name != layer.name) ||
+                (layerState.inRange != layer.inRange) ||
+                (layerState.id != layer.id) ||
+                (layerState.visibility != layer.visibility)) {
+              return true;
+            }
+        }
+        return false;
+    },
+
+    redraw: function() {
+      if (this.needsRedraw()) {
+        // Clear out previous layers
+        /*
+        $('.layers.base .layers-content div', this.blockswitcher).remove();
+        $('.layers.data .layers-content div', this.blockswitcher).remove();
+        $('.layers.base', this.blockswitcher).hide();
+        $('.layers.data', this.blockswitcher).hide();
+        */
+        this.$element.html('');
+
+        // Save state -- for checking layer if the map state changed.
+        // We save this before redrawing, because in the process of redrawing
+        // we will trigger more visibility changes, and we want to not redraw
+        // and enter an infinite loop.
+        var len = this.map.layers.length;
+        this.layerStates = [];
+        for (var i = 0; i < len; i++) {
+          var layerState = this.map.layers[i];
+          this.layerStates[i] = {
+              name: layerState.name,
+              visibility: layerState.visibility,
+              inRange: layerState.inRange,
+              id: layerState.id
+          };
+        }
+
+        var layers = this.map.layers.slice();
+        for (i = 0, len = layers.length; i < len; i++) {
+          var layer = layers[i];
+          if (layer.displayInLayerSwitcher) {
+            // Only check a baselayer if it is *the* baselayer, check data layers if they are visible
+            var checked = layer.isBaseLayer ? (layer === this.map.baseLayer) : layer.getVisibility();
+            var clickLayer = $.proxy(function(e) { this.layerClick(e); return false; }, this);
+            var $layer_element = $('<a></a>');
+            // Add states and click handler
+            $layer_element
+                .click(clickLayer)
+                .attr('href', '#')
+                .text(layer.name)
+                .addClass('layer-toggle')
+                .data('layer', layer)
+                .attr('disabled', !layer.inRange);
+                if (checked) {
+                  $layer_element.addClass('active');
+                }
+            }
+            this.$element.append($layer_element);
+            this.$element.trigger('layeradded', $layer_element);
+          }
+        }
+    },
+
+    setMap: function(map) {
+        OpenLayers.Control.prototype.setMap.apply(this, arguments);
+        this.map.events.on({
+            'addlayer': this.redraw,
+            'changelayer': this.redraw,
+            'removelayer': this.redraw,
+            'changebaselayer': this.redraw,
+            scope: this
+        });
+        this.redraw();
+    }
+});
