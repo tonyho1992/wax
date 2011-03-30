@@ -13,7 +13,7 @@ wax.Legend = function(context, container) {
 };
 
 wax.Legend.prototype.render = function(urls) {
-    this.container.empty();
+    $('.wax-legend', this.container).hide();
 
     var that = this;
     var render = function(content) {

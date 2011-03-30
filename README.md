@@ -93,6 +93,13 @@ Wax includes two libraries in `/lib` which are included in builds
 
 ## Changelog
 
+#### 1.0.4
+
+* connector/g: Hide error tiles and wrap on dateline.
+* connector/g: Performance improvements.
+* control/legend: Fix rerender bug
+* control/tooltip: `addedtooltip` event for binding/extending tooltip behavior. Subject to change.
+
 #### 1.0.3
 
 * Embedder functionality for Google Maps and OpenLayers
