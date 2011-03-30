@@ -130,11 +130,11 @@ wax.ol.Interaction =
                         if (!tiles[t]) return;
                         if (feature && that.feature[t] !== feature) {
                             that.feature[t] = feature;
-                            that.callbacks['out'] (feature, tiles[t].layer.map.viewPortDiv, t);
-                            that.callbacks['over'](feature, tiles[t].layer.map.viewPortDiv, t);
+                            that.callbacks['out'] (feature, tiles[t].layer.map.div, t);
+                            that.callbacks['over'](feature, tiles[t].layer.map.div, t);
                         } else if (!feature) {
                             that.feature[t] = null;
-                            that.callbacks['out'](feature, tiles[t].layer.map.viewPortDiv, t);
+                            that.callbacks['out'](feature, tiles[t].layer.map.div, t);
                         }
                     } else {
                         // Request this feature
