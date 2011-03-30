@@ -13,16 +13,13 @@ wax.ol.Interaction =
     gm: new wax.GridManager(),
 
     setMap: function(map) {
-        var that = this;
         $(map.div).bind('mousemove', $.proxy(this.getInfoForHover, this));
-        $(map.div).mousedown(function() {
-            console.log('down');
-        });
         this.clickHandler = new OpenLayers.Handler.Click(
             this, {
                 click: this.getInfoForClick
             }
         );
+
         this.clickHandler.setMap(map);
         this.clickHandler.activate();
 
