@@ -31,7 +31,7 @@ wax.ol.Interaction =
 
     initialize: function(options) {
         this.options = options || {};
-        this.clickAction = options.clickAction || 'full';
+        this.clickAction = this.options.clickAction || 'full';
         OpenLayers.Control.prototype.initialize.apply(this, [this.options || {}]);
 
         this.callbacks = {

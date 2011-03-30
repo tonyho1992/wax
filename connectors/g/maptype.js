@@ -27,28 +27,44 @@ wax.g.MapType = function(options) {
     // non-configurable options
     this.interactive = true;
     this.tileSize = new google.maps.Size(256, 256);
+
+    // DOM element cache
+    this.cache = {};
 };
 
 // Get a tile element from a coordinate, zoom level, and an ownerDocument.
 wax.g.MapType.prototype.getTile = function(coord, zoom, ownerDocument) {
-  return $('<div></div>')
+    var key = zoom + '/' + coord.x + '/' + coord.y;
+    this.cache[key] = this.cache[key] || $('<div></div>')
         .addClass('interactive-div-' + zoom)
-        .width(256).height(256).append(
-            $('<img />').attr('src', this.getTileUrl(coord, zoom))
-            .width(256).height(256))[0];
+        .width(256).height(256)
+        .data('gTileKey', key)
+        .append(
+            $('<img />')
+            .width(256).height(256)
+            .attr('src', this.getTileUrl(coord, zoom))
+            .error(function() { $(this).hide() })
+        )[0];
+    return this.cache[key];
 };
 
 // Remove a tile that has fallen out of the map's viewport.
 //
-// TODO: expire cache data.
+// TODO: expire cache data in the gridmanager.
 wax.g.MapType.prototype.releaseTile = function(tile) {
+    var key = $(tile).data('gTileKey');
+    this.cache[key] && delete this.cache[key];
     $(tile).remove();
 };
 
 // Get a tile url, based on x, y coordinates and a z value.
 wax.g.MapType.prototype.getTileUrl = function(coord, z) {
     // Y coordinate is flipped in Mapbox, compared to Google
-    var flipped_y = Math.abs(coord.y - (Math.pow(2, z) - 1));
-    return (coord.x >= 0 && flipped_y >= 0) ? (this.baseUrl + '/' + z +
-        '/' + coord.x + '/' + flipped_y + '.png') : this.blankImage;
+    var mod = Math.pow(2, z),
+        y = (mod - 1) - coord.y,
+        x = (coord.x % mod);
+        x = (x < 0) ? (coord.x % mod) + mod : x;
+    return (y >= 0)
+        ? (this.baseUrl + '/' + z + '/' + x + '/' + y + '.png')
+        : this.blankImage;
 };

@@ -302,7 +302,11 @@ wax.Record = function(obj, context) {
         var ret = _.reduce(head.split('.'), function(part, segment) {
             return [part[1] || part[0], part[1] ? part[1][segment] : part[0][segment]];
         }, [cur || window, null]);
-        return ret;
+        if (ret[0] && ret[1]) {
+            return ret;
+        } else {
+            throw head + ' not found.';
+        }
     };
     var makeObject = function(fn_name, args) {
         var fn_obj = getFunction(fn_name),
@@ -395,7 +399,7 @@ wax.Record = function(obj, context) {
         case '@call':
             return runFunction(statement.subject, statement.object, null);
         }
-    } else if (typeof obj === 'object') {
+    } else if (obj !== null && typeof obj === 'object') {
         var keys = _.keys(obj);
         for (i = 0; i < keys.length; i++) {
             var key = keys[i];
@@ -1248,14 +1252,21 @@ wax.GridInstance.prototype.resolveCode = function(key) {
 };
 
 wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
-  if (Math.floor((y - $(tile_element).offset().top) / this.tileRes) > 256 ||
-    Math.floor((x - $(tile_element).offset().left) / this.tileRes) > 256) return;
-
+  if (tile_element.left && tile_element.top) {
+      var tileX = tile_element.left,
+          tileY = tile_element.top;
+  } else {
+      var $tile_element = $(tile_element);
+      var tileX = $tile_element.offset().left;
+          tileY = $tile_element.offset().top;
+  }
+  if (Math.floor((y - tileY) / this.tileRes) > 256 ||
+    Math.floor((x - tileX) / this.tileRes) > 256) return;
 
   var key = this.grid_tile.grid[
-     Math.floor((y - $(tile_element).offset().top) / this.tileRes)
+     Math.floor((y - tileY) / this.tileRes)
   ].charCodeAt(
-     Math.floor((x - $(tile_element).offset().left) / this.tileRes)
+     Math.floor((x - tileX) / this.tileRes)
   );
 
   key = this.resolveCode(key);
@@ -1306,7 +1317,7 @@ wax.GridManager.prototype.makeEvent = function(evt) {
 
 // Simplistically derive the URL of the grid data endpoint from a tile URL
 wax.GridManager.prototype.tileDataUrl = function(url) {
-  return url.replace(/(.png|.jpg|.jpeg)(\d*)/, '.grid.json');
+  return url.replace(/(\.png|\.jpg|\.jpeg)(\d*)/, '.grid.json');
 };
 
 // Simplistically derive the URL of the formatter function from a tile URL
@@ -1417,7 +1428,9 @@ wax.tooltip.getToolTip = function(feature, context, index) {
             index +
             "'>" +
             "</div>").html(feature);
-        $(context).append(tooltip);
+        if (!$(context).triggerHandler('addedtooltip', [tooltip, context])) {
+            $(context).append(tooltip);
+        }
     }
     for (var i = (index - 1); i > 0; i--) {
         var fallback = $('div.wax-tooltip-' + i + ':not(.removed)');
@@ -1461,7 +1474,7 @@ wax.tooltip.unselect = function(feature, context, layer_id) {
         .css('cursor', 'default')
         .children('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
         .addClass('removed')
-        .fadeOut('fast', function() { $(this).remove(); });
+        .remove();
     $('div', context).css('cursor', 'default');
 
     $(context)
@@ -1479,6 +1492,17 @@ wax.g = wax.g || {};
 // Controls constructor.
 wax.g.Controls = function(map) {
     this.map = map;
+
+    // Find the map div reference. Munging of the google maps codebase makes
+    // the key to this reference unpredictable, hence we iterate to find.
+    this.mapDiv = false;
+    for (var key in map) {
+        // IE safe check for whether object is a DOM element.
+        if (map[key] && map[key].nodeType > 0) {
+            this.mapDiv = map[key];
+            break;
+        }
+    }
 };
 
 // Since Google Maps obscures mouseover events, grids need to calculated
@@ -1486,8 +1510,8 @@ wax.g.Controls = function(map) {
 wax.g.Controls.prototype.calculateGrid = function() {
     if (this.map.interaction_grid) return;
     // Get all 'marked' tiles, added by the `wax.g.MapType` layer.
-    var interactive_tiles = $('.interactive-div-' + this.map.getZoom() + ' img', this.map.d);
-    var start_offset = $(this.map.d).offset();
+    var interactive_tiles = $('div.interactive-div-' + this.map.getZoom() + ' img', this.mapDiv);
+    var start_offset = $(this.mapDiv).offset();
     // Return an array of objects which have the **relative** offset of
     // each tile, with a reference to the tile object in `tile`, since the API
     // returns evt coordinates as relative to the map object.
@@ -1534,14 +1558,14 @@ wax.g.Controls.prototype.Interaction = function() {
     gm.getGrid($(found.tile).attr('src'), function(g) {
         if (!g) return;
         var feature = g.getFeature(
-          evt.pixel.x + $(that.map.d).offset().left,
-          evt.pixel.y + $(that.map.d).offset().top,
+          evt.pixel.x + $(that.mapDiv).offset().left,
+          evt.pixel.y + $(that.mapDiv).offset().top,
           found.tile,
           options
         );
         if (feature !== f) {
-          wax.tooltip.unselect(feature, $(that.map.d), 0);
-          wax.tooltip.select(feature, $(that.map.d), 0);
+          wax.tooltip.unselect(feature, $(that.mapDiv), 0);
+          wax.tooltip.select(feature, $(that.mapDiv), 0);
           f = feature;
         }
     });
@@ -1553,12 +1577,12 @@ wax.g.Controls.prototype.Interaction = function() {
     gm.getGrid($(found.tile).attr('src'), function(g) {
         if (!g) return;
         var feature = g.getFeature(
-          evt.pixel.x + $(that.map.d).offset().left,
-          evt.pixel.y + $(that.map.d).offset().top,
+          evt.pixel.x + $(that.mapDiv).offset().left,
+          evt.pixel.y + $(that.mapDiv).offset().top,
           found.tile,
           options
         );
-        feature && wax.tooltip.click(feature, $(that.map.d), 0);
+        feature && wax.tooltip.click(feature, $(that.mapDiv), 0);
     });
   });
   return this;
@@ -1566,16 +1590,26 @@ wax.g.Controls.prototype.Interaction = function() {
 
 wax.g.Controls.prototype.Legend = function() {
     var that = this,
-        legend = new wax.Legend($(this.map.d)),
+        legend = new wax.Legend($(this.mapDiv)),
         url = null;
 
     // Ideally we would use the 'tilesloaded' event here. This doesn't seem to
     // work so we use the much less appropriate 'idle' event.
     google.maps.event.addListener(this.map, 'idle', function() {
         if (url) return;
-        var img = $('.interactive-div-' + that.map.getZoom() + ' img:first', that.map.d);
+        var img = $('div.interactive-div-' + that.map.getZoom() + ' img:first', that.mapDiv);
         img && (url = img.attr('src')) && legend.render([url]);
     });
+    return this;
+};
+
+wax.g.Controls.prototype.Embedder = function(script_id) {
+    $(this.mapDiv).prepend($('<input type="text" class="embed-src" />')
+        .css({
+            'z-index': '9999999999',
+            'position': 'relative'
+        })
+        .val("<div id='" + script_id + "'>" + $('#' + script_id).html() + "</div>"));
     return this;
 };
 // Wax for Google Maps API v3
@@ -1607,28 +1641,44 @@ wax.g.MapType = function(options) {
     // non-configurable options
     this.interactive = true;
     this.tileSize = new google.maps.Size(256, 256);
+
+    // DOM element cache
+    this.cache = {};
 };
 
 // Get a tile element from a coordinate, zoom level, and an ownerDocument.
 wax.g.MapType.prototype.getTile = function(coord, zoom, ownerDocument) {
-  return $('<div></div>')
+    var key = zoom + '/' + coord.x + '/' + coord.y;
+    this.cache[key] = this.cache[key] || $('<div></div>')
         .addClass('interactive-div-' + zoom)
-        .width(256).height(256).append(
-            $('<img />').attr('src', this.getTileUrl(coord, zoom))
-            .width(256).height(256))[0];
+        .width(256).height(256)
+        .data('gTileKey', key)
+        .append(
+            $('<img />')
+            .width(256).height(256)
+            .attr('src', this.getTileUrl(coord, zoom))
+            .error(function() { $(this).hide() })
+        )[0];
+    return this.cache[key];
 };
 
 // Remove a tile that has fallen out of the map's viewport.
 //
-// TODO: expire cache data.
+// TODO: expire cache data in the gridmanager.
 wax.g.MapType.prototype.releaseTile = function(tile) {
+    var key = $(tile).data('gTileKey');
+    this.cache[key] && delete this.cache[key];
     $(tile).remove();
 };
 
 // Get a tile url, based on x, y coordinates and a z value.
 wax.g.MapType.prototype.getTileUrl = function(coord, z) {
     // Y coordinate is flipped in Mapbox, compared to Google
-    var flipped_y = Math.abs(coord.y - (Math.pow(2, z) - 1));
-    return (coord.x >= 0 && flipped_y >= 0) ? (this.baseUrl + '/' + z +
-        '/' + coord.x + '/' + flipped_y + '.png') : this.blankImage;
+    var mod = Math.pow(2, z),
+        y = (mod - 1) - coord.y,
+        x = (coord.x % mod);
+        x = (x < 0) ? (coord.x % mod) + mod : x;
+    return (y >= 0)
+        ? (this.baseUrl + '/' + z + '/' + x + '/' + y + '.png')
+        : this.blankImage;
 };
