@@ -138,7 +138,7 @@ wax.ol.Interaction =
                         // TODO(tmcw) re-add layer
                         that.feature[t] = null;
                         if (tiles[t]) {
-                            that.callbacks['out']({}, tiles[t].layer.map.viewPortDiv, t);
+                            that.callbacks['out']({}, tiles[t].layer.map.div, t);
                         } else {
                             that.callbacks['out']({}, false, t);
                         }
