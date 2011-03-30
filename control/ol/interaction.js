@@ -14,7 +14,15 @@ wax.ol.Interaction =
 
     setMap: function(map) {
         $(map.div).bind('mousemove', $.proxy(this.getInfoForHover, this));
-        $(map.div).bind('click', $.proxy(this.getInfoForClick, this));
+        this.clickHandler = new OpenLayers.Handler.Click(
+            this, {
+                click: this.getInfoForClick
+            }
+        );
+
+        this.clickHandler.setMap(map);
+        this.clickHandler.activate();
+
         OpenLayers.Control.prototype.setMap.apply(this, arguments);
     },
 
@@ -119,11 +127,11 @@ wax.ol.Interaction =
                         if (!tiles[t]) return;
                         if (feature && that.feature[t] !== feature) {
                             that.feature[t] = feature;
-                            that.callbacks['out'] (feature, tiles[t].layer.map.viewPortDiv, t);
-                            that.callbacks['over'](feature, tiles[t].layer.map.viewPortDiv, t);
+                            that.callbacks['out'] (feature, tiles[t].layer.map.div, t);
+                            that.callbacks['over'](feature, tiles[t].layer.map.div, t);
                         } else if (!feature) {
                             that.feature[t] = null;
-                            that.callbacks['out'](feature, tiles[t].layer.map.viewPortDiv, t);
+                            that.callbacks['out'](feature, tiles[t].layer.map.div, t);
                         }
                     } else {
                         // Request this feature
