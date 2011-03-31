@@ -23,6 +23,14 @@ wax.ol.Interaction =
         this.clickHandler.setMap(map);
         this.clickHandler.activate();
 
+        this.map.events.on({
+            "addlayer":        this.resetLayers,
+            "changelayer":     this.resetLayers,
+            "removelayer":     this.resetLayers,
+            "changebaselayer": this.resetLayers,
+            scope: this
+        });
+
         OpenLayers.Control.prototype.setMap.apply(this, arguments);
     },
 
@@ -75,6 +83,10 @@ wax.ol.Interaction =
                 (this.map.layers[i].CLASS_NAME === 'OpenLayers.Layer.TMS');
         }
         );
+    },
+
+    resetLayers: function() {
+        this._viableLayers = null;
     },
 
     // React to a click mouse event
