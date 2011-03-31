@@ -23,7 +23,7 @@ wax.ol.Interaction =
         this.clickHandler.setMap(map);
         this.clickHandler.activate();
 
-        this.map.events.on({
+        map.events.on({
             "addlayer":        this.resetLayers,
             "changelayer":     this.resetLayers,
             "removelayer":     this.resetLayers,
