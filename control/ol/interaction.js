@@ -139,18 +139,18 @@ wax.ol.Interaction =
                         if (!tiles[t]) return;
                         if (feature && that.feature[t] !== feature) {
                             that.feature[t] = feature;
-                            that.callbacks['out'] (feature, tiles[t].layer.map.div, t);
-                            that.callbacks['over'](feature, tiles[t].layer.map.div, t);
+                            that.callbacks['out'] (feature, tiles[t].layer.map.div, t, evt);
+                            that.callbacks['over'](feature, tiles[t].layer.map.div, t, evt);
                         } else if (!feature) {
                             that.feature[t] = null;
-                            that.callbacks['out'](feature, tiles[t].layer.map.div, t);
+                            that.callbacks['out'](feature, tiles[t].layer.map.div, t, evt);
                         }
                     } else {
                         // Request this feature
                         // TODO(tmcw) re-add layer
                         that.feature[t] = null;
                         if (tiles[t]) {
-                            that.callbacks['out']({}, tiles[t].layer.map.div, t);
+                            that.callbacks['out']({}, tiles[t].layer.map.div, t, evt);
                         } else {
                             that.callbacks['out']({}, false, t);
                         }
