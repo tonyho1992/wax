@@ -1419,7 +1419,7 @@ wax.tooltip = {};
 
 // Get the active tooltip for a layer or create a new one if no tooltip exists.
 // Hide any tooltips on layers underneath this one.
-wax.tooltip.getToolTip = function(feature, context, index) {
+wax.tooltip.getToolTip = function(feature, context, index, evt) {
     var tooltip = $(context).children('div.wax-tooltip-' +
         index +
         ':not(.removed)');
@@ -1428,7 +1428,7 @@ wax.tooltip.getToolTip = function(feature, context, index) {
             index +
             "'>" +
             "</div>").html(feature);
-        if (!$(context).triggerHandler('addedtooltip', [tooltip, context])) {
+        if (!$(context).triggerHandler('addedtooltip', [tooltip, context, evt])) {
             $(context).append(tooltip);
         }
     }
@@ -1459,26 +1459,25 @@ wax.tooltip.click = function(feature, context, index) {
 };
 
 // Show a tooltip.
-wax.tooltip.select = function(feature, context, layer_id) {
+wax.tooltip.select = function(feature, context, layer_id, evt) {
     if (!feature) return;
 
-    wax.tooltip.getToolTip(feature, context, layer_id);
+    wax.tooltip.getToolTip(feature, context, layer_id, evt);
     $(context).css('cursor', 'pointer');
     $('div', context).css('cursor', 'pointer');
 };
 
 // Hide all tooltips on this layer and show the first hidden tooltip on the
 // highest layer underneath if found.
-wax.tooltip.unselect = function(feature, context, layer_id) {
+wax.tooltip.unselect = function(feature, context, layer_id, evt) {
     $(context)
         .css('cursor', 'default')
-        .children('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
-        .addClass('removed')
+    $('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
         .remove();
+    // TODO: remove
     $('div', context).css('cursor', 'default');
 
-    $(context)
-        .children('div.wax-tooltip:first')
+    $('div.wax-tooltip:first')
         .removeClass('hidden')
         .show();
 };
@@ -1525,12 +1524,6 @@ wax.ol.Interaction =
 
     gm: new wax.GridManager(),
 
-    setMap: function(map) {
-        $(map.div).bind('mousemove', $.proxy(this.getInfoForHover, this));
-        $(map.div).bind('click', $.proxy(this.getInfoForClick, this));
-        OpenLayers.Control.prototype.setMap.apply(this, arguments);
-    },
-
     initialize: function(options) {
         this.options = options || {};
         this.clickAction = this.options.clickAction || 'full';
@@ -1541,6 +1534,28 @@ wax.ol.Interaction =
             over:  wax.tooltip.select,
             click: wax.tooltip.click
         };
+    },
+    
+    setMap: function(map) {
+        $(map.div).bind('mousemove', $.proxy(this.getInfoForHover, this));
+        this.clickHandler = new OpenLayers.Handler.Click(
+            this, {
+                click: this.getInfoForClick
+            }
+        );
+
+        this.clickHandler.setMap(map);
+        this.clickHandler.activate();
+
+        map.events.on({
+            "addlayer":        this.resetLayers,
+            "changelayer":     this.resetLayers,
+            "removelayer":     this.resetLayers,
+            "changebaselayer": this.resetLayers,
+            scope: this
+        });
+
+        OpenLayers.Control.prototype.setMap.apply(this, arguments);
     },
 
     // Get an Array of the stack of tiles under the mouse.
@@ -1580,6 +1595,10 @@ wax.ol.Interaction =
                 (this.map.layers[i].CLASS_NAME === 'OpenLayers.Layer.TMS');
         }
         );
+    },
+
+    resetLayers: function() {
+        this._viableLayers = null;
     },
 
     // React to a click mouse event
@@ -1632,18 +1651,18 @@ wax.ol.Interaction =
                         if (!tiles[t]) return;
                         if (feature && that.feature[t] !== feature) {
                             that.feature[t] = feature;
-                            that.callbacks['out'] (feature, tiles[t].layer.map.viewPortDiv, t);
-                            that.callbacks['over'](feature, tiles[t].layer.map.viewPortDiv, t);
+                            that.callbacks['out'] (feature, tiles[t].layer.map.div, t, evt);
+                            that.callbacks['over'](feature, tiles[t].layer.map.div, t, evt);
                         } else if (!feature) {
                             that.feature[t] = null;
-                            that.callbacks['out'](feature, tiles[t].layer.map.viewPortDiv, t);
+                            that.callbacks['out'](feature, tiles[t].layer.map.div, t, evt);
                         }
                     } else {
                         // Request this feature
                         // TODO(tmcw) re-add layer
                         that.feature[t] = null;
                         if (tiles[t]) {
-                            that.callbacks['out']({}, tiles[t].layer.map.viewPortDiv, t);
+                            that.callbacks['out']({}, tiles[t].layer.map.div, t, evt);
                         } else {
                             that.callbacks['out']({}, false, t);
                         }

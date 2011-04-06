@@ -1419,7 +1419,7 @@ wax.tooltip = {};
 
 // Get the active tooltip for a layer or create a new one if no tooltip exists.
 // Hide any tooltips on layers underneath this one.
-wax.tooltip.getToolTip = function(feature, context, index) {
+wax.tooltip.getToolTip = function(feature, context, index, evt) {
     var tooltip = $(context).children('div.wax-tooltip-' +
         index +
         ':not(.removed)');
@@ -1428,7 +1428,7 @@ wax.tooltip.getToolTip = function(feature, context, index) {
             index +
             "'>" +
             "</div>").html(feature);
-        if (!$(context).triggerHandler('addedtooltip', [tooltip, context])) {
+        if (!$(context).triggerHandler('addedtooltip', [tooltip, context, evt])) {
             $(context).append(tooltip);
         }
     }
@@ -1459,26 +1459,25 @@ wax.tooltip.click = function(feature, context, index) {
 };
 
 // Show a tooltip.
-wax.tooltip.select = function(feature, context, layer_id) {
+wax.tooltip.select = function(feature, context, layer_id, evt) {
     if (!feature) return;
 
-    wax.tooltip.getToolTip(feature, context, layer_id);
+    wax.tooltip.getToolTip(feature, context, layer_id, evt);
     $(context).css('cursor', 'pointer');
     $('div', context).css('cursor', 'pointer');
 };
 
 // Hide all tooltips on this layer and show the first hidden tooltip on the
 // highest layer underneath if found.
-wax.tooltip.unselect = function(feature, context, layer_id) {
+wax.tooltip.unselect = function(feature, context, layer_id, evt) {
     $(context)
         .css('cursor', 'default')
-        .children('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
-        .addClass('removed')
+    $('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
         .remove();
+    // TODO: remove
     $('div', context).css('cursor', 'default');
 
-    $(context)
-        .children('div.wax-tooltip:first')
+    $('div.wax-tooltip:first')
         .removeClass('hidden')
         .show();
 };

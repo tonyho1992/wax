@@ -12,6 +12,18 @@ wax.ol.Interaction =
 
     gm: new wax.GridManager(),
 
+    initialize: function(options) {
+        this.options = options || {};
+        this.clickAction = this.options.clickAction || 'full';
+        OpenLayers.Control.prototype.initialize.apply(this, [this.options || {}]);
+
+        this.callbacks = {
+            out:   wax.tooltip.unselect,
+            over:  wax.tooltip.select,
+            click: wax.tooltip.click
+        };
+    },
+    
     setMap: function(map) {
         $(map.div).bind('mousemove', $.proxy(this.getInfoForHover, this));
         this.clickHandler = new OpenLayers.Handler.Click(
@@ -32,18 +44,6 @@ wax.ol.Interaction =
         });
 
         OpenLayers.Control.prototype.setMap.apply(this, arguments);
-    },
-
-    initialize: function(options) {
-        this.options = options || {};
-        this.clickAction = this.options.clickAction || 'full';
-        OpenLayers.Control.prototype.initialize.apply(this, [this.options || {}]);
-
-        this.callbacks = {
-            out:   wax.tooltip.unselect,
-            over:  wax.tooltip.select,
-            click: wax.tooltip.click
-        };
     },
 
     // Get an Array of the stack of tiles under the mouse.
