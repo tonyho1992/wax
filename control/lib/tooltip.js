@@ -60,8 +60,14 @@ wax.tooltip.select = function(feature, context, layer_id, evt) {
 wax.tooltip.unselect = function(feature, context, layer_id, evt) {
     $(context)
         .css('cursor', 'default')
-    $('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
-        .remove();
+    if (layer_id) {
+        $('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
+            .remove();
+    } else {
+        $('div.wax-tooltip:not(.wax-popup)')
+            .remove();
+    }
+
     // TODO: remove
     $('div', context).css('cursor', 'default');
 

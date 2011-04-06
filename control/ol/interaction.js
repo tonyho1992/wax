@@ -87,6 +87,7 @@ wax.ol.Interaction =
 
     resetLayers: function() {
         this._viableLayers = null;
+        this.callbacks['out']();
     },
 
     // React to a click mouse event
