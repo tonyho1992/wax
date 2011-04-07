@@ -8,6 +8,12 @@ if (!com) {
 
 com.modestmaps.Map.prototype.interaction = function() {
     this.waxGM = new wax.GridManager();
+            
+    this.callbacks = {
+        out:   wax.tooltip.unselect,
+        over:  wax.tooltip.select,
+        click: wax.tooltip.click
+    };
 
     this.waxGetTileGrid = function() {
         // TODO: don't build for tiles outside of viewport
@@ -40,29 +46,24 @@ com.modestmaps.Map.prototype.interaction = function() {
         }
 
         if ($tile) {
-            this.waxGM.getGrid($tile.attr('src'), function(g) {
+            this.waxGM.getGrid($tile.attr('src'), $.proxy(function(g) {
                 if (g) {
                     var feature = g.getFeature(evt.pageX, evt.pageY, $tile, { format: 'teaser' });
                     if (feature) {
-                        if (!tiles[t]) return;
-                        if (feature && that.feature[t] !== feature) {
-                            that.feature[t] = feature;
-                            that.callbacks['out'] (feature, this.parent, 0, evt);
-                            that.callbacks['over'](feature, this.parent, 0, evt);
+                        if (feature && this.feature !== feature) {
+                            this.feature = feature;
+                            this.callbacks.out(feature, this.parent, 0, evt);
+                            this.callbacks.over(feature, this.parent, 0, evt);
                         } else if (!feature) {
-                            that.feature[t] = null;
-                            that.callbacks['out'](feature, this.parent, 0, evt);
+                            this.feature = null;
+                            this.callbacks.out(feature, this.parent, 0, evt);
                         }
                     } else {
-                        that.feature[t] = null;
-                        if (tiles[t]) {
-                            that.callbacks['out']({}, this.parent, 0, evt);
-                        } else {
-                            that.callbacks['out']({}, false, t);
-                        }
+                        this.feature = null;
+                        this.callbacks.out({}, this.parent, 0, evt);
                     }
                 }
-            });
+            }, this));
         }
 
     }, this));
