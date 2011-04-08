@@ -38,8 +38,15 @@ com.modestmaps.Map.prototype.interaction = function(options) {
     };
 
     // TODO: don't track on drag
-    $(this.parent).bind('mousemove', $.proxy(function(evt) {
-        console.log('testing mouse move');
+    $(this.parent).bind('mousedown mouseup mousemove', $.proxy(function(evt) {
+        var down = false;
+        if (evt.type === 'mouseup') {
+            down = false;
+        } else if (down || evt.type === 'mousedown') {
+            down = true;
+            return;
+        }
+
         var grid = this.waxGetTileGrid();
         for (var i = 0; i < grid.length; i++) {
             if ((grid[i][0] < evt.pageY) &&
