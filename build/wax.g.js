@@ -1252,6 +1252,7 @@ wax.GridInstance.prototype.resolveCode = function(key) {
 };
 
 wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
+  if (!(this.grid_tile && this.grid_tile.grid)) return;
   if (tile_element.left && tile_element.top) {
       var tileX = tile_element.left,
           tileY = tile_element.top;
