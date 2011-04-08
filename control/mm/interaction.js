@@ -6,18 +6,23 @@ if (!com) {
     }
 }
 
-com.modestmaps.Map.prototype.interaction = function() {
+// A chaining-style control that adds
+// interaction to a modestmaps.Map object.
+com.modestmaps.Map.prototype.interaction = function(options) {
     this.waxGM = new wax.GridManager();
-            
+
+    // This requires wax.Tooltip or similar
     this.callbacks = {
-        out:   wax.tooltip.unselect,
-        over:  wax.tooltip.select,
+        out: wax.tooltip.unselect,
+        over: wax.tooltip.select,
         click: wax.tooltip.click
     };
 
     this.waxGetTileGrid = function() {
         // TODO: don't build for tiles outside of viewport
         var zoom = this.getZoom();
+        // Calculate a tile grid and cache it, by using the `.tiles`
+        // element on this map.
         return this._waxGetTileGrid || (this._waxGetTileGrid =
             (function(t) {
                 var o = [];
@@ -34,6 +39,7 @@ com.modestmaps.Map.prototype.interaction = function() {
 
     // TODO: don't track on drag
     $(this.parent).bind('mousemove', $.proxy(function(evt) {
+        console.log('testing mouse move');
         var grid = this.waxGetTileGrid();
         for (var i = 0; i < grid.length; i++) {
             if ((grid[i][0] < evt.pageY) &&
@@ -68,7 +74,10 @@ com.modestmaps.Map.prototype.interaction = function() {
 
     }, this));
 
-    var modifying_events = ['zoomed', 'panned', 'centered', 'extentset', 'resized', 'drawn'];
+    // When the map is moved, the calculated tile grid is no longer
+    // accurate, so it must be reset.
+    var modifying_events = ['zoomed', 'panned', 'centered',
+        'extentset', 'resized', 'drawn'];
     for (var i = 0; i < modifying_events.length; i++) {
         this.addCallback(modifying_events[i], function(map, e) {
             map._waxGetTileGrid = null;

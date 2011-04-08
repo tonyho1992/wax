@@ -1,3 +1,6 @@
+// Wax: Zoom Control
+// -----------------
+
 // namespacing!
 if (!com) {
     var com = { };
@@ -6,6 +9,9 @@ if (!com) {
     }
 }
 
+// Add zoom links, which can be styled as buttons, to a `modestmaps.Map`
+// control. This function can be used chaining-style with other
+// chaining-style controls.
 com.modestmaps.Map.prototype.zoomer = function() {
     $('<a class="zoomer zoomin" href="#zoomin">+</a>')
         .click($.proxy(function() {
@@ -20,4 +26,4 @@ com.modestmaps.Map.prototype.zoomer = function() {
         }, this))
         .prependTo(this.parent);
     return this;
-}
+};
