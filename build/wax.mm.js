@@ -1378,9 +1378,8 @@ wax.Formatter.prototype.format = function(options, data) {
 var wax = wax || {};
 
 wax.Legend = function(context, container) {
-    (!container) && (container = $('<div class="wax-legends"></div>'));
     this.context = context;
-    this.container = container;
+    this.container = container || $('<div class="wax-legends"></div>');
     this.legends = {};
     $(this.context).append(this.container);
 };
@@ -1388,17 +1387,16 @@ wax.Legend = function(context, container) {
 wax.Legend.prototype.render = function(urls) {
     $('.wax-legend', this.container).hide();
 
-    var that = this;
-    var render = function(content) {
+    var render = $.proxy(function(content) {
         if (!content) {
-            that.legends[url] = false;
-        } else if (that.legends[url]) {
-            that.legends[url].show();
+            this.legends[url] = false;
+        } else if (this.legends[url]) {
+            this.legends[url].show();
         } else {
-            that.legends[url] = $("<div class='wax-legend'></div>").append(content);
-            that.container.append(that.legends[url]);
+            this.legends[url] = $("<div class='wax-legend'></div>").append(content);
+            this.container.append(this.legends[url]);
         }
-    };
+    }, this);
     for (var i = 0; i < urls.length; i++) {
         var url = this.legendUrl(urls[i]);
         wax.request.get(url, function(data) {
@@ -1496,18 +1494,23 @@ if (!com) {
     }
 }
 
-com.modestmaps.Map.prototype.interaction = function() {
+// A chaining-style control that adds
+// interaction to a modestmaps.Map object.
+com.modestmaps.Map.prototype.interaction = function(options) {
     this.waxGM = new wax.GridManager();
-            
+
+    // This requires wax.Tooltip or similar
     this.callbacks = {
-        out:   wax.tooltip.unselect,
-        over:  wax.tooltip.select,
+        out: wax.tooltip.unselect,
+        over: wax.tooltip.select,
         click: wax.tooltip.click
     };
 
     this.waxGetTileGrid = function() {
         // TODO: don't build for tiles outside of viewport
         var zoom = this.getZoom();
+        // Calculate a tile grid and cache it, by using the `.tiles`
+        // element on this map.
         return this._waxGetTileGrid || (this._waxGetTileGrid =
             (function(t) {
                 var o = [];
@@ -1523,7 +1526,15 @@ com.modestmaps.Map.prototype.interaction = function() {
     };
 
     // TODO: don't track on drag
-    $(this.parent).bind('mousemove', $.proxy(function(evt) {
+    $(this.parent).bind('mousedown mouseup mousemove', $.proxy(function(evt) {
+        var down = false;
+        if (evt.type === 'mouseup') {
+            down = false;
+        } else if (down || evt.type === 'mousedown') {
+            down = true;
+            return;
+        }
+
         var grid = this.waxGetTileGrid();
         for (var i = 0; i < grid.length; i++) {
             if ((grid[i][0] < evt.pageY) &&
@@ -1558,7 +1569,10 @@ com.modestmaps.Map.prototype.interaction = function() {
 
     }, this));
 
-    var modifying_events = ['zoomed', 'panned', 'centered', 'extentset', 'resized', 'drawn'];
+    // When the map is moved, the calculated tile grid is no longer
+    // accurate, so it must be reset.
+    var modifying_events = ['zoomed', 'panned', 'centered',
+        'extentset', 'resized', 'drawn'];
     for (var i = 0; i < modifying_events.length; i++) {
         this.addCallback(modifying_events[i], function(map, e) {
             map._waxGetTileGrid = null;
@@ -1567,6 +1581,13 @@ com.modestmaps.Map.prototype.interaction = function() {
 
     return this;
 };
+// Wax: Legend Control
+// -------------------
+// Requires:
+// 
+// * modestmaps
+// * wax.Legend
+
 // namespacing!
 if (!com) {
     var com = { };
@@ -1575,6 +1596,34 @@ if (!com) {
     }
 }
 
+// A chaining-style control that adds
+// interaction to a modestmaps.Map object.
+com.modestmaps.Map.prototype.legend = function(options) {
+    options = options || {};
+    this.legend = new wax.Legend(this.parent, options.container);
+    this.legend.render([
+        this.provider.getTileUrl({
+            zoom: 0,
+            column: 0,
+            row: 0
+        })
+    ]);
+    return this;
+};
+// Wax: Zoom Control
+// -----------------
+
+// namespacing!
+if (!com) {
+    var com = { };
+    if (!com.modestmaps) {
+        com.modestmaps = { };
+    }
+}
+
+// Add zoom links, which can be styled as buttons, to a `modestmaps.Map`
+// control. This function can be used chaining-style with other
+// chaining-style controls.
 com.modestmaps.Map.prototype.zoomer = function() {
     $('<a class="zoomer zoomin" href="#zoomin">+</a>')
         .click($.proxy(function() {
@@ -1589,7 +1638,7 @@ com.modestmaps.Map.prototype.zoomer = function() {
         }, this))
         .prependTo(this.parent);
     return this;
-}
+};
 // namespacing!
 if (!com) {
     var com = { };

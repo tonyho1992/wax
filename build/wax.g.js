@@ -1378,9 +1378,8 @@ wax.Formatter.prototype.format = function(options, data) {
 var wax = wax || {};
 
 wax.Legend = function(context, container) {
-    (!container) && (container = $('<div class="wax-legends"></div>'));
     this.context = context;
-    this.container = container;
+    this.container = container || $('<div class="wax-legends"></div>');
     this.legends = {};
     $(this.context).append(this.container);
 };
@@ -1388,17 +1387,16 @@ wax.Legend = function(context, container) {
 wax.Legend.prototype.render = function(urls) {
     $('.wax-legend', this.container).hide();
 
-    var that = this;
-    var render = function(content) {
+    var render = $.proxy(function(content) {
         if (!content) {
-            that.legends[url] = false;
-        } else if (that.legends[url]) {
-            that.legends[url].show();
+            this.legends[url] = false;
+        } else if (this.legends[url]) {
+            this.legends[url].show();
         } else {
-            that.legends[url] = $("<div class='wax-legend'></div>").append(content);
-            that.container.append(that.legends[url]);
+            this.legends[url] = $("<div class='wax-legend'></div>").append(content);
+            this.container.append(this.legends[url]);
         }
-    };
+    }, this);
     for (var i = 0; i < urls.length; i++) {
         var url = this.legendUrl(urls[i]);
         wax.request.get(url, function(data) {

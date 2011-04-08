@@ -5,9 +5,8 @@
 var wax = wax || {};
 
 wax.Legend = function(context, container) {
-    (!container) && (container = $('<div class="wax-legends"></div>'));
     this.context = context;
-    this.container = container;
+    this.container = container || $('<div class="wax-legends"></div>');
     this.legends = {};
     $(this.context).append(this.container);
 };
