@@ -1,7 +1,7 @@
 // Wax: Legend Control
 // -------------------
 // Requires:
-// 
+//
 // * modestmaps
 // * wax.Legend
 

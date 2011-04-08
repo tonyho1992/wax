@@ -15,7 +15,7 @@ wax.tooltip.getToolTip = function(feature, context, index, evt) {
         tooltip = $("<div class='wax-tooltip wax-tooltip-" +
             index +
             "'>" +
-            "</div>").html(feature);
+            '</div>').html(feature);
         if (!$(context).triggerHandler('addedtooltip', [tooltip, context, evt])) {
             $(context).append(tooltip);
         }
@@ -59,7 +59,7 @@ wax.tooltip.select = function(feature, context, layer_id, evt) {
 // highest layer underneath if found.
 wax.tooltip.unselect = function(feature, context, layer_id, evt) {
     $(context)
-        .css('cursor', 'default')
+        .css('cursor', 'default');
     if (layer_id) {
         $('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
             .remove();

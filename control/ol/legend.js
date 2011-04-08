@@ -24,10 +24,10 @@ wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
         OpenLayers.Control.prototype.setMap.apply(this, arguments);
         this.activate();
         this.map.events.on({
-            "addlayer": this.setLegend,
-            "changelayer": this.setLegend,
-            "removelayer": this.setLegend,
-            "changebaselayer": this.setLegend,
+            'addlayer': this.setLegend,
+            'changelayer': this.setLegend,
+            'removelayer': this.setLegend,
+            'changebaselayer': this.setLegend,
             scope: this
         });
     },

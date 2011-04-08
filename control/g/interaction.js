@@ -125,6 +125,6 @@ wax.g.Controls.prototype.Embedder = function(script_id) {
             'z-index': '9999999999',
             'position': 'relative'
         })
-        .val("<div id='" + script_id + "'>" + $('#' + script_id).html() + "</div>"));
+        .val("<div id='" + script_id + "'>" + $('#' + script_id).html() + '</div>'));
     return this;
 };

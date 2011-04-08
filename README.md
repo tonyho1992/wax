@@ -12,6 +12,8 @@ implementation of the [MBTiles interaction specification](https://github.com/map
 
 * `wax.ol.Interaction`
 * `wax.ol.Legend`
+* `wax.ol.Embedder`
+* `wax.ol.Switcher`
 
 #### Google Maps API v3
 
@@ -19,13 +21,19 @@ implementation of the [MBTiles interaction specification](https://github.com/map
 * `wax.g.MapType`
 * `wax.g.mapBoxLogo`
 
+#### Modest Maps
+
+* `.interaction()`
+* `.zoomer()`
+* `.legend()`
+
 #### Lib
 
 * `jquery.jsonp-2.1.4.js`, [from jquery-jsonp](http://code.google.com/p/jquery-jsonp/)
 
 #### Records
 
-The main usage of mapping frameworks through Wax is via records. Records are pure JSON objects that have a 1:1 representation with function Javascript code, but, unlike imperative code, can be stored and manipulated as configuration. Records are tested with [polymaps](http://polymaps.org), [openlayers](http://openlayers.org/) and Google Maps API v3, but the system (`/lib/record.js`) is generalized beyond mapping tools of any sort, to exist as a basic Javascript AST interpreter.
+The main usage of mapping frameworks through Wax is via records. Records are pure JSON objects that have a 1:1 representation with function Javascript code, but, unlike imperative code, can be stored and manipulated as configuration. Records are tested with [polymaps](http://polymaps.org), [openlayers](http://openlayers.org/), [Modest Maps](https://github.com/stamen/modestmaps-js) and Google Maps API v3, but the system (`/lib/record.js`) is generalized beyond mapping tools of any sort, to exist as a basic Javascript AST interpreter.
 
 Currently records support several control techniques:
 
@@ -93,29 +101,35 @@ Wax includes two libraries in `/lib` which are included in builds
 
 ## Changelog
 
+#### 1.1.0
+
+* connector/mm: Added [Modest Maps](https://github.com/stamen/modestmaps-js) connector.
+* control/mm: Added `.legend()`, `.interaction()`, and `.zoomer()` controls for Modest Maps.
+* control/lib: Added `addedTooltip` event to `tooltip.js` to allow for external styling code.
+
 #### 1.0.4
 
 * connector/g: Hide error tiles and wrap on dateline.
 * connector/g: Performance improvements.
-* control/legend: Fix rerender bug
+* control/legend: Fix rerender bug.
 * control/tooltip: `addedtooltip` event for binding/extending tooltip behavior. Subject to change.
 
 #### 1.0.3
 
-* Embedder functionality for Google Maps and OpenLayers
+* Embedder functionality for Google Maps and OpenLayers.
 
 #### 1.0.2
 
-* Bug fixes for Firefox 3
+* Bug fixes for Firefox 3.
 
 #### 1.0.1
 
 * `make ext` added for downloading and installing external libraries needed to use examples.
-* Bug fixes for legend, IE compatibility
+* Bug fixes for legend, IE compatibility.
 
 #### 1.0.0
 
-* Initial release
+* Initial release.
 
 ## Authors
 

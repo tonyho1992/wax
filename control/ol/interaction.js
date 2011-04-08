@@ -18,12 +18,12 @@ wax.ol.Interaction =
         OpenLayers.Control.prototype.initialize.apply(this, [this.options || {}]);
 
         this.callbacks = {
-            out:   wax.tooltip.unselect,
-            over:  wax.tooltip.select,
+            out: wax.tooltip.unselect,
+            over: wax.tooltip.select,
             click: wax.tooltip.click
         };
     },
-    
+
     setMap: function(map) {
         $(map.div).bind('mousemove', $.proxy(this.getInfoForHover, this));
         this.clickHandler = new OpenLayers.Handler.Click(
@@ -36,10 +36,10 @@ wax.ol.Interaction =
         this.clickHandler.activate();
 
         map.events.on({
-            "addlayer":        this.resetLayers,
-            "changelayer":     this.resetLayers,
-            "removelayer":     this.resetLayers,
-            "changebaselayer": this.resetLayers,
+            'addlayer': this.resetLayers,
+            'changelayer': this.resetLayers,
+            'removelayer': this.resetLayers,
+            'changebaselayer': this.resetLayers,
             scope: this
         });
 

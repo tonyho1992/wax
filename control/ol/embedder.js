@@ -20,7 +20,7 @@ wax.ol.Embedder =
               'z-index': '9999999999',
               'position': 'relative'
           })
-          .val("<div id='" + this.el + "-script'>" + $('#' + this.el + '-script').html() + "</div>"));
+          .val("<div id='" + this.el + "-script'>" + $('#' + this.el + '-script').html() + '</div>'));
       }
       this.activate();
     },

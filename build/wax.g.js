@@ -1186,6 +1186,29 @@ wax.Record = function(obj, context) {
 // Wax header
 var wax = wax || {};
 
+// Nondrag
+// -------
+// A simple abstraction from the `mousemove` handler that doesn't
+// trigger mousemove events while dragging.
+(function($) {
+    $.fn.extend({
+        nondrag: function(callback) {
+            $(this).bind('mousedown mouseup mousemove', function(evt) {
+                var down = false;
+                if (evt.type === 'mouseup') {
+                    down = false;
+                } else if (down || evt.type === 'mousedown') {
+                    down = true;
+                    // Don't trigger the callback if this is a drag.
+                    return;
+                }
+                callback(evt);
+            });
+            return this;
+        }
+    });
+})(jQuery);
+
 // Request
 // -------
 // Request data cache. `callback(data)` where `data` is the response data.
@@ -1228,21 +1251,21 @@ wax.request = {
             });
         }
     }
-}
+};
 
 // GridInstance
 // ------------
 // GridInstances are queryable, fully-formed
 // objects for acquiring features from events.
-wax.GridInstance = function (grid_tile, formatter) {
+wax.GridInstance = function(grid_tile, formatter) {
     this.grid_tile = grid_tile;
     this.formatter = formatter;
     this.tileRes = 4;
-}
+};
 
 // Resolve the UTF-8 encoding stored in grids to simple
 // number values.
-// See the [utfgrid section of the mbtiles spec](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md) 
+// See the [utfgrid section of the mbtiles spec](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md)
 // for details.
 wax.GridInstance.prototype.resolveCode = function(key) {
   (key >= 93) && key--;
@@ -1285,12 +1308,12 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
 // GridManager
 // -----------
 // Generally one GridManager will be used per map.
-wax.GridManager = function () {
+wax.GridManager = function() {
     this.grid_tiles = {};
     this.key_maps = {};
     this.formatters = {};
     this.locks = {};
-}
+};
 
 // Get a grid - calls `callback` with either a `GridInstance`
 // object or false. Behind the scenes, this calls `getFormatter`
@@ -1360,7 +1383,7 @@ wax.Formatter = function(obj) {
     } else {
         this.f = function() {};
     }
-}
+};
 
 // Wrap the given formatter function in order to
 // catch exceptions that it may throw.
@@ -1426,7 +1449,7 @@ wax.tooltip.getToolTip = function(feature, context, index, evt) {
         tooltip = $("<div class='wax-tooltip wax-tooltip-" +
             index +
             "'>" +
-            "</div>").html(feature);
+            '</div>').html(feature);
         if (!$(context).triggerHandler('addedtooltip', [tooltip, context, evt])) {
             $(context).append(tooltip);
         }
@@ -1470,7 +1493,7 @@ wax.tooltip.select = function(feature, context, layer_id, evt) {
 // highest layer underneath if found.
 wax.tooltip.unselect = function(feature, context, layer_id, evt) {
     $(context)
-        .css('cursor', 'default')
+        .css('cursor', 'default');
     if (layer_id) {
         $('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
             .remove();
@@ -1613,7 +1636,7 @@ wax.g.Controls.prototype.Embedder = function(script_id) {
             'z-index': '9999999999',
             'position': 'relative'
         })
-        .val("<div id='" + script_id + "'>" + $('#' + script_id).html() + "</div>"));
+        .val("<div id='" + script_id + "'>" + $('#' + script_id).html() + '</div>'));
     return this;
 };
 // Wax for Google Maps API v3
