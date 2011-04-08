@@ -26,6 +26,7 @@ implementation of the [MBTiles interaction specification](https://github.com/map
 * `.interaction()`
 * `.zoomer()`
 * `.legend()`
+* `.fullscreen()`
 
 #### Lib
 
@@ -104,7 +105,7 @@ Wax includes two libraries in `/lib` which are included in builds
 #### 1.1.0
 
 * connector/mm: Added [Modest Maps](https://github.com/stamen/modestmaps-js) connector.
-* control/mm: Added `.legend()`, `.interaction()`, and `.zoomer()` controls for Modest Maps.
+* control/mm: Added `.legend()`, `.interaction()`, `.fullscreen()`, and `.zoomer()` controls for Modest Maps.
 * control/lib: Added `addedTooltip` event to `tooltip.js` to allow for external styling code.
 
 #### 1.0.4
