@@ -5,6 +5,8 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/> 
     <title>Wax Manual</title> 
     <script src='lib/jquery.js' type='text/javascript'></script>
+    <script src='../ext/modestmaps.js' type='text/javascript'></script>
+    <script src='../build/wax.mm.min.js' type='text/javascript'></script>
     <script src='lib/showdown.js' type='text/javascript'></script>
     <script src='lib/shjs.js' type='text/javascript'></script>
     <script src='lib/sh_javascript.min.js' type='text/javascript'></script>
@@ -91,22 +93,8 @@ and higher.
 
 Wax provides a set of map controls for Modest Maps that make common map
 tricks easier to do.
-
-### Fullscreen
-
-The fullscreen control adds a link to the map that assigns a 
-fullscreen class to the map, which makes it fill the page.
-
-### Zoomer
-
-The Zoomer control is a stripped-down version of zoom controls, offering just
-zoom in & out buttons.
-
-### Legend
-
-The legend control pulls legend information from an interactive layer and 
-displays it on the map.
-
+</p>
+<p class='md'>
 ### Interaction
 
 The interaction control adds quite a bit of logic to the map, adding 
@@ -118,6 +106,73 @@ of the [MBTiles spec] [2].
 [1]: https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md
 [2]: https://github.com/mapbox/mbtiles-spec
 </p>
+<div class='section'>
+<div id='modestmaps-interaction' class='map'></div>
+<pre class='sh_javascript run'>
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-interaction',
+    new com.modestmaps.WaxProvider(
+      'http://a.npr.mapbox.com/',
+      'iheartnpr-0010'), new mm.Point(448,300))
+  .interaction();
+m.setCenterZoom(
+  new com.modestmaps.Location(38.8225909, -97.5585),
+  4);
+</pre>
+</div>
+
+
+<p class='md'>
+### Fullscreen
+
+The fullscreen control adds a link to the map that assigns a 
+fullscreen class to the map, which makes it fill the page.
+</p>
+
+<div class='section'>
+<div id='modestmaps-fullscreen' class='map'></div>
+<pre class='sh_javascript run'>
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-fullscreen',
+    new com.modestmaps.WaxProvider(
+      'http://a.tile.mapbox.com/',
+      'world-light'), new mm.Point(448,300))
+  .fullscreen();
+m.setCenterZoom(
+  new com.modestmaps.Location(38.8225909, -97.5585),
+  4);
+</pre>
+</div>
+
+<p class='md'>
+### Zoomer
+
+The Zoomer control is a stripped-down version of zoom controls, offering just
+zoom in & out buttons.
+</p>
+
+<div class='section'>
+<div id='modestmaps-zoomer' class='map dark'></div>
+<pre class='sh_javascript run'>
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-zoomer',
+    new com.modestmaps.WaxProvider(
+      'http://a.tile.mapbox.com/',
+      'world-glass'), new mm.Point(448,300))
+  .zoomer();
+m.setCenterZoom(
+  new com.modestmaps.Location(38.8225909, -97.5585),
+  4);
+</pre>
+</div>
+
+<p class='md'>
+### Legend
+
+The legend control pulls legend information from an interactive layer and 
+displays it on the map.
+</p>
+
     </div>
   </body>
 </html>

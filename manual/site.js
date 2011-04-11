@@ -12,5 +12,8 @@ $(function() {
             $(this).attr('id', cleaned);
         });
     });
+    $('.run').each(function() {
+        eval($(this).text());
+    });
     sh_highlightDocument();
 });

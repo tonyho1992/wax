@@ -1,20 +1,31 @@
 body {
   font:normal 15px/25px Georgia,serif;
+  color:#333;
   }
 a {
   color:#b64c4c;
   }
 div.page {
-  width: 800px;
+  width:800px;
   margin-left:auto;
   margin-right:auto;
+  }
+div.section {
+  float:left;
+  }
+div.map {
+  border:1px solid #000;
+  float:left;
+  }
+div.dark {
+  background-color:#222;
   }
 div.md {
   width: 450px;
   float:left;
   }
 h2 {
-  border-bottom:1px solid #000;
+  border-bottom:1px solid #333;
   }
 pre {
   width: 300px;
@@ -25,4 +36,16 @@ pre {
 code {
   background:#fbe7cc;
   padding:1px 3px;
+  }
+
+/**
+ * This page's style
+ */
+div.wax-tooltip {
+  background-color:#333;
+  color:#fff;
+  z-index:9999999999;
+}
+a.wax-fullscreen {
+  z-index:9999999999;
   }
