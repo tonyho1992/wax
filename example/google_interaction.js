@@ -14,8 +14,8 @@ $(function() {
                 ['@inject setMapTypeId', 'mb']
             ]
         ],
-        ['@chain Interaction'],
-        ['@chain Legend']
+        ['@chain interaction'],
+        ['@chain legend']
     ];
     wax.Record(map);
 });

@@ -8,6 +8,11 @@ if (!com) {
 
 // A chaining-style control that adds
 // interaction to a modestmaps.Map object.
+//
+// Takes an options object with the following keys:
+//
+// * `callbacks` (optional): an `out`, `over`, and `click` callback.
+//   If not given, the `wax.tooltip` library will be expected.
 com.modestmaps.Map.prototype.interaction = function(options) {
     // Our GridManager (from `gridutil.js`). This will keep the
     // cache of grid information and provide friendly utility methods
@@ -15,7 +20,7 @@ com.modestmaps.Map.prototype.interaction = function(options) {
     this.waxGM = new wax.GridManager();
 
     // This requires wax.Tooltip or similar
-    this.callbacks = {
+    this.callbacks = options.callbacks || {
         out: wax.tooltip.unselect,
         over: wax.tooltip.select,
         click: wax.tooltip.click
