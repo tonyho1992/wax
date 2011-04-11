@@ -16,7 +16,10 @@ if (!com) {
 com.modestmaps.Map.prototype.fullscreen = function() {
     $('<a class="wax-fullscreen" href="#fullscreen">fullscreen</a>')
         .click($.proxy(function() {
-            this.parent.toggleClass('fullscreen');
+            $(this.parent).toggleClass('wax-fullscreen-map');
+            this.setSize(
+                $(this.parent).outerWidth(),
+                $(this.parent).outerHeight());
             return false;
         }, this))
         .appendTo(this.parent);

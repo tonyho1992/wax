@@ -18,12 +18,12 @@ com.modestmaps.Map.prototype.zoomer = function() {
             this.zoomIn();
             return false;
         }, this))
-        .prependTo(this.parent);
+        .appendTo(this.parent);
     $('<a class="zoomer zoomout" href="#zoomout">-</a>')
         .click($.proxy(function() {
             this.zoomOut();
             return false;
         }, this))
-        .prependTo(this.parent);
+        .appendTo(this.parent);
     return this;
 };

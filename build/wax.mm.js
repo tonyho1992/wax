@@ -1550,7 +1550,10 @@ if (!com) {
 com.modestmaps.Map.prototype.fullscreen = function() {
     $('<a class="wax-fullscreen" href="#fullscreen">fullscreen</a>')
         .click($.proxy(function() {
-            this.parent.toggleClass('fullscreen');
+            $(this.parent).toggleClass('wax-fullscreen-map');
+            this.setSize(
+                $(this.parent).outerWidth(),
+                $(this.parent).outerHeight());
             return false;
         }, this))
         .appendTo(this.parent);
@@ -1710,13 +1713,13 @@ com.modestmaps.Map.prototype.zoomer = function() {
             this.zoomIn();
             return false;
         }, this))
-        .prependTo(this.parent);
+        .appendTo(this.parent);
     $('<a class="zoomer zoomout" href="#zoomout">-</a>')
         .click($.proxy(function() {
             this.zoomOut();
             return false;
         }, this))
-        .prependTo(this.parent);
+        .appendTo(this.parent);
     return this;
 };
 // namespacing!

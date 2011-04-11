@@ -1,7 +1,7 @@
 body {
   font:normal 15px/25px Georgia,serif;
   background:url('noise.png') #eee;
-  color:#333;
+  color:#25282B;
   }
 a {
   color:#b64c4c;
@@ -28,12 +28,14 @@ div.md {
 h2 {
   border-bottom:1px solid #333;
   }
-pre {
+pre, div.sidebar {
   width: 300px;
   padding:0 25px;
   margin:0;
-  font: normal 12px/20px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
   float:right;
+  }
+pre {
+  font: normal 12px/20px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
   }
 code {
   background:#fbe7cc;
@@ -49,5 +51,8 @@ div.wax-tooltip {
   z-index:9999999999;
 }
 a.wax-fullscreen {
-  z-index:9999999999;
+  position:absolute;
+  top:5px;
+  left:5px;
+  z-index:99999;
   }
