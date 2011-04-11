@@ -14,6 +14,7 @@ if (!com) {
 // * `callbacks` (optional): an `out`, `over`, and `click` callback.
 //   If not given, the `wax.tooltip` library will be expected.
 com.modestmaps.Map.prototype.interaction = function(options) {
+    options = options || {};
     // Our GridManager (from `gridutil.js`). This will keep the
     // cache of grid information and provide friendly utility methods
     // that return `GridTile` objects instead of raw data.

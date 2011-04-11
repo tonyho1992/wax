@@ -14,11 +14,11 @@ if (!com) {
 // control. This function can be used chaining-style with other
 // chaining-style controls.
 com.modestmaps.Map.prototype.fullscreen = function() {
-    $('<a class="fullscreen" href="#fullscreen">fullscreen</a>')
+    $('<a class="wax-fullscreen" href="#fullscreen">fullscreen</a>')
         .click($.proxy(function() {
             this.parent.toggleClass('fullscreen');
             return false;
         }, this))
-        .prependTo(this.parent);
+        .appendTo(this.parent);
     return this;
 };

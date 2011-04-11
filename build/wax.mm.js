@@ -1509,6 +1509,29 @@ wax.tooltip.unselect = function(feature, context, layer_id, evt) {
         .removeClass('hidden')
         .show();
 };
+// Wax: Embedder Control
+// -------------------
+
+// namespacing!
+if (!com) {
+    var com = { };
+    if (!com.modestmaps) {
+        com.modestmaps = { };
+    }
+}
+
+com.modestmaps.Map.prototype.embedder = function(options) {
+    options = options || {};
+    if ($('#' + this.el + '-script').length) {
+      $(this.parent).prepend($('<input type="text" class="embed-src" />')
+        .css({
+            'z-index': '9999999999',
+            'position': 'relative'
+        })
+        .val("<div id='" + this.el + "-script'>" + $('#' + this.el + '-script').html() + '</div>'));
+    }
+    return this;
+};
 // Wax: Fullscreen
 // -----------------
 // A simple fullscreen control for Modest Maps
@@ -1525,12 +1548,12 @@ if (!com) {
 // control. This function can be used chaining-style with other
 // chaining-style controls.
 com.modestmaps.Map.prototype.fullscreen = function() {
-    $('<a class="fullscreen" href="#fullscreen">fullscreen</a>')
+    $('<a class="wax-fullscreen" href="#fullscreen">fullscreen</a>')
         .click($.proxy(function() {
             this.parent.toggleClass('fullscreen');
             return false;
         }, this))
-        .prependTo(this.parent);
+        .appendTo(this.parent);
     return this;
 };
 // namespacing!
@@ -1543,14 +1566,20 @@ if (!com) {
 
 // A chaining-style control that adds
 // interaction to a modestmaps.Map object.
+//
+// Takes an options object with the following keys:
+//
+// * `callbacks` (optional): an `out`, `over`, and `click` callback.
+//   If not given, the `wax.tooltip` library will be expected.
 com.modestmaps.Map.prototype.interaction = function(options) {
+    options = options || {};
     // Our GridManager (from `gridutil.js`). This will keep the
     // cache of grid information and provide friendly utility methods
     // that return `GridTile` objects instead of raw data.
     this.waxGM = new wax.GridManager();
 
     // This requires wax.Tooltip or similar
-    this.callbacks = {
+    this.callbacks = options.callbacks || {
         out: wax.tooltip.unselect,
         over: wax.tooltip.select,
         click: wax.tooltip.click

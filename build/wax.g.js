@@ -1555,88 +1555,104 @@ wax.g.Controls.prototype.calculateGrid = function() {
     return tiles;
 };
 
-wax.g.Controls.prototype.inTile = function(sevt, xy) {
-    if ((xy.top < sevt.y) &&
-        ((xy.top + 256) > sevt.y) &&
-         (xy.left < sevt.x) &&
-        ((xy.left + 256) > sevt.x)) {
-        return true;
-    }
-};
+wax.g.Controls.prototype.interaction = function(options) {
+    var that = this;
+    var gm = new wax.GridManager();
+    var f = null;
 
-wax.g.Controls.prototype.Interaction = function() {
-  var that = this;
-  var gm = new wax.GridManager();
-  var f = null;
-  var find = function(map, evt) {
-    var found = false;
-    var interaction_grid = that.calculateGrid();
-    for (var i = 0; i < interaction_grid.length && !found; i++) {
-      if (that.inTile(evt.pixel, interaction_grid[i].xy)) {
-          var found = interaction_grid[i];
-      }
-    }
-    return found;
-  };
-  google.maps.event.addListener(this.map, 'mousemove', function(evt) {
-    var options = { format: 'teaser' };
-    var found = find(this.map, evt);
-    if (!found) return;
-    gm.getGrid($(found.tile).attr('src'), function(g) {
-        if (!g) return;
-        var feature = g.getFeature(
-          evt.pixel.x + $(that.mapDiv).offset().left,
-          evt.pixel.y + $(that.mapDiv).offset().top,
-          found.tile,
-          options
-        );
-        if (feature !== f) {
-          wax.tooltip.unselect(feature, $(that.mapDiv), 0);
-          wax.tooltip.select(feature, $(that.mapDiv), 0);
-          f = feature;
+    // This requires wax.Tooltip or similar
+    var callbacks = options.callbacks || {
+        out: wax.tooltip.unselect,
+        over: wax.tooltip.select,
+        click: wax.tooltip.click
+    };
+
+    var inTile = function(sevt, xy) {
+        if ((xy.top < sevt.y) &&
+            ((xy.top + 256) > sevt.y) &&
+            (xy.left < sevt.x) &&
+            ((xy.left + 256) > sevt.x)) {
+            return true;
         }
+    };
+
+    var find = function(map, evt) {
+        var found = false;
+        var interaction_grid = that.calculateGrid();
+        for (var i = 0; i < interaction_grid.length && !found; i++) {
+            if (inTile(evt.pixel, interaction_grid[i].xy)) {
+                var found = interaction_grid[i];
+            }
+        }
+        return found;
+    };
+
+    google.maps.event.addListener(this.map, 'mousemove', function(evt) {
+        var options = { format: 'teaser' };
+        var found = find(this.map, evt);
+        if (!found) return;
+        gm.getGrid($(found.tile).attr('src'), function(g) {
+            if (!g) return;
+            var feature = g.getFeature(
+                evt.pixel.x + $(that.mapDiv).offset().left,
+                evt.pixel.y + $(that.mapDiv).offset().top,
+                found.tile,
+                options
+            );
+            if (feature !== f) {
+                callbacks.out(feature, $(that.mapDiv), 0);
+                callbacks.over(feature, $(that.mapDiv), 0);
+                f = feature;
+            }
+        });
     });
-  });
-  google.maps.event.addListener(this.map, 'click', function(evt) {
-    var options = { format: 'full' };
-    var found = find(this.map, evt);
-    if (!found) return;
-    gm.getGrid($(found.tile).attr('src'), function(g) {
-        if (!g) return;
-        var feature = g.getFeature(
-          evt.pixel.x + $(that.mapDiv).offset().left,
-          evt.pixel.y + $(that.mapDiv).offset().top,
-          found.tile,
-          options
-        );
-        feature && wax.tooltip.click(feature, $(that.mapDiv), 0);
+
+    google.maps.event.addListener(this.map, 'click', function(evt) {
+        var options = { format: 'full' };
+        var found = find(this.map, evt);
+        if (!found) return;
+        gm.getGrid($(found.tile).attr('src'), function(g) {
+            if (!g) return;
+            var feature = g.getFeature(
+                evt.pixel.x + $(that.mapDiv).offset().left,
+                evt.pixel.y + $(that.mapDiv).offset().top,
+                found.tile,
+                options
+            );
+            feature && callbacks.click(feature, $(that.mapDiv), 0);
+        });
     });
-  });
-  return this;
+
+    // Ensure chainability
+    return this;
 };
 
-wax.g.Controls.prototype.Legend = function() {
-    var that = this,
-        legend = new wax.Legend($(this.mapDiv)),
+wax.g.Controls.prototype.legend = function() {
+    var legend = new wax.Legend($(this.mapDiv)),
         url = null;
 
     // Ideally we would use the 'tilesloaded' event here. This doesn't seem to
     // work so we use the much less appropriate 'idle' event.
-    google.maps.event.addListener(this.map, 'idle', function() {
+    google.maps.event.addListener(this.map, 'idle', $.proxy(function() {
         if (url) return;
-        var img = $('div.interactive-div-' + that.map.getZoom() + ' img:first', that.mapDiv);
+        var img = $('div.interactive-div-' + this.map.getZoom() + ' img:first',
+            this.mapDiv);
         img && (url = img.attr('src')) && legend.render([url]);
-    });
+    }, this));
+
+    // Ensure chainability
     return this;
 };
 
-wax.g.Controls.prototype.Embedder = function(script_id) {
+wax.g.Controls.prototype.embedder = function(script_id) {
     $(this.mapDiv).prepend($('<input type="text" class="embed-src" />')
-        .css({
-            'z-index': '9999999999',
-            'position': 'relative'
-        })
-        .val("<div id='" + script_id + "'>" + $('#' + script_id).html() + '</div>'));
+    .css({
+        'z-index': '9999999999',
+        'position': 'relative'
+    })
+    .val("<div id='" + script_id + "'>" + $('#' + script_id).html() + '</div>'));
+    
+    // Ensure chainability
     return this;
 };
 // Wax for Google Maps API v3
