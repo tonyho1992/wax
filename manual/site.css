@@ -29,7 +29,8 @@ h2 {
   }
 pre {
   width: 300px;
-  padding:25px;
+  padding:0 25px;
+  margin:0;
   font: normal 12px/20px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
   float:right;
   }
