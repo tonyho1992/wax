@@ -1,0 +1,28 @@
+body {
+  font:normal 15px/25px Georgia,serif;
+  }
+a {
+  color:#b64c4c;
+  }
+div.page {
+  width: 800px;
+  margin-left:auto;
+  margin-right:auto;
+  }
+div.md {
+  width: 450px;
+  float:left;
+  }
+h2 {
+  border-bottom:1px solid #000;
+  }
+pre {
+  width: 300px;
+  padding:25px;
+  font: normal 12px/20px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
+  float:right;
+  }
+code {
+  background:#fbe7cc;
+  padding:1px 3px;
+  }

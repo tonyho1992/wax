@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"> 
+  <head> 
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/> 
+    <title>Wax Manual</title> 
+    <script src='lib/jquery.js' type='text/javascript'></script>
+    <script src='lib/showdown.js' type='text/javascript'></script>
+    <script src='lib/shjs.js' type='text/javascript'></script>
+    <script src='lib/sh_javascript.min.js' type='text/javascript'></script>
+    <script src='site.js' type='text/javascript'></script>
+    <link href='lib/shjs.css' rel='stylesheet' type='text/css' /> 
+    <link href='site.css' rel='stylesheet' type='text/css' /> 
+  </head> 
+  <body> 
+    <div class='page'> 
+<p class='md'>
+## Wax Records
+
+Records are a feature of Wax aimed to simplify the configuration of sites that
+host many maps. They translate the configuration of any mapping API into 
+logic-free [JSON](http://json.org/), where it can be stored in a database and 
+easily modified by other code.
+</p>
+<div class='section'>
+<pre class='sh_javascript'>
+new google.maps.Map(document.getElementById('gmap'), {
+  center: new google.maps.LatLng(0, 0),
+  zoom: 2,
+  mapTypeId: google.maps.MapTypeId.ROADMAP
+});
+
+// The above code is equivalent to
+
+wax.Record({ 'wax':
+  ['@new google.maps.Map',
+    ['@call document.getElementById', 'gmap'],
+    {
+      center: ['@new google.maps.LatLng', 0, 0],
+      zoom: 2,
+      mapTypeId: ['@literal google.maps.MapTypeId.ROADMAP']
+    }
+  ]
+});
+</pre>
+<p class='md'>
+Records aim to be a very close translation from the actual Javascript. 
+You'll notice that the Javascript keyword `new` is represented by `@new`, 
+and the same with calling functions, using literal functions, etc.
+
+* Records are not written for variable-heavy code. A great chaining interface,
+with `@group`, `@inject`, and `@chain` is available for libraries that 
+are written in a chainable fashion, like Modest Maps and Polymaps.
+* Records are mainly written for code that will be 'done' when the Record 
+stops spinning. Although `wax.Record` returns the last object it was playing
+around with (most often the map object), this is more a convenience than a core 
+API guarantee.
+</p>
+</div>
+<p class='md'>
+## Mapping Libraries
+
+Wax supports [Modest Maps] [1], [OpenLayers] [2], and [Google Maps] [3] APIs
+with custom map controls - the ability to interact with tooltips and links,
+a legend to illustrate map data, and other various utilities.
+
+Modest Maps is the recommended library for use with Wax. Being more compact 
+than OpenLayers, faster on older browsers than Polymaps, and more flexible 
+than the Google Maps makes it a good choice for custom mapping applications.
+The library was originally developed by Tom Carden and Mike Migurski of
+[Stamen](http://stamen.com/) as a port of [ActionScript and Python code](http://modestmaps.com/).
+
+### Modest Maps and Layering
+
+Modest Maps natively supports a single map layer at a time, unlike OpenLayers, 
+which has a flexible baselayer/overlay system. Currently we're working on 
+compositing layers server-side rather than supporting multiple layers in the 
+browser, because this could give a much higher level of performance.
+
+The main reason that [Polymaps](http://polymaps.org/) is not recommended for
+mainstream usage is its lack of support for Internet Explorer. Modest Maps,
+OpenLayers, and Google Maps all have solid support for Internet Explorer 7
+and higher.
+
+[1]: https://github.com/stamen/modestmaps-js
+[2]: http://www.openlayers.org/
+[3]: http://code.google.com/apis/maps/documentation/javascript/
+</p>
+<p class='md'>
+## Wax's Tricks
+
+Wax provides a set of map controls for Modest Maps that make common map
+tricks easier to do.
+
+### Fullscreen
+
+The fullscreen control adds a link to the map that assigns a 
+fullscreen class to the map, which makes it fill the page.
+
+### Zoomer
+
+The Zoomer control is a stripped-down version of zoom controls, offering just
+zoom in & out buttons.
+
+### Legend
+
+The legend control pulls legend information from an interactive layer and 
+displays it on the map.
+
+### Interaction
+
+The interaction control adds quite a bit of logic to the map, adding 
+interactivity - mouse hovers and clicks - to layers that support it, like those
+made with [TileMill](http://tilemill.com/) and the interactive 
+[UTFGrid section] [1]
+of the [MBTiles spec] [2].
+
+[1]: https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md
+[2]: https://github.com/mapbox/mbtiles-spec
+</p>
+    </div>
+  </body>
+</html>
