@@ -6,6 +6,7 @@ ext:
 	wget http://code.jquery.com/jquery-1.5.1.min.js -O ext/jquery-1.5.min.js
 	wget --no-check-certificate https://github.com/simplegeo/polymaps/raw/master/polymaps.js -O ext/polymaps.js
 	wget --no-check-certificate https://github.com/developmentseed/openlayers_slim/raw/v1.9/OpenLayers.js -O ext/OpenLayers.js
+	wget --no-check-certificate https://github.com/stamen/modestmaps-js/raw/c202b0a274f4235c4ebd8362fff11d88a2c0fc8f/modestmaps.min.js -O ext/modestmaps.js
 
 build/wax.ol.min.js:
 	cat lib/*.js control/lib/*.js control/ol/*.js > build/wax.ol.js
