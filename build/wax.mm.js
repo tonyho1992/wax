@@ -1732,32 +1732,43 @@ if (!com) {
 
 // A layer connector for Modest Maps
 //
-// Takes a `base_url` first argument that can be a string for a single
+// ### Required arguments
+//
+// * `base_url` first argument that can be a string for a single
 // server or an array to hit multiple servers or CNAMEs.
+// * `layername`
 //
-// Also takes a `layername` argument.
+// ### Optional arguments
 //
-// Also takes a `filetype` argument.
-com.modestmaps.WaxProvider = function(base_url, layername, filetype) {
-    this.layername = layername;
-    this.base_urls = (typeof(base_url) == 'string') ? [base_url] : base_url;
-    this.n_urls = this.base_urls.length;
-    this.filetype = filetype || '.png';
+// * `filetype`: like `.jpeg` (default `.png`)
+// * `zoomrange`: like [0, 10] (default [0, 18])
+// 
+com.modestmaps.WaxProvider = function(options) {
+    this.layerName = options.layerName;
+    this.baseUrls = (typeof(options.baseUrl) == 'string') ?
+            [options.baseUrl] : options.baseUrl;
+    this.n_urls = this.baseUrls.length;
+    this.filetype = options.filetype || '.png';
+    this.zoomRange = options.zoomRange || [0, 18];
 };
 
 com.modestmaps.WaxProvider.prototype = {
-    key: null,
-    style: null,
+    outerLimits: function() {
+        return [
+            new com.modestmaps.Coordinate(0,0,0).zoomTo(this.zoomRange[0]),
+            new com.modestmaps.Coordinate(1,1,0).zoomTo(this.zoomRange[1])
+        ];
+    },
     getTileUrl: function(coord) {
         coord = this.sourceCoordinate(coord);
         var worldSize = Math.pow(2, coord.zoom);
         coord.row = Math.pow(2, coord.zoom) - coord.row - 1;
         if (this.n_urls === 1) {
-            var server = this.base_urls[0];
+            var server = this.baseUrls[0];
         } else {
-            var server = this.base_urls[parseInt(worldSize * coord.row + coord.column) % this.n_urls];
+            var server = this.baseUrls[parseInt(worldSize * coord.row + coord.column) % this.n_urls];
         }
-        var imgPath = new Array('1.0.0', this.layername, coord.zoom, coord.column, coord.row).join('/');
+        var imgPath = ['1.0.0', this.layerName, coord.zoom, coord.column, coord.row].join('/');
         return server + imgPath + this.filetype;
     }
 };

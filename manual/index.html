@@ -73,11 +73,11 @@ var mm = com.modestmaps;
 // Set up a map in a div with the id 'modestmaps-setup'
 var m = new mm.Map('modestmaps-setup',
   // Use Wax's special 'provider' code to add a new custom layer
-  new com.modestmaps.WaxProvider(
+  new com.modestmaps.WaxProvider({
     // From the main MapBox server
-    'http://a.tile.mapbox.com/',
+    baseUrl: 'http://a.tile.mapbox.com/',
     // Called world-light
-    'world-light'),
+    layerName: 'world-light'}),
     // And it'll be 448px by 300px
     new mm.Point(448,300));
 
@@ -110,9 +110,9 @@ of the [MBTiles spec] [2].
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-interaction',
-    new com.modestmaps.WaxProvider(
-      'http://a.npr.mapbox.com/',
-      'iheartnpr-0010'), new mm.Point(448,300))
+    new com.modestmaps.WaxProvider({
+      baseUrl: 'http://a.npr.mapbox.com/',
+      layerName: 'iheartnpr-0010'}), new mm.Point(448,300))
   .interaction();
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
@@ -133,9 +133,9 @@ fullscreen class to the map, which makes it fill the page.
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-fullscreen',
-    new com.modestmaps.WaxProvider(
-      'http://a.tile.mapbox.com/',
-      'world-light'), new mm.Point(448,300))
+    new com.modestmaps.WaxProvider({
+      baseUrl: 'http://a.tile.mapbox.com/',
+      layerName: 'world-light'}), new mm.Point(448,300))
   .fullscreen();
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
@@ -155,9 +155,9 @@ zoom in & out buttons.
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-zoomer',
-    new com.modestmaps.WaxProvider(
-      'http://a.tile.mapbox.com/',
-      'world-glass'), new mm.Point(448,300))
+    new com.modestmaps.WaxProvider({
+      baseUrl: 'http://a.tile.mapbox.com/',
+      layerName: 'world-glass'}), new mm.Point(448,300))
   .zoomer();
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
@@ -177,9 +177,9 @@ displays it on the map.
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-legend',
-    new com.modestmaps.WaxProvider(
-      'http://a.tile.mapbox.com/',
-      'world-print'), new mm.Point(448,300))
+    new com.modestmaps.WaxProvider({
+      baseUrl: 'http://a.tile.mapbox.com/',
+      layerName: 'world-print'}), new mm.Point(448,300))
   .legend();
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
@@ -283,11 +283,12 @@ the `WaxProvider` function an array of domain names instead of just one.
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-cnames',
-    new com.modestmaps.WaxProvider([
-      'http://a.tile.mapbox.com/',
-      'http://b.tile.mapbox.com/',
-      'http://c.tile.mapbox.com/'],
-      'world-glass'), new mm.Point(448,300));
+    new com.modestmaps.WaxProvider({
+      baseUrl: [
+        'http://a.tile.mapbox.com/',
+        'http://b.tile.mapbox.com/',
+        'http://c.tile.mapbox.com/'],
+      layerName: 'world-glass'}), new mm.Point(448,300));
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
   4);
