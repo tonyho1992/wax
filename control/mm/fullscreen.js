@@ -1,5 +1,6 @@
 // Wax: Fullscreen
 // -----------------
+// A simple fullscreen control for Modest Maps
 
 // namespacing!
 if (!com) {

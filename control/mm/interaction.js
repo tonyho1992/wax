@@ -9,6 +9,9 @@ if (!com) {
 // A chaining-style control that adds
 // interaction to a modestmaps.Map object.
 com.modestmaps.Map.prototype.interaction = function(options) {
+    // Our GridManager (from `gridutil.js`). This will keep the
+    // cache of grid information and provide friendly utility methods
+    // that return `GridTile` objects instead of raw data.
     this.waxGM = new wax.GridManager();
 
     // This requires wax.Tooltip or similar
@@ -18,6 +21,9 @@ com.modestmaps.Map.prototype.interaction = function(options) {
         click: wax.tooltip.click
     };
 
+    // Search through `.tiles` and determine the position,
+    // from the top-left of the **document**, and cache that data
+    // so that `mousemove` events don't always recalculate.
     this.waxGetTileGrid = function() {
         // TODO: don't build for tiles outside of viewport
         var zoom = this.getZoom();
@@ -37,6 +43,8 @@ com.modestmaps.Map.prototype.interaction = function(options) {
             })(this.tiles));
     };
 
+    // On `mousemove` events that **don't** have the mouse button
+    // down - so that the map isn't being dragged.
     $(this.parent).nondrag($.proxy(function(evt) {
         var grid = this.waxGetTileGrid();
         for (var i = 0; i < grid.length; i++) {
@@ -52,7 +60,11 @@ com.modestmaps.Map.prototype.interaction = function(options) {
         if ($tile) {
             this.waxGM.getGrid($tile.attr('src'), $.proxy(function(g) {
                 if (g) {
-                    var feature = g.getFeature(evt.pageX, evt.pageY, $tile, { format: 'teaser' });
+                    var feature = g.getFeature(evt.pageX, evt.pageY, $tile, {
+                        format: 'teaser'
+                    });
+                    // This and other Modest Maps controls only support a single layer.
+                    // Thus a layer index of **0** is given to the tooltip library
                     if (feature) {
                         if (feature && this.feature !== feature) {
                             this.feature = feature;
@@ -82,5 +94,6 @@ com.modestmaps.Map.prototype.interaction = function(options) {
         });
     }
 
+    // Ensure chainability
     return this;
 };

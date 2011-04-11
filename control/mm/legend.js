@@ -13,8 +13,8 @@ if (!com) {
     }
 }
 
-// A chaining-style control that adds
-// interaction to a modestmaps.Map object.
+// The Modest Maps version of this control is a very, very
+// light wrapper around the `/lib` code for legends.
 com.modestmaps.Map.prototype.legend = function(options) {
     options = options || {};
     this.legend = new wax.Legend(this.parent, options.container);

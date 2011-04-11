@@ -319,7 +319,7 @@ wax.Record = function(obj, context) {
             fn_obj[1].apply(obj, args);
         // lord have mercy on your soul.
         } else {
-            switch(args.length) {
+            switch (args.length) {
                 case 0: obj = new fn_obj[1](); break;
                 case 1: obj = new fn_obj[1](args[0]); break;
                 case 2: obj = new fn_obj[1](args[0], args[1]); break;
@@ -1511,6 +1511,7 @@ wax.tooltip.unselect = function(feature, context, layer_id, evt) {
 };
 // Wax: Fullscreen
 // -----------------
+// A simple fullscreen control for Modest Maps
 
 // namespacing!
 if (!com) {
@@ -1543,6 +1544,9 @@ if (!com) {
 // A chaining-style control that adds
 // interaction to a modestmaps.Map object.
 com.modestmaps.Map.prototype.interaction = function(options) {
+    // Our GridManager (from `gridutil.js`). This will keep the
+    // cache of grid information and provide friendly utility methods
+    // that return `GridTile` objects instead of raw data.
     this.waxGM = new wax.GridManager();
 
     // This requires wax.Tooltip or similar
@@ -1552,6 +1556,9 @@ com.modestmaps.Map.prototype.interaction = function(options) {
         click: wax.tooltip.click
     };
 
+    // Search through `.tiles` and determine the position,
+    // from the top-left of the **document**, and cache that data
+    // so that `mousemove` events don't always recalculate.
     this.waxGetTileGrid = function() {
         // TODO: don't build for tiles outside of viewport
         var zoom = this.getZoom();
@@ -1571,6 +1578,8 @@ com.modestmaps.Map.prototype.interaction = function(options) {
             })(this.tiles));
     };
 
+    // On `mousemove` events that **don't** have the mouse button
+    // down - so that the map isn't being dragged.
     $(this.parent).nondrag($.proxy(function(evt) {
         var grid = this.waxGetTileGrid();
         for (var i = 0; i < grid.length; i++) {
@@ -1586,7 +1595,11 @@ com.modestmaps.Map.prototype.interaction = function(options) {
         if ($tile) {
             this.waxGM.getGrid($tile.attr('src'), $.proxy(function(g) {
                 if (g) {
-                    var feature = g.getFeature(evt.pageX, evt.pageY, $tile, { format: 'teaser' });
+                    var feature = g.getFeature(evt.pageX, evt.pageY, $tile, {
+                        format: 'teaser'
+                    });
+                    // This and other Modest Maps controls only support a single layer.
+                    // Thus a layer index of **0** is given to the tooltip library
                     if (feature) {
                         if (feature && this.feature !== feature) {
                             this.feature = feature;
@@ -1616,6 +1629,7 @@ com.modestmaps.Map.prototype.interaction = function(options) {
         });
     }
 
+    // Ensure chainability
     return this;
 };
 // Wax: Legend Control
@@ -1633,8 +1647,8 @@ if (!com) {
     }
 }
 
-// A chaining-style control that adds
-// interaction to a modestmaps.Map object.
+// The Modest Maps version of this control is a very, very
+// light wrapper around the `/lib` code for legends.
 com.modestmaps.Map.prototype.legend = function(options) {
     options = options || {};
     this.legend = new wax.Legend(this.parent, options.container);
@@ -1687,7 +1701,7 @@ if (!com) {
 com.modestmaps.WaxProvider = function(base_url, layername) {
     this.layername = layername;
     this.base_url = base_url;
-}
+};
 
 com.modestmaps.WaxProvider.prototype = {
     key: null,
@@ -1699,6 +1713,6 @@ com.modestmaps.WaxProvider.prototype = {
         var imgPath = new Array('1.0.0', this.layername, coord.zoom, coord.column, coord.row).join('/');
         return this.base_url + imgPath + '.png';
     }
-}
+};
 
 com.modestmaps.extend(com.modestmaps.WaxProvider, com.modestmaps.MapProvider);

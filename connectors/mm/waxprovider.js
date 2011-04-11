@@ -9,7 +9,7 @@ if (!com) {
 com.modestmaps.WaxProvider = function(base_url, layername) {
     this.layername = layername;
     this.base_url = base_url;
-}
+};
 
 com.modestmaps.WaxProvider.prototype = {
     key: null,
@@ -21,6 +21,6 @@ com.modestmaps.WaxProvider.prototype = {
         var imgPath = new Array('1.0.0', this.layername, coord.zoom, coord.column, coord.row).join('/');
         return this.base_url + imgPath + '.png';
     }
-}
+};
 
 com.modestmaps.extend(com.modestmaps.WaxProvider, com.modestmaps.MapProvider);

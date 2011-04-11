@@ -1,5 +1,9 @@
 // Wax: Legend Control
 // -------------------
+// This is a simple layer switcher for OpenLayers, based loosely
+// off of the strategy of the openlayers_plus blockswitcher.
+// See the last lines for the `layeradded` event, which is the
+// way to style layer switcher elements.
 
 // Wax header
 var wax = wax || {};
@@ -8,18 +12,40 @@ wax.ol = wax.ol || {};
 wax.ol.Switcher = OpenLayers.Class(OpenLayers.Control, {
     CLASS_NAME: 'wax.ol.Switcher',
 
+    // Called on `new`. In the tradition of BackBone.js, this control takes
+    // an option `e` in its settings object which is a reference to a DOM
+    // element it will own.
     initialize: function(options) {
         this.$element = $(options.e);
         this.options = options || {};
         OpenLayers.Control.prototype.initialize.apply(this, [options || {}]);
     },
 
+    // Called from OpenLayers. Attach event handlers to call `this.redraw`
+    // when the map state has changed.
+    setMap: function(map) {
+        OpenLayers.Control.prototype.setMap.apply(this, arguments);
+        this.map.events.on({
+            addlayer: this.redraw,
+            changelayer: this.redraw,
+            removelayer: this.redraw,
+            changebaselayer: this.redraw,
+            scope: this
+        });
+        this.redraw();
+    },
+
+    // The callback of a click on a layer switcher layer element (usually a
+    // link element).
     layerClick: function(evt) {
       var element = evt.currentTarget;
       var layer = $(element).data('layer');
       $('a.active', this.$element).removeClass('active');
       $.each(this.map.getLayersBy('isBaseLayer', false),
         function() {
+          // Only make visible, non-RootContainer layers invisible.
+          // RootContainer layers are behind-the-scenes OpenLayers-created
+          // layers that help manage interaction with multiple Vector layers.
           if (this.CLASS_NAME !== 'OpenLayers.Layer.Vector.RootContainer' &&
              this.displayInLayerSwitcher) {
             this.setVisibility(false);
@@ -30,8 +56,11 @@ wax.ol.Switcher = OpenLayers.Class(OpenLayers.Control, {
       $(element).addClass('active');
     },
 
+    // Evaluate whether the map state has changed enough to justify a
+    // redraw of this element
     needsRedraw: function() {
-        if (!this.layerStates || this.layerStates.length || (this.map.layers.length != this.layerStates.length)) {
+        if (!this.layerStates || this.layerStates.length ||
+           (this.map.layers.length != this.layerStates.length)) {
             return true;
         }
         for (var i = 0, len = this.layerStates.length; i < len; i++) {
@@ -47,15 +76,11 @@ wax.ol.Switcher = OpenLayers.Class(OpenLayers.Control, {
         return false;
     },
 
+    // Rebuild this layer switcher by clearing out its `$element` (aka `e`)
+    // and rebuilding its DOM structure.
     redraw: function() {
       if (this.needsRedraw()) {
         // Clear out previous layers
-        /*
-        $('.layers.base .layers-content div', this.blockswitcher).remove();
-        $('.layers.data .layers-content div', this.blockswitcher).remove();
-        $('.layers.base', this.blockswitcher).hide();
-        $('.layers.data', this.blockswitcher).hide();
-        */
         this.$element.html('');
 
         // Save state -- for checking layer if the map state changed.
@@ -95,20 +120,11 @@ wax.ol.Switcher = OpenLayers.Class(OpenLayers.Control, {
                 }
             }
             this.$element.append($layer_element);
+            // Trigger a `layeradded` event on the element we own. This is
+            // the way to style layer switcher elements: attach a listener
+            // to this event, and then modify on addition.
             this.$element.trigger('layeradded', $layer_element);
           }
         }
-    },
-
-    setMap: function(map) {
-        OpenLayers.Control.prototype.setMap.apply(this, arguments);
-        this.map.events.on({
-            'addlayer': this.redraw,
-            'changelayer': this.redraw,
-            'removelayer': this.redraw,
-            'changebaselayer': this.redraw,
-            scope: this
-        });
-        this.redraw();
     }
 });
