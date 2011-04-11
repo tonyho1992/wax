@@ -260,6 +260,36 @@ and higher.
 [3]: http://code.google.com/apis/maps/documentation/javascript/
 </p>
 
+<p class='md'>
+### Protips
+
+For faster maps, use multiple servers. [Most browsers have a limit](https://encrypted.google.com/search?hl=en&q=browser+domain+connection+limit&aq=f&aqi=&aql=&oq=)
+for how many things they can ask a single server for at one time - for 
+instance, Modest Maps will aim to download 18 tiles as soon as you load a map, 
+but Internet Explorer decides that the server shouldn't handle more than two
+requests at a time. Thus, only two tiles are downloaded at a time, despite the 
+fact that modern servers can handle many more. For this problem, we use multiple 
+servers, or more often, multiple domain names. So, you can use
+
+* `a.tile.mapbox.com`
+* `b.tile.mapbox.com` and
+* `c.tile.mapbox.com`
+
+For tile requests. And you can easily specify them in Modest Maps - just give
+the `WaxProvider` function an array of domain names instead of just one.
+</p>
+<pre class='sh_javascript run'>
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-cnames',
+    new com.modestmaps.WaxProvider([
+      'http://a.tile.mapbox.com/',
+      'http://b.tile.mapbox.com/',
+      'http://c.tile.mapbox.com/'],
+      'world-glass'), new mm.Point(448,300));
+m.setCenterZoom(
+  new com.modestmaps.Location(38.8225909, -97.5585),
+  4);
+</pre>
     </div>
   </body>
 </html>
