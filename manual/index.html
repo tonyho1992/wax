@@ -173,6 +173,21 @@ The legend control pulls legend information from an interactive layer and
 displays it on the map.
 </p>
 
+<div class='section'>
+<div id='modestmaps-legend' class='map'></div>
+<pre class='sh_javascript run'>
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-legend',
+    new com.modestmaps.WaxProvider(
+      'http://a.tile.mapbox.com/',
+      'world-print'), new mm.Point(448,300))
+  .legend();
+m.setCenterZoom(
+  new com.modestmaps.Location(38.8225909, -97.5585),
+  4);
+</pre>
+</div>
+
     </div>
   </body>
 </html>
