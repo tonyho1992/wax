@@ -102,6 +102,17 @@ Wax includes two libraries in `/lib` which are included in builds
 
 ## Changelog
 
+#### 1.2.0
+
+* Functions on the Google Maps `Controls` object are now lowercase.
+* Changed `WaxProvider`'s signature: now takes an object of settings and supports multiple domains, filetypes and zoom restrictions.
+* Changed `wax.g.MapType`'s signature: now accepts an object of settings in the same form as `WaxProvider`
+* Modest Maps `.interaction()` now supports clicks, with the same `clickAction` setting as the OpenLayers version.
+* Added large manual for usage.
+* Fixed Modest Maps `.fullscreen()` sizing.
+* Removed `/examples` directory: examples will be in manuals.
+* Performance optimization of interaction code: no calculations are performed during drag events.
+
 #### 1.1.0
 
 * connector/mm: Added [Modest Maps](https://github.com/stamen/modestmaps-js) connector.
