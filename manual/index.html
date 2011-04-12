@@ -61,6 +61,17 @@ The first step is to actually download and include the necessary Javascript
 code to make your map work. We'll also include a CSS file to start rolling with 
 style.
 
+After you've got the code downloaded, you'll need to put it on your server and
+include it on your page. The include files are segmented by the mapping API you're 
+using, so in our case, we'll use Modest Maps - `mm`.
+
+    <script src='build/wax.mm.min.js' type='text/javascript'></script>
+
+Then you'll want to include the theme file so that you can see controls -
+you can always swap in your own later on.
+
+    <link href='theme/controls.css' rel='stylesheet' type='text/css' /> 
+
 You'll do the usual Modest Maps setup - just as you'll do the standard setup 
 process with the other APIs.
 </p>
@@ -126,6 +137,11 @@ m.setCenterZoom(
 
 The fullscreen control adds a link to the map that assigns a 
 fullscreen class to the map, which makes it fill the page.
+
+You'll see that this control adds a fullscreen link to the map, and that it's 
+a bit ugly right now. Until Wax's theming improves, keep in mind that its 
+styling, which is contained in `theme/controls.css`, is completely optional 
+and you can replace it with your own.
 </p>
 
 <div class='section'>

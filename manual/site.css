@@ -25,10 +25,13 @@ div.md {
   width: 450px;
   float:left;
   }
+  div.md pre code {
+    padding:10px;
+    }
 h2 {
   border-bottom:1px solid #333;
   }
-pre, div.sidebar {
+pre.sh_javascript, div.sidebar {
   width: 300px;
   padding:0 25px;
   margin:0;
