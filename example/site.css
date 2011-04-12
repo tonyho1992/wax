@@ -5,10 +5,10 @@ body {
   }
 
 .map_cube {
-    height:300px;
-    width:50%;
-    float:left;
-}
+  height:300px;
+  width:50%;
+  float:left;
+  }
 
 .interactive-pre {
   font-size: 4px;
