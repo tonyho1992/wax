@@ -76,7 +76,11 @@ You'll do the usual Modest Maps setup - just as you'll do the standard setup
 process with the other APIs.
 </p>
 <div class='section'>
-<div id='modestmaps-setup' class='map'></div>
+<div id='modestmaps-setup' class='map'>
+<span class='attribution'>
+    <a href='http://mapbox.com/tileset/world-light'>World Light</a>
+</span>
+</div>
 <pre class='sh_javascript run'>
 // Alias com.modestmaps to mm. This isn't necessary - just
 // nice, because it makes the code shorter.
@@ -117,7 +121,12 @@ of the [MBTiles spec] [2].
 [2]: https://github.com/mapbox/mbtiles-spec
 </p>
 <div class='section'>
-<div id='modestmaps-interaction' class='map'></div>
+<div id='modestmaps-interaction' class='map'>
+<span class='attribution'>
+    <a href='http://developmentseed.org/blog/2011/apr/7/i-heart-npr-facebook-app-maps-fans'>Map by NPR</a>
+</span>
+</div>
+
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-interaction',
@@ -145,7 +154,11 @@ and you can replace it with your own.
 </p>
 
 <div class='section'>
-<div id='modestmaps-fullscreen' class='map'></div>
+<div id='modestmaps-fullscreen' class='map'>
+<span class='attribution'>
+    <a href='http://mapbox.com/tileset/world-light'>World Light</a>
+</span>
+</div>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-fullscreen',
@@ -167,7 +180,11 @@ zoom in & out buttons.
 </p>
 
 <div class='section'>
-<div id='modestmaps-zoomer' class='map dark'></div>
+<div id='modestmaps-zoomer' class='map dark'>
+<span class='attribution'>
+    <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
+</span>
+</div>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-zoomer',
@@ -189,7 +206,11 @@ displays it on the map.
 </p>
 
 <div class='section'>
-<div id='modestmaps-legend' class='map'></div>
+<div id='modestmaps-legend' class='map'>
+<span class='attribution'>
+    <a href='http://mapbox.com/tileset/world-print'>World Print</a>
+</span>
+</div>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-legend',
@@ -295,7 +316,11 @@ servers, or more often, multiple domain names. So, you can use
 For tile requests. And you can easily specify them in Modest Maps - just give
 the `WaxProvider` function an array of domain names instead of just one.
 </p>
-<div id='modestmaps-cnames' class='map dark'></div>
+<div id='modestmaps-cnames' class='map dark'>
+<span class='attribution'>
+  <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
+</span>
+</div>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-cnames',
@@ -319,7 +344,11 @@ object, not just layerName and baseUrl.
 * **zoomRange**: default `[0, 18]`, it can be any restricted range of 
 zoom levels that you happen to have rendered.
 </p>
-<div id='modestmaps-options' class='map'></div>
+<div id='modestmaps-options' class='map'>
+<span class='attribution'>
+  <a href='http://mapbox.com/tileset/pakistan-grey'>Pakistan Grey</a>
+</span>
+</div>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-options',
@@ -332,6 +361,9 @@ m.setCenterZoom(
   new com.modestmaps.Location(30.5, 69.78),
   4);
 </pre>
+</div>
+<div class='footer'>
+    Except where noted, all maps &copy; <a href='http://mapbox.com/'>MapBox</a>
 </div>
     </div>
   </body>
