@@ -36,10 +36,10 @@ wax.ol.Interaction =
         this.clickHandler.activate();
 
         map.events.on({
-            'addlayer': this.resetLayers,
-            'changelayer': this.resetLayers,
-            'removelayer': this.resetLayers,
-            'changebaselayer': this.resetLayers,
+            addlayer: this.resetLayers,
+            changelayer: this.resetLayers,
+            removelayer: this.resetLayers,
+            changebaselayer: this.resetLayers,
             scope: this
         });
 
@@ -108,7 +108,7 @@ wax.ol.Interaction =
                 if (feature) {
                     switch (that.clickAction) {
                         case 'full':
-                            that.callbacks['click'](feature, tiles[t].layer.map.viewPortDiv, t);
+                            that.callbacks.click(feature, tiles[t].layer.map.viewPortDiv, t);
                         break;
                         case 'location':
                             window.location = feature;
@@ -140,20 +140,20 @@ wax.ol.Interaction =
                         if (!tiles[t]) return;
                         if (feature && that.feature[t] !== feature) {
                             that.feature[t] = feature;
-                            that.callbacks['out'] (feature, tiles[t].layer.map.div, t, evt);
-                            that.callbacks['over'](feature, tiles[t].layer.map.div, t, evt);
+                            that.callbacks.out(feature, tiles[t].layer.map.div, t, evt);
+                            that.callbacks.over(feature, tiles[t].layer.map.div, t, evt);
                         } else if (!feature) {
                             that.feature[t] = null;
-                            that.callbacks['out'](feature, tiles[t].layer.map.div, t, evt);
+                            that.callbacks.out(feature, tiles[t].layer.map.div, t, evt);
                         }
                     } else {
                         // Request this feature
                         // TODO(tmcw) re-add layer
                         that.feature[t] = null;
                         if (tiles[t]) {
-                            that.callbacks['out']({}, tiles[t].layer.map.div, t, evt);
+                            that.callbacks.out({}, tiles[t].layer.map.div, t, evt);
                         } else {
-                            that.callbacks['out']({}, false, t);
+                            that.callbacks.out({}, false, t);
                         }
                     }
                 }
