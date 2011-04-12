@@ -6,6 +6,27 @@ a.wax-fullscreen {
   z-index: 99999;
   }
 
+a.zoomer {
+  text-decoration:none;
+  position:absolute;
+  background-color:#444;
+  color:#fff;
+  line-height:25px;
+  font-size:20px;
+  z-index:99999;
+  text-align:center;
+  width:25px;
+  height:25px;
+  }
+
+  a.zoomin {
+    left:5px;
+    }
+
+  a.zoomout {
+    left:35px;
+    }
+
 .wax-fullscreen-map {
   position:fixed !important;
   width:auto !important;
