@@ -1549,13 +1549,23 @@ if (!com) {
 // chaining-style controls.
 com.modestmaps.Map.prototype.fullscreen = function() {
     $('<a class="wax-fullscreen" href="#fullscreen">fullscreen</a>')
-        .click($.proxy(function() {
-            $(this.parent).toggleClass('wax-fullscreen-map');
-            this.setSize(
-                $(this.parent).outerWidth(),
-                $(this.parent).outerHeight());
-            return false;
-        }, this))
+        .toggle(
+            $.proxy(function() {
+                this.smallSize = [$(this.parent).width(), $(this.parent).height()];
+                $(this.parent).addClass('wax-fullscreen-map');
+                this.setSize(
+                    $(this.parent).outerWidth(),
+                    $(this.parent).outerHeight());
+                return false;
+            }, this),
+            $.proxy(function() {
+                $(this.parent).removeClass('wax-fullscreen-map');
+                this.setSize(
+                    this.smallSize[0],
+                    this.smallSize[1]);
+                return false;
+            }, this)
+        )
         .appendTo(this.parent);
     return this;
 };
