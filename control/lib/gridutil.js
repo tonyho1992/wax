@@ -99,7 +99,8 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
           tileY = tile_element.top;
   } else {
       var $tile_element = $(tile_element);
-      var tileX = $tile_element.offset().left;
+      // IE problem here - though recoverable, for whatever reason
+      var tileX = $tile_element.offset().left,
           tileY = $tile_element.offset().top;
   }
   if (Math.floor((y - tileY) / this.tileRes) > 256 ||
