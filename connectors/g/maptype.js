@@ -9,19 +9,27 @@ wax.g = wax.g || {};
 //
 //     {
 //       name: '',
+//       filetype: '.png',
+//       layerName: 'world-light',
 //       alt: '',
-//       minZoom: 0,
-//       minZoom: 18,
+//       zoomRange: [0, 18],
 //       baseUrl: 'a url',
 //     }
 wax.g.MapType = function(options) {
     options = options || {};
     this.name = options.name || '';
     this.alt = options.alt || '';
-    this.maxZoom = options.maxZoom || 18;
-    this.minZoom = options.minZoom || 0;
+    this.filetype = options.filetype || '.png';
+    this.layerName = options.layerName || 'world-light';
+    if (options.zoomRange) {
+        this.minZoom = options.zoomRange[0];
+        this.maxZoom = options.zoomRange[1];
+    } else {
+        this.minZoom = 0;
+        this.maxZoom = 18;
+    }
     this.baseUrl = options.baseUrl ||
-        'http://a.tile.mapbox.com/1.0.0/world-light';
+        'http://a.tile.mapbox.com/';
     this.blankImage = options.blankImage || '';
 
     // non-configurable options
@@ -64,7 +72,9 @@ wax.g.MapType.prototype.getTileUrl = function(coord, z) {
         y = (mod - 1) - coord.y,
         x = (coord.x % mod);
         x = (x < 0) ? (coord.x % mod) + mod : x;
+
     return (y >= 0)
-        ? (this.baseUrl + '/' + z + '/' + x + '/' + y + '.png')
+        ? (this.baseUrl + '1.0.0/' + this.layerName + '/' + z + '/' +
+           x + '/' + y + this.filetype)
         : this.blankImage;
 };
