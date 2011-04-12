@@ -310,6 +310,29 @@ m.setCenterZoom(
   4);
 </pre>
 </div>
+<div class='section'>
+<p class='md'>
+And, of course, there are other options you can set on the WaxProvider 
+object, not just layerName and baseUrl.
+
+* **filetype**: default `.png`, it can be `.jpg` or anything else.
+* **zoomRange**: default `[0, 18]`, it can be any restricted range of 
+zoom levels that you happen to have rendered.
+</p>
+<div id='modestmaps-options' class='map'></div>
+<pre class='sh_javascript run'>
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-options',
+    new com.modestmaps.WaxProvider({
+      baseUrl: 'http://a.tile.mapbox.com/',
+      layerName: 'pakistan-grey',
+      zoomRange: [0, 9],
+      filetype: '.jpg'}), new mm.Point(448,300));
+m.setCenterZoom(
+  new com.modestmaps.Location(30.5, 69.78),
+  4);
+</pre>
+</div>
     </div>
   </body>
 </html>

@@ -1656,7 +1656,6 @@ com.modestmaps.Map.prototype.interaction = function(options) {
         if ($tile = this.waxGetTile(evt)) {
             this.waxGM.getGrid($tile.attr('src'), $.proxy(function(g) {
                 if (g) {
-                    console.log(this.clickAction);
                     var feature = g.getFeature(evt.pageX, evt.pageY, $tile, {
                         format: this.clickAction
                     });

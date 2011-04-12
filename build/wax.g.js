@@ -1556,6 +1556,7 @@ wax.g.Controls.prototype.calculateGrid = function() {
 };
 
 wax.g.Controls.prototype.interaction = function(options) {
+    options = options || {};
     var that = this;
     var gm = new wax.GridManager();
     var f = null;
@@ -1576,16 +1577,16 @@ wax.g.Controls.prototype.interaction = function(options) {
         }
     };
 
-    var find = function(map, evt) {
+    var find = $.proxy(function(map, evt) {
         var found = false;
-        var interaction_grid = that.calculateGrid();
+        var interaction_grid = this.calculateGrid();
         for (var i = 0; i < interaction_grid.length && !found; i++) {
             if (inTile(evt.pixel, interaction_grid[i].xy)) {
                 var found = interaction_grid[i];
             }
         }
         return found;
-    };
+    }, this);
 
     google.maps.event.addListener(this.map, 'mousemove', function(evt) {
         var options = { format: 'teaser' };
