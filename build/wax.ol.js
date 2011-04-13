@@ -1567,7 +1567,8 @@ wax.ol.Interaction =
     },
 
     setMap: function(map) {
-        $(map.div).bind('mousemove', $.proxy(this.getInfoForHover, this));
+        $(map.viewPortDiv).bind('mousemove', $.proxy(this.getInfoForHover, this));
+        $(map.viewPortDiv).bind('mouseout', $.proxy(this.resetLayers, this));
         this.clickHandler = new OpenLayers.Handler.Click(
             this, {
                 click: this.getInfoForClick
