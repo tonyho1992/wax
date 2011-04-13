@@ -54,7 +54,7 @@ com.modestmaps.Map.prototype.interaction = function(options) {
     };
 
     this.waxClearTimeout = function() {
-        if (this.clickTimeout != null) {
+        if (this.clickTimeout !== null) {
             window.clearTimeout(this.clickTimeout);
             this.clickTimeout = null;
             return true;
@@ -92,7 +92,8 @@ com.modestmaps.Map.prototype.interaction = function(options) {
     }, this));
 
     this.waxHandleClick = function(evt) {
-        if ($tile = this.waxGetTile(evt)) {
+        var $tile = this.waxGetTile(evt);
+        if ($tile) {
             this.waxGM.getGrid($tile.attr('src'), $.proxy(function(g) {
                 if (g) {
                     var feature = g.getFeature(evt.pageX, evt.pageY, $tile, {
@@ -114,24 +115,25 @@ com.modestmaps.Map.prototype.interaction = function(options) {
     };
 
     this.waxGetTile = function(evt) {
+        var $tile;
         var grid = this.waxGetTileGrid();
         for (var i = 0; i < grid.length; i++) {
             if ((grid[i][0] < evt.pageY) &&
                ((grid[i][0] + 256) > evt.pageY) &&
                 (grid[i][1] < evt.pageX) &&
                ((grid[i][1] + 256) > evt.pageX)) {
-                var $tile = grid[i][2];
+                $tile = grid[i][2];
                 break;
             }
         }
         return $tile || false;
-    }
-
+    };
 
     // On `mousemove` events that **don't** have the mouse button
     // down - so that the map isn't being dragged.
     $(this.parent).nondrag($.proxy(function(evt) {
-        if ($tile = this.waxGetTile(evt)) {
+        var $tile = this.waxGetTile(evt);
+        if ($tile) {
             this.waxGM.getGrid($tile.attr('src'), $.proxy(function(g) {
                 if (g) {
                     var feature = g.getFeature(evt.pageX, evt.pageY, $tile, {
@@ -162,10 +164,13 @@ com.modestmaps.Map.prototype.interaction = function(options) {
     // accurate, so it must be reset.
     var modifying_events = ['zoomed', 'panned', 'centered',
         'extentset', 'resized', 'drawn'];
+
+    var clearMap = function(map, e) {
+        map._waxGetTileGrid = null;
+    };
+
     for (var i = 0; i < modifying_events.length; i++) {
-        this.addCallback(modifying_events[i], function(map, e) {
-            map._waxGetTileGrid = null;
-        });
+        this.addCallback(modifying_events[i], clearMap);
     }
 
     // Ensure chainability

@@ -36,13 +36,14 @@ com.modestmaps.WaxProvider.prototype = {
         ];
     },
     getTileUrl: function(coord) {
+        var server;
         coord = this.sourceCoordinate(coord);
         var worldSize = Math.pow(2, coord.zoom);
         coord.row = Math.pow(2, coord.zoom) - coord.row - 1;
         if (this.n_urls === 1) {
-            var server = this.baseUrls[0];
+            server = this.baseUrls[0];
         } else {
-            var server = this.baseUrls[parseInt(worldSize * coord.row + coord.column) % this.n_urls];
+            server = this.baseUrls[parseInt(worldSize * coord.row + coord.column, 10) % this.n_urls];
         }
         var imgPath = ['1.0.0', this.layerName, coord.zoom, coord.column, coord.row].join('/');
         return server + imgPath + this.filetype;

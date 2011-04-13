@@ -14,7 +14,7 @@ wax.Legend = function(context, container) {
 wax.Legend.prototype.render = function(urls) {
     $('.wax-legend', this.container).hide();
 
-    var render = $.proxy(function(content) {
+    var render = $.proxy(function(url, content) {
         if (!content) {
             this.legends[url] = false;
         } else if (this.legends[url]) {
@@ -27,7 +27,7 @@ wax.Legend.prototype.render = function(urls) {
     for (var i = 0; i < urls.length; i++) {
         var url = this.legendUrl(urls[i]);
         wax.request.get(url, function(data) {
-            (data && data.legend) && (render(data.legend));
+            (data && data.legend) && (render(url, data.legend));
         });
     }
 };

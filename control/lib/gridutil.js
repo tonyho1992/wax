@@ -94,14 +94,15 @@ wax.GridInstance.prototype.resolveCode = function(key) {
 
 wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
   if (!(this.grid_tile && this.grid_tile.grid)) return;
+  var tileX, tileY;
   if (tile_element.left && tile_element.top) {
-      var tileX = tile_element.left,
-          tileY = tile_element.top;
+      tileX = tile_element.left;
+      tileY = tile_element.top;
   } else {
       var $tile_element = $(tile_element);
       // IE problem here - though recoverable, for whatever reason
-      var tileX = $tile_element.offset().left,
-          tileY = $tile_element.offset().top;
+      tileX = $tile_element.offset().left;
+      tileY = $tile_element.offset().top;
   }
   if (Math.floor((y - tileY) / this.tileRes) > 256 ||
     Math.floor((x - tileX) / this.tileRes) > 256) return;
