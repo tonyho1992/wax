@@ -102,6 +102,10 @@ Wax includes two libraries in `/lib` which are included in builds
 
 ## Changelog
 
+#### 1.2.1
+
+* Bug fixes for OpenLayers
+
 #### 1.2.0
 
 * Functions on the Google Maps `Controls` object are now lowercase.
