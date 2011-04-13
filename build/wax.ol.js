@@ -1276,13 +1276,15 @@ wax.GridInstance.prototype.resolveCode = function(key) {
 
 wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
   if (!(this.grid_tile && this.grid_tile.grid)) return;
+  var tileX, tileY;
   if (tile_element.left && tile_element.top) {
-      var tileX = tile_element.left,
-          tileY = tile_element.top;
+      tileX = tile_element.left;
+      tileY = tile_element.top;
   } else {
       var $tile_element = $(tile_element);
-      var tileX = $tile_element.offset().left;
-          tileY = $tile_element.offset().top;
+      // IE problem here - though recoverable, for whatever reason
+      tileX = $tile_element.offset().left;
+      tileY = $tile_element.offset().top;
   }
   if (Math.floor((y - tileY) / this.tileRes) > 256 ||
     Math.floor((x - tileX) / this.tileRes) > 256) return;
@@ -1410,7 +1412,7 @@ wax.Legend = function(context, container) {
 wax.Legend.prototype.render = function(urls) {
     $('.wax-legend', this.container).hide();
 
-    var render = $.proxy(function(content) {
+    var render = $.proxy(function(url, content) {
         if (!content) {
             this.legends[url] = false;
         } else if (this.legends[url]) {
@@ -1423,7 +1425,7 @@ wax.Legend.prototype.render = function(urls) {
     for (var i = 0; i < urls.length; i++) {
         var url = this.legendUrl(urls[i]);
         wax.request.get(url, function(data) {
-            (data && data.legend) && (render(data.legend));
+            (data && data.legend) && (render(url, data.legend));
         });
     }
 };

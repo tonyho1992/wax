@@ -1276,13 +1276,15 @@ wax.GridInstance.prototype.resolveCode = function(key) {
 
 wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
   if (!(this.grid_tile && this.grid_tile.grid)) return;
+  var tileX, tileY;
   if (tile_element.left && tile_element.top) {
-      var tileX = tile_element.left,
-          tileY = tile_element.top;
+      tileX = tile_element.left;
+      tileY = tile_element.top;
   } else {
       var $tile_element = $(tile_element);
-      var tileX = $tile_element.offset().left;
-          tileY = $tile_element.offset().top;
+      // IE problem here - though recoverable, for whatever reason
+      tileX = $tile_element.offset().left;
+      tileY = $tile_element.offset().top;
   }
   if (Math.floor((y - tileY) / this.tileRes) > 256 ||
     Math.floor((x - tileX) / this.tileRes) > 256) return;
@@ -1410,7 +1412,7 @@ wax.Legend = function(context, container) {
 wax.Legend.prototype.render = function(urls) {
     $('.wax-legend', this.container).hide();
 
-    var render = $.proxy(function(content) {
+    var render = $.proxy(function(url, content) {
         if (!content) {
             this.legends[url] = false;
         } else if (this.legends[url]) {
@@ -1423,7 +1425,7 @@ wax.Legend.prototype.render = function(urls) {
     for (var i = 0; i < urls.length; i++) {
         var url = this.legendUrl(urls[i]);
         wax.request.get(url, function(data) {
-            (data && data.legend) && (render(data.legend));
+            (data && data.legend) && (render(url, data.legend));
         });
     }
 };
@@ -1548,6 +1550,9 @@ if (!com) {
 // control. This function can be used chaining-style with other
 // chaining-style controls.
 com.modestmaps.Map.prototype.fullscreen = function() {
+    // Modest Maps demands an absolute height & width, and doesn't auto-correct
+    // for changes, so here we save the original size of the element and
+    // restore to that size on exit from fullscreen.
     $('<a class="wax-fullscreen" href="#fullscreen">fullscreen</a>')
         .toggle(
             $.proxy(function() {
@@ -1625,7 +1630,7 @@ com.modestmaps.Map.prototype.interaction = function(options) {
     };
 
     this.waxClearTimeout = function() {
-        if (this.clickTimeout != null) {
+        if (this.clickTimeout !== null) {
             window.clearTimeout(this.clickTimeout);
             this.clickTimeout = null;
             return true;
@@ -1663,7 +1668,8 @@ com.modestmaps.Map.prototype.interaction = function(options) {
     }, this));
 
     this.waxHandleClick = function(evt) {
-        if ($tile = this.waxGetTile(evt)) {
+        var $tile = this.waxGetTile(evt);
+        if ($tile) {
             this.waxGM.getGrid($tile.attr('src'), $.proxy(function(g) {
                 if (g) {
                     var feature = g.getFeature(evt.pageX, evt.pageY, $tile, {
@@ -1685,24 +1691,25 @@ com.modestmaps.Map.prototype.interaction = function(options) {
     };
 
     this.waxGetTile = function(evt) {
+        var $tile;
         var grid = this.waxGetTileGrid();
         for (var i = 0; i < grid.length; i++) {
             if ((grid[i][0] < evt.pageY) &&
                ((grid[i][0] + 256) > evt.pageY) &&
                 (grid[i][1] < evt.pageX) &&
                ((grid[i][1] + 256) > evt.pageX)) {
-                var $tile = grid[i][2];
+                $tile = grid[i][2];
                 break;
             }
         }
         return $tile || false;
-    }
-
+    };
 
     // On `mousemove` events that **don't** have the mouse button
     // down - so that the map isn't being dragged.
     $(this.parent).nondrag($.proxy(function(evt) {
-        if ($tile = this.waxGetTile(evt)) {
+        var $tile = this.waxGetTile(evt);
+        if ($tile) {
             this.waxGM.getGrid($tile.attr('src'), $.proxy(function(g) {
                 if (g) {
                     var feature = g.getFeature(evt.pageX, evt.pageY, $tile, {
@@ -1733,10 +1740,13 @@ com.modestmaps.Map.prototype.interaction = function(options) {
     // accurate, so it must be reset.
     var modifying_events = ['zoomed', 'panned', 'centered',
         'extentset', 'resized', 'drawn'];
+
+    var clearMap = function(map, e) {
+        map._waxGetTileGrid = null;
+    };
+
     for (var i = 0; i < modifying_events.length; i++) {
-        this.addCallback(modifying_events[i], function(map, e) {
-            map._waxGetTileGrid = null;
-        });
+        this.addCallback(modifying_events[i], clearMap);
     }
 
     // Ensure chainability
@@ -1838,13 +1848,14 @@ com.modestmaps.WaxProvider.prototype = {
         ];
     },
     getTileUrl: function(coord) {
+        var server;
         coord = this.sourceCoordinate(coord);
         var worldSize = Math.pow(2, coord.zoom);
         coord.row = Math.pow(2, coord.zoom) - coord.row - 1;
         if (this.n_urls === 1) {
-            var server = this.baseUrls[0];
+            server = this.baseUrls[0];
         } else {
-            var server = this.baseUrls[parseInt(worldSize * coord.row + coord.column) % this.n_urls];
+            server = this.baseUrls[parseInt(worldSize * coord.row + coord.column, 10) % this.n_urls];
         }
         var imgPath = ['1.0.0', this.layerName, coord.zoom, coord.column, coord.row].join('/');
         return server + imgPath + this.filetype;
