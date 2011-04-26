@@ -19,20 +19,20 @@ com.modestmaps.Map.prototype.fullscreen = function() {
     // restore to that size on exit from fullscreen.
     $('<a class="wax-fullscreen" href="#fullscreen">fullscreen</a>')
         .toggle(
-            $.proxy(function() {
+            $.proxy(function(e) {
+                e.preventDefault();
                 this.smallSize = [$(this.parent).width(), $(this.parent).height()];
                 $(this.parent).addClass('wax-fullscreen-map');
                 this.setSize(
                     $(this.parent).outerWidth(),
                     $(this.parent).outerHeight());
-                return false;
             }, this),
-            $.proxy(function() {
+            $.proxy(function(e) {
+                e.preventDefault();
                 $(this.parent).removeClass('wax-fullscreen-map');
                 this.setSize(
                     this.smallSize[0],
                     this.smallSize[1]);
-                return false;
             }, this)
         )
         .appendTo(this.parent);
