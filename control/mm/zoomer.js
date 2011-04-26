@@ -14,15 +14,15 @@ if (!com) {
 // chaining-style controls.
 com.modestmaps.Map.prototype.zoomer = function() {
     $('<a class="zoomer zoomin" href="#zoomin">+</a>')
-        .click($.proxy(function() {
+        .click($.proxy(function(e) {
+            e.preventDefault();
             this.zoomIn();
-            return false;
         }, this))
         .appendTo(this.parent);
     $('<a class="zoomer zoomout" href="#zoomout">-</a>')
-        .click($.proxy(function() {
+        .click($.proxy(function(e) {
+            e.preventDefault();
             this.zoomOut();
-            return false;
         }, this))
         .appendTo(this.parent);
     return this;
