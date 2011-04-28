@@ -38,6 +38,10 @@ com.modestmaps.WaxProvider.prototype = {
     getTileUrl: function(coord) {
         var server;
         coord = this.sourceCoordinate(coord);
+        if (!coord) {
+            return null;
+        }
+
         var worldSize = Math.pow(2, coord.zoom);
         coord.row = Math.pow(2, coord.zoom) - coord.row - 1;
         if (this.n_urls === 1) {
