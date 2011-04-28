@@ -74,4 +74,6 @@ wax.tooltip.unselect = function(feature, context, layer_id, evt) {
     $('div.wax-tooltip:first')
         .removeClass('hidden')
         .show();
+
+    $(context).triggerHandler('removedtooltip', [feature, context, evt])
 };
