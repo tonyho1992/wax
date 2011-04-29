@@ -1657,6 +1657,8 @@ com.modestmaps.Map.prototype.interaction = function(options) {
         $(this.parent).one('mouseup', $.proxy(function(evt) {
             // Don't register clicks that are likely the boundaries
             // of dragging the map
+            console.log('up called');
+            console.log(evt.pageY === this.downEvent.pageY);
             if (evt.pageY === this.downEvent.pageY &&
                 evt.pageX === this.downEvent.pageX) {
                 this.clickTimeout = window.setTimeout(
@@ -1798,18 +1800,28 @@ if (!com) {
 // control. This function can be used chaining-style with other
 // chaining-style controls.
 com.modestmaps.Map.prototype.zoomer = function() {
-    $('<a class="zoomer zoomin" href="#zoomin">+</a>')
+    var zoomin = $('<a class="zoomer zoomin" href="#zoomin">+</a>')
         .click($.proxy(function(e) {
             e.preventDefault();
             this.zoomIn();
         }, this))
         .appendTo(this.parent);
-    $('<a class="zoomer zoomout" href="#zoomout">-</a>')
+    var zoomout = $('<a class="zoomer zoomout" href="#zoomout">-</a>')
         .click($.proxy(function(e) {
             e.preventDefault();
             this.zoomOut();
         }, this))
         .appendTo(this.parent);
+    this.addCallback('drawn', function(map, e) {
+        if (map.coordinate.zoom === map.provider.outerLimits()[0].zoom) {
+            zoomout.addClass('zoomdisabled');
+        } else if (map.coordinate.zoom === map.provider.outerLimits()[1].zoom) {
+            zoomin.addClass('zoomdisabled');
+        } else {
+            zoomin.removeClass('zoomdisabled');
+            zoomout.removeClass('zoomdisabled');
+        }
+    });
     return this;
 };
 // namespacing!

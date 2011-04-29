@@ -79,6 +79,8 @@ com.modestmaps.Map.prototype.interaction = function(options) {
         $(this.parent).one('mouseup', $.proxy(function(evt) {
             // Don't register clicks that are likely the boundaries
             // of dragging the map
+            console.log('up called');
+            console.log(evt.pageY === this.downEvent.pageY);
             if (evt.pageY === this.downEvent.pageY &&
                 evt.pageX === this.downEvent.pageX) {
                 this.clickTimeout = window.setTimeout(

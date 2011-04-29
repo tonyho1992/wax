@@ -27,6 +27,11 @@ a.zoomer {
     left:35px;
     }
 
+  a.zoomdisabled {
+    background-color:#333;
+    }
+
+
 .wax-fullscreen-map {
   position:fixed !important;
   width:auto !important;
