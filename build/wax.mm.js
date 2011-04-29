@@ -1632,7 +1632,7 @@ com.modestmaps.Map.prototype.interaction = function(options) {
     };
 
     this.waxClearTimeout = function() {
-        if (this.clickTimeout !== null) {
+        if (this.clickTimeout) {
             window.clearTimeout(this.clickTimeout);
             this.clickTimeout = null;
             return true;
@@ -1650,17 +1650,18 @@ com.modestmaps.Map.prototype.interaction = function(options) {
     $(this.parent).mousedown($.proxy(function(evt) {
         // Ignore double-clicks by ignoring clicks within 300ms of
         // each other.
-        if (this.waxClearTimeout()) { return; }
+        if (this.waxClearTimeout()) {
+            return;
+        }
         // Store this event so that we can compare it to the
         // up event
+        var tol = 4; // tolerance
         this.downEvent = evt;
         $(this.parent).one('mouseup', $.proxy(function(evt) {
             // Don't register clicks that are likely the boundaries
             // of dragging the map
-            console.log('up called');
-            console.log(evt.pageY === this.downEvent.pageY);
-            if (evt.pageY === this.downEvent.pageY &&
-                evt.pageX === this.downEvent.pageX) {
+            if (Math.round(evt.pageY / tol) === Math.round(this.downEvent.pageY / tol) &&
+                Math.round(evt.pageX / tol) === Math.round(this.downEvent.pageX / tol)) {
                 this.clickTimeout = window.setTimeout(
                     $.proxy(function() {
                         this.waxHandleClick(evt);
