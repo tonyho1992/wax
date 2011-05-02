@@ -1593,7 +1593,7 @@ wax.g.Controls.prototype.interaction = function(options) {
     }, this);
 
     google.maps.event.addListener(this.map, 'mousemove', function(evt) {
-        var options = { format: 'teaser' };
+        var opt = { format: 'teaser' };
         var found = find(this.map, evt);
         if (!found) return;
         gm.getGrid($(found.tile).attr('src'), function(g) {
@@ -1602,7 +1602,7 @@ wax.g.Controls.prototype.interaction = function(options) {
                 evt.pixel.x + $(that.mapDiv).offset().left,
                 evt.pixel.y + $(that.mapDiv).offset().top,
                 found.tile,
-                options
+                opt
             );
             if (feature !== f) {
                 callbacks.out(feature, $(that.mapDiv), 0);
@@ -1613,7 +1613,9 @@ wax.g.Controls.prototype.interaction = function(options) {
     });
 
     google.maps.event.addListener(this.map, 'click', function(evt) {
-        var options = { format: 'full' };
+        var opt = {
+            format: options.clickAction || 'full'
+        };
         var found = find(this.map, evt);
         if (!found) return;
         gm.getGrid($(found.tile).attr('src'), function(g) {
@@ -1622,9 +1624,15 @@ wax.g.Controls.prototype.interaction = function(options) {
                 evt.pixel.x + $(that.mapDiv).offset().left,
                 evt.pixel.y + $(that.mapDiv).offset().top,
                 found.tile,
-                options
+                opt
             );
-            feature && callbacks.click(feature, $(that.mapDiv), 0);
+            if (feature) {
+                if (opt.format == 'full') {
+                    callbacks.click(feature, $(that.mapDiv), 0);
+                } else {
+                    window.location = feature;
+                }
+            }
         });
     });
 
