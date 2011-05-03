@@ -19,22 +19,30 @@ com.modestmaps.Map.prototype.fullscreen = function() {
     // restore to that size on exit from fullscreen.
     $('<a class="wax-fullscreen" href="#fullscreen">fullscreen</a>')
         .toggle(
-            $.proxy(function(e) {
-                e.preventDefault();
-                this.smallSize = [$(this.parent).width(), $(this.parent).height()];
-                $(this.parent).addClass('wax-fullscreen-map');
-                this.setSize(
-                    $(this.parent).outerWidth(),
-                    $(this.parent).outerHeight());
-            }, this),
-            $.proxy(function(e) {
-                e.preventDefault();
-                $(this.parent).removeClass('wax-fullscreen-map');
-                this.setSize(
-                    this.smallSize[0],
-                    this.smallSize[1]);
-            }, this)
+            $.proxy(this.maximize, this),
+            $.proxy(this.minimize, this)
         )
         .appendTo(this.parent);
     return this;
+};
+
+com.modestmaps.Map.prototype.maximize = function(e) {
+    if (e) {
+        e.preventDefault();
+    }
+    this.smallSize = [$(this.parent).width(), $(this.parent).height()];
+    $(this.parent).addClass('wax-fullscreen-map');
+    this.setSize(
+        $(this.parent).outerWidth(),
+        $(this.parent).outerHeight());
+};
+
+com.modestmaps.Map.prototype.minimize = function(e) {
+    if (e) {
+        e.preventDefault();
+    }
+    $(this.parent).removeClass('wax-fullscreen-map');
+    this.setSize(
+        this.smallSize[0],
+        this.smallSize[1]);
 };
