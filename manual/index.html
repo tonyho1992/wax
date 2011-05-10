@@ -195,6 +195,33 @@ m.setCenterZoom(
 </pre>
 </div>
 
+
+<p class='md'>
+### ZoomBox
+
+The ZoomBox control is a control that lets you zoom using the shift-key and a box.
+</p>
+
+<div class='section'>
+<div id='modestmaps-zoombox' class='map dark'>
+<span class='attribution'>
+    <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
+</span>
+</div>
+<pre class='sh_javascript run'>
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-zoombox',
+    new com.modestmaps.WaxProvider({
+      baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+      layerName: 'world-glass'}), new mm.Point(448,300))
+  .zoombox();
+m.setCenterZoom(
+  new com.modestmaps.Location(38.8225909, -97.5585),
+  4);
+</pre>
+</div>
+
+
 <p class='md'>
 ### Legend
 

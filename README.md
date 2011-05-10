@@ -27,6 +27,8 @@ implementation of the [MBTiles interaction specification](https://github.com/map
 * `.zoomer()`
 * `.legend()`
 * `.fullscreen()`
+* `.zoombox()`
+* `.hash()`
 
 #### Lib
 
@@ -101,6 +103,10 @@ Wax includes two libraries in `/lib` which are included in builds
 * [jquery-jsonp](http://code.google.com/p/jquery-jsonp/) (MIT)
 
 ## Changelog
+
+#### 1.3.0
+
+* Added `.zoombox()` and `hash()` controls for Modest Maps.
 
 #### 1.2.1
 

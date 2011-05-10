@@ -8,6 +8,14 @@ if (!com) {
 
 // Ripped from underscore.js
 
+/* Ideal layout
+
+    map.hash({
+        push: function(),
+        init: function(callback)
+    });
+*/
+
 // Internal function used to implement `_.throttle` and `_.debounce`.
 var limit = function(func, wait, debounce) {
   var timeout;
