@@ -86,8 +86,8 @@ wax.GridInstance = function(grid_tile, formatter) {
 // See the [utfgrid section of the mbtiles spec](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md)
 // for details.
 wax.GridInstance.prototype.resolveCode = function(key) {
-  (key >= 93) && key--;
-  (key >= 35) && key--;
+  if (key >= 93) key--;
+  if (key >= 35) key--;
   key -= 32;
   return key;
 };
@@ -198,7 +198,7 @@ wax.Formatter = function(obj) {
             eval('this.f = ' + obj.formatter);
         } catch (e) {
             // Syntax errors in formatter
-            console && console.log(e);
+            if (console) console.log(e);
         }
     } else {
         this.f = function() {};
@@ -211,6 +211,6 @@ wax.Formatter.prototype.format = function(options, data) {
     try {
         return this.f(options, data);
     } catch (e) {
-        console && console.log(e);
+        if (console) console.log(e);
     }
 };

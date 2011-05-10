@@ -73,7 +73,9 @@ a.zoomer {
   top:0px;
   right:0px;
   }
-.zoombox-box {
+
+.zoombox-box,
+.boxselector-box {
   margin:0;
   padding:0;
   border:1px dashed #888;
@@ -84,11 +86,13 @@ a.zoomer {
   width: 0;
   height: 0;
   display: none;
-}
-.zoombox-box-container {
+  }
+
+.zoombox-box-container,
+.boxselector-box-container {
   margin:0;
   padding:0;
   position:absolute;
   top:0;
   left:0;
-}
+  }

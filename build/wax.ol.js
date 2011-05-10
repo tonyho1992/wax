@@ -1268,8 +1268,8 @@ wax.GridInstance = function(grid_tile, formatter) {
 // See the [utfgrid section of the mbtiles spec](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md)
 // for details.
 wax.GridInstance.prototype.resolveCode = function(key) {
-  (key >= 93) && key--;
-  (key >= 35) && key--;
+  if (key >= 93) key--;
+  if (key >= 35) key--;
   key -= 32;
   return key;
 };
@@ -1380,7 +1380,7 @@ wax.Formatter = function(obj) {
             eval('this.f = ' + obj.formatter);
         } catch (e) {
             // Syntax errors in formatter
-            console && console.log(e);
+            if (console) console.log(e);
         }
     } else {
         this.f = function() {};
@@ -1393,7 +1393,7 @@ wax.Formatter.prototype.format = function(options, data) {
     try {
         return this.f(options, data);
     } catch (e) {
-        console && console.log(e);
+        if (console) console.log(e);
     }
 };
 // Wax Legend
@@ -1422,11 +1422,12 @@ wax.Legend.prototype.render = function(urls) {
             this.container.append(this.legends[url]);
         }
     }, this);
+    var renderLegend = function(data) {
+        if (data && data.legend) render(url, data.legend);
+    };
     for (var i = 0; i < urls.length; i++) {
         var url = this.legendUrl(urls[i]);
-        wax.request.get(url, function(data) {
-            (data && data.legend) && (render(url, data.legend));
-        });
+        wax.request.get(url, renderLegend);
     }
 };
 
@@ -1511,7 +1512,7 @@ wax.tooltip.unselect = function(feature, context, layer_id, evt) {
         .removeClass('hidden')
         .show();
 
-    $(context).triggerHandler('removedtooltip', [feature, context, evt])
+    $(context).triggerHandler('removedtooltip', [feature, context, evt]);
 };
 // Wax header
 var wax = wax || {};
@@ -1622,11 +1623,11 @@ wax.ol.Interaction =
         if (this._viableLayers) return this._viableLayers;
         return this._viableLayers = $(this.map.layers).filter(
             function(i) {
-            // TODO: make better indication of whether
-            // this is an interactive layer
-            return (this.map.layers[i].visibility === true) &&
-                (this.map.layers[i].CLASS_NAME === 'OpenLayers.Layer.TMS');
-        }
+                // TODO: make better indication of whether
+                // this is an interactive layer
+                return (this.map.layers[i].visibility === true) &&
+                    (this.map.layers[i].CLASS_NAME === 'OpenLayers.Layer.TMS');
+            }
         );
     },
 

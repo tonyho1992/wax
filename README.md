@@ -104,6 +104,10 @@ Wax includes two libraries in `/lib` which are included in builds
 
 ## Changelog
 
+#### 1.4.0
+
+* Added `.boxselect(function())`
+
 #### 1.3.0
 
 * Added `.zoombox()` and `hash()` controls for Modest Maps.

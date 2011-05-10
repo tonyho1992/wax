@@ -78,11 +78,11 @@ wax.ol.Interaction =
         if (this._viableLayers) return this._viableLayers;
         return this._viableLayers = $(this.map.layers).filter(
             function(i) {
-            // TODO: make better indication of whether
-            // this is an interactive layer
-            return (this.map.layers[i].visibility === true) &&
-                (this.map.layers[i].CLASS_NAME === 'OpenLayers.Layer.TMS');
-        }
+                // TODO: make better indication of whether
+                // this is an interactive layer
+                return (this.map.layers[i].visibility === true) &&
+                    (this.map.layers[i].CLASS_NAME === 'OpenLayers.Layer.TMS');
+            }
         );
     },
 

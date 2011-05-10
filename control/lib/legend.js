@@ -24,11 +24,12 @@ wax.Legend.prototype.render = function(urls) {
             this.container.append(this.legends[url]);
         }
     }, this);
+    var renderLegend = function(data) {
+        if (data && data.legend) render(url, data.legend);
+    };
     for (var i = 0; i < urls.length; i++) {
         var url = this.legendUrl(urls[i]);
-        wax.request.get(url, function(data) {
-            (data && data.legend) && (render(url, data.legend));
-        });
+        wax.request.get(url, renderLegend);
     }
 };
 
