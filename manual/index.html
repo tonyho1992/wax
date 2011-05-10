@@ -122,17 +122,14 @@ of the [MBTiles spec] [2].
 </p>
 <div class='section'>
 <div id='modestmaps-interaction' class='map'>
-<span class='attribution'>
-    <a href='http://developmentseed.org/blog/2011/apr/7/i-heart-npr-facebook-app-maps-fans'>Map by NPR</a>
-</span>
 </div>
 
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-interaction',
     new com.modestmaps.WaxProvider({
-      baseUrl: 'http://a.npr.mapbox.com/',
-      layerName: 'iheartnpr-0010'}), new mm.Point(448,300))
+      baseUrl: 'http://a.tiles.mapbox.com/devseed/',
+      layerName: 'excess-properties'}), new mm.Point(448,300))
   .interaction();
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
