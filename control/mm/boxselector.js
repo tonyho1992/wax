@@ -96,7 +96,7 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
                 Math.min(l1.lat, l2.lat),
                 Math.max(l1.lon, l2.lon)));
 
-            boxselector.box = extent;
+            boxselector.box = [l1, l2];
             callback(extent);
 
             com.modestmaps.removeEvent(map.parent, 'mousemove', boxselector.mouseMove);
