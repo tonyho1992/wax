@@ -1603,8 +1603,17 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
             var l1 = map.pointLocation(point),
                 l2 = map.pointLocation(mouseDownPoint);
 
-            boxselector.box = [l1, l2];
-            callback([l1, l2]);
+            // Format coordinates like mm.map.getExtent().
+            var extent = []
+            extent.push(new com.modestmaps.Location(
+                Math.max(l1.lat, l2.lat),
+                Math.min(l1.lon, l2.lon)));
+            extent.push(new com.modestmaps.Location(
+                Math.min(l1.lat, l2.lat),
+                Math.max(l1.lon, l2.lon)));
+
+            boxselector.box = extent;
+            callback(extent);
 
             com.modestmaps.removeEvent(map.parent, 'mousemove', boxselector.mouseMove);
             com.modestmaps.removeEvent(map.parent, 'mouseup', boxselector.mouseUp);
