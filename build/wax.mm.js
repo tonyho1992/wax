@@ -1548,9 +1548,8 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
         var callback = opts.callback;
     }
 
-    var boxselector = {
-        map: this,
-        getMousePoint: function(e) {
+    var boxselector = this.boxselector;
+    this.boxselector.getMousePoint = function(e) {
             // start with just the mouse (x, y)
             var point = new com.modestmaps.Point(e.clientX, e.clientY);
             // correct for scrolled document
@@ -1558,13 +1557,14 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
             point.y += document.body.scrollTop + document.documentElement.scrollTop;
 
             // correct for nested offsets in DOM
-            for (var node = this.map.parent; node; node = node.offsetParent) {
+            for (var node = map.parent; node; node = node.offsetParent) {
                 point.x -= node.offsetLeft;
                 point.y -= node.offsetTop;
             }
             return point;
-        },
-        mouseDown: function(e) {
+    };
+
+    this.boxselector.mouseDown = function(e) {
             if (e.shiftKey) {
                 mouseDownPoint = boxselector.getMousePoint(e);
 
@@ -1579,56 +1579,59 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
                 map.parent.style.cursor = 'crosshair';
                 return com.modestmaps.cancelEvent(e);
             }
-        },
-        mouseMove: function(e) {
-            var point = boxselector.getMousePoint(e);
-            box.style.display = 'block';
-            if (point.x < mouseDownPoint.x) {
-                box.style.left = point.x + 'px';
-                box.style.right = (boxselector.map.dimensions.x - mouseDownPoint.x) + 'px';
-            } else {
-                box.style.left = mouseDownPoint.x + 'px';
-                box.style.right = (boxselector.map.dimensions.x - point.x) + 'px';
-            }
-            if (point.y < mouseDownPoint.y) {
-                box.style.top = point.y + 'px';
-            } else {
-                box.style.bottom = (boxselector.map.dimensions.y - point.y) + 'px';
-            }
-            return com.modestmaps.cancelEvent(e);
-        },
-        mouseUp: function(e) {
-            var point = boxselector.getMousePoint(e);
-
-            var l1 = map.pointLocation(point),
-                l2 = map.pointLocation(mouseDownPoint);
-
-            // Format coordinates like mm.map.getExtent().
-            var extent = [];
-            extent.push(new com.modestmaps.Location(
-                Math.max(l1.lat, l2.lat),
-                Math.min(l1.lon, l2.lon)));
-            extent.push(new com.modestmaps.Location(
-                Math.min(l1.lat, l2.lat),
-                Math.max(l1.lon, l2.lon)));
-
-            boxselector.box = [l1, l2];
-            callback(extent);
-
-            com.modestmaps.removeEvent(map.parent, 'mousemove', boxselector.mouseMove);
-            com.modestmaps.removeEvent(map.parent, 'mouseup', boxselector.mouseUp);
-
-            map.parent.style.cursor = 'auto';
-
-            return com.modestmaps.cancelEvent(e);
-        }
     };
 
-    this.boxselector = boxselector;
+    this.boxselector.mouseMove = function(e) {
+        var point = boxselector.getMousePoint(e);
+        box.style.display = 'block';
+        if (point.x < mouseDownPoint.x) {
+            box.style.left = point.x + 'px';
+            box.style.right = (map.dimensions.x - mouseDownPoint.x) + 'px';
+        } else {
+            box.style.left = mouseDownPoint.x + 'px';
+            box.style.right = (map.dimensions.x - point.x) + 'px';
+        }
+        if (point.y < mouseDownPoint.y) {
+            box.style.top = point.y + 'px';
+        } else {
+            box.style.bottom = (map.dimensions.y - point.y) + 'px';
+        }
+        return com.modestmaps.cancelEvent(e);
+    };
+
+    this.boxselector.mouseUp = function(e) {
+        var point = boxselector.getMousePoint(e);
+
+        var l1 = map.pointLocation(point),
+            l2 = map.pointLocation(mouseDownPoint);
+
+        // Format coordinates like mm.map.getExtent().
+        var extent = [];
+        extent.push(new com.modestmaps.Location(
+            Math.max(l1.lat, l2.lat),
+            Math.min(l1.lon, l2.lon)));
+        extent.push(new com.modestmaps.Location(
+            Math.min(l1.lat, l2.lat),
+            Math.max(l1.lon, l2.lon)));
+
+        boxselector.box = [l1, l2];
+        callback(extent);
+
+        com.modestmaps.removeEvent(map.parent, 'mousemove', boxselector.mouseMove);
+        com.modestmaps.removeEvent(map.parent, 'mouseup', boxselector.mouseUp);
+
+        map.parent.style.cursor = 'auto';
+
+        return com.modestmaps.cancelEvent(e);
+    };
+
     com.modestmaps.addEvent(boxDiv, 'mousedown', boxselector.mouseDown);
 
-    this.addCallback('drawn', function(map, e) {
+    var drawbox =  function(map, e) {
         if (map.boxselector.box) {
+            box.style.display = 'block';
+            box.style.height = 'auto';
+            box.style.width = 'auto';
             var br = map.locationPoint(map.boxselector.box[0]);
             var tl = map.locationPoint(map.boxselector.box[1]);
             box.style.left = Math.max(0, tl.x) + 'px';
@@ -1636,7 +1639,15 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
             box.style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
             box.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
         }
-    });
+    };
+
+    this.addCallback('drawn', drawbox);
+
+    this.boxselector.remove = function() {
+        boxDiv.parentNode.removeChild(boxDiv);
+        map.removeCallback('mousedown', drawbox);
+        delete box;
+    }
 
     return this;
 };
