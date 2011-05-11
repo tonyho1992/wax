@@ -1604,7 +1604,7 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
                 l2 = map.pointLocation(mouseDownPoint);
 
             // Format coordinates like mm.map.getExtent().
-            var extent = []
+            var extent = [];
             extent.push(new com.modestmaps.Location(
                 Math.max(l1.lat, l2.lat),
                 Math.min(l1.lon, l2.lon)));
