@@ -113,6 +113,9 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
 
     var drawbox =  function(map, e) {
         if (map.boxselector.box) {
+            box.style.display = 'block';
+            box.style.height = 'auto';
+            box.style.width = 'auto';
             var br = map.locationPoint(map.boxselector.box[0]);
             var tl = map.locationPoint(map.boxselector.box[1]);
             box.style.left = Math.max(0, tl.x) + 'px';
