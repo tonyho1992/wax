@@ -1542,11 +1542,9 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
     var mouseDownPoint = null;
     var map = this;
 
-    if (typeof opts === 'function') {
-        var callback = opts;
-    } else {
-        var callback = opts.callback;
-    }
+    var callback = (typeof opts === 'function') ?
+        opts :
+        opts.callback;
 
     var boxselector = this.boxselector;
     this.boxselector.getMousePoint = function(e) {
@@ -1646,8 +1644,7 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
     this.boxselector.remove = function() {
         boxDiv.parentNode.removeChild(boxDiv);
         map.removeCallback('mousedown', drawbox);
-        delete box;
-    }
+    };
 
     return this;
 };
