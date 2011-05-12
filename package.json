@@ -1,8 +1,14 @@
 {
     "author": "Development Seed <info@developmentseed.org>",
     "name": "wax",
-    "author": "Tom MacWright <macwright@gmail.com>",
-    "version": "1.4.0",
+    "authors": [
+        "Tom MacWright <macwright@gmail.com>",
+        "Will White <will@developmentseed.org>"
+    ],
+    "licenses": [{
+      "type": "BSD"
+    }],
+    "version": "1.4.1",
     "files": [
       "build"
     ],

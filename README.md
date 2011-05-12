@@ -104,6 +104,10 @@ Wax includes two libraries in `/lib` which are included in builds
 
 ## Changelog
 
+#### 1.4.1
+
+* Tweaks to `boxselect` including removability.
+
 #### 1.4.0
 
 * Added `.boxselect(function())`
