@@ -1,8 +1,11 @@
 {
     "author": "Development Seed <info@developmentseed.org>",
     "name": "wax",
-    "authors": [
-        "Tom MacWright <macwright@gmail.com>",
+    "author": [
+        "Tom MacWright <macwright@gmail.com>"
+    ],
+    "contributors": [
+        "Young Hahn <young@developmentseed.org>",
         "Will White <will@developmentseed.org>"
     ],
     "licenses": [{
