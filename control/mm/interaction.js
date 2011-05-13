@@ -1,3 +1,5 @@
+// Requires jQuery
+//
 // namespacing!
 if (!com) {
     var com = { };

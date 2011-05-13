@@ -74,7 +74,7 @@ com.modestmaps.Map.prototype.hash = function(options) {
     stateChange: function(state) {
       if (state === s0) return; // ignore spurious hashchange events
       if (hash.parser((s0 = state).substring(1))) {
-        move(); // replace bogus hash
+        hash.move(); // replace bogus hash
       }
     },
     // If a state isn't present when you initially load the map, the map should

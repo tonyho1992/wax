@@ -1514,9 +1514,8 @@ wax.tooltip.unselect = function(feature, context, layer_id, evt) {
 
     $(context).triggerHandler('removedtooltip', [feature, context, evt]);
 };
-// Wax: ZoomBox
+// Wax: Box Selector
 // -----------------
-// An OL-style ZoomBox control, from the Modest Maps example.
 
 // namespacing!
 if (!com) {
@@ -1728,15 +1727,6 @@ if (!com) {
 }
 
 // Ripped from underscore.js
-
-/* Ideal layout
-
-    map.hash({
-        push: function(),
-        init: function(callback)
-    });
-*/
-
 // Internal function used to implement `_.throttle` and `_.debounce`.
 var limit = function(func, wait, debounce) {
   var timeout;
@@ -1759,7 +1749,7 @@ var throttle = function(func, wait) {
 
 var locationHash = {
   stateChange: function(callback) {
-    window.addEventListener("hashchange", function() {
+    window.addEventListener('hashchange', function() {
       callback(location.hash);
     }, false);
   },
@@ -1771,7 +1761,6 @@ var locationHash = {
   }
 };
 
-
 com.modestmaps.Map.prototype.hash = function(options) {
   var s0, // cached location.hash
       lat = 90 - 1e-8, // allowable latitude range
@@ -1780,7 +1769,7 @@ com.modestmaps.Map.prototype.hash = function(options) {
   var hash = {
     map: this,
     parser: function(s) {
-      var args = s.split("/").map(Number);
+      var args = s.split('/').map(Number);
       if (args.length < 3 || args.some(isNaN)) {
         return true; // replace bogus hash
       } else if (args.length == 3) {
@@ -1791,7 +1780,7 @@ com.modestmaps.Map.prototype.hash = function(options) {
       var center = this.map.getCenter(),
           zoom = this.map.getZoom(),
           precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
-      return "#" + [zoom.toFixed(2),
+      return '#' + [zoom.toFixed(2),
         center.lat.toFixed(precision),
         center.lon.toFixed(precision)].join('/');
     },
@@ -1805,9 +1794,11 @@ com.modestmaps.Map.prototype.hash = function(options) {
     stateChange: function(state) {
       if (state === s0) return; // ignore spurious hashchange events
       if (hash.parser((s0 = state).substring(1))) {
-        move(); // replace bogus hash
+        hash.move(); // replace bogus hash
       }
     },
+    // If a state isn't present when you initially load the map, the map should
+    // still get a center and zoom level.
     initialize: function() {
       if (options.defaultCenter) this.map.setCenter(options.defaultCenter);
       if (options.defaultZoom) this.map.setZoom(options.defaultZoom);
@@ -1817,11 +1808,13 @@ com.modestmaps.Map.prototype.hash = function(options) {
   options.manager.getState() ?
     hash.stateChange(options.manager.getState()) :
     hash.initialize() && hash.move();
-  this.addCallback("drawn", throttle(hash.move, 500));
+  this.addCallback('drawn', throttle(hash.move, 500));
   options.manager.stateChange(hash.stateChange);
 
   return this;
 };
+// Requires jQuery
+//
 // namespacing!
 if (!com) {
     var com = { };
@@ -2030,6 +2023,20 @@ com.modestmaps.Map.prototype.legend = function(options) {
             row: 0
         })
     ]);
+    return this;
+};
+// Wax: Point Selector
+// -----------------
+
+// namespacing!
+if (!com) {
+    var com = { };
+    if (!com.modestmaps) {
+        com.modestmaps = { };
+    }
+}
+
+com.modestmaps.Map.prototype.pointselector = function(opts) {
     return this;
 };
 // Wax: ZoomBox
