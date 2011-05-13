@@ -210,12 +210,12 @@ The ZoomBox control is a control that lets you zoom using the shift-key and a bo
 </div>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
-var m = new mm.Map('modestmaps-zoombox',
+var zoombox_m = new mm.Map('modestmaps-zoombox',
     new com.modestmaps.WaxProvider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'world-glass'}), new mm.Point(448,300))
   .zoombox();
-m.setCenterZoom(
+zoombox_m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
   4);
 </pre>
@@ -252,9 +252,6 @@ m.setCenterZoom(
   2);
 </pre>
 </div>
-
-
-
 
 <p class='md'>
 ### pointselector (BETA)
