@@ -104,6 +104,11 @@ Wax includes two libraries in `/lib` which are included in builds
 
 ## Changelog
 
+#### 1.4.2
+
+* Beta pointselector control.
+* Make zoombox removable.
+
 #### 1.4.1
 
 * Tweaks to `boxselect` including removability.
