@@ -31,35 +31,35 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
 
     var boxselector = this.boxselector;
     this.boxselector.getMousePoint = function(e) {
-            // start with just the mouse (x, y)
-            var point = new com.modestmaps.Point(e.clientX, e.clientY);
-            // correct for scrolled document
-            point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
-            point.y += document.body.scrollTop + document.documentElement.scrollTop;
+        // start with just the mouse (x, y)
+        var point = new com.modestmaps.Point(e.clientX, e.clientY);
+        // correct for scrolled document
+        point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
+        point.y += document.body.scrollTop + document.documentElement.scrollTop;
 
-            // correct for nested offsets in DOM
-            for (var node = map.parent; node; node = node.offsetParent) {
-                point.x -= node.offsetLeft;
-                point.y -= node.offsetTop;
-            }
-            return point;
+        // correct for nested offsets in DOM
+        for (var node = map.parent; node; node = node.offsetParent) {
+            point.x -= node.offsetLeft;
+            point.y -= node.offsetTop;
+        }
+        return point;
     };
 
     this.boxselector.mouseDown = function(e) {
-            if (e.shiftKey) {
-                mouseDownPoint = boxselector.getMousePoint(e);
+        if (e.shiftKey) {
+            mouseDownPoint = boxselector.getMousePoint(e);
 
-                box.style.left = mouseDownPoint.x + 'px';
-                box.style.top = mouseDownPoint.y + 'px';
-                box.style.height = 'auto';
-                box.style.width = 'auto';
+            box.style.left = mouseDownPoint.x + 'px';
+            box.style.top = mouseDownPoint.y + 'px';
+            box.style.height = 'auto';
+            box.style.width = 'auto';
 
-                com.modestmaps.addEvent(map.parent, 'mousemove', boxselector.mouseMove);
-                com.modestmaps.addEvent(map.parent, 'mouseup', boxselector.mouseUp);
+            com.modestmaps.addEvent(map.parent, 'mousemove', boxselector.mouseMove);
+            com.modestmaps.addEvent(map.parent, 'mouseup', boxselector.mouseUp);
 
-                map.parent.style.cursor = 'crosshair';
-                return com.modestmaps.cancelEvent(e);
-            }
+            map.parent.style.cursor = 'crosshair';
+            return com.modestmaps.cancelEvent(e);
+        }
     };
 
     this.boxselector.mouseMove = function(e) {
