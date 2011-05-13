@@ -1,6 +1,5 @@
-// Wax: ZoomBox
+// Wax: Box Selector
 // -----------------
-// An OL-style ZoomBox control, from the Modest Maps example.
 
 // namespacing!
 if (!com) {
