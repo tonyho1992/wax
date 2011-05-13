@@ -14,7 +14,7 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
     var boxDiv = document.createElement('div');
     boxDiv.id = this.parent.id + '-boxselector';
     boxDiv.className = 'boxselector-box-container';
-    boxDiv.style.width =  this.dimensions.x + 'px';
+    boxDiv.style.width = this.dimensions.x + 'px';
     boxDiv.style.height = this.dimensions.y + 'px';
     this.parent.appendChild(boxDiv);
 
@@ -109,7 +109,7 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
 
     com.modestmaps.addEvent(boxDiv, 'mousedown', boxselector.mouseDown);
 
-    var drawbox =  function(map, e) {
+    var drawbox = function(map, e) {
         if (map.boxselector.box) {
             box.style.display = 'block';
             box.style.height = 'auto';
@@ -117,7 +117,7 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
             var br = map.locationPoint(map.boxselector.box[0]);
             var tl = map.locationPoint(map.boxselector.box[1]);
             box.style.left = Math.max(0, tl.x) + 'px';
-            box.style.top =  Math.max(0, tl.y) + 'px';
+            box.style.top = Math.max(0, tl.y) + 'px';
             box.style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
             box.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
         }

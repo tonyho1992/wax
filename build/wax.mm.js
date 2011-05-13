@@ -1530,7 +1530,7 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
     var boxDiv = document.createElement('div');
     boxDiv.id = this.parent.id + '-boxselector';
     boxDiv.className = 'boxselector-box-container';
-    boxDiv.style.width =  this.dimensions.x + 'px';
+    boxDiv.style.width = this.dimensions.x + 'px';
     boxDiv.style.height = this.dimensions.y + 'px';
     this.parent.appendChild(boxDiv);
 
@@ -1625,7 +1625,7 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
 
     com.modestmaps.addEvent(boxDiv, 'mousedown', boxselector.mouseDown);
 
-    var drawbox =  function(map, e) {
+    var drawbox = function(map, e) {
         if (map.boxselector.box) {
             box.style.display = 'block';
             box.style.height = 'auto';
@@ -1633,7 +1633,7 @@ com.modestmaps.Map.prototype.boxselector = function(opts) {
             var br = map.locationPoint(map.boxselector.box[0]);
             var tl = map.locationPoint(map.boxselector.box[1]);
             box.style.left = Math.max(0, tl.x) + 'px';
-            box.style.top =  Math.max(0, tl.y) + 'px';
+            box.style.top = Math.max(0, tl.y) + 'px';
             box.style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
             box.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
         }
@@ -1757,6 +1757,21 @@ var throttle = function(func, wait) {
   return limit(func, wait, false);
 };
 
+var locationHash = {
+  stateChange: function(callback) {
+    window.addEventListener("hashchange", function() {
+      callback(location.hash);
+    }, false);
+  },
+  getState: function() {
+    return location.hash;
+  },
+  pushState: function(state) {
+    location.hash = state;
+  }
+};
+
+
 com.modestmaps.Map.prototype.hash = function(options) {
   var s0, // cached location.hash
       lat = 90 - 1e-8, // allowable latitude range
@@ -1766,8 +1781,9 @@ com.modestmaps.Map.prototype.hash = function(options) {
     map: this,
     parser: function(s) {
       var args = s.split("/").map(Number);
-      if (args.length < 3 || args.some(isNaN)) return true; // replace bogus hash
-      else if (args.length == 3) {
+      if (args.length < 3 || args.some(isNaN)) {
+        return true; // replace bogus hash
+      } else if (args.length == 3) {
         this.map.setCenterZoom(new com.modestmaps.Location(args[1], args[2]), args[0]);
       }
     },
@@ -1781,18 +1797,28 @@ com.modestmaps.Map.prototype.hash = function(options) {
     },
     move: function() {
       var s1 = hash.formatter();
-      if (s0 !== s1) location.replace(s0 = s1); // don't recenter the map!
+      if (s0 !== s1) {
+        s0 = s1;
+        options.manager.pushState(s0); // don't recenter the map!
+      }
     },
-    hashchange: function() {
-      if (location.hash === s0) return; // ignore spurious hashchange events
-      if (hash.parser((s0 = location.hash).substring(1)))
+    stateChange: function(state) {
+      if (state === s0) return; // ignore spurious hashchange events
+      if (hash.parser((s0 = state).substring(1))) {
         move(); // replace bogus hash
+      }
+    },
+    initialize: function() {
+      if (options.defaultCenter) this.map.setCenter(options.defaultCenter);
+      if (options.defaultZoom) this.map.setZoom(options.defaultZoom);
     }
   };
 
-  location.hash ? hash.hashchange() : hash.move();
+  options.manager.getState() ?
+    hash.stateChange(options.manager.getState()) :
+    hash.initialize() && hash.move();
   this.addCallback("drawn", throttle(hash.move, 500));
-  window.addEventListener("hashchange", hash.hashchange, false);
+  options.manager.stateChange(hash.stateChange);
 
   return this;
 };
