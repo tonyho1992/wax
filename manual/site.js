@@ -2,18 +2,25 @@
 $(function() {
     // Convert any markdown sections to HTML.
     $('.md').each(function() {
-        var html = $('<div></div>')
-            .html((new Showdown.converter()).makeHtml($(this).html()))
-            .attr('class', $(this).attr('class'))
-            .attr('id', $(this).attr('id'));
+        var html = document.createElement('div');
+        html.innerHTML = (new Showdown.converter()).makeHtml(this.innerHTML);
+        html.className = this.className;
+        html.id = this.id;
+        // TODO: free from shackles of jQuery
         $(this).hide().after(html);
         $('h1, h2, h3, h4, h5, h6', html).each(function() {
-            var cleaned = $(this).text().replace(/[\s\W]+/g, '-').toLowerCase();
-            $(this).attr('id', cleaned);
+            this.id = this.innerText.replace(/[\s\W]+/g, '-').toLowerCase();
+
+            var para = document.createElement('a');
+            para.innerHTML = '&para;'
+            para.className = 'para'
+            para.href = '#' + this.id;
+
+            this.appendChild(para);
         });
     });
     $('.run').each(function() {
-        eval($(this).text());
+        eval(this.innerText);
     });
     sh_highlightDocument();
 });
