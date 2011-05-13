@@ -89,10 +89,21 @@ a.zoomer {
   }
 
 .zoombox-box-container,
-.boxselector-box-container {
+.boxselector-box-container,
+.pointselector-box-container {
   margin:0;
   padding:0;
   position:absolute;
   top:0;
   left:0;
+  }
+
+.wax-point-div {
+  width:10px;
+  height:10px;
+  margin-left:-5px;
+  margin-top:-5px;
+  background:#fff;
+  border:1px solid #333;
+  -webkit-border-radius:5px;
   }
