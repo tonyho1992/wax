@@ -2238,26 +2238,35 @@ if (!com) {
 // control. This function can be used chaining-style with other
 // chaining-style controls.
 com.modestmaps.Map.prototype.zoomer = function() {
-    var zoomin = $('<a class="zoomer zoomin" href="#zoomin">+</a>')
-        .click($.proxy(function(e) {
-            e.preventDefault();
-            this.zoomIn();
-        }, this))
-        .appendTo(this.parent);
-    var zoomout = $('<a class="zoomer zoomout" href="#zoomout">-</a>')
-        .click($.proxy(function(e) {
-            e.preventDefault();
-            this.zoomOut();
-        }, this))
-        .appendTo(this.parent);
+    var map = this;
+    var zoomin = document.createElement('a');
+    zoomin.innerText = '+';
+    zoomin.href = '#';
+    zoomin.className = 'zoomer zoomin';
+    zoomin.addEventListener('click', function(e) {
+        com.modestmaps.cancelEvent(e);
+        map.zoomIn();
+    }, false);
+    this.parent.appendChild(zoomin);
+
+    var zoomout = document.createElement('a');
+    zoomout.innerText = '-';
+    zoomout.href = '#';
+    zoomout.className = 'zoomer zoomout';
+    zoomout.addEventListener('click', function(e) {
+        com.modestmaps.cancelEvent(e);
+        map.zoomOut();
+    }, this);
+    this.parent.appendChild(zoomout);
+
     this.addCallback('drawn', function(map, e) {
         if (map.coordinate.zoom === map.provider.outerLimits()[0].zoom) {
-            zoomout.addClass('zoomdisabled');
+            zoomout.className = 'zoomer zoomout zoomdisabled';
         } else if (map.coordinate.zoom === map.provider.outerLimits()[1].zoom) {
-            zoomin.addClass('zoomdisabled');
+            zoomin.className = 'zoomer zoomin zoomdisabled';
         } else {
-            zoomin.removeClass('zoomdisabled');
-            zoomout.removeClass('zoomdisabled');
+            zoomin.className = 'zoomer zoomin';
+            zoomout.className = 'zoomer zoomout';
         }
     });
     return this;
