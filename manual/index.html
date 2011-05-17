@@ -497,6 +497,7 @@ m.setCenterZoom(
   4);
 </pre>
 </div>
+
 <div class='section'>
 <p class='md'>
 And, of course, there are other options you can set on the WaxProvider 
@@ -524,6 +525,41 @@ m.setCenterZoom(
   4);
 </pre>
 </div>
+
+<div class='section'>
+<p class='md'>
+### Currying
+</p>
+<div id='modestmaps-reverse' class='map'>
+<span class='attribution'>
+  <a href='http://mapbox.com/tileset/pakistan-grey'>Pakistan Grey</a>
+</span>
+</div>
+<pre class='sh_javascript run'>
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-reverse',
+    new com.modestmaps.WaxProvider({
+      baseUrl: 'http://a.tile.mapbox.com/',
+      layerName: 'pakistan-grey',
+      zoomRange: [0, 9],
+      filetype: '.jpg'}), new mm.Point(448,300));
+_(m).melt(wax.pointselector, {
+  callback: function(coords) {
+    $('#modestmaps-pointselector .attribution').text(
+      coords.map(function(c) {
+        return c.lat + ',' + c.lon;
+      }).join(' - '));
+    }
+  });
+m.setCenterZoom(
+  new com.modestmaps.Location(30.5, 69.78),
+  4);
+</pre>
+</div>
+
+
+
+
     </div>
   </body>
 </html>
