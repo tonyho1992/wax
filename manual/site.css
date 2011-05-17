@@ -92,6 +92,17 @@ code {
     padding-left:3px;
   }
 
+.geocoder-input-wrapper {
+  clear:both;
+  width:440px;
+  padding:5px;
+  background-color:#444;
+  color:#fff;
+}
+.geocoder-input-wrapper label {
+  padding:0 5px;
+}
+
 
 /**
  * This page's style

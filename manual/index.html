@@ -270,12 +270,12 @@ var m = new mm.Map('modestmaps-pointselector',
     new com.modestmaps.WaxProvider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'blue-marble-topo-bathy-jul'}), new mm.Point(448,300))
-  .pointselector(function(coords) {
-    $('#modestmaps-pointselector .attribution').text(
-      coords.map(function(c) {
-        return c.lat + ',' + c.lon;
-      }).join(' - '));
-    });
+wax.pointselector(m, function(coords) {
+  $('#modestmaps-pointselector .attribution').text(
+    coords.map(function(c) {
+      return c.lat + ',' + c.lon;
+    }).join(' - '));
+  });
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
   2);
@@ -288,27 +288,45 @@ m.setCenterZoom(
 </p>
 
 <div class='section'>
+<div class='geocoder-input-wrapper'>
+<label for='geocoder-input'>Location</label><input id='geocoder-input'></input>
+<button id='geocoder-submit'>Go</button>
+</div>
 <div id='modestmaps-geocoder' class='map dark'>
 <span class='attribution'>
     <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
 </span>
 </div>
 <pre class='sh_javascript run'>
+/*
 var mm = com.modestmaps;
+var KEY = 'Fmjtd|luu22dutn9%2C8w%3Do5-h6z5h';
 var m = new mm.Map('modestmaps-geocoder',
     new com.modestmaps.WaxProvider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'blue-marble-topo-bathy-jul'}), new mm.Point(448,300))
-  .pointselector(function(coords) {
+  var pointselector = pointselector(function(coords) {
     $('#modestmaps-pointselector .attribution').text(
       coords.map(function(c) {
         return c.lat + ',' + c.lon;
       }).join(' - '));
-    })
-  .geocoder(function() { console.log(arguments); });
+    });
+
+m.geocoder({
+  geocoder: geocoders.mapquest({key: KEY}),
+  success: function(point) {
+    pointselector.addLocation(point);
+  }
+});
+
+$('#geocoder-submit').click(function() {
+  m.geocoder.geocode($('#geocoder-input').val());
+});
+
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
   2);
+  */
 </pre>
 </div>
 

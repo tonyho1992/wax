@@ -2,17 +2,11 @@
 // -----------------
 
 // namespacing!
-if (!com) {
-    var com = { };
-    if (!com.modestmaps) {
-        com.modestmaps = { };
-    }
-}
+wax = wax || {};
 
-com.modestmaps.Map.prototype.pointselector = function(opts) {
+wax.pointselector = function(map, opts) {
     var mouseDownPoint = null,
         mouseUpPoint = null,
-        map = this,
         tolerance = 5,
         MM = com.modestmaps,
         locations = [];
@@ -21,19 +15,22 @@ com.modestmaps.Map.prototype.pointselector = function(opts) {
         opts :
         opts.callback;
 
-
     var overlayDiv = document.createElement('div');
-    overlayDiv.id = this.parent.id + '-boxselector';
+    overlayDiv.id = map.parent.id + '-boxselector';
     overlayDiv.className = 'pointselector-box-container';
-    overlayDiv.style.width = this.dimensions.x + 'px';
-    overlayDiv.style.height = this.dimensions.y + 'px';
-    this.parent.appendChild(overlayDiv);
+    overlayDiv.style.width = map.dimensions.x + 'px';
+    overlayDiv.style.height = map.dimensions.y + 'px';
+    map.parent.appendChild(overlayDiv);
 
     var makePoint = function(e) {
         var point = new MM.Point(e.clientX, e.clientY);
         // correct for scrolled document
         point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
         point.y += document.body.scrollTop + document.documentElement.scrollTop;
+
+        // and for the document
+        point.x -= parseFloat(MM.getStyle(document.documentElement, 'margin-left'));
+        point.y -= parseFloat(MM.getStyle(document.documentElement, 'margin-top'));
 
         // correct for nested offsets in DOM
         for (var node = map.parent; node; node = node.offsetParent) {
@@ -42,6 +39,7 @@ com.modestmaps.Map.prototype.pointselector = function(opts) {
         }
         return point;
     };
+
 
     var pointselector = {
         deletePoint: function(location, e) {
@@ -84,18 +82,26 @@ com.modestmaps.Map.prototype.pointselector = function(opts) {
             locations.push(location);
             pointselector.drawPoints();
         },
+        cleanLocations: function(locations) {
+            var o = [];
+            for (var i = 0; i < locations.length; i++) {
+                o.push(new MM.Location(locations[i].lat, locations[i].lon));
+            }
+            return o;
+        },
         mouseUp: function(e) {
             if (!mouseDownPoint) return;
             mouseUpPoint = makePoint(e);
             if (MM.Point.distance(mouseDownPoint, mouseUpPoint) < tolerance) {
                 pointselector.addLocation(map.pointLocation(mouseDownPoint));
-                callback(locations);
+                callback(pointselector.cleanLocations(locations));
             }
             mouseDownPoint = null;
             MM.removeEvent(map.parent, 'mouseup', pointselector.mouseUp);
         }
     };
+
     MM.addEvent(overlayDiv, 'mousedown', pointselector.mouseDown);
     map.addCallback('drawn', pointselector.drawPoints);
-    return this;
+    return pointselector;
 };
