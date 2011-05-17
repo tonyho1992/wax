@@ -64,6 +64,35 @@ code {
   padding:1px 3px;
   }
 
+.navigation {
+  position:fixed;
+  top:10px;
+  left:10px;
+}
+
+  .navigation ul {
+    list-style-type:none;
+    margin:0;
+    padding:0;
+  }
+  .navigation ul li a {
+    text-decoration:none;
+  }
+  .navigation ul li a:hover {
+    text-decoration:underline;
+  }
+  .navigation ul li {
+    padding:0px;
+    font:normal 12px/18px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
+  }
+  .navigation ul li.H2 {
+    font-weight:bold;
+  }
+  .navigation ul li.H3 {
+    padding-left:3px;
+  }
+
+
 /**
  * This page's style
  */
