@@ -1,5 +1,7 @@
 // Wax: Geocoder
 // -------------
+//
+// Requires: jQuery, jquery-jsonp
 
 // namespacing!
 if (!com) {
@@ -9,51 +11,42 @@ if (!com) {
     }
 }
 
+var geocoders = {
+    mapquest: function(opts) {
+        return function(location, callback) {
+            $.jsonp({
+                url: 'http://platform.beta.mapquest.com/geocoding/v1/address',
+                data: {
+                  key: opts.key,
+                  location: location
+                },
+                callbackParameter: 'callback',
+                context: this,
+                success: function(data) {
+                    // TODO: simplify
+                    if (data.results && data.results.length && data.results[0].locations) {
+                        callback(null, data.results[0].locations[0].latLng);
+                    }
+                },
+                error: function() {
+                    callback('Geocoding service could not be reached.');
+                }
+            });
+        };
+    }
+};
+
 com.modestmaps.Map.prototype.geocoder = function(opts) {
-    var mouseDownPoint = null,
-        mouseUpPoint = null,
-        map = this,
-        tolerance = 5,
-        MM = com.modestmaps,
-        locations = [];
+    var MM = com.modestmaps;
 
-    var callback = (typeof opts === 'function') ?
-        opts :
-        opts.callback;
-
-
-    var overlayDiv = document.createElement('div');
-    overlayDiv.id = this.parent.id + '-boxselector';
-    overlayDiv.className = 'pointselector-box-container';
-    overlayDiv.style.width = this.dimensions.x + 'px';
-    overlayDiv.style.height = this.dimensions.y + 'px';
-    this.parent.appendChild(overlayDiv);
-
-    var makePoint = function(e) {
-        var point = new MM.Point(e.clientX, e.clientY);
-        // correct for scrolled document
-        point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
-        point.y += document.body.scrollTop + document.documentElement.scrollTop;
-
-        // correct for nested offsets in DOM
-        for (var node = map.parent; node; node = node.offsetParent) {
-            point.x -= node.offsetLeft;
-            point.y -= node.offsetTop;
-        }
-        return point;
-    };
-
-    var pointselector = {
-        deletePoint: function(location, e) {
-            if (confirm('Delete this point?')) {
-                // TODO: indexOf not supported in IE
-                location.pointDiv.parentNode.removeChild(location.pointDiv);
-                locations.splice(locations.indexOf(location), 1);
-                callback(locations);
-            }
+    this.geocoder = {
+        geocode: function(location) {
+            opts.geocoder(location, function(err, point) {
+                if (!err) opts.success(new MM.Location(point.lat, point.lon));
+            });
         }
     };
-    MM.addEvent(overlayDiv, 'mousedown', pointselector.mouseDown);
-    map.addCallback('drawn', pointselector.drawPoints);
     return this;
 };
+
+

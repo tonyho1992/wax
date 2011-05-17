@@ -80,13 +80,16 @@ com.modestmaps.Map.prototype.pointselector = function(opts) {
             mouseDownPoint = makePoint(e);
             MM.addEvent(map.parent, 'mouseup', pointselector.mouseUp);
         },
+        addLocation: function(location) {
+            locations.push(location);
+            pointselector.drawPoints();
+        },
         mouseUp: function(e) {
             if (!mouseDownPoint) return;
             mouseUpPoint = makePoint(e);
             if (MM.Point.distance(mouseDownPoint, mouseUpPoint) < tolerance) {
-                locations.push(map.pointLocation(mouseDownPoint));
+                pointselector.addLocation(map.pointLocation(mouseDownPoint));
                 callback(locations);
-                pointselector.drawPoints();
             }
             mouseDownPoint = null;
             MM.removeEvent(map.parent, 'mouseup', pointselector.mouseUp);
