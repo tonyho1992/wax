@@ -269,7 +269,8 @@ var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-pointselector',
     new com.modestmaps.WaxProvider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'blue-marble-topo-bathy-jul'}), new mm.Point(448,300))
+      layerName: 'blue-marble-topo-bathy-jul'}),
+    new mm.Point(448,300))
 wax.pointselector(m, function(coords) {
   $('#modestmaps-pointselector .attribution').text(
     coords.map(function(c) {
@@ -304,13 +305,15 @@ var KEY = 'Fmjtd|luu22dutn9%2C8w%3Do5-h6z5h';
 var m = new mm.Map('modestmaps-geocoder',
     new com.modestmaps.WaxProvider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'blue-marble-topo-bathy-jul'}), new mm.Point(448,300))
-  var pointselector = pointselector(function(coords) {
-    $('#modestmaps-pointselector .attribution').text(
-      coords.map(function(c) {
-        return c.lat + ',' + c.lon;
-      }).join(' - '));
-    });
+      layerName: 'blue-marble-topo-bathy-jul'
+    }),
+    new mm.Point(448,300))
+var pointselector = pointselector(function(coords) {
+  $('#modestmaps-pointselector .attribution').text(
+    coords.map(function(c) {
+      return c.lat + ',' + c.lon;
+    }).join(' - '));
+});
 
 m.geocoder({
   geocoder: geocoders.mapquest({key: KEY}),

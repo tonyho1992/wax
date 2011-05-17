@@ -47,7 +47,7 @@ wax.pointselector = function(map, opts) {
                 // TODO: indexOf not supported in IE
                 location.pointDiv.parentNode.removeChild(location.pointDiv);
                 locations.splice(locations.indexOf(location), 1);
-                callback(locations);
+                callback(pointselector.cleanLocations(locations));
             }
         },
         drawPoints: function() {
@@ -59,12 +59,13 @@ wax.pointselector = function(map, opts) {
                     locations[i].pointDiv.className = 'wax-point-div';
                     locations[i].pointDiv.style.position = 'absolute';
                     locations[i].pointDiv.style.display = 'block';
+                    // TODO: avoid circular reference
                     locations[i].pointDiv.location = locations[i];
                     // Create this closure once per point
                     MM.addEvent(locations[i].pointDiv, 'mouseup', (function selectPointWrap(e) {
                         var l = locations[i];
                         return function(e) {
-                            MM.cancelEvent(e);
+                            MM.removeEvent(map.parent, 'mouseup', pointselector.mouseUp);
                             pointselector.deletePoint(l, e);
                         };
                     })());
