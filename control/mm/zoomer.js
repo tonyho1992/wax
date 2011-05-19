@@ -16,6 +16,7 @@ com.modestmaps.Map.prototype.zoomer = function() {
     var map = this;
     var zoomin = document.createElement('a');
     zoomin.innerText = '+';
+    zoomin.innerContent = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
     zoomin.addEventListener('click', function(e) {
@@ -26,6 +27,7 @@ com.modestmaps.Map.prototype.zoomer = function() {
 
     var zoomout = document.createElement('a');
     zoomout.innerText = '-';
+    zoomin.innerContent = '-';
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
     zoomout.addEventListener('click', function(e) {
