@@ -92,7 +92,7 @@ var mm = com.modestmaps;
 // Set up a map in a div with the id 'modestmaps-setup'
 var m = new mm.Map('modestmaps-setup',
   // Use Wax's special 'provider' code to add a new custom layer
-  new com.modestmaps.WaxProvider({
+  new wax.provider({
     // From the main MapBox server
     baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
     // Called world-light
@@ -131,7 +131,7 @@ of the [MBTiles spec] [2].
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-interaction',
-    new com.modestmaps.WaxProvider({
+    new wax.provider({
       baseUrl: 'http://a.tiles.mapbox.com/devseed/',
       layerName: 'excess-properties'}), new mm.Point(448,300))
 wax.interaction(m);
@@ -162,7 +162,7 @@ and you can replace it with your own.
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-fullscreen',
-    new com.modestmaps.WaxProvider({
+    new wax.provider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'world-light'}), new mm.Point(448,300));
 wax.fullscreen(m);
@@ -188,7 +188,7 @@ zoom in &amp; out buttons.
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-zoomer',
-    new com.modestmaps.WaxProvider({
+    new wax.provider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'world-glass'}), new mm.Point(448,300))
 wax.zoomer(m);
@@ -213,7 +213,7 @@ The ZoomBox control is a control that lets you zoom using the shift-key and a bo
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var zoombox_m = new mm.Map('modestmaps-zoombox',
-    new com.modestmaps.WaxProvider({
+    new wax.provider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'world-glass'}), new mm.Point(448,300));
 wax.zoombox(zoombox_m);
@@ -239,7 +239,7 @@ map with the shift-key and a box.
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-boxselector',
-    new com.modestmaps.WaxProvider({
+    new wax.provider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'blue-marble-topo-bathy-jul'}), new mm.Point(448,300))
 wax.boxselector(m, function(coords) {
@@ -267,7 +267,7 @@ m.setCenterZoom(
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-pointselector',
-    new com.modestmaps.WaxProvider({
+    new wax.provider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'blue-marble-topo-bathy-jul'}),
     new mm.Point(448,300))
@@ -299,7 +299,7 @@ displays it on the map.
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-legend',
-    new com.modestmaps.WaxProvider({
+    new wax.provider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'world-dark'}), new mm.Point(448,300));
 wax.legend(m);
@@ -325,7 +325,7 @@ the same state as the user was.
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-hash',
-    new com.modestmaps.WaxProvider({
+    new wax.provider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'natural-earth-2'}), new mm.Point(448,300));
 wax.hash(m, {
@@ -436,7 +436,7 @@ the `WaxProvider` function an array of domain names instead of just one.
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-cnames',
-    new com.modestmaps.WaxProvider({
+    new wax.provider({
       baseUrl: [
         'http://a.tile.mapbox.com/',
         'http://b.tile.mapbox.com/',
@@ -465,7 +465,7 @@ zoom levels that you happen to have rendered.
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-options',
-    new com.modestmaps.WaxProvider({
+    new wax.provider({
       baseUrl: 'http://a.tile.mapbox.com/',
       layerName: 'pakistan-grey',
       zoomRange: [0, 9],
@@ -488,7 +488,7 @@ m.setCenterZoom(
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-reverse',
-    new com.modestmaps.WaxProvider({
+    new wax.provider({
       baseUrl: 'http://a.tile.mapbox.com/',
       layerName: 'pakistan-grey',
       zoomRange: [0, 9],
@@ -506,10 +506,6 @@ m.setCenterZoom(
   4);
 </pre>
 </div>
-
-
-
-
     </div>
   </body>
 </html>
