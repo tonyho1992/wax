@@ -20,7 +20,7 @@ wax.fullscreen = function(map, opts) {
             this.a.href = '#fullscreen';
             this.a.innerHTML = 'fullscreen';
             map.parent.appendChild(this.a);
-            com.modestmaps.addEvent('click', this.click(map));
+            com.modestmaps.addEvent(this.a, 'click', this.click(map));
             return this;
         },
 
