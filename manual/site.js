@@ -4,7 +4,7 @@ $.domReady(function() {
     var nav = $('.navigation ul');
     $('.md').each(function() {
         var html = document.createElement('div');
-        html.innerHTML = (new Showdown.converter()).makeHtml(this.innerHTML);
+        $(html).html(new Showdown.converter()).makeHtml($(this).html());
         html.className = this.className;
         html.id = this.id;
         // TODO: free from shackles of jQuery
