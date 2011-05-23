@@ -483,12 +483,13 @@ wax.Legend.prototype.legendUrl = function(url) {
 };
 
 // TODO: rewrite without underscore
-_.mixin({
-    melt: function(self, func, obj) {
+var w = function(self) {
+    self.melt = function(func, obj) {
         func.apply(obj, [self, obj]);
         return self;
-    }
-});
+    };
+    return self;
+};
 // Requires: jQuery
 //
 // Wax GridUtil

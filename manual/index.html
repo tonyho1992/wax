@@ -191,7 +191,7 @@ var m = new mm.Map('modestmaps-zoomer',
     new com.modestmaps.WaxProvider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'world-glass'}), new mm.Point(448,300))
-  .zoomer();
+wax.zoomer(m);
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
   4);
@@ -493,7 +493,7 @@ var m = new mm.Map('modestmaps-reverse',
       layerName: 'pakistan-grey',
       zoomRange: [0, 9],
       filetype: '.jpg'}), new mm.Point(448,300));
-_(m).melt(wax.pointselector, {
+w(m).melt(wax.pointselector, {
   callback: function(coords) {
     $('#modestmaps-pointselector .attribution').text(
       coords.map(function(c) {

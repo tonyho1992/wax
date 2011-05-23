@@ -1,19 +1,13 @@
 // Wax: Zoom Control
 // -----------------
 
-// namespacing!
-if (!com) {
-    var com = { };
-    if (!com.modestmaps) {
-        com.modestmaps = { };
-    }
-}
+// Wax
+wax = wax || {};
 
 // Add zoom links, which can be styled as buttons, to a `modestmaps.Map`
 // control. This function can be used chaining-style with other
 // chaining-style controls.
-com.modestmaps.Map.prototype.zoomer = function() {
-    var map = this;
+wax.zoomer = function(map) {
     var zoomin = document.createElement('a');
     zoomin.innerHTML = '+';
     zoomin.href = '#';
@@ -22,7 +16,7 @@ com.modestmaps.Map.prototype.zoomer = function() {
         com.modestmaps.cancelEvent(e);
         map.zoomIn();
     }, false);
-    this.parent.appendChild(zoomin);
+    map.parent.appendChild(zoomin);
 
     var zoomout = document.createElement('a');
     zoomout.innerHTML = '-';
@@ -32,17 +26,22 @@ com.modestmaps.Map.prototype.zoomer = function() {
         com.modestmaps.cancelEvent(e);
         map.zoomOut();
     }, false);
-    this.parent.appendChild(zoomout);
+    map.parent.appendChild(zoomout);
 
-    this.addCallback('drawn', function(map, e) {
-        if (map.coordinate.zoom === map.provider.outerLimits()[0].zoom) {
-            zoomout.className = 'zoomer zoomout zoomdisabled';
-        } else if (map.coordinate.zoom === map.provider.outerLimits()[1].zoom) {
-            zoomin.className = 'zoomer zoomin zoomdisabled';
-        } else {
-            zoomin.className = 'zoomer zoomin';
-            zoomout.className = 'zoomer zoomout';
+    var zoomer = {
+        add: function(map) {
+            map.addCallback('drawn', function(map, e) {
+                if (map.coordinate.zoom === map.provider.outerLimits()[0].zoom) {
+                    zoomout.className = 'zoomer zoomout zoomdisabled';
+                } else if (map.coordinate.zoom === map.provider.outerLimits()[1].zoom) {
+                    zoomin.className = 'zoomer zoomin zoomdisabled';
+                } else {
+                    zoomin.className = 'zoomer zoomin';
+                    zoomout.className = 'zoomer zoomout';
+                }
+            });
+            return this;
         }
-    });
-    return this;
+    };
+    return zoomer.add(map);
 };
