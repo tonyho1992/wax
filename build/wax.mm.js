@@ -1344,12 +1344,7 @@ wax.zoomer = function(map) {
     return zoomer.add(map);
 };
 // namespacing!
-if (!com) {
-    var com = { };
-    if (!com.modestmaps) {
-        com.modestmaps = { };
-    }
-}
+wax = wax || {};
 
 // A layer connector for Modest Maps
 //
@@ -1363,8 +1358,7 @@ if (!com) {
 //
 // * `filetype`: like `.jpeg` (default `.png`)
 // * `zoomrange`: like [0, 10] (default [0, 18])
-// 
-com.modestmaps.WaxProvider = function(options) {
+wax.provider = function(options) {
     this.layerName = options.layerName;
     this.baseUrls = (typeof(options.baseUrl) == 'string') ?
             [options.baseUrl] : options.baseUrl;
@@ -1373,7 +1367,7 @@ com.modestmaps.WaxProvider = function(options) {
     this.zoomRange = options.zoomRange || [0, 18];
 };
 
-com.modestmaps.WaxProvider.prototype = {
+wax.provider.prototype = {
     outerLimits: function() {
         return [
             new com.modestmaps.Coordinate(0,0,0).zoomTo(this.zoomRange[0]),
@@ -1399,4 +1393,4 @@ com.modestmaps.WaxProvider.prototype = {
     }
 };
 
-com.modestmaps.extend(com.modestmaps.WaxProvider, com.modestmaps.MapProvider);
+com.modestmaps.extend(wax.provider, com.modestmaps.MapProvider);
