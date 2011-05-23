@@ -8,6 +8,7 @@ $.domReady(function() {
         html.className = this.className;
         html.id = this.id;
         // TODO: free from shackles of jQuery
+        /*
         $(this).hide().after(html);
         $('h1, h2, h3, h4, h5, h6', html).each(function() {
             this.setAttribute('id', $(this).text().replace(/[\s\W]+/g, '-').toLowerCase());
@@ -27,6 +28,7 @@ $.domReady(function() {
 
             this.appendChild(para);
         });
+        */
     });
     $('.run').each(function() {
         eval($(this).text());
