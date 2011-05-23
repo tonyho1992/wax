@@ -757,7 +757,7 @@ wax.fullscreen = function(map, opts) {
 
         click: function(map) {
             return this._click = this._click || wax.util.bind(function(e) {
-                if (e) e.preventDefault();
+                if (e) com.modestmaps.cancelEvent(e);
 
                 if (this.state) {
                     this.smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
