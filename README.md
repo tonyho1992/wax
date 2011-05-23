@@ -23,16 +23,15 @@ implementation of the [MBTiles interaction specification](https://github.com/map
 
 #### Modest Maps
 
-* `.interaction()`
-* `.zoomer()`
-* `.legend()`
-* `.fullscreen()`
-* `.zoombox()`
-* `.hash()`
-
-#### Lib
-
-* `jquery.jsonp-2.1.4.js`, [from jquery-jsonp](http://code.google.com/p/jquery-jsonp/)
+* `wax.interaction()`
+* `wax.zoomer()`
+* `wax.zoombox()`
+* `wax.boxselect()`
+* `wax.pointselector()`
+* `wax.legend()`
+* `wax.fullscreen()`
+* `wax.zoombox()`
+* `wax.hash()`
 
 #### Records
 
@@ -51,7 +50,6 @@ These techniques (with arbitrary levels of nesting), are sufficient to construct
 
 ## Requirements
 
-* [jQuery](http://jquery.com/) - tested with 1.5
 * (docs only) [docco](https://github.com/jashkenas/docco)
 * (build only) [UglifyJS](https://github.com/mishoo/UglifyJS/)
 
