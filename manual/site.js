@@ -29,15 +29,7 @@ $.domReady(function() {
         });
     });
     $('.run').each(function() {
-        try {
-            eval($(this).text());
-        } catch(e) {
-            if (console) {
-                console.log(e);
-            } else {
-                alert(e, e.message);
-            }
-        }
+        eval($(this).text());
     });
     sh_highlightDocument();
 });
