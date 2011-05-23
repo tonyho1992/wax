@@ -828,8 +828,11 @@ wax.hash = function(map, options) {
         map: this,
         parser: function(s) {
             var args = s.split('/');
-            for (var i = 0; i < args.length; i++) args[i] = Number(args);
-            if (args.length < 3 || args.some(isNaN)) {
+            for (var i = 0; i < args.length; i++) {
+                if (isNaN(args[i])) return true;
+                args[i] = Number(args);
+            }
+            if (args.length < 3) {
                 return true; // replace bogus hash
             } else if (args.length == 3) {
                 map.setCenterZoom(new com.modestmaps.Location(args[1], args[2]), args[0]);
