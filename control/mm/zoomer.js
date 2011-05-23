@@ -15,8 +15,7 @@ if (!com) {
 com.modestmaps.Map.prototype.zoomer = function() {
     var map = this;
     var zoomin = document.createElement('a');
-    zoomin.innerText = '+';
-    zoomin.innerContent = '+';
+    zoomin.innerHTML = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
     zoomin.addEventListener('click', function(e) {
@@ -26,14 +25,13 @@ com.modestmaps.Map.prototype.zoomer = function() {
     this.parent.appendChild(zoomin);
 
     var zoomout = document.createElement('a');
-    zoomout.innerText = '-';
-    zoomin.innerContent = '-';
+    zoomout.innerHTML = '-';
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
     zoomout.addEventListener('click', function(e) {
         com.modestmaps.cancelEvent(e);
         map.zoomOut();
-    }, this);
+    }, false);
     this.parent.appendChild(zoomout);
 
     this.addCallback('drawn', function(map, e) {

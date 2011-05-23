@@ -16,6 +16,8 @@ div.section {
 div.map {
   border:1px solid #000;
   float:left;
+  width:448px;
+  height:300px;
   }
   span.attribution {
     z-index:9999999;

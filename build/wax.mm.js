@@ -1,4 +1,10 @@
-// Instantiate objects based on a JSON "record". The record must be a statement
+/*!
+  * Reqwest! A x-browser general purpose XHR connection manager
+  * copyright Dustin Diaz 2011
+  * https://github.com/ded/reqwest
+  * license MIT
+  */
+!function(window){function serial(a){var b=a.name;if(a.disabled||!b)return"";b=enc(b);switch(a.tagName.toLowerCase()){case"input":switch(a.type){case"reset":case"button":case"image":case"file":return"";case"checkbox":case"radio":return a.checked?b+"="+(a.value?enc(a.value):!0)+"&":"";default:return b+"="+(a.value?enc(a.value):!0)+"&"}break;case"textarea":return b+"="+enc(a.value)+"&";case"select":return b+"="+enc(a.options[a.selectedIndex].value)+"&"}return""}function enc(a){return encodeURIComponent(a)}function reqwest(a,b){return new Reqwest(a,b)}function init(o,fn){function error(a){o.error&&o.error(a),complete(a)}function success(resp){o.timeout&&clearTimeout(self.timeout)&&(self.timeout=null);var r=resp.responseText;switch(type){case"json":resp=eval("("+r+")");break;case"js":resp=eval(r);break;case"html":resp=r}fn(resp),o.success&&o.success(resp),complete(resp)}function complete(a){o.complete&&o.complete(a)}this.url=typeof o=="string"?o:o.url,this.timeout=null;var type=o.type||setType(this.url),self=this;fn=fn||function(){},o.timeout&&(this.timeout=setTimeout(function(){self.abort(),error()},o.timeout)),this.request=getRequest(o,success,error)}function setType(a){if(/\.json$/.test(a))return"json";if(/\.jsonp$/.test(a))return"jsonp";if(/\.js$/.test(a))return"js";if(/\.html?$/.test(a))return"html";if(/\.xml$/.test(a))return"xml";return"js"}function Reqwest(a,b){this.o=a,this.fn=b,init.apply(this,arguments)}function getRequest(a,b,c){if(a.type!="jsonp"){var f=xhr();f.open(a.method||"GET",typeof a=="string"?a:a.url,!0),setHeaders(f,a),f.onreadystatechange=readyState(f,b,c),a.before&&a.before(f),f.send(a.data||null);return f}var d=doc.createElement("script"),e=getCallbackName(a);window[e]=generalCallback,d.type="text/javascript",d.src=a.url,d.async=!0,d.onload=function(){a.success&&a.success(lastValue),lastValue=undefined,head.removeChild(d)},head.insertBefore(d,topScript)}function generalCallback(a){lastValue=a}function getCallbackName(a){var b=a.jsonpCallback||"callback";if(a.url.substr(-(b.length+2))==b+"=?"){var c="reqwest_"+uniqid++;a.url=a.url.substr(0,a.url.length-1)+c;return c}var d=new RegExp(b+"=([\\w]+)");return a.url.match(d)[1]}function setHeaders(a,b){var c=b.headers||{};c.Accept="text/javascript, text/html, application/xml, text/xml, */*",c["X-Requested-With"]=c["X-Requested-With"]||"XMLHttpRequest";if(b.data){c["Content-type"]="application/x-www-form-urlencoded";for(var d in c)c.hasOwnProperty(d)&&a.setRequestHeader(d,c[d],!1)}}function readyState(a,b,c){return function(){a&&a.readyState==4&&(twoHundo.test(a.status)?b(a):c(a))}}var twoHundo=/^20\d$/,doc=document,byTag="getElementsByTagName",topScript=doc[byTag]("script")[0],head=topScript.parentNode,xhr="XMLHttpRequest"in window?function(){return new XMLHttpRequest}:function(){return new ActiveXObject("Microsoft.XMLHTTP")},uniqid=0,lastValue;Reqwest.prototype={abort:function(){this.request.abort()},retry:function(){init.call(this,this.o,this.fn)}},reqwest.serialize=function(a){var b=a[byTag]("input"),c=a[byTag]("select"),d=a[byTag]("textarea");return(v(b).chain().toArray().map(serial).value().join("")+v(c).chain().toArray().map(serial).value().join("")+v(d).chain().toArray().map(serial).value().join("")).replace(/&$/,"")},reqwest.serializeArray=function(a){for(var b=this.serialize(a).split("&"),c=0,d=b.length,e=[],f;c<d;c++)b[c]&&(f=b[c].split("="))&&e.push({name:f[0],value:f[1]});return e};var old=window.reqwest;reqwest.noConflict=function(){window.reqwest=old;return this},window.reqwest=reqwest}(this)// Instantiate objects based on a JSON "record". The record must be a statement
 // array in the following form:
 //
 //     [ "{verb} {subject}", arg0, arg1, arg2, ... argn ]
@@ -1232,24 +1238,26 @@ wax.tooltip = {};
 // Get the active tooltip for a layer or create a new one if no tooltip exists.
 // Hide any tooltips on layers underneath this one.
 wax.tooltip.getToolTip = function(feature, context, index, evt) {
-    var tooltip = $(context).children('div.wax-tooltip-' +
-        index +
-        ':not(.removed)');
-    if (tooltip.size() === 0) {
-        tooltip = $("<div class='wax-tooltip wax-tooltip-" +
-            index +
-            "'>" +
-            '</div>').html(feature);
-        if (!$(context).triggerHandler('addedtooltip', [tooltip, context, evt])) {
-            $(context).append(tooltip);
-        }
-    }
-    for (var i = (index - 1); i > 0; i--) {
-        var fallback = $('div.wax-tooltip-' + i + ':not(.removed)');
-        if (fallback.size() > 0) {
-            fallback.addClass('hidden').hide();
-        }
-    }
+    // var tooltip = $(context).children('div.wax-tooltip-' +
+    //     index +
+    //     ':not(.removed)');
+
+    // if (tooltip.size() === 0) {
+    tooltip = document.createElement('div');
+    tooltip.className = 'wax-tooltip wax-tooltip-' + index;
+    tooltip.innerHTML = feature;
+
+        // if (!$(context).triggerHandler('addedtooltip', [tooltip, context, evt])) {
+             context.appendChild(tooltip);
+        // }
+    // }
+
+    // for (var i = (index - 1); i > 0; i--) {
+    //     var fallback = $('div.wax-tooltip-' + i + ':not(.removed)');
+    //     if (fallback.size() > 0) {
+    //         fallback.addClass('hidden').hide();
+    //     }
+    // }
     return tooltip;
 };
 
@@ -1257,17 +1265,17 @@ wax.tooltip.getToolTip = function(feature, context, index, evt) {
 // shown until this popup is closed or another popup is opened.
 wax.tooltip.click = function(feature, context, index) {
     var tooltip = wax.tooltip.getToolTip(feature, context, index);
-    var close = $('<a href="#close" class="close">Close</a>');
-    close.click(function() {
-        tooltip
-            .addClass('removed')
-            .fadeOut('fast', function() { $(this).remove(); });
+    var close = document.createElement('a');
+    close.href = '#close';
+    close.className = 'close';
+    close.innerHTML = 'Close';
+    close.addListener('click', function() {
+        tooltip.parentNode.removeChild(tooltip);
         return false;
     });
-    tooltip
-        .addClass('wax-popup')
-        .html(feature)
-        .append(close);
+    tooltip.className += ' wax-popup';
+    tooltip.innerHTML = feature;
+    tooltip.appendChild(close);
 };
 
 // Show a tooltip.
@@ -1275,15 +1283,14 @@ wax.tooltip.select = function(feature, context, layer_id, evt) {
     if (!feature) return;
 
     wax.tooltip.getToolTip(feature, context, layer_id, evt);
-    $(context).css('cursor', 'pointer');
-    $('div', context).css('cursor', 'pointer');
+    context.style.cursor = 'pointer';
 };
 
 // Hide all tooltips on this layer and show the first hidden tooltip on the
 // highest layer underneath if found.
 wax.tooltip.unselect = function(feature, context, layer_id, evt) {
-    $(context)
-        .css('cursor', 'default');
+    context.style.cursor = 'default';
+    /*
     if (layer_id) {
         $('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
             .remove();
@@ -1291,15 +1298,15 @@ wax.tooltip.unselect = function(feature, context, layer_id, evt) {
         $('div.wax-tooltip:not(.wax-popup)')
             .remove();
     }
+    */
 
     // TODO: remove
-    $('div', context).css('cursor', 'default');
 
-    $('div.wax-tooltip:first')
-        .removeClass('hidden')
-        .show();
+    // $('div.wax-tooltip:first')
+    //     .removeClass('hidden')
+    //     .show();
 
-    $(context).triggerHandler('removedtooltip', [feature, context, evt]);
+    // $(context).triggerHandler('removedtooltip', [feature, context, evt]);
 };
 // Wax: Box Selector
 // -----------------
@@ -1474,7 +1481,7 @@ wax.fullscreen = function(map, opts) {
             this.a.href = '#fullscreen';
             this.a.innerHTML = 'fullscreen';
             map.parent.appendChild(this.a);
-            this.a.addEventListener('click', this.click(map));
+            this.a.addEventListener('click', this.click(map), false);
             return this;
         },
 
@@ -1676,6 +1683,7 @@ wax.interaction = function(map, options) {
                 map.addCallback(this.modifyingEvents[i], this.clearMap);
             }
             MM.addEvent(map.parent, 'mousemove', this.onMove());
+            MM.addEvent(map.parent, 'mousedown', this.mouseDown());
             return this;
         },
 
@@ -1760,68 +1768,58 @@ wax.interaction = function(map, options) {
         },
 
         mouseDown: function(evt) {
-            // Ignore double-clicks by ignoring clicks within 300ms of
-            // each other.
-            if (this.waxClearTimeout()) {
-                return;
-            }
-            // Store this event so that we can compare it to the
-            // up event
-            var tol = 4; // tolerance
-            this.downEvent = evt;
-            $(this.parent).one('mouseup', wax.util.bind(function(evt) {
+            return this._mouseDown = this._mouseDown || wax.util.bind(function(evt) {
+                // Ignore double-clicks by ignoring clicks within 300ms of
+                // each other.
+                if (this.clearTimeout()) {
+                    return;
+                }
+                // Store this event so that we can compare it to the
+                // up event
+                this.downEvent = evt;
+                MM.addEvent(map.parent, 'mouseup', this.mouseUp());
+            }, this);
+        },
+
+        mouseUp: function() {
+            return this._mouseUp = this._mouseUp || wax.util.bind(function(evt) {
+                MM.removeEvent(map.parent, 'mouseup', this.mouseUp());
                 // Don't register clicks that are likely the boundaries
                 // of dragging the map
+                var tol = 4; // tolerance
                 if (Math.round(evt.pageY / tol) === Math.round(this.downEvent.pageY / tol) &&
                     Math.round(evt.pageX / tol) === Math.round(this.downEvent.pageX / tol)) {
-                    this.clickTimeout = window.setTimeout(
-                        $.proxy(function() {
-                            this.waxHandleClick(evt);
-                        }, this),
-                        300
-                    );
+                    // Contain the event data in a closure.
+                    this.clickTimeout = window.setTimeout(wax.util.bind(function() { this.click()(evt); }, this), 300);
                 }
-            }, this));
-        }
-    };
+            }, this);
+        },
 
-
-    /*
-    // Click handler
-    // -------------
-    //
-    // The extra logic here is all to avoid the inconsistencies
-    // of browsers in handling double and single clicks on the same
-    // element. After dealing with particulars, delegates to waxHandleClick
-    $(this.parent).mousedown($.proxy(, this));
-
-    this.waxHandleClick = function(evt) {
-        var $tile = this.waxGetTile(evt);
-        if ($tile) {
-            this.waxGM.getGrid($tile.attr('src'), $.proxy(function(g) {
-                if (g) {
-                    var feature = g.getFeature(evt.pageX, evt.pageY, $tile, {
-                        format: this.clickAction
-                    });
-                    if (feature) {
-                        switch (this.clickAction) {
-                            case 'full':
-                                this.callbacks.click(feature, this.parent, 0, evt);
-                                break;
-                            case 'location':
-                                window.location = feature;
-                                break;
+        click: function(evt) {
+            return this._onClick = this._onClick || wax.util.bind(function(evt) {
+                var tile = this.getTile(evt);
+                if (tile) {
+                    this.waxGM.getGrid(tile.src, wax.util.bind(function(g) {
+                        if (g) {
+                            var feature = g.getFeature(evt.pageX, evt.pageY, tile, {
+                                format: this.clickAction
+                            });
+                            if (feature) {
+                                switch (this.clickAction) {
+                                    case 'full':
+                                        this.callbacks.click(feature, this.parent, 0, evt);
+                                        break;
+                                    case 'location':
+                                        window.location = feature;
+                                        break;
+                                }
+                            }
                         }
-                    }
+                    }, this));
                 }
-            }, this));
+            }, this);
         }
     };
-
-
-
-
-    */
 
     // Ensure chainability
     return interaction.add(map);
@@ -2090,8 +2088,7 @@ if (!com) {
 com.modestmaps.Map.prototype.zoomer = function() {
     var map = this;
     var zoomin = document.createElement('a');
-    zoomin.innerText = '+';
-    zoomin.innerContent = '+';
+    zoomin.innerHTML = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
     zoomin.addEventListener('click', function(e) {
@@ -2101,14 +2098,13 @@ com.modestmaps.Map.prototype.zoomer = function() {
     this.parent.appendChild(zoomin);
 
     var zoomout = document.createElement('a');
-    zoomout.innerText = '-';
-    zoomin.innerContent = '-';
+    zoomout.innerHTML = '-';
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
     zoomout.addEventListener('click', function(e) {
         com.modestmaps.cancelEvent(e);
         map.zoomOut();
-    }, this);
+    }, false);
     this.parent.appendChild(zoomout);
 
     this.addCallback('drawn', function(map, e) {

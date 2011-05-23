@@ -35,6 +35,7 @@ wax.interaction = function(map, options) {
                 map.addCallback(this.modifyingEvents[i], this.clearMap);
             }
             MM.addEvent(map.parent, 'mousemove', this.onMove());
+            MM.addEvent(map.parent, 'mousedown', this.mouseDown());
             return this;
         },
 
@@ -119,68 +120,58 @@ wax.interaction = function(map, options) {
         },
 
         mouseDown: function(evt) {
-            // Ignore double-clicks by ignoring clicks within 300ms of
-            // each other.
-            if (this.waxClearTimeout()) {
-                return;
-            }
-            // Store this event so that we can compare it to the
-            // up event
-            var tol = 4; // tolerance
-            this.downEvent = evt;
-            $(this.parent).one('mouseup', wax.util.bind(function(evt) {
+            return this._mouseDown = this._mouseDown || wax.util.bind(function(evt) {
+                // Ignore double-clicks by ignoring clicks within 300ms of
+                // each other.
+                if (this.clearTimeout()) {
+                    return;
+                }
+                // Store this event so that we can compare it to the
+                // up event
+                this.downEvent = evt;
+                MM.addEvent(map.parent, 'mouseup', this.mouseUp());
+            }, this);
+        },
+
+        mouseUp: function() {
+            return this._mouseUp = this._mouseUp || wax.util.bind(function(evt) {
+                MM.removeEvent(map.parent, 'mouseup', this.mouseUp());
                 // Don't register clicks that are likely the boundaries
                 // of dragging the map
+                var tol = 4; // tolerance
                 if (Math.round(evt.pageY / tol) === Math.round(this.downEvent.pageY / tol) &&
                     Math.round(evt.pageX / tol) === Math.round(this.downEvent.pageX / tol)) {
-                    this.clickTimeout = window.setTimeout(
-                        $.proxy(function() {
-                            this.waxHandleClick(evt);
-                        }, this),
-                        300
-                    );
+                    // Contain the event data in a closure.
+                    this.clickTimeout = window.setTimeout(wax.util.bind(function() { this.click()(evt); }, this), 300);
                 }
-            }, this));
-        }
-    };
+            }, this);
+        },
 
-
-    /*
-    // Click handler
-    // -------------
-    //
-    // The extra logic here is all to avoid the inconsistencies
-    // of browsers in handling double and single clicks on the same
-    // element. After dealing with particulars, delegates to waxHandleClick
-    $(this.parent).mousedown($.proxy(, this));
-
-    this.waxHandleClick = function(evt) {
-        var $tile = this.waxGetTile(evt);
-        if ($tile) {
-            this.waxGM.getGrid($tile.attr('src'), $.proxy(function(g) {
-                if (g) {
-                    var feature = g.getFeature(evt.pageX, evt.pageY, $tile, {
-                        format: this.clickAction
-                    });
-                    if (feature) {
-                        switch (this.clickAction) {
-                            case 'full':
-                                this.callbacks.click(feature, this.parent, 0, evt);
-                                break;
-                            case 'location':
-                                window.location = feature;
-                                break;
+        click: function(evt) {
+            return this._onClick = this._onClick || wax.util.bind(function(evt) {
+                var tile = this.getTile(evt);
+                if (tile) {
+                    this.waxGM.getGrid(tile.src, wax.util.bind(function(g) {
+                        if (g) {
+                            var feature = g.getFeature(evt.pageX, evt.pageY, tile, {
+                                format: this.clickAction
+                            });
+                            if (feature) {
+                                switch (this.clickAction) {
+                                    case 'full':
+                                        this.callbacks.click(feature, this.parent, 0, evt);
+                                        break;
+                                    case 'location':
+                                        window.location = feature;
+                                        break;
+                                }
+                            }
                         }
-                    }
+                    }, this));
                 }
-            }, this));
+            }, this);
         }
     };
-
-
-
-
-    */
 
     // Ensure chainability
     return interaction.add(map);

@@ -29,7 +29,11 @@ $.domReady(function() {
         });
     });
     $('.run').each(function() {
-        eval(this.innerText);
+        try {
+            eval($(this).text());
+        } catch(e) {
+            console && console.log(e);
+        }
     });
     sh_highlightDocument();
 });

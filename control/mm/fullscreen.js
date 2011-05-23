@@ -20,7 +20,7 @@ wax.fullscreen = function(map, opts) {
             this.a.href = '#fullscreen';
             this.a.innerHTML = 'fullscreen';
             map.parent.appendChild(this.a);
-            this.a.addEventListener('click', this.click(map));
+            this.a.addEventListener('click', this.click(map), false);
             return this;
         },
 
