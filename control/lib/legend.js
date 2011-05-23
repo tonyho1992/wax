@@ -6,7 +6,7 @@ var wax = wax || {};
 
 wax.Legend = function(context, container) {
     this.context = context;
-    this.container = container || $('<div class="wax-legends"></div>');
+    this.container = container || $('<div class="wax-legends"></div>')[0];
     this.legends = {};
     $(this.context).append(this.container);
 };
@@ -14,7 +14,7 @@ wax.Legend = function(context, container) {
 wax.Legend.prototype.render = function(urls) {
     $('.wax-legend', this.container).hide();
 
-    var render = $.proxy(function(url, content) {
+    var render = wax.util.bind(function(url, content) {
         if (!content) {
             this.legends[url] = false;
         } else if (this.legends[url]) {

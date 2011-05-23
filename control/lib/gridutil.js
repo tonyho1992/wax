@@ -4,29 +4,6 @@
 // Wax header
 var wax = wax || {};
 
-// Nondrag
-// -------
-// A simple abstraction from the `mousemove` handler that doesn't
-// trigger mousemove events while dragging.
-(function($) {
-    $.fn.extend({
-        nondrag: function(callback) {
-            $(this).bind('mousedown mouseup mousemove', function(evt) {
-                var down = false;
-                if (evt.type === 'mouseup') {
-                    down = false;
-                } else if (down || evt.type === 'mousedown') {
-                    down = true;
-                    // Don't trigger the callback if this is a drag.
-                    return;
-                }
-                callback(evt);
-            });
-            return this;
-        }
-    });
-})(jQuery);
-
 wax.util = {
     // From Bonzo
     offset: function(el) {
@@ -76,11 +53,10 @@ wax.request = {
             // Request.
             var that = this;
             this.locks[url] = true;
-            $.jsonp({
-                url: url,
-                context: this,
-                callback: 'grid',
-                callbackParameter: 'callback',
+            reqwest({
+                url: url + '?callback=grid',
+                type: 'jsonp',
+                jsonpCallback: 'callback',
                 success: function(data) {
                     that.locks[url] = false;
                     that.cache[url] = data;

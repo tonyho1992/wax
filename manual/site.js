@@ -1,5 +1,5 @@
 // Application bootstrap.
-$(function() {
+$.domReady(function() {
     // Convert any markdown sections to HTML.
     var nav = $('.navigation ul');
     $('.md').each(function() {
