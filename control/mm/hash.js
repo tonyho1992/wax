@@ -47,7 +47,8 @@ wax.hash = function(map, options) {
     var hash = {
         map: this,
         parser: function(s) {
-            var args = s.split('/').map(Number);
+            var args = s.split('/');
+            for (var i = 0; i < args.length; i++) args[i] = Number(args);
             if (args.length < 3 || args.some(isNaN)) {
                 return true; // replace bogus hash
             } else if (args.length == 3) {
