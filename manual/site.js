@@ -10,7 +10,7 @@ $.domReady(function() {
         // TODO: free from shackles of jQuery
         $(this).hide().after(html);
         $('h1, h2, h3, h4, h5, h6', html).each(function() {
-            this.id = $(this).text().replace(/[\s\W]+/g, '-').toLowerCase();
+            this.setAttribute('id', $(this).text().replace(/[\s\W]+/g, '-').toLowerCase());
 
             var para = document.createElement('a'),
                 sectionLi = document.createElement('li'),
@@ -20,7 +20,7 @@ $.domReady(function() {
             para.className = 'para'
             para.href = '#' + this.id;
             sectionA.href = '#' + this.id;
-            sectionA.innerText = this.innerText;
+            $(sectionA).text($(this).text());
             sectionLi.className = this.nodeName;
             sectionLi.appendChild(sectionA);
             nav.append(sectionLi);
