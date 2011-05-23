@@ -15,13 +15,7 @@ wax.pointselector = function(map, opts) {
         opts :
         opts.callback;
 
-    var overlayDiv = document.createElement('div');
-    overlayDiv.id = map.parent.id + '-boxselector';
-    overlayDiv.className = 'pointselector-box-container';
-    overlayDiv.style.width = map.dimensions.x + 'px';
-    overlayDiv.style.height = map.dimensions.y + 'px';
-    map.parent.appendChild(overlayDiv);
-
+    // Create a `com.modestmaps.Point` from a screen event, like a click.
     var makePoint = function(e) {
         var point = new MM.Point(e.clientX, e.clientY);
         // correct for scrolled document
@@ -40,8 +34,20 @@ wax.pointselector = function(map, opts) {
         return point;
     };
 
-
     var pointselector = {
+        // Attach this control to a map by registering callbacks
+        // and adding the overlay
+        add: function(map) {
+            this.overlayDiv = document.createElement('div');
+            this.overlayDiv.id = map.parent.id + '-boxselector';
+            this.overlayDiv.className = 'pointselector-box-container';
+            this.overlayDiv.style.width = map.dimensions.x + 'px';
+            this.overlayDiv.style.height = map.dimensions.y + 'px';
+            map.parent.appendChild(this.overlayDiv);
+            MM.addEvent(this.overlayDiv, 'mousedown', pointselector.mouseDown);
+            map.addCallback('drawn', pointselector.drawPoints);
+            return this;
+        },
         deletePoint: function(location, e) {
             if (confirm('Delete this point?')) {
                 // TODO: indexOf not supported in IE
@@ -69,7 +75,7 @@ wax.pointselector = function(map, opts) {
                             pointselector.deletePoint(l, e);
                         };
                     })());
-                    overlayDiv.appendChild(locations[i].pointDiv);
+                    this.overlayDiv.appendChild(locations[i].pointDiv);
                 }
                 locations[i].pointDiv.style.left = point.x + 'px';
                 locations[i].pointDiv.style.top = point.y + 'px';
@@ -83,6 +89,8 @@ wax.pointselector = function(map, opts) {
             locations.push(location);
             pointselector.drawPoints();
         },
+        // Remove the awful circular reference from locations.
+        // TODO: This function should be made unnecessary by not having it.
         cleanLocations: function(locations) {
             var o = [];
             for (var i = 0; i < locations.length; i++) {
@@ -102,7 +110,5 @@ wax.pointselector = function(map, opts) {
         }
     };
 
-    MM.addEvent(overlayDiv, 'mousedown', pointselector.mouseDown);
-    map.addCallback('drawn', pointselector.drawPoints);
-    return pointselector;
+    return pointselector.add(map);
 };

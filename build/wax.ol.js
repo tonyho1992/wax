@@ -1246,6 +1246,35 @@ var wax = wax || {};
     });
 })(jQuery);
 
+wax.util = {
+    // From Bonzo
+    offset: function(el) {
+        var width = el.offsetWidth;
+        var height = el.offsetHeight;
+        var top = el.offsetTop;
+        var left = el.offsetLeft;
+
+        while (el = el.offsetParent) {
+            top += el.offsetTop;
+            left += el.offsetLeft;
+        }
+
+        return {
+            top: top,
+            left: left,
+            height: height,
+            width: width
+        };
+    },
+    // From underscore, minus funcbind for now.
+    bind: function(func, obj) {
+      var args = Array.prototype.slice.call(arguments, 2);
+      return function() {
+        return func.apply(obj, args.concat(Array.prototype.slice.call(arguments)));
+      };
+    }
+};
+
 // Request
 // -------
 // Request data cache. `callback(data)` where `data` is the response data.
@@ -1313,16 +1342,12 @@ wax.GridInstance.prototype.resolveCode = function(key) {
 
 wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
   if (!(this.grid_tile && this.grid_tile.grid)) return;
-  var tileX, tileY;
-  if (tile_element.left && tile_element.top) {
-      tileX = tile_element.left;
-      tileY = tile_element.top;
-  } else {
-      var $tile_element = $(tile_element);
-      // IE problem here - though recoverable, for whatever reason
-      tileX = $tile_element.offset().left;
-      tileY = $tile_element.offset().top;
-  }
+
+  // IE problem here - though recoverable, for whatever reason
+  var offset = wax.util.offset(tile_element);
+  var tileX = offset.left;
+  var tileY = offset.top;
+
   if (Math.floor((y - tileY) / this.tileRes) > 256 ||
     Math.floor((x - tileX) / this.tileRes) > 256) return;
 
@@ -1472,6 +1497,15 @@ wax.Legend.prototype.legendUrl = function(url) {
     return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
 };
 
+// TODO: rewrite without underscore
+_.mixin({
+    melt: function(self, func, obj) {
+        func.apply(obj, [self, obj]);
+        return self;
+    }
+});
+// Requires: jQuery
+//
 // Wax GridUtil
 // ------------
 
@@ -1551,26 +1585,6 @@ wax.tooltip.unselect = function(feature, context, layer_id, evt) {
 
     $(context).triggerHandler('removedtooltip', [feature, context, evt]);
 };
-// TODO: rewrite without underscore
-_.mixin({
-  revbind: function(func, obj) {
-    var nativeBind = Function.prototype.bind;
-    var slice = Array.prototype.slice;
-    if (func.bind === nativeBind && nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
-    var args = slice.call(arguments, 2);
-    return function() {
-      // return func.apply(obj, args.concat(slice.call(arguments)));
-      return func.apply(obj, arguments.concat(slice.call(args)));
-    };
-  }
-});
-
-_.mixin({
-    melt: function(self, func, obj) {
-        func.apply(obj, [self, obj]);
-        return self;
-    }
-});
 // Wax header
 var wax = wax || {};
 wax.ol = wax.ol || {};

@@ -134,7 +134,7 @@ var m = new mm.Map('modestmaps-interaction',
     new com.modestmaps.WaxProvider({
       baseUrl: 'http://a.tiles.mapbox.com/devseed/',
       layerName: 'excess-properties'}), new mm.Point(448,300))
-  .interaction();
+wax.interaction(m);
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
   4);
@@ -164,8 +164,8 @@ var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-fullscreen',
     new com.modestmaps.WaxProvider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'world-light'}), new mm.Point(448,300))
-  .fullscreen();
+      layerName: 'world-light'}), new mm.Point(448,300));
+wax.fullscreen(m);
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
   4);
@@ -215,8 +215,8 @@ var mm = com.modestmaps;
 var zoombox_m = new mm.Map('modestmaps-zoombox',
     new com.modestmaps.WaxProvider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'world-glass'}), new mm.Point(448,300))
-  .zoombox();
+      layerName: 'world-glass'}), new mm.Point(448,300));
+wax.zoombox(zoombox_m);
 zoombox_m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
   4);
@@ -242,7 +242,7 @@ var m = new mm.Map('modestmaps-boxselector',
     new com.modestmaps.WaxProvider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'blue-marble-topo-bathy-jul'}), new mm.Point(448,300))
-  .boxselector(function(coords) {
+wax.boxselector(m, function(coords) {
     $('#modestmaps-boxselector .attribution').text(
       coords.map(function(c) {
         return c.lat + ',' + c.lon;
@@ -351,8 +351,8 @@ var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-legend',
     new com.modestmaps.WaxProvider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'world-dark'}), new mm.Point(448,300))
-  .legend();
+      layerName: 'world-dark'}), new mm.Point(448,300));
+wax.legend(m);
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
   4);
@@ -377,8 +377,8 @@ var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-hash',
     new com.modestmaps.WaxProvider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'natural-earth-2'}), new mm.Point(448,300))
-  .hash({
+      layerName: 'natural-earth-2'}), new mm.Point(448,300));
+wax.hash(m, {
       defaultCenter: new com.modestmaps.Location(38.8225909, -97.5585),
       defaultZoom: 4,
       manager: locationHash

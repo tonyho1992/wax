@@ -1246,6 +1246,35 @@ var wax = wax || {};
     });
 })(jQuery);
 
+wax.util = {
+    // From Bonzo
+    offset: function(el) {
+        var width = el.offsetWidth;
+        var height = el.offsetHeight;
+        var top = el.offsetTop;
+        var left = el.offsetLeft;
+
+        while (el = el.offsetParent) {
+            top += el.offsetTop;
+            left += el.offsetLeft;
+        }
+
+        return {
+            top: top,
+            left: left,
+            height: height,
+            width: width
+        };
+    },
+    // From underscore, minus funcbind for now.
+    bind: function(func, obj) {
+      var args = Array.prototype.slice.call(arguments, 2);
+      return function() {
+        return func.apply(obj, args.concat(Array.prototype.slice.call(arguments)));
+      };
+    }
+};
+
 // Request
 // -------
 // Request data cache. `callback(data)` where `data` is the response data.
@@ -1313,16 +1342,12 @@ wax.GridInstance.prototype.resolveCode = function(key) {
 
 wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
   if (!(this.grid_tile && this.grid_tile.grid)) return;
-  var tileX, tileY;
-  if (tile_element.left && tile_element.top) {
-      tileX = tile_element.left;
-      tileY = tile_element.top;
-  } else {
-      var $tile_element = $(tile_element);
-      // IE problem here - though recoverable, for whatever reason
-      tileX = $tile_element.offset().left;
-      tileY = $tile_element.offset().top;
-  }
+
+  // IE problem here - though recoverable, for whatever reason
+  var offset = wax.util.offset(tile_element);
+  var tileX = offset.left;
+  var tileY = offset.top;
+
   if (Math.floor((y - tileY) / this.tileRes) > 256 ||
     Math.floor((x - tileX) / this.tileRes) > 256) return;
 
@@ -1472,6 +1497,15 @@ wax.Legend.prototype.legendUrl = function(url) {
     return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
 };
 
+// TODO: rewrite without underscore
+_.mixin({
+    melt: function(self, func, obj) {
+        func.apply(obj, [self, obj]);
+        return self;
+    }
+});
+// Requires: jQuery
+//
 // Wax GridUtil
 // ------------
 
@@ -1551,158 +1585,133 @@ wax.tooltip.unselect = function(feature, context, layer_id, evt) {
 
     $(context).triggerHandler('removedtooltip', [feature, context, evt]);
 };
-// TODO: rewrite without underscore
-_.mixin({
-  revbind: function(func, obj) {
-    var nativeBind = Function.prototype.bind;
-    var slice = Array.prototype.slice;
-    if (func.bind === nativeBind && nativeBind) return nativeBind.apply(func, slice.call(arguments, 1));
-    var args = slice.call(arguments, 2);
-    return function() {
-      // return func.apply(obj, args.concat(slice.call(arguments)));
-      return func.apply(obj, arguments.concat(slice.call(args)));
-    };
-  }
-});
-
-_.mixin({
-    melt: function(self, func, obj) {
-        func.apply(obj, [self, obj]);
-        return self;
-    }
-});
 // Wax: Box Selector
 // -----------------
+wax = wax || {};
 
-// namespacing!
-if (!com) {
-    var com = { };
-    if (!com.modestmaps) {
-        com.modestmaps = { };
-    }
-}
-
-com.modestmaps.Map.prototype.boxselector = function(opts) {
-    var boxDiv = document.createElement('div');
-    boxDiv.id = this.parent.id + '-boxselector';
-    boxDiv.className = 'boxselector-box-container';
-    boxDiv.style.width = this.dimensions.x + 'px';
-    boxDiv.style.height = this.dimensions.y + 'px';
-    this.parent.appendChild(boxDiv);
-
-    var box = document.createElement('div');
-    box.id = this.parent.id + '-boxselector-box';
-    box.className = 'boxselector-box';
-    boxDiv.appendChild(box);
-
+wax.boxselector = function(map, opts) {
     var mouseDownPoint = null;
-    var map = this;
 
     var callback = (typeof opts === 'function') ?
         opts :
         opts.callback;
 
-    var boxselector = this.boxselector;
-    this.boxselector.getMousePoint = function(e) {
-        // start with just the mouse (x, y)
-        var point = new com.modestmaps.Point(e.clientX, e.clientY);
-        // correct for scrolled document
-        point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
-        point.y += document.body.scrollTop + document.documentElement.scrollTop;
+    var boxselector = {
+        add: function(map) {
+            this.containerDiv = document.createElement('div');
+            this.containerDiv.id = map.parent.id + '-zoombox';
+            this.containerDiv.className = 'boxselector-box-container';
+            this.containerDiv.style.width =  map.dimensions.x + 'px';
+            this.containerDiv.style.height = map.dimensions.y + 'px';
 
-        // correct for nested offsets in DOM
-        for (var node = map.parent; node; node = node.offsetParent) {
-            point.x -= node.offsetLeft;
-            point.y -= node.offsetTop;
+            this.boxDiv = document.createElement('div');
+            this.boxDiv.id = map.parent.id + '-boxselector-box';
+            this.boxDiv.className = 'boxselector-box';
+            this.containerDiv.appendChild(this.boxDiv);
+            map.parent.appendChild(this.containerDiv);
+
+            com.modestmaps.addEvent(this.containerDiv, 'mousedown', this.mouseDown());
+            map.addCallback('drawn', this.drawbox());
+        },
+        remove: function() {
+            this.containerDiv.parentNode.removeChild(this.containerDiv);
+            map.removeCallback('mousedown', this.drawbox());
+        },
+        getMousePoint: function(e) {
+            // start with just the mouse (x, y)
+            var point = new com.modestmaps.Point(e.clientX, e.clientY);
+            // correct for scrolled document
+            point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
+            point.y += document.body.scrollTop + document.documentElement.scrollTop;
+
+            // correct for nested offsets in DOM
+            for (var node = map.parent; node; node = node.offsetParent) {
+                point.x -= node.offsetLeft;
+                point.y -= node.offsetTop;
+            }
+            return point;
+        },
+        mouseDown: function() {
+            return this._mouseDown = this._mouseDown || wax.util.bind(function(e) {
+                if (e.shiftKey) {
+                    mouseDownPoint = this.getMousePoint(e);
+
+                    this.boxDiv.style.left = mouseDownPoint.x + 'px';
+                    this.boxDiv.style.top = mouseDownPoint.y + 'px';
+
+                    com.modestmaps.addEvent(map.parent, 'mousemove', this.mouseMove());
+                    com.modestmaps.addEvent(map.parent, 'mouseup', this.mouseUp());
+
+                    map.parent.style.cursor = 'crosshair';
+                    return com.modestmaps.cancelEvent(e);
+                }
+            }, this);
+        },
+        mouseMove: function(e) {
+            return this._mouseMove = this._mouseMove || wax.util.bind(function(e) {
+                var point = this.getMousePoint(e);
+                this.boxDiv.style.display = 'block';
+                if (point.x < mouseDownPoint.x) {
+                    this.boxDiv.style.left = point.x + 'px';
+                } else {
+                    this.boxDiv.style.left = mouseDownPoint.x + 'px';
+                }
+                this.boxDiv.style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
+                if (point.y < mouseDownPoint.y) {
+                    this.boxDiv.style.top = point.y + 'px';
+                } else {
+                    this.boxDiv.style.top = mouseDownPoint.y + 'px';
+                }
+                this.boxDiv.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
+                return com.modestmaps.cancelEvent(e);
+            }, this);
+        },
+        mouseUp: function() {
+            return this._mouseUp = this._mouseUp || wax.util.bind(function(e) {
+                var point = boxselector.getMousePoint(e);
+
+                var l1 = map.pointLocation(point),
+                    l2 = map.pointLocation(mouseDownPoint);
+
+                // Format coordinates like mm.map.getExtent().
+                var extent = [
+                    new com.modestmaps.Location(
+                        Math.max(l1.lat, l2.lat),
+                        Math.min(l1.lon, l2.lon)),
+                    new com.modestmaps.Location(
+                        Math.min(l1.lat, l2.lat),
+                        Math.max(l1.lon, l2.lon))
+                ];
+
+                this.box = [l1, l2];
+                callback(extent);
+
+                com.modestmaps.removeEvent(map.parent, 'mousemove', this.mouseMove());
+                com.modestmaps.removeEvent(map.parent, 'mouseup', this.mouseUp());
+
+                map.parent.style.cursor = 'auto';
+
+                return com.modestmaps.cancelEvent(e);
+            }, this);
+        },
+        drawbox: function() {
+            return this._drawbox = this._drawbox || wax.util.bind(function(map, e) {
+                if (this.boxDiv) {
+                    this.boxDiv.style.display = 'block';
+                    this.boxDiv.style.height = 'auto';
+                    this.boxDiv.style.width = 'auto';
+                    var br = map.locationPoint(this.box[0]);
+                    var tl = map.locationPoint(this.box[1]);
+                    this.boxDiv.style.left = Math.max(0, tl.x) + 'px';
+                    this.boxDiv.style.top = Math.max(0, tl.y) + 'px';
+                    this.boxDiv.style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
+                    this.boxDiv.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
+                }
+            }, this);
         }
-        return point;
     };
 
-    this.boxselector.mouseDown = function(e) {
-        if (e.shiftKey) {
-            mouseDownPoint = boxselector.getMousePoint(e);
-
-            box.style.left = mouseDownPoint.x + 'px';
-            box.style.top = mouseDownPoint.y + 'px';
-            box.style.height = 'auto';
-            box.style.width = 'auto';
-
-            com.modestmaps.addEvent(map.parent, 'mousemove', boxselector.mouseMove);
-            com.modestmaps.addEvent(map.parent, 'mouseup', boxselector.mouseUp);
-
-            map.parent.style.cursor = 'crosshair';
-            return com.modestmaps.cancelEvent(e);
-        }
-    };
-
-    this.boxselector.mouseMove = function(e) {
-        var point = boxselector.getMousePoint(e);
-        box.style.display = 'block';
-        if (point.x < mouseDownPoint.x) {
-            box.style.left = point.x + 'px';
-            box.style.right = (map.dimensions.x - mouseDownPoint.x) + 'px';
-        } else {
-            box.style.left = mouseDownPoint.x + 'px';
-            box.style.right = (map.dimensions.x - point.x) + 'px';
-        }
-        if (point.y < mouseDownPoint.y) {
-            box.style.top = point.y + 'px';
-        } else {
-            box.style.bottom = (map.dimensions.y - point.y) + 'px';
-        }
-        return com.modestmaps.cancelEvent(e);
-    };
-
-    this.boxselector.mouseUp = function(e) {
-        var point = boxselector.getMousePoint(e);
-
-        var l1 = map.pointLocation(point),
-            l2 = map.pointLocation(mouseDownPoint);
-
-        // Format coordinates like mm.map.getExtent().
-        var extent = [];
-        extent.push(new com.modestmaps.Location(
-            Math.max(l1.lat, l2.lat),
-            Math.min(l1.lon, l2.lon)));
-        extent.push(new com.modestmaps.Location(
-            Math.min(l1.lat, l2.lat),
-            Math.max(l1.lon, l2.lon)));
-
-        boxselector.box = [l1, l2];
-        callback(extent);
-
-        com.modestmaps.removeEvent(map.parent, 'mousemove', boxselector.mouseMove);
-        com.modestmaps.removeEvent(map.parent, 'mouseup', boxselector.mouseUp);
-
-        map.parent.style.cursor = 'auto';
-
-        return com.modestmaps.cancelEvent(e);
-    };
-
-    com.modestmaps.addEvent(boxDiv, 'mousedown', boxselector.mouseDown);
-
-    var drawbox = function(map, e) {
-        if (map.boxselector.box) {
-            box.style.display = 'block';
-            box.style.height = 'auto';
-            box.style.width = 'auto';
-            var br = map.locationPoint(map.boxselector.box[0]);
-            var tl = map.locationPoint(map.boxselector.box[1]);
-            box.style.left = Math.max(0, tl.x) + 'px';
-            box.style.top = Math.max(0, tl.y) + 'px';
-            box.style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
-            box.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
-        }
-    };
-
-    this.addCallback('drawn', drawbox);
-
-    this.boxselector.remove = function() {
-        boxDiv.parentNode.removeChild(boxDiv);
-        map.removeCallback('mousedown', drawbox);
-    };
-
-    return this;
+    return boxselector.add(map);
 };
 // Wax: Embedder Control
 // -------------------
@@ -1730,50 +1739,51 @@ com.modestmaps.Map.prototype.embedder = function(options) {
 // Wax: Fullscreen
 // -----------------
 // A simple fullscreen control for Modest Maps
-
-// namespacing!
-if (!com) {
-    var com = { };
-    if (!com.modestmaps) {
-        com.modestmaps = { };
-    }
-}
+wax = wax || {};
 
 // Add zoom links, which can be styled as buttons, to a `modestmaps.Map`
 // control. This function can be used chaining-style with other
 // chaining-style controls.
-com.modestmaps.Map.prototype.fullscreen = function() {
-    // Modest Maps demands an absolute height & width, and doesn't auto-correct
-    // for changes, so here we save the original size of the element and
-    // restore to that size on exit from fullscreen.
-    $('<a class="wax-fullscreen" href="#fullscreen">fullscreen</a>')
-        .toggle(
-            $.proxy(this.maximize, this),
-            $.proxy(this.minimize, this)
-        )
-        .appendTo(this.parent);
-    return this;
-};
+wax.fullscreen = function(map, opts) {
 
-com.modestmaps.Map.prototype.maximize = function(e) {
-    if (e) {
-        e.preventDefault();
-    }
-    this.smallSize = [$(this.parent).width(), $(this.parent).height()];
-    $(this.parent).addClass('wax-fullscreen-map');
-    this.setSize(
-        $(this.parent).outerWidth(),
-        $(this.parent).outerHeight());
-};
+    var fullscreen = {
+        state: 1, // minimized
 
-com.modestmaps.Map.prototype.minimize = function(e) {
-    if (e) {
-        e.preventDefault();
-    }
-    $(this.parent).removeClass('wax-fullscreen-map');
-    this.setSize(
-        this.smallSize[0],
-        this.smallSize[1]);
+        // Modest Maps demands an absolute height & width, and doesn't auto-correct
+        // for changes, so here we save the original size of the element and
+        // restore to that size on exit from fullscreen.
+        add: function(map) {
+            this.a = document.createElement('a');
+            this.a.className = 'wax-fullscreen';
+            this.a.href = '#fullscreen';
+            this.a.innerHTML = 'fullscreen';
+            map.parent.appendChild(this.a);
+            this.a.addEventListener('click', this.click(map));
+            return this;
+        },
+
+        click: function(map) {
+            return this._click = this._click || wax.util.bind(function(e) {
+                if (e) e.preventDefault();
+
+                if (this.state) {
+                    this.smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
+                    map.parent.className += ' wax-fullscreen-map';
+                    map.setSize(
+                        map.parent.offsetWidth,
+                        map.parent.offsetHeight);
+                } else {
+                    map.parent.className = map.parent.className.replace('wax-fullscreen-map', '');
+                    map.setSize(
+                        this.smallSize[0],
+                        this.smallSize[1]);
+                }
+                this.state = !this.state;
+            }, this);
+        }
+    };
+
+    return fullscreen.add(map);
 };
 // Wax: Geocoder
 // -------------
@@ -1820,13 +1830,8 @@ wax.geocoder = function(map, opts) {
     };
     return this;
 };
-// namespacing!
-if (!com) {
-    var com = { };
-    if (!com.modestmaps) {
-        com.modestmaps = { };
-    }
-}
+// Wax: Hash
+wax = wax || {};
 
 // Ripped from underscore.js
 // Internal function used to implement `_.throttle` and `_.debounce`.
@@ -1849,6 +1854,9 @@ var throttle = function(func, wait) {
   return limit(func, wait, false);
 };
 
+// A basic manager dealing only in hashchange and `location.hash`.
+// This **will interfere** with anchors, so a HTML5 pushState
+// implementation will be prefered.
 var locationHash = {
   stateChange: function(callback) {
     window.addEventListener('hashchange', function() {
@@ -1863,67 +1871,59 @@ var locationHash = {
   }
 };
 
-com.modestmaps.Map.prototype.hash = function(options) {
-  var s0, // cached location.hash
-      lat = 90 - 1e-8, // allowable latitude range
-      map;
+wax.hash = function(map, options) {
+    var s0, // cached location.hash
+        lat = 90 - 1e-8, // allowable latitude range
+        map;
 
-  var hash = {
-    map: this,
-    parser: function(s) {
-      var args = s.split('/').map(Number);
-      if (args.length < 3 || args.some(isNaN)) {
-        return true; // replace bogus hash
-      } else if (args.length == 3) {
-        this.map.setCenterZoom(new com.modestmaps.Location(args[1], args[2]), args[0]);
-      }
-    },
-    formatter: function() {
-      var center = this.map.getCenter(),
-          zoom = this.map.getZoom(),
-          precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
-      return '#' + [zoom.toFixed(2),
-        center.lat.toFixed(precision),
-        center.lon.toFixed(precision)].join('/');
-    },
-    move: function() {
-      var s1 = hash.formatter();
-      if (s0 !== s1) {
-        s0 = s1;
-        options.manager.pushState(s0); // don't recenter the map!
-      }
-    },
-    stateChange: function(state) {
-      if (state === s0) return; // ignore spurious hashchange events
-      if (hash.parser((s0 = state).substring(1))) {
-        hash.move(); // replace bogus hash
-      }
-    },
-    // If a state isn't present when you initially load the map, the map should
-    // still get a center and zoom level.
-    initialize: function() {
-      if (options.defaultCenter) this.map.setCenter(options.defaultCenter);
-      if (options.defaultZoom) this.map.setZoom(options.defaultZoom);
-    }
-  };
-
-  options.manager.getState() ?
-    hash.stateChange(options.manager.getState()) :
-    hash.initialize() && hash.move();
-  this.addCallback('drawn', throttle(hash.move, 500));
-  options.manager.stateChange(hash.stateChange);
-
-  return this;
+    var hash = {
+        map: this,
+        parser: function(s) {
+            var args = s.split('/').map(Number);
+            if (args.length < 3 || args.some(isNaN)) {
+                return true; // replace bogus hash
+            } else if (args.length == 3) {
+                map.setCenterZoom(new com.modestmaps.Location(args[1], args[2]), args[0]);
+            }
+        },
+        add: function(map) {
+            options.manager.getState() ?
+                hash.stateChange(options.manager.getState()) :
+                hash.initialize() && hash.move();
+            map.addCallback('drawn', throttle(hash.move, 500));
+            options.manager.stateChange(hash.stateChange);
+        },
+        formatter: function() {
+            var center = map.getCenter(),
+                zoom = map.getZoom(),
+                precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
+            return '#' + [zoom.toFixed(2),
+              center.lat.toFixed(precision),
+              center.lon.toFixed(precision)].join('/');
+        },
+        move: function() {
+            var s1 = hash.formatter();
+            if (s0 !== s1) {
+                s0 = s1;
+                options.manager.pushState(s0); // don't recenter the map!
+            }
+        },
+        stateChange: function(state) {
+            if (state === s0) return; // ignore spurious hashchange events
+            if (hash.parser((s0 = state).substring(1))) {
+              hash.move(); // replace bogus hash
+            }
+        },
+        // If a state isn't present when you initially load the map, the map should
+        // still get a center and zoom level.
+        initialize: function() {
+            if (options.defaultCenter) map.setCenter(options.defaultCenter);
+            if (options.defaultZoom) map.setZoom(options.defaultZoom);
+        }
+    };
+    return hash.add(map);
 };
-// Requires jQuery
-//
-// namespacing!
-if (!com) {
-    var com = { };
-    if (!com.modestmaps) {
-        com.modestmaps = { };
-    }
-}
+wax = wax || {};
 
 // A chaining-style control that adds
 // interaction to a modestmaps.Map object.
@@ -1934,84 +1934,150 @@ if (!com) {
 //   If not given, the `wax.tooltip` library will be expected.
 // * `clickAction` (optional): **full** or **location**: default is
 //   **full**.
-com.modestmaps.Map.prototype.interaction = function(options) {
+wax.interaction = function(map, options) {
+    var MM = com.modestmaps;
     options = options || {};
     // Our GridManager (from `gridutil.js`). This will keep the
     // cache of grid information and provide friendly utility methods
     // that return `GridTile` objects instead of raw data.
-    this.waxGM = new wax.GridManager();
+    var interaction = {
+        modifyingEvents: ['zoomed', 'panned', 'centered',
+            'extentset', 'resized', 'drawn'],
 
-    // This requires wax.Tooltip or similar
-    this.callbacks = options.callbacks || {
-        out: wax.tooltip.unselect,
-        over: wax.tooltip.select,
-        click: wax.tooltip.click
-    };
+        waxGM: new wax.GridManager(),
 
-    this.clickAction = options.clickAction || 'full';
+        // This requires wax.Tooltip or similar
+        callbacks: options.callbacks || {
+            out: wax.tooltip.unselect,
+            over: wax.tooltip.select,
+            click: wax.tooltip.click
+        },
 
-    // Search through `.tiles` and determine the position,
-    // from the top-left of the **document**, and cache that data
-    // so that `mousemove` events don't always recalculate.
-    this.waxGetTileGrid = function() {
-        // TODO: don't build for tiles outside of viewport
-        var zoom = this.getZoom();
-        // Calculate a tile grid and cache it, by using the `.tiles`
-        // element on this map.
-        return this._waxGetTileGrid || (this._waxGetTileGrid =
-            (function(t) {
-                var o = [];
-                $.each(t, function(key, img) {
-                    if (key.split(',')[0] == zoom) {
-                        var $img = $(img);
-                        var offset = $img.offset();
-                        o.push([offset.top, offset.left, $img]);
+        clickAction: options.clickAction || 'full',
+
+        add: function() {
+            for (var i = 0; i < this.modifyingEvents.length; i++) {
+                map.addCallback(this.modifyingEvents[i], this.clearMap);
+            }
+            MM.addEvent(map.parent, 'mousemove', this.onMove());
+            return this;
+        },
+
+        // Search through `.tiles` and determine the position,
+        // from the top-left of the **document**, and cache that data
+        // so that `mousemove` events don't always recalculate.
+        getTileGrid: function() {
+            // TODO: don't build for tiles outside of viewport
+            var zoom = map.getZoom();
+            // Calculate a tile grid and cache it, by using the `.tiles`
+            // element on this map.
+            return this._getTileGrid || (this._getTileGrid =
+                (function(t) {
+                    var o = [];
+                    for (var key in t) {
+                        if (key.split(',')[0] == zoom) {
+                            var offset = wax.util.offset(t[key]);
+                            o.push([offset.top, offset.left, t[key]]);
+                        }
                     }
-                });
-                return o;
-            })(this.tiles));
-    };
+                    return o;
+                })(map.tiles));
+        },
 
-    this.waxClearTimeout = function() {
-        if (this.clickTimeout) {
-            window.clearTimeout(this.clickTimeout);
-            this.clickTimeout = null;
-            return true;
-        } else {
-            return false;
+        clearTileGrid: function(map, e) {
+            this._waxGetTileGrid = null;
+        },
+
+        getTile: function(evt) {
+            var tile;
+            var grid = this.getTileGrid();
+            for (var i = 0; i < grid.length; i++) {
+                if ((grid[i][0] < evt.pageY) &&
+                   ((grid[i][0] + 256) > evt.pageY) &&
+                    (grid[i][1] < evt.pageX) &&
+                   ((grid[i][1] + 256) > evt.pageX)) {
+                    tile = grid[i][2];
+                    break;
+                }
+            }
+            return tile || false;
+        },
+
+        clearTimeout: function() {
+            if (this.clickTimeout) {
+                window.clearTimeout(this.clickTimeout);
+                this.clickTimeout = null;
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        onMove: function(evt) {
+            return this._onMove = this._onMove || wax.util.bind(function(evt) {
+                var tile = this.getTile(evt);
+                if (tile) {
+                    this.waxGM.getGrid(tile.src, wax.util.bind(function(g) {
+                        if (g) {
+                            var feature = g.getFeature(evt.pageX, evt.pageY, tile, {
+                                format: 'teaser'
+                            });
+                            // This and other Modest Maps controls only support a single layer.
+                            // Thus a layer index of **0** is given to the tooltip library
+                            if (feature) {
+                                if (feature && this.feature !== feature) {
+                                    this.feature = feature;
+                                    this.callbacks.out(feature, map.parent, 0, evt);
+                                    this.callbacks.over(feature, map.parent, 0, evt);
+                                } else if (!feature) {
+                                    this.feature = null;
+                                    this.callbacks.out(feature, map.parent, 0, evt);
+                                }
+                            } else {
+                                this.feature = null;
+                                this.callbacks.out({}, map.parent, 0, evt);
+                            }
+                        }
+                    }, this));
+                }
+            }, this);
+        },
+
+        mouseDown: function(evt) {
+            // Ignore double-clicks by ignoring clicks within 300ms of
+            // each other.
+            if (this.waxClearTimeout()) {
+                return;
+            }
+            // Store this event so that we can compare it to the
+            // up event
+            var tol = 4; // tolerance
+            this.downEvent = evt;
+            $(this.parent).one('mouseup', wax.util.bind(function(evt) {
+                // Don't register clicks that are likely the boundaries
+                // of dragging the map
+                if (Math.round(evt.pageY / tol) === Math.round(this.downEvent.pageY / tol) &&
+                    Math.round(evt.pageX / tol) === Math.round(this.downEvent.pageX / tol)) {
+                    this.clickTimeout = window.setTimeout(
+                        $.proxy(function() {
+                            this.waxHandleClick(evt);
+                        }, this),
+                        300
+                    );
+                }
+            }, this));
         }
     };
 
+
+    /*
     // Click handler
     // -------------
     //
     // The extra logic here is all to avoid the inconsistencies
     // of browsers in handling double and single clicks on the same
     // element. After dealing with particulars, delegates to waxHandleClick
-    $(this.parent).mousedown($.proxy(function(evt) {
-        // Ignore double-clicks by ignoring clicks within 300ms of
-        // each other.
-        if (this.waxClearTimeout()) {
-            return;
-        }
-        // Store this event so that we can compare it to the
-        // up event
-        var tol = 4; // tolerance
-        this.downEvent = evt;
-        $(this.parent).one('mouseup', $.proxy(function(evt) {
-            // Don't register clicks that are likely the boundaries
-            // of dragging the map
-            if (Math.round(evt.pageY / tol) === Math.round(this.downEvent.pageY / tol) &&
-                Math.round(evt.pageX / tol) === Math.round(this.downEvent.pageX / tol)) {
-                this.clickTimeout = window.setTimeout(
-                    $.proxy(function() {
-                        this.waxHandleClick(evt);
-                    }, this),
-                    300
-                );
-            }
-        }, this));
-    }, this));
+    $(this.parent).mousedown($.proxy(, this));
 
     this.waxHandleClick = function(evt) {
         var $tile = this.waxGetTile(evt);
@@ -2036,67 +2102,13 @@ com.modestmaps.Map.prototype.interaction = function(options) {
         }
     };
 
-    this.waxGetTile = function(evt) {
-        var $tile;
-        var grid = this.waxGetTileGrid();
-        for (var i = 0; i < grid.length; i++) {
-            if ((grid[i][0] < evt.pageY) &&
-               ((grid[i][0] + 256) > evt.pageY) &&
-                (grid[i][1] < evt.pageX) &&
-               ((grid[i][1] + 256) > evt.pageX)) {
-                $tile = grid[i][2];
-                break;
-            }
-        }
-        return $tile || false;
-    };
 
-    // On `mousemove` events that **don't** have the mouse button
-    // down - so that the map isn't being dragged.
-    $(this.parent).nondrag($.proxy(function(evt) {
-        var $tile = this.waxGetTile(evt);
-        if ($tile) {
-            this.waxGM.getGrid($tile.attr('src'), $.proxy(function(g) {
-                if (g) {
-                    var feature = g.getFeature(evt.pageX, evt.pageY, $tile, {
-                        format: 'teaser'
-                    });
-                    // This and other Modest Maps controls only support a single layer.
-                    // Thus a layer index of **0** is given to the tooltip library
-                    if (feature) {
-                        if (feature && this.feature !== feature) {
-                            this.feature = feature;
-                            this.callbacks.out(feature, this.parent, 0, evt);
-                            this.callbacks.over(feature, this.parent, 0, evt);
-                        } else if (!feature) {
-                            this.feature = null;
-                            this.callbacks.out(feature, this.parent, 0, evt);
-                        }
-                    } else {
-                        this.feature = null;
-                        this.callbacks.out({}, this.parent, 0, evt);
-                    }
-                }
-            }, this));
-        }
 
-    }, this));
 
-    // When the map is moved, the calculated tile grid is no longer
-    // accurate, so it must be reset.
-    var modifying_events = ['zoomed', 'panned', 'centered',
-        'extentset', 'resized', 'drawn'];
-
-    var clearMap = function(map, e) {
-        map._waxGetTileGrid = null;
-    };
-
-    for (var i = 0; i < modifying_events.length; i++) {
-        this.addCallback(modifying_events[i], clearMap);
-    }
+    */
 
     // Ensure chainability
-    return this;
+    return interaction.add(map);
 };
 // Wax: Legend Control
 // -------------------
@@ -2106,26 +2118,29 @@ com.modestmaps.Map.prototype.interaction = function(options) {
 // * wax.Legend
 
 // namespacing!
-if (!com) {
-    var com = { };
-    if (!com.modestmaps) {
-        com.modestmaps = { };
-    }
-}
+wax = wax || {};
 
 // The Modest Maps version of this control is a very, very
 // light wrapper around the `/lib` code for legends.
-com.modestmaps.Map.prototype.legend = function(options) {
+wax.legend = function(map, options) {
     options = options || {};
-    this.legend = new wax.Legend(this.parent, options.container);
-    this.legend.render([
-        this.provider.getTileUrl({
-            zoom: 0,
-            column: 0,
-            row: 0
-        })
-    ]);
-    return this;
+    var legend = {
+        add: function() {
+            this.legend = new wax.Legend(map.parent, options.container);
+            this.legend.render([
+                map.provider.getTileUrl({
+                    zoom: 0,
+                    column: 0,
+                    row: 0
+                })
+            ]);
+        }
+    };
+    return legend.add(map);
+};
+wax = wax || {};
+
+wax.mobile = {
 };
 // Wax: Point Selector
 // -----------------
@@ -2144,13 +2159,7 @@ wax.pointselector = function(map, opts) {
         opts :
         opts.callback;
 
-    var overlayDiv = document.createElement('div');
-    overlayDiv.id = map.parent.id + '-boxselector';
-    overlayDiv.className = 'pointselector-box-container';
-    overlayDiv.style.width = map.dimensions.x + 'px';
-    overlayDiv.style.height = map.dimensions.y + 'px';
-    map.parent.appendChild(overlayDiv);
-
+    // Create a `com.modestmaps.Point` from a screen event, like a click.
     var makePoint = function(e) {
         var point = new MM.Point(e.clientX, e.clientY);
         // correct for scrolled document
@@ -2169,8 +2178,20 @@ wax.pointselector = function(map, opts) {
         return point;
     };
 
-
     var pointselector = {
+        // Attach this control to a map by registering callbacks
+        // and adding the overlay
+        add: function(map) {
+            this.overlayDiv = document.createElement('div');
+            this.overlayDiv.id = map.parent.id + '-boxselector';
+            this.overlayDiv.className = 'pointselector-box-container';
+            this.overlayDiv.style.width = map.dimensions.x + 'px';
+            this.overlayDiv.style.height = map.dimensions.y + 'px';
+            map.parent.appendChild(this.overlayDiv);
+            MM.addEvent(this.overlayDiv, 'mousedown', pointselector.mouseDown);
+            map.addCallback('drawn', pointselector.drawPoints);
+            return this;
+        },
         deletePoint: function(location, e) {
             if (confirm('Delete this point?')) {
                 // TODO: indexOf not supported in IE
@@ -2198,7 +2219,7 @@ wax.pointselector = function(map, opts) {
                             pointselector.deletePoint(l, e);
                         };
                     })());
-                    overlayDiv.appendChild(locations[i].pointDiv);
+                    this.overlayDiv.appendChild(locations[i].pointDiv);
                 }
                 locations[i].pointDiv.style.left = point.x + 'px';
                 locations[i].pointDiv.style.top = point.y + 'px';
@@ -2212,6 +2233,8 @@ wax.pointselector = function(map, opts) {
             locations.push(location);
             pointselector.drawPoints();
         },
+        // Remove the awful circular reference from locations.
+        // TODO: This function should be made unnecessary by not having it.
         cleanLocations: function(locations) {
             var o = [];
             for (var i = 0; i < locations.length; i++) {
@@ -2231,109 +2254,108 @@ wax.pointselector = function(map, opts) {
         }
     };
 
-    MM.addEvent(overlayDiv, 'mousedown', pointselector.mouseDown);
-    map.addCallback('drawn', pointselector.drawPoints);
-    return pointselector;
+    return pointselector.add(map);
 };
 // Wax: ZoomBox
 // -----------------
 // An OL-style ZoomBox control, from the Modest Maps example.
 
-// namespacing!
-if (!com) {
-    var com = { };
-    if (!com.modestmaps) {
-        com.modestmaps = { };
-    }
-}
+wax = wax || {};
 
-com.modestmaps.Map.prototype.zoombox = function(opts) {
-    var boxDiv = document.createElement('div');
-    boxDiv.id = this.parent.id + '-zoombox';
-    boxDiv.className = 'zoombox-box-container';
-    boxDiv.style.width =  this.dimensions.x + 'px';
-    boxDiv.style.height = this.dimensions.y + 'px';
-    this.parent.appendChild(boxDiv);
-
-    var box = document.createElement('div');
-    box.id = this.parent.id + '-zoombox-box';
-    box.className = 'zoombox-box';
-    boxDiv.appendChild(box);
-
+wax.zoombox = function(map, opts) {
     // TODO: respond to resize
     var mouseDownPoint = null;
-    var map = this;
 
-    var zoombox = this.zoombox;
+    var zoombox = {
+        add: function(map) {
+            this.boxDiv = document.createElement('div');
+            this.boxDiv.id = map.parent.id + '-zoombox';
+            this.boxDiv.className = 'zoombox-box-container';
+            this.boxDiv.style.width =  map.dimensions.x + 'px';
+            this.boxDiv.style.height = map.dimensions.y + 'px';
 
-    this.zoombox.remove = function() {
-        boxDiv.parentNode.removeChild(boxDiv);
-        map.removeCallback('mousedown', zoombox.mouseDown);
-    };
-    this.zoombox.getMousePoint = function(e) {
-        // start with just the mouse (x, y)
-        var point = new com.modestmaps.Point(e.clientX, e.clientY);
-        // correct for scrolled document
-        point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
-        point.y += document.body.scrollTop + document.documentElement.scrollTop;
+            this.box = document.createElement('div');
+            this.box.id = map.parent.id + '-zoombox-box';
+            this.box.className = 'zoombox-box';
+            this.boxDiv.appendChild(this.box);
 
-        // correct for nested offsets in DOM
-        for (var node = map.parent; node; node = node.offsetParent) {
-            point.x -= node.offsetLeft;
-            point.y -= node.offsetTop;
+            com.modestmaps.addEvent(this.boxDiv, 'mousedown', this.mouseDown());
+            map.parent.appendChild(this.boxDiv);
+        },
+        remove: function() {
+            this.boxDiv.parentNode.removeChild(this.boxDiv);
+            map.removeCallback('mousedown', this.mouseDown);
+        },
+        getMousePoint: function(e) {
+            // start with just the mouse (x, y)
+            var point = new com.modestmaps.Point(e.clientX, e.clientY);
+            // correct for scrolled document
+            point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
+            point.y += document.body.scrollTop + document.documentElement.scrollTop;
+
+            // correct for nested offsets in DOM
+            for (var node = map.parent; node; node = node.offsetParent) {
+                point.x -= node.offsetLeft;
+                point.y -= node.offsetTop;
+            }
+            return point;
+        },
+        mouseDown: function() {
+            return this._mouseDown = this._mouseDown || wax.util.bind(function(e) {
+                if (e.shiftKey) {
+                    mouseDownPoint = this.getMousePoint(e);
+
+                    this.box.style.left = mouseDownPoint.x + 'px';
+                    this.box.style.top = mouseDownPoint.y + 'px';
+
+                    com.modestmaps.addEvent(map.parent, 'mousemove', this.mouseMove());
+                    com.modestmaps.addEvent(map.parent, 'mouseup', this.mouseUp());
+
+                    map.parent.style.cursor = 'crosshair';
+                    return com.modestmaps.cancelEvent(e);
+                }
+            }, this);
+        },
+        mouseMove: function(e) {
+            return this._mouseMove = this._mouseMove || wax.util.bind(function(e) {
+                var point = this.getMousePoint(e);
+                this.box.style.display = 'block';
+                if (point.x < mouseDownPoint.x) {
+                    this.box.style.left = point.x + 'px';
+                } else {
+                    this.box.style.left = mouseDownPoint.x + 'px';
+                }
+                this.box.style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
+                if (point.y < mouseDownPoint.y) {
+                    this.box.style.top = point.y + 'px';
+                } else {
+                    this.box.style.top = mouseDownPoint.y + 'px';
+                }
+                this.box.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
+                return com.modestmaps.cancelEvent(e);
+            }, this);
+        },
+        mouseUp: function(e) {
+            return this._mouseUp = this._mouseUp || wax.util.bind(function(e) {
+                var point = this.getMousePoint(e);
+
+                var l1 = map.pointLocation(point),
+                    l2 = map.pointLocation(mouseDownPoint);
+
+                map.setExtent([l1, l2]);
+
+                this.box.style.display = 'none';
+                com.modestmaps.removeEvent(map.parent, 'mousemove', this.mouseMove());
+                com.modestmaps.removeEvent(map.parent, 'mouseup', this.mouseUp());
+
+                map.parent.style.cursor = 'auto';
+
+                return com.modestmaps.cancelEvent(e);
+            }, this);
         }
-        return point;
-    };
-    this.zoombox.mouseDown = function(e) {
-        if (e.shiftKey) {
-            mouseDownPoint = zoombox.getMousePoint(e);
-
-            box.style.left = mouseDownPoint.x + 'px';
-            box.style.top = mouseDownPoint.y + 'px';
-
-            com.modestmaps.addEvent(map.parent, 'mousemove', zoombox.mouseMove);
-            com.modestmaps.addEvent(map.parent, 'mouseup', zoombox.mouseUp);
-
-            map.parent.style.cursor = 'crosshair';
-            return com.modestmaps.cancelEvent(e);
-        }
-    };
-    this.zoombox.mouseMove = function(e) {
-        var point = zoombox.getMousePoint(e);
-        box.style.display = 'block';
-        if (point.x < mouseDownPoint.x) {
-            box.style.left = point.x + 'px';
-        } else {
-            box.style.left = mouseDownPoint.x + 'px';
-        }
-        box.style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
-        if (point.y < mouseDownPoint.y) {
-            box.style.top = point.y + 'px';
-        } else {
-            box.style.top = mouseDownPoint.y + 'px';
-        }
-        box.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
-        return com.modestmaps.cancelEvent(e);
-    };
-    this.zoombox.mouseUp = function(e) {
-        var point = zoombox.getMousePoint(e);
-
-        var l1 = map.pointLocation(point),
-            l2 = map.pointLocation(mouseDownPoint);
-
-        map.setExtent([l1, l2]);
-
-        box.style.display = 'none';
-        com.modestmaps.removeEvent(map.parent, 'mousemove', zoombox.mouseMove);
-        com.modestmaps.removeEvent(map.parent, 'mouseup', zoombox.mouseUp);
-
-        map.parent.style.cursor = 'auto';
-
-        return com.modestmaps.cancelEvent(e);
     };
 
-    com.modestmaps.addEvent(boxDiv, 'mousedown', zoombox.mouseDown);
-    return this;
+    return zoombox.add(map);
 };
 // Wax: Zoom Control
 // -----------------
@@ -2353,6 +2375,7 @@ com.modestmaps.Map.prototype.zoomer = function() {
     var map = this;
     var zoomin = document.createElement('a');
     zoomin.innerText = '+';
+    zoomin.innerContent = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
     zoomin.addEventListener('click', function(e) {
@@ -2363,6 +2386,7 @@ com.modestmaps.Map.prototype.zoomer = function() {
 
     var zoomout = document.createElement('a');
     zoomout.innerText = '-';
+    zoomin.innerContent = '-';
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
     zoomout.addEventListener('click', function(e) {

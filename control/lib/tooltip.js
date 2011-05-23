@@ -1,3 +1,5 @@
+// Requires: jQuery
+//
 // Wax GridUtil
 // ------------
 

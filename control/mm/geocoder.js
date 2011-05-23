@@ -4,12 +4,7 @@
 // Requires: jQuery, jquery-jsonp
 
 // namespacing!
-if (!com) {
-    var com = { };
-    if (!com.modestmaps) {
-        com.modestmaps = { };
-    }
-}
+var wax = wax || {};
 
 var geocoders = {
     mapquest: function(opts) {
@@ -36,7 +31,7 @@ var geocoders = {
     }
 };
 
-com.modestmaps.Map.prototype.geocoder = function(opts) {
+wax.geocoder = function(map, opts) {
     var MM = com.modestmaps;
 
     this.geocoder = {
@@ -48,5 +43,3 @@ com.modestmaps.Map.prototype.geocoder = function(opts) {
     };
     return this;
 };
-
-
