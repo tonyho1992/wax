@@ -1,12 +1,26 @@
 # Wax
 
-Tools for improving web maps. The centerpiece of the code is a client 
+Tools for improving web maps. The centerpiece of the code is a client
 implementation of the [MBTiles interaction specification](https://github.com/mapbox/mbtiles-spec).
 
 ## Controls
 
 * `wax.tooltip`
 * `wax.legend`
+
+#### Modest Maps
+
+Modest Maps is the primary target for Wax, given its simplicity and high quality.
+
+* `wax.interaction()`
+* `wax.zoomer()`
+* `wax.zoombox()`
+* `wax.boxselect()`
+* `wax.pointselector()`
+* `wax.legend()`
+* `wax.fullscreen()`
+* `wax.zoombox()`
+* `wax.hash()`
 
 #### OpenLayers
 
@@ -21,17 +35,6 @@ implementation of the [MBTiles interaction specification](https://github.com/map
 * `wax.g.MapType`
 * `wax.g.mapBoxLogo`
 
-#### Modest Maps
-
-* `wax.interaction()`
-* `wax.zoomer()`
-* `wax.zoombox()`
-* `wax.boxselect()`
-* `wax.pointselector()`
-* `wax.legend()`
-* `wax.fullscreen()`
-* `wax.zoombox()`
-* `wax.hash()`
 
 #### Records
 
