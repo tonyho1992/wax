@@ -27,7 +27,7 @@ var throttle = function(func, wait) {
 // implementation will be prefered.
 var locationHash = {
   stateChange: function(callback) {
-    window.addEventListener('hashchange', function() {
+    com.modestmaps.addEvent(window, 'hashchange', function() {
       callback(location.hash);
     }, false);
   },

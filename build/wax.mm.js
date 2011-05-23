@@ -751,7 +751,7 @@ wax.fullscreen = function(map, opts) {
             this.a.href = '#fullscreen';
             this.a.innerHTML = 'fullscreen';
             map.parent.appendChild(this.a);
-            this.a.addEventListener('click', this.click(map), false);
+            com.modestmaps.addEvent('click', this.click(map));
             return this;
         },
 
@@ -807,7 +807,7 @@ var throttle = function(func, wait) {
 // implementation will be prefered.
 var locationHash = {
   stateChange: function(callback) {
-    window.addEventListener('hashchange', function() {
+    com.modestmaps.addEvent(window, 'hashchange', function() {
       callback(location.hash);
     }, false);
   },
@@ -1310,7 +1310,7 @@ wax.zoomer = function(map) {
     zoomin.innerHTML = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
-    zoomin.addEventListener('click', function(e) {
+    com.modestmaps.addEvent(zoomin, 'click', function(e) {
         com.modestmaps.cancelEvent(e);
         map.zoomIn();
     }, false);
@@ -1320,7 +1320,7 @@ wax.zoomer = function(map) {
     zoomout.innerHTML = '-';
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
-    zoomout.addEventListener('click', function(e) {
+    com.modestmaps.addEvent(zoomout, 'click', function(e) {
         com.modestmaps.cancelEvent(e);
         map.zoomOut();
     }, false);

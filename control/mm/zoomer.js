@@ -12,7 +12,7 @@ wax.zoomer = function(map) {
     zoomin.innerHTML = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
-    zoomin.addEventListener('click', function(e) {
+    com.modestmaps.addEvent(zoomin, 'click', function(e) {
         com.modestmaps.cancelEvent(e);
         map.zoomIn();
     }, false);
@@ -22,7 +22,7 @@ wax.zoomer = function(map) {
     zoomout.innerHTML = '-';
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
-    zoomout.addEventListener('click', function(e) {
+    com.modestmaps.addEvent(zoomout, 'click', function(e) {
         com.modestmaps.cancelEvent(e);
         map.zoomOut();
     }, false);
