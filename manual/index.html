@@ -22,7 +22,7 @@
 <ul></ul>
 </div>
 
-<p class='md'>
+<pre class='md'>
 ## Publishing Maps
 
 **Wax** is a collection of extras and tools that make it easier to publish 
@@ -38,10 +38,10 @@ quite simple to get to the next step: your basic ingredients are
 * A map server, like [TileStream](https://github.com/mapbox/tilestream)
 * A Javascript API, like [Modest Maps](https://github.com/stamen/modestmaps-js)
 * Your website
-</p>
+</pre>
 
 <div class='section'>
-<p class='md'>
+<pre class='md'>
 The mapping server serves up **tiles** of rendered data - tiles being 256 pixel 
 square images covering some of the world. Here's a tile of Europe from the 
 [World Light tileset](http://mapbox.com/tileset/world-light).
@@ -50,15 +50,15 @@ There are quite a few mapping APIs, but at their core, they're doing the same
 sort of thing - adding these tiles to a page and managing them so that the 
 map seems like a continuous world instead of little squares. We'll start off with 
 **Modest Maps** because it's lightweight and fast.
-</p>
+</pre>
 <div class='sidebar'>
-<p class='md'>
+<pre class='md'>
 ![Europe](http://b.tile.mapbox.com/1.0.0/world-light/2/2/2.png)
-</p>
+</pre>
 </div>
 </div>
 
-<p class='md'>
+<pre class='md'>
 ### Including the Code
 
 The first step is to actually download and include the necessary Javascript 
@@ -78,7 +78,7 @@ you can always swap in your own later on.
 
 You'll do the usual Modest Maps setup - just as you'll do the standard setup 
 process with the other APIs.
-</p>
+</pre>
 <div class='section'>
 <div id='modestmaps-setup' class='map'>
 <span class='attribution'>
@@ -106,13 +106,13 @@ m.setCenterZoom(
   4);
 </pre>
 </div>
-<p class='md'>
+<pre class='md'>
 ## Wax Extras
 
 Wax provides a set of map controls for Modest Maps that make common map
 tricks easier to do.
-</p>
-<p class='md'>
+</pre>
+<pre class='md'>
 ### Interaction
 
 The interaction control adds quite a bit of logic to the map, adding 
@@ -123,7 +123,7 @@ of the [MBTiles spec] [2].
 
 [1]: https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md
 [2]: https://github.com/mapbox/mbtiles-spec
-</p>
+</pre>
 <div class='section'>
 <div id='modestmaps-interaction' class='map'>
 </div>
@@ -141,7 +141,7 @@ m.setCenterZoom(
 </pre>
 </div>
 
-<p class='md'>
+<pre class='md'>
 ### Fullscreen
 
 The fullscreen control adds a link to the map that assigns a
@@ -151,7 +151,7 @@ You'll see that this control adds a fullscreen link to the map, and that it's
 a bit ugly right now. Until Wax's theming improves, keep in mind that its
 styling, which is contained in `theme/controls.css`, is completely optional
 and you can replace it with your own.
-</p>
+</pre>
 
 <div class='section'>
 <div id='modestmaps-fullscreen' class='map'>
@@ -172,12 +172,12 @@ m.setCenterZoom(
 </pre>
 </div>
 
-<p class='md'>
+<pre class='md'>
 ### Zoomer
 
 The Zoomer control is a stripped-down version of zoom controls, offering just
 zoom in &amp; out buttons.
-</p>
+</pre>
 
 <div class='section'>
 <div id='modestmaps-zoomer' class='map dark'>
@@ -198,11 +198,11 @@ m.setCenterZoom(
 </pre>
 </div>
 
-<p class='md'>
+<pre class='md'>
 ### ZoomBox
 
 The ZoomBox control is a control that lets you zoom using the shift-key and a box.
-</p>
+</pre>
 
 <div class='section'>
 <div id='modestmaps-zoombox' class='map dark'>
@@ -223,12 +223,12 @@ zoombox_m.setCenterZoom(
 </pre>
 </div>
 
-<p class='md'>
+<pre class='md'>
 ### boxselector
 
 The boxselector control is a control that lets you highlight a region of the
 map with the shift-key and a box.
-</p>
+</pre>
 
 <div class='section'>
 <div id='modestmaps-boxselector' class='map dark'>
@@ -254,9 +254,9 @@ m.setCenterZoom(
 </pre>
 </div>
 
-<p class='md'>
+<pre class='md'>
 ### pointselector (BETA)
-</p>
+</pre>
 
 <div class='section'>
 <div id='modestmaps-pointselector' class='map dark'>
@@ -283,12 +283,12 @@ m.setCenterZoom(
 </pre>
 </div>
 
-<p class='md'>
+<pre class='md'>
 ### Legend
 
 The legend control pulls legend information from an interactive layer and
 displays it on the map.
-</p>
+</pre>
 
 <div class='section'>
 <div id='modestmaps-legend' class='map'>
@@ -309,12 +309,12 @@ m.setCenterZoom(
 </pre>
 </div>
 
-<p class='md'>
+<pre class='md'>
 ### Hash (BETA)
 
 The hash control saves the map position so that links hit the map in
 the same state as the user was.
-</p>
+</pre>
 
 <div class='section'>
 <div id='modestmaps-hash' class='map'>
@@ -336,14 +336,14 @@ wax.hash(m, {
 </pre>
 </div>
 
-<p class='md'>
+<pre class='md'>
 ## Wax Records
 
 Records are a feature of Wax aimed to simplify the configuration of sites that
 host many maps. They translate the configuration of any mapping API into 
 logic-free [JSON](http://json.org/), where it can be stored in a database and 
 easily modified by other code.
-</p>
+</pre>
 <div class='section'>
 <pre class='sh_javascript'>
 new google.maps.Map(document.getElementById('gmap'), {
@@ -365,7 +365,7 @@ wax.Record({ 'wax':
   ]
 });
 </pre>
-<p class='md'>
+<pre class='md'>
 Records aim to be a very close translation from the actual Javascript. 
 You'll notice that the Javascript keyword `new` is represented by `@new`, 
 and the same with calling functions, using literal functions, etc.
@@ -377,9 +377,9 @@ are written in a chainable fashion, like Modest Maps and Polymaps.
 stops spinning. Although `wax.Record` returns the last object it was playing
 around with (most often the map object), this is more a convenience than a core 
 API guarantee.
-</p>
+</pre>
 </div>
-<p class='md'>
+<pre class='md'>
 ## Mapping Libraries
 
 Wax supports [Modest Maps] [1], [OpenLayers] [2], and [Google Maps] [3] APIs
@@ -407,10 +407,10 @@ and higher.
 [1]: https://github.com/stamen/modestmaps-js
 [2]: http://www.openlayers.org/
 [3]: http://code.google.com/apis/maps/documentation/javascript/
-</p>
+</pre>
 
 <div class='section'>
-<p class='md'>
+<pre class='md'>
 ### Protips
 
 For faster maps, use multiple servers. [Most browsers have a limit](https://encrypted.google.com/search?hl=en&q=browser+domain+connection+limit&aq=f&aqi=&aql=&oq=)
@@ -427,7 +427,7 @@ servers, or more often, multiple domain names. So, you can use
 
 For tile requests. And you can easily specify them in Modest Maps - just give
 the `WaxProvider` function an array of domain names instead of just one.
-</p>
+</pre>
 <div id='modestmaps-cnames' class='map dark'>
 <span class='attribution'>
   <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
@@ -449,14 +449,14 @@ m.setCenterZoom(
 </div>
 
 <div class='section'>
-<p class='md'>
-And, of course, there are other options you can set on the WaxProvider 
+<pre class='md'>
+And, of course, there are other options you can set on the `wax.provider` 
 object, not just layerName and baseUrl.
 
 * **filetype**: default `.png`, it can be `.jpg` or anything else.
 * **zoomRange**: default `[0, 18]`, it can be any restricted range of 
 zoom levels that you happen to have rendered.
-</p>
+</pre>
 <div id='modestmaps-options' class='map'>
 <span class='attribution'>
   <a href='http://mapbox.com/tileset/pakistan-grey'>Pakistan Grey</a>
