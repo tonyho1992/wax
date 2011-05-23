@@ -32,7 +32,11 @@ $.domReady(function() {
         try {
             eval($(this).text());
         } catch(e) {
-            console && console.log(e);
+            if (console) {
+                console.log(e);
+            } else {
+                alert(e, e.message);
+            }
         }
     });
     sh_highlightDocument();
