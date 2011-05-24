@@ -1,4 +1,0 @@
-wax = wax || {};
-
-wax.mobile = {
-};

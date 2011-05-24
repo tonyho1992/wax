@@ -1,9 +1,11 @@
 wax.util = wax.util || {};
 
-
+// Utils are extracted from other libraries or
+// written from scratch to plug holes in browser compatibility.
 wax.util = {
     // From Bonzo
     offset: function(el) {
+        // TODO: window margin offset
         var width = el.offsetWidth;
         var height = el.offsetHeight;
         var top = el.offsetTop;
@@ -22,6 +24,8 @@ wax.util = {
         };
     },
     // From underscore, minus funcbind for now.
+    // Returns a version of a function that always has the second parameter,
+    // `obj`, as `this`.
     bind: function(func, obj) {
       var args = Array.prototype.slice.call(arguments, 2);
       return function() {
@@ -32,7 +36,7 @@ wax.util = {
     isString: function(obj) {
       return !!(obj === '' || (obj && obj.charCodeAt && obj.substr));
     },
-
+    // IE doesn't have indexOf
     indexOf: function(array, item) {
       var nativeIndexOf = Array.prototype.indexOf;
       if (array === null) return -1;
@@ -41,11 +45,11 @@ wax.util = {
       for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
       return -1;
     },
-
+    // is this object an array?
     isArray: Array.isArray || function(obj) {
       return Object.prototype.toString.call(obj) === '[object Array]';
     },
-
+    // From underscore: reimplement the ECMA5 `Object.keys()` methodb
     keys: Object.keys || function(obj) {
       var hasOwnProperty = Object.prototype.hasOwnProperty;
       if (obj !== Object(obj)) throw new TypeError('Invalid object');
@@ -53,8 +57,8 @@ wax.util = {
       for (var key in obj) if (hasOwnProperty.call(obj, key)) keys[keys.length] = key;
       return keys;
     },
-
-    // From quirksmode
+    // From quirksmode: normalize the offset of an event from the top-left
+    // of the page.
     eventoffset: function(e) {
         var posx = 0;
         var posy = 0;

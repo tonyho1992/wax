@@ -40,8 +40,10 @@ var locationHash = {
 };
 
 wax.hash = function(map, options) {
-    var s0, // cached location.hash
-        lat = 90 - 1e-8, // allowable latitude range
+    // cached location.hash
+    var s0,
+        // allowable latitude range
+        lat = 90 - 1e-8,
         map;
 
     var hash = {
@@ -53,7 +55,8 @@ wax.hash = function(map, options) {
                 args[i] = Number(args);
             }
             if (args.length < 3) {
-                return true; // replace bogus hash
+                // replace bogus hash
+                return true;
             } else if (args.length == 3) {
                 map.setCenterZoom(new com.modestmaps.Location(args[1], args[2]), args[0]);
             }
@@ -65,6 +68,8 @@ wax.hash = function(map, options) {
             map.addCallback('drawn', throttle(hash.move, 500));
             options.manager.stateChange(hash.stateChange);
         },
+        // Currently misnamed. Get the hash string that will go in the URL,
+        // pulling from the map object
         formatter: function() {
             var center = map.getCenter(),
                 zoom = map.getZoom(),
@@ -77,13 +82,16 @@ wax.hash = function(map, options) {
             var s1 = hash.formatter();
             if (s0 !== s1) {
                 s0 = s1;
-                options.manager.pushState(s0); // don't recenter the map!
+                // don't recenter the map!
+                options.manager.pushState(s0);
             }
         },
         stateChange: function(state) {
-            if (state === s0) return; // ignore spurious hashchange events
+            // ignore spurious hashchange events
+            if (state === s0) return;
             if (hash.parser((s0 = state).substring(1))) {
-              hash.move(); // replace bogus hash
+              // replace bogus hash
+              hash.move();
             }
         },
         // If a state isn't present when you initially load the map, the map should

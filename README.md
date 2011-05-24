@@ -66,7 +66,6 @@ To set up the examples first run:
 
 Then check out the example html files.
 
-
 ## Building library
 
 For wax users, a minified library is already provided in build/.
