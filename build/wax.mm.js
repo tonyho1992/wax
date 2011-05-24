@@ -1127,7 +1127,7 @@ wax.pointselector = function(map, opts) {
             this.overlayDiv.style.width = map.dimensions.x + 'px';
             this.overlayDiv.style.height = map.dimensions.y + 'px';
             map.parent.appendChild(this.overlayDiv);
-            MM.addEvent(this.overlayDiv, 'mousedown', pointselector.mouseDown);
+            MM.addEvent(map.parent, 'mousedown', pointselector.mouseDown);
             map.addCallback('drawn', pointselector.drawPoints);
             return this;
         },
@@ -1164,7 +1164,6 @@ wax.pointselector = function(map, opts) {
             }
         },
         mouseDown: function(e) {
-            alert('mouseDown');
             mouseDownPoint = makePoint(e);
             MM.addEvent(map.parent, 'mouseup', pointselector.mouseUp);
         },
