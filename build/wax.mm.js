@@ -1120,6 +1120,7 @@ wax.pointselector = function(map, opts) {
 
     // Create a `com.modestmaps.Point` from a screen event, like a click.
     var makePoint = function(e) {
+        console.log('starting');
         var coords = wax.util.eventoffset(e);
         var point = new MM.Point(coords.x, coords.y);
         // correct for scrolled document
@@ -1133,6 +1134,7 @@ wax.pointselector = function(map, opts) {
             point.x -= node.offsetLeft;
             point.y -= node.offsetTop;
         }
+        console.log(point);
         return point;
     };
 
