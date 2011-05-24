@@ -566,6 +566,26 @@ wax.util = {
       var keys = [];
       for (var key in obj) if (hasOwnProperty.call(obj, key)) keys[keys.length] = key;
       return keys;
+    },
+
+    // From quirksmode
+    eventoffset: function(e) {
+        var posx = 0;
+        var posy = 0;
+        if (!e) var e = window.event;
+        if (e.pageX || e.pageY) 	{
+            return {
+                x: e.pageX,
+                y: e.pageY
+            }
+        } else if (e.clientX || e.clientY) 	{
+            return {
+                x: e.clientX + document.body.scrollLeft
+                    + document.documentElement.scrollLeft,
+                y: e.clientY + document.body.scrollTop
+                    + document.documentElement.scrollTop
+            }
+        }
     }
 };
 // Wax for Google Maps API v3

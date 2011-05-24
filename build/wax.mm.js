@@ -572,6 +572,26 @@ wax.util = {
       var keys = [];
       for (var key in obj) if (hasOwnProperty.call(obj, key)) keys[keys.length] = key;
       return keys;
+    },
+
+    // From quirksmode
+    eventoffset: function(e) {
+        var posx = 0;
+        var posy = 0;
+        if (!e) var e = window.event;
+        if (e.pageX || e.pageY) 	{
+            return {
+                x: e.pageX,
+                y: e.pageY
+            }
+        } else if (e.clientX || e.clientY) 	{
+            return {
+                x: e.clientX + document.body.scrollLeft
+                    + document.documentElement.scrollLeft,
+                y: e.clientY + document.body.scrollTop
+                    + document.documentElement.scrollTop
+            }
+        }
     }
 };
 // Wax: Box Selector
@@ -1100,10 +1120,9 @@ wax.pointselector = function(map, opts) {
 
     // Create a `com.modestmaps.Point` from a screen event, like a click.
     var makePoint = function(e) {
-        var point = new MM.Point(e.clientX, e.clientY);
+        var coords = wax.util.eventoffset(e);
+        var point = new MM.Point(coords.x, coords.y);
         // correct for scrolled document
-        point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
-        point.y += document.body.scrollTop + document.documentElement.scrollTop;
 
         // and for the document
         point.x -= parseFloat(MM.getStyle(document.documentElement, 'margin-left'));
@@ -1164,7 +1183,6 @@ wax.pointselector = function(map, opts) {
             }
         },
         mouseDown: function(e) {
-            alert(e);
             mouseDownPoint = makePoint(e);
             MM.addEvent(map.parent, 'mouseup', pointselector.mouseUp);
         },
