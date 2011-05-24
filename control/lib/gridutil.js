@@ -4,35 +4,6 @@
 // Wax header
 var wax = wax || {};
 
-wax.util = {
-    // From Bonzo
-    offset: function(el) {
-        var width = el.offsetWidth;
-        var height = el.offsetHeight;
-        var top = el.offsetTop;
-        var left = el.offsetLeft;
-
-        while (el = el.offsetParent) {
-            top += el.offsetTop;
-            left += el.offsetLeft;
-        }
-
-        return {
-            top: top,
-            left: left,
-            height: height,
-            width: width
-        };
-    },
-    // From underscore, minus funcbind for now.
-    bind: function(func, obj) {
-      var args = Array.prototype.slice.call(arguments, 2);
-      return function() {
-        return func.apply(obj, args.concat(Array.prototype.slice.call(arguments)));
-      };
-    }
-};
-
 // Request
 // -------
 // Request data cache. `callback(data)` where `data` is the response data.

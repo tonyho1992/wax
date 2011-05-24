@@ -26,11 +26,6 @@
 //   context. Each statement will be called in serial and affect the context
 //   for the next statement.
 //
-// Requirements:
-//
-// - Underscore.js
-// - jQuery @TODO: only used for $.browser check. Could probably be removed.
-//
 // Usage:
 //
 //     var gmap = ['@new google.maps.Map',
@@ -43,33 +38,7 @@
 //     ];
 //     wax.Record(gmap);
 var wax = wax || {};
-wax.util = wax.util || {};
 
-// From underscore
-wax.util.isString = function(obj) {
-  return !!(obj === '' || (obj && obj.charCodeAt && obj.substr));
-};
-
-wax.util.indexOf = function(array, item) {
-  var nativeIndexOf = Array.prototype.indexOf;
-  if (array == null) return -1;
-  var i, l;
-  if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item);
-  for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
-  return -1;
-};
-
-wax.util.isArray = Array.isArray || function(obj) {
-  return Object.prototype.toString.call(obj) === '[object Array]';
-};
-
-wax.util.keys = Object.keys || function(obj) {
-  var hasOwnProperty = Object.prototype.hasOwnProperty;
-  if (obj !== Object(obj)) throw new TypeError('Invalid object');
-  var keys = [];
-  for (var key in obj) if (hasOwnProperty.call(obj, key)) keys[keys.length] = key;
-  return keys;
-};
 
 // TODO: replace with non-global-modifier
 // https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/Reduce
@@ -237,35 +206,6 @@ wax.Record = function(obj, context) {
 
 // Wax header
 var wax = wax || {};
-
-wax.util = {
-    // From Bonzo
-    offset: function(el) {
-        var width = el.offsetWidth;
-        var height = el.offsetHeight;
-        var top = el.offsetTop;
-        var left = el.offsetLeft;
-
-        while (el = el.offsetParent) {
-            top += el.offsetTop;
-            left += el.offsetLeft;
-        }
-
-        return {
-            top: top,
-            left: left,
-            height: height,
-            width: width
-        };
-    },
-    // From underscore, minus funcbind for now.
-    bind: function(func, obj) {
-      var args = Array.prototype.slice.call(arguments, 2);
-      return function() {
-        return func.apply(obj, args.concat(Array.prototype.slice.call(arguments)));
-      };
-    }
-};
 
 // Request
 // -------
@@ -577,6 +517,62 @@ wax.tooltip.unselect = function(feature, context, layer_id, evt) {
     //     .show();
 
     // $(context).triggerHandler('removedtooltip', [feature, context, evt]);
+};
+wax.util = wax.util || {};
+
+
+wax.util = {
+    // From Bonzo
+    offset: function(el) {
+        var width = el.offsetWidth;
+        var height = el.offsetHeight;
+        var top = el.offsetTop;
+        var left = el.offsetLeft;
+
+        while (el = el.offsetParent) {
+            top += el.offsetTop;
+            left += el.offsetLeft;
+        }
+
+        return {
+            top: top,
+            left: left,
+            height: height,
+            width: width
+        };
+    },
+    // From underscore, minus funcbind for now.
+    bind: function(func, obj) {
+      var args = Array.prototype.slice.call(arguments, 2);
+      return function() {
+        return func.apply(obj, args.concat(Array.prototype.slice.call(arguments)));
+      };
+    },
+    // From underscore
+    isString: function(obj) {
+      return !!(obj === '' || (obj && obj.charCodeAt && obj.substr));
+    },
+
+    indexOf: function(array, item) {
+      var nativeIndexOf = Array.prototype.indexOf;
+      if (array === null) return -1;
+      var i, l;
+      if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item);
+      for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
+      return -1;
+    },
+
+    isArray: Array.isArray || function(obj) {
+      return Object.prototype.toString.call(obj) === '[object Array]';
+    },
+
+    keys: Object.keys || function(obj) {
+      var hasOwnProperty = Object.prototype.hasOwnProperty;
+      if (obj !== Object(obj)) throw new TypeError('Invalid object');
+      var keys = [];
+      for (var key in obj) if (hasOwnProperty.call(obj, key)) keys[keys.length] = key;
+      return keys;
+    }
 };
 // Wax: Box Selector
 // -----------------
@@ -1137,9 +1133,8 @@ wax.pointselector = function(map, opts) {
         },
         deletePoint: function(location, e) {
             if (confirm('Delete this point?')) {
-                // TODO: indexOf not supported in IE
                 location.pointDiv.parentNode.removeChild(location.pointDiv);
-                locations.splice(locations.indexOf(location), 1);
+                locations.splice(wax.util.indexOf(locations, location), 1);
                 callback(pointselector.cleanLocations(locations));
             }
         },
@@ -1169,6 +1164,7 @@ wax.pointselector = function(map, opts) {
             }
         },
         mouseDown: function(e) {
+            alert('mouseDown');
             mouseDownPoint = makePoint(e);
             MM.addEvent(map.parent, 'mouseup', pointselector.mouseUp);
         },

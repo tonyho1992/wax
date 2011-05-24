@@ -50,9 +50,8 @@ wax.pointselector = function(map, opts) {
         },
         deletePoint: function(location, e) {
             if (confirm('Delete this point?')) {
-                // TODO: indexOf not supported in IE
                 location.pointDiv.parentNode.removeChild(location.pointDiv);
-                locations.splice(locations.indexOf(location), 1);
+                locations.splice(wax.util.indexOf(locations, location), 1);
                 callback(pointselector.cleanLocations(locations));
             }
         },
@@ -82,6 +81,7 @@ wax.pointselector = function(map, opts) {
             }
         },
         mouseDown: function(e) {
+            alert('mouseDown');
             mouseDownPoint = makePoint(e);
             MM.addEvent(map.parent, 'mouseup', pointselector.mouseUp);
         },
