@@ -573,12 +573,12 @@ wax.util = {
         var posx = 0;
         var posy = 0;
         if (!e) var e = window.event;
-        if (e.pageX || e.pageY) 	{
+        if (e.pageX || e.pageY) {
             return {
                 x: e.pageX,
                 y: e.pageY
             }
-        } else if (e.clientX || e.clientY) 	{
+        } else if (e.clientX || e.clientY) {
             return {
                 x: e.clientX + document.body.scrollLeft
                     + document.documentElement.scrollLeft,

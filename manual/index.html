@@ -69,12 +69,10 @@ After you've got the code downloaded, you'll need to put it on your server and
 include it on your page. The include files are segmented by the mapping API you're 
 using, so in our case, we'll use Modest Maps - `mm`.
 
-    <script src='build/wax.mm.min.js' type='text/javascript'></script>
 
 Then you'll want to include the theme file so that you can see controls -
 you can always swap in your own later on.
 
-    <link href='theme/controls.css' rel='stylesheet' type='text/css' /> 
 
 You'll do the usual Modest Maps setup - just as you'll do the standard setup 
 process with the other APIs.
@@ -273,9 +271,7 @@ var m = new mm.Map('modestmaps-pointselector',
     new mm.Point(448,300))
 wax.pointselector(m, function(coords) {
   $('#modestmaps-pointselector .attribution').text(
-    coords.map(function(c) {
-      return c.lat + ',' + c.lon;
-    }).join(' - '));
+    coords.join(' - '))
   });
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
@@ -486,6 +482,7 @@ m.setCenterZoom(
 </span>
 </div>
 <pre class='sh_javascript run'>
+/*
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-reverse',
     new wax.provider({
@@ -504,6 +501,7 @@ w(m).melt(wax.pointselector, {
 m.setCenterZoom(
   new com.modestmaps.Location(30.5, 69.78),
   4);
+  */
 </pre>
 </div>
     </div>
