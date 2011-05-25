@@ -1,5 +1,5 @@
 doc:
-	docco control/*/*.js
+	./node_modules/.bin/docco control/mm/*.js
 
 ext:
 	-test ! -d ext && mkdir ext
