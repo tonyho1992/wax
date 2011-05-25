@@ -9,26 +9,23 @@ $.domReady(function() {
         html.id = this.id;
         // TODO: free from shackles of jQuery
         $(this).hide().after(html);
-        /*
-        $('h1, h2, h3, h4, h5, h6', html).each(function() {
-            this.setAttribute('id', $(this).text().replace(/[\s\W]+/g, '-').toLowerCase());
+    });
+    $('h1, h2, h3, h4, h5, h6').each(function(elem, i, wrapped) {
+        this.setAttribute('id', $(this).text().replace(/[\s\W]+/g, '-').toLowerCase());
 
-            var para = document.createElement('a'),
-                sectionLi = document.createElement('li'),
-                sectionA = document.createElement('a');
+        var para = document.createElement('a'),
+            sectionLi = document.createElement('li'),
+            sectionA = document.createElement('a');
 
-            para.innerHTML = '&para;'
-            para.className = 'para'
-            para.href = '#' + this.id;
-            sectionA.href = '#' + this.id;
-            $(sectionA).text($(this).text());
-            sectionLi.className = this.nodeName;
-            sectionLi.appendChild(sectionA);
-            nav.append(sectionLi);
-
-            this.appendChild(para);
-        });
-        */
+        para.innerHTML = '&para;'
+        para.className = 'para'
+        para.href = '#' + this.id;
+        sectionA.href = '#' + this.id;
+        $(sectionA).text($(this).text());
+        sectionLi.className = this.nodeName;
+        sectionLi.appendChild(sectionA);
+        nav.append(sectionLi);
+        $(this).append(para);
     });
     $('.run').each(function() {
         eval($(this).text());
