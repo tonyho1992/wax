@@ -43,8 +43,7 @@ wax.hash = function(map, options) {
     // cached location.hash
     var s0,
         // allowable latitude range
-        lat = 90 - 1e-8,
-        map;
+        lat = 90 - 1e-8;
 
     var hash = {
         map: this,
@@ -62,9 +61,12 @@ wax.hash = function(map, options) {
             }
         },
         add: function(map) {
-            options.manager.getState() ?
-                hash.stateChange(options.manager.getState()) :
-                hash.initialize() && hash.move();
+            if (options.manager.getState()) {
+                hash.stateChange(options.manager.getState());
+            } else {
+                hash.initialize();
+                hash.move();
+            }
             map.addCallback('drawn', throttle(hash.move, 500));
             options.manager.stateChange(hash.stateChange);
         },

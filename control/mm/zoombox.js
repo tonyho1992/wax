@@ -43,7 +43,7 @@ wax.zoombox = function(map, opts) {
             return point;
         },
         mouseDown: function() {
-            return this._mouseDown = this._mouseDown || wax.util.bind(function(e) {
+            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(e) {
                 if (e.shiftKey) {
                     mouseDownPoint = this.getMousePoint(e);
 
@@ -57,9 +57,10 @@ wax.zoombox = function(map, opts) {
                     return com.modestmaps.cancelEvent(e);
                 }
             }, this);
+            return this._mouseDown;
         },
         mouseMove: function(e) {
-            return this._mouseMove = this._mouseMove || wax.util.bind(function(e) {
+            if (!this._mouseMove) this._mouseMove = wax.util.bind(function(e) {
                 var point = this.getMousePoint(e);
                 this.box.style.display = 'block';
                 if (point.x < mouseDownPoint.x) {
@@ -76,9 +77,10 @@ wax.zoombox = function(map, opts) {
                 this.box.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
                 return com.modestmaps.cancelEvent(e);
             }, this);
+            return this._mouseMove;
         },
         mouseUp: function(e) {
-            return this._mouseUp = this._mouseUp || wax.util.bind(function(e) {
+            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(e) {
                 var point = this.getMousePoint(e);
 
                 var l1 = map.pointLocation(point),
@@ -94,6 +96,7 @@ wax.zoombox = function(map, opts) {
 
                 return com.modestmaps.cancelEvent(e);
             }, this);
+            return this._mouseUp;
         }
     };
 

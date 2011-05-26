@@ -67,14 +67,14 @@ wax.util = {
             return {
                 x: e.pageX,
                 y: e.pageY
-            }
+            };
         } else if (e.clientX || e.clientY) {
             return {
-                x: e.clientX + document.body.scrollLeft
-                    + document.documentElement.scrollLeft,
-                y: e.clientY + document.body.scrollTop
-                    + document.documentElement.scrollTop
-            }
+                x: e.clientX + document.body.scrollLeft +
+                    document.documentElement.scrollLeft,
+                y: e.clientY + document.body.scrollTop +
+                    document.documentElement.scrollTop
+            };
         }
     }
 };

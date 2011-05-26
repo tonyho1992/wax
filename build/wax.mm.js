@@ -428,7 +428,17 @@ wax.Legend.prototype.legendUrl = function(url) {
     return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
 };
 
-// TODO: rewrite without underscore
+// Like underscore's bind, except it runs a function
+// with no arguments off of an object.
+//
+//     var map = ...;
+//     w(map).melt(myFunction);
+//
+// is equivalent to
+//
+//     var map = ...;
+//     myFunction(map);
+//
 var w = function(self) {
     self.melt = function(func, obj) {
         func.apply(obj, [self, obj]);
@@ -445,29 +455,16 @@ var w = function(self) {
 var wax = wax || {};
 wax.tooltip = {};
 
+// TODO: make this a non-global
+var _currentTooltip;
+
 // Get the active tooltip for a layer or create a new one if no tooltip exists.
 // Hide any tooltips on layers underneath this one.
 wax.tooltip.getToolTip = function(feature, context, index, evt) {
-    // var tooltip = $(context).children('div.wax-tooltip-' +
-    //     index +
-    //     ':not(.removed)');
-
-    // if (tooltip.size() === 0) {
     tooltip = document.createElement('div');
     tooltip.className = 'wax-tooltip wax-tooltip-' + index;
     tooltip.innerHTML = feature;
-
-        // if (!$(context).triggerHandler('addedtooltip', [tooltip, context, evt])) {
-             context.appendChild(tooltip);
-        // }
-    // }
-
-    // for (var i = (index - 1); i > 0; i--) {
-    //     var fallback = $('div.wax-tooltip-' + i + ':not(.removed)');
-    //     if (fallback.size() > 0) {
-    //         fallback.addClass('hidden').hide();
-    //     }
-    // }
+    context.appendChild(tooltip);
     return tooltip;
 };
 
@@ -491,8 +488,7 @@ wax.tooltip.click = function(feature, context, index) {
 // Show a tooltip.
 wax.tooltip.select = function(feature, context, layer_id, evt) {
     if (!feature) return;
-
-    wax.tooltip.getToolTip(feature, context, layer_id, evt);
+    _currentTooltip = wax.tooltip.getToolTip(feature, context, layer_id, evt);
     context.style.cursor = 'pointer';
 };
 
@@ -500,30 +496,19 @@ wax.tooltip.select = function(feature, context, layer_id, evt) {
 // highest layer underneath if found.
 wax.tooltip.unselect = function(feature, context, layer_id, evt) {
     context.style.cursor = 'default';
-    /*
-    if (layer_id) {
-        $('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
-            .remove();
-    } else {
-        $('div.wax-tooltip:not(.wax-popup)')
-            .remove();
+    if (_currentTooltip) {
+      _currentTooltip.parentNode.removeChild(_currentTooltip);
+      _currentTooltip = undefined;
     }
-    */
-
-    // TODO: remove
-
-    // $('div.wax-tooltip:first')
-    //     .removeClass('hidden')
-    //     .show();
-
-    // $(context).triggerHandler('removedtooltip', [feature, context, evt]);
 };
 wax.util = wax.util || {};
 
-
+// Utils are extracted from other libraries or
+// written from scratch to plug holes in browser compatibility.
 wax.util = {
     // From Bonzo
     offset: function(el) {
+        // TODO: window margin offset
         var width = el.offsetWidth;
         var height = el.offsetHeight;
         var top = el.offsetTop;
@@ -542,6 +527,8 @@ wax.util = {
         };
     },
     // From underscore, minus funcbind for now.
+    // Returns a version of a function that always has the second parameter,
+    // `obj`, as `this`.
     bind: function(func, obj) {
       var args = Array.prototype.slice.call(arguments, 2);
       return function() {
@@ -552,7 +539,7 @@ wax.util = {
     isString: function(obj) {
       return !!(obj === '' || (obj && obj.charCodeAt && obj.substr));
     },
-
+    // IE doesn't have indexOf
     indexOf: function(array, item) {
       var nativeIndexOf = Array.prototype.indexOf;
       if (array === null) return -1;
@@ -561,11 +548,11 @@ wax.util = {
       for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
       return -1;
     },
-
+    // is this object an array?
     isArray: Array.isArray || function(obj) {
       return Object.prototype.toString.call(obj) === '[object Array]';
     },
-
+    // From underscore: reimplement the ECMA5 `Object.keys()` methodb
     keys: Object.keys || function(obj) {
       var hasOwnProperty = Object.prototype.hasOwnProperty;
       if (obj !== Object(obj)) throw new TypeError('Invalid object');
@@ -573,8 +560,8 @@ wax.util = {
       for (var key in obj) if (hasOwnProperty.call(obj, key)) keys[keys.length] = key;
       return keys;
     },
-
-    // From quirksmode
+    // From quirksmode: normalize the offset of an event from the top-left
+    // of the page.
     eventoffset: function(e) {
         var posx = 0;
         var posy = 0;
@@ -583,14 +570,14 @@ wax.util = {
             return {
                 x: e.pageX,
                 y: e.pageY
-            }
+            };
         } else if (e.clientX || e.clientY) {
             return {
-                x: e.clientX + document.body.scrollLeft
-                    + document.documentElement.scrollLeft,
-                y: e.clientY + document.body.scrollTop
-                    + document.documentElement.scrollTop
-            }
+                x: e.clientX + document.body.scrollLeft +
+                    document.documentElement.scrollLeft,
+                y: e.clientY + document.body.scrollTop +
+                    document.documentElement.scrollTop
+            };
         }
     }
 };
@@ -641,7 +628,7 @@ wax.boxselector = function(map, opts) {
             return point;
         },
         mouseDown: function() {
-            return this._mouseDown = this._mouseDown || wax.util.bind(function(e) {
+            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(e) {
                 if (e.shiftKey) {
                     mouseDownPoint = this.getMousePoint(e);
 
@@ -655,9 +642,10 @@ wax.boxselector = function(map, opts) {
                     return com.modestmaps.cancelEvent(e);
                 }
             }, this);
+            return this._mouseDown;
         },
         mouseMove: function(e) {
-            return this._mouseMove = this._mouseMove || wax.util.bind(function(e) {
+            if (!this._mouseMove) this._mouseMove = wax.util.bind(function(e) {
                 var point = this.getMousePoint(e);
                 this.boxDiv.style.display = 'block';
                 if (point.x < mouseDownPoint.x) {
@@ -674,9 +662,10 @@ wax.boxselector = function(map, opts) {
                 this.boxDiv.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
                 return com.modestmaps.cancelEvent(e);
             }, this);
+            return this._mouseMove;
         },
         mouseUp: function() {
-            return this._mouseUp = this._mouseUp || wax.util.bind(function(e) {
+            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(e) {
                 var point = boxselector.getMousePoint(e);
 
                 var l1 = map.pointLocation(point),
@@ -702,9 +691,10 @@ wax.boxselector = function(map, opts) {
 
                 return com.modestmaps.cancelEvent(e);
             }, this);
+            return this._mouseUp;
         },
         drawbox: function() {
-            return this._drawbox = this._drawbox || wax.util.bind(function(map, e) {
+            if (!this._drawbox) this._drawbox = wax.util.bind(function(map, e) {
                 if (this.boxDiv) {
                     this.boxDiv.style.display = 'block';
                     this.boxDiv.style.height = 'auto';
@@ -717,6 +707,7 @@ wax.boxselector = function(map, opts) {
                     this.boxDiv.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
                 }
             }, this);
+            return this._drawbox;
         }
     };
 
@@ -772,7 +763,8 @@ wax.fullscreen = function(map, opts) {
         },
 
         click: function(map) {
-            return this._click = this._click || wax.util.bind(function(e) {
+            if (this._click) return this._click;
+            else this._click = wax.util.bind(function(e) {
                 if (e) com.modestmaps.cancelEvent(e);
 
                 if (this.state) {
@@ -789,6 +781,7 @@ wax.fullscreen = function(map, opts) {
                 }
                 this.state = !this.state;
             }, this);
+            return this._click;
         }
     };
 
@@ -836,9 +829,10 @@ var locationHash = {
 };
 
 wax.hash = function(map, options) {
-    var s0, // cached location.hash
-        lat = 90 - 1e-8, // allowable latitude range
-        map;
+    // cached location.hash
+    var s0,
+        // allowable latitude range
+        lat = 90 - 1e-8;
 
     var hash = {
         map: this,
@@ -849,18 +843,24 @@ wax.hash = function(map, options) {
                 args[i] = Number(args);
             }
             if (args.length < 3) {
-                return true; // replace bogus hash
+                // replace bogus hash
+                return true;
             } else if (args.length == 3) {
                 map.setCenterZoom(new com.modestmaps.Location(args[1], args[2]), args[0]);
             }
         },
         add: function(map) {
-            options.manager.getState() ?
-                hash.stateChange(options.manager.getState()) :
-                hash.initialize() && hash.move();
+            if (options.manager.getState()) {
+                hash.stateChange(options.manager.getState());
+            } else {
+                hash.initialize();
+                hash.move();
+            }
             map.addCallback('drawn', throttle(hash.move, 500));
             options.manager.stateChange(hash.stateChange);
         },
+        // Currently misnamed. Get the hash string that will go in the URL,
+        // pulling from the map object
         formatter: function() {
             var center = map.getCenter(),
                 zoom = map.getZoom(),
@@ -873,13 +873,16 @@ wax.hash = function(map, options) {
             var s1 = hash.formatter();
             if (s0 !== s1) {
                 s0 = s1;
-                options.manager.pushState(s0); // don't recenter the map!
+                // don't recenter the map!
+                options.manager.pushState(s0);
             }
         },
         stateChange: function(state) {
-            if (state === s0) return; // ignore spurious hashchange events
+            // ignore spurious hashchange events
+            if (state === s0) return;
             if (hash.parser((s0 = state).substring(1))) {
-              hash.move(); // replace bogus hash
+              // replace bogus hash
+              hash.move();
             }
         },
         // If a state isn't present when you initially load the map, the map should
@@ -923,6 +926,7 @@ wax.interaction = function(map, options) {
 
         clickAction: options.clickAction || 'full',
 
+        // Attach listeners to the map
         add: function() {
             for (var i = 0; i < this.modifyingEvents.length; i++) {
                 map.addCallback(this.modifyingEvents[i], this.clearMap);
@@ -972,6 +976,8 @@ wax.interaction = function(map, options) {
             return tile || false;
         },
 
+        // Clear the double-click timeout to prevent double-clicks from
+        // triggering popups.
         clearTimeout: function() {
             if (this.clickTimeout) {
                 window.clearTimeout(this.clickTimeout);
@@ -983,7 +989,7 @@ wax.interaction = function(map, options) {
         },
 
         onMove: function(evt) {
-            return this._onMove = this._onMove || wax.util.bind(function(evt) {
+            if (!this._onMove) this._onMove = wax.util.bind(function(evt) {
                 var tile = this.getTile(evt);
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(g) {
@@ -1010,10 +1016,11 @@ wax.interaction = function(map, options) {
                     }, this));
                 }
             }, this);
+            return this._onMove;
         },
 
         mouseDown: function(evt) {
-            return this._mouseDown = this._mouseDown || wax.util.bind(function(evt) {
+            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(evt) {
                 // Ignore double-clicks by ignoring clicks within 300ms of
                 // each other.
                 if (this.clearTimeout()) {
@@ -1024,10 +1031,11 @@ wax.interaction = function(map, options) {
                 this.downEvent = evt;
                 MM.addEvent(map.parent, 'mouseup', this.mouseUp());
             }, this);
+            return this._mouseDown;
         },
 
         mouseUp: function() {
-            return this._mouseUp = this._mouseUp || wax.util.bind(function(evt) {
+            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(evt) {
                 MM.removeEvent(map.parent, 'mouseup', this.mouseUp());
                 // Don't register clicks that are likely the boundaries
                 // of dragging the map
@@ -1035,13 +1043,15 @@ wax.interaction = function(map, options) {
                 if (Math.round(evt.pageY / tol) === Math.round(this.downEvent.pageY / tol) &&
                     Math.round(evt.pageX / tol) === Math.round(this.downEvent.pageX / tol)) {
                     // Contain the event data in a closure.
-                    this.clickTimeout = window.setTimeout(wax.util.bind(function() { this.click()(evt); }, this), 300);
+                    this.clickTimeout = window.setTimeout(
+                        wax.util.bind(function() { this.click()(evt); }, this), 300);
                 }
             }, this);
+            return this._mouseUp;
         },
 
         click: function(evt) {
-            return this._onClick = this._onClick || wax.util.bind(function(evt) {
+            if (!this._onClick) this._onClick = wax.util.bind(function(evt) {
                 var tile = this.getTile(evt);
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(g) {
@@ -1063,6 +1073,7 @@ wax.interaction = function(map, options) {
                     }, this));
                 }
             }, this);
+            return this._onClick;
         }
     };
 
@@ -1097,9 +1108,163 @@ wax.legend = function(map, options) {
     };
     return legend.add(map);
 };
+// Mobile
+// ------
+// For making maps on normal websites nicely mobile-ized
+
 wax = wax || {};
 
-wax.mobile = {
+wax.mobile = function(map, opts) {
+    opts = opts || {};
+    // Inspired by Leaflet
+    var mm = com.modestmaps,
+        ua = navigator.userAgent.toLowerCase(),
+        isWebkit = ua.indexOf("webkit") != -1,
+        isMobile = ua.indexOf("mobile") != -1,
+        mobileWebkit = isMobile && isWebkit;
+
+    var defaultOverlayDraw = function(div) {
+        var canvas = document.createElement('canvas');
+        var width = parseInt(div.style.width, 10),
+            height = parseInt(div.style.height, 10),
+            w2 = width / 2,
+            h2 = height / 2,
+            // Make the size of the arrow nicely proportional to the map
+            size = Math.min(width, height) / 4;
+
+        var ctx = canvas.getContext('2d');
+        canvas.setAttribute('width', width);
+        canvas.setAttribute('height', height);
+        ctx.globalAlpha = 0.5;
+        // Draw a nice gradient to signal that the map is inaccessible
+        var inactive = ctx.createLinearGradient(0, 0, 300, 225);
+        inactive.addColorStop(0, "black");
+        inactive.addColorStop(1, "rgb(200, 200, 200)");
+        ctx.fillStyle = inactive;
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.fillStyle = "rgb(255, 255, 255)";
+        ctx.beginPath();
+        ctx.moveTo(w2 - size * 0.6, h2 - size); // give the (x,y) coordinates
+        ctx.lineTo(w2 - size * 0.6, h2 + size);
+        ctx.lineTo(w2 + size * 0.6, h2);
+        ctx.fill();
+
+        // Done! Now fill the shape, and draw the stroke.
+        // Note: your shape will not be visible until you call any of the two methods.
+        div.appendChild(canvas);
+    };
+
+    var defaultBackDraw = function(div) {
+        div.style.position = 'absolute';
+        div.style.height = '50px';
+        div.style.left =
+            div.style.right = '0';
+
+        var canvas = document.createElement('canvas');
+        canvas.setAttribute('width', div.offsetWidth);
+        canvas.setAttribute('height', div.offsetHeight);
+
+        var ctx = canvas.getContext('2d');
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.fillRect(0, 0, div.offsetWidth, div.offsetHeight);
+        ctx.fillStyle = "rgb(0, 0, 0)";
+        ctx.font = "bold 20px sans-serif";
+        ctx.fillText("back", 20, 30);
+        div.appendChild(canvas);
+    };
+
+    var maximizeElement = function(elem) {
+        elem.style.position = 'absolute';
+        elem.style.width =
+            elem.style.height = 'auto';
+        elem.style.top = (window.pageYOffset) + 'px';
+        elem.style.left =
+            elem.style.right = '0px';
+    };
+
+    var minimizeElement = function(elem) {
+        elem.style.position = 'relative';
+        elem.style.width =
+            elem.style.height =
+            elem.style.top =
+            elem.style.left =
+            elem.style.right = 'auto';
+    };
+
+    var overlayDiv,
+        oldBody,
+        standIn,
+        meta,
+        overlayDraw = opts.overlayDraw || defaultOverlayDraw,
+        backDraw = opts.backDraw || defaultBackDraw;
+        bodyDraw = opts.bodyDraw || function() {};
+
+    var mobile = {
+        add: function(map) {
+            // Code in this block is only run on Mobile Safari;
+            // therefore HTML5 Canvas is fine.
+            if (mobileWebkit) {
+                meta = document.createElement('meta');
+                meta.id = 'wax-touch';
+                meta.setAttribute('name', 'viewport');
+                overlayDiv = document.createElement('div');
+                overlayDiv.id = map.parent.id + '-mobileoverlay';
+                overlayDiv.className = 'wax-mobileoverlay';
+                overlayDiv.style.position = 'absolute';
+                overlayDiv.style.width = map.dimensions.x + 'px';
+                overlayDiv.style.height = map.dimensions.y + 'px';
+                map.parent.appendChild(overlayDiv);
+                overlayDraw(overlayDiv);
+
+                standIn = document.createElement('div');
+                backDiv = document.createElement('div');
+                // Store the old body - we'll need it.
+                oldBody = document.body;
+
+                newBody = document.createElement('body');
+                newBody.appendChild(backDiv);
+
+                mm.addEvent(overlayDiv, 'touchstart', this.toTouch);
+                mm.addEvent(backDiv, 'touchstart', this.toPage);
+            }
+            return this;
+        },
+        // Enter "touch mode"
+        toTouch: function() {
+            // Enter a new body
+            map.parent.parentNode.replaceChild(standIn, map.parent);
+            newBody.insertBefore(map.parent, backDiv);
+            document.body = newBody;
+
+            bodyDraw(newBody);
+            backDraw(backDiv);
+            meta.setAttribute('content',
+                'initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0');
+            document.head.appendChild(meta);
+            map._smallSize = [map.parent.clientWidth, map.parent.clientHeight];
+            maximizeElement(map.parent);
+            map.setSize(
+                map.parent.offsetWidth,
+                window.innerHeight);
+            backDiv.style.display = 'block';
+            overlayDiv.style.display = 'none';
+        },
+        // Return from touch mode
+        toPage: function() {
+            // Currently this code doesn't, and can't, reset the
+            // scale of the page. Anything to not use the meta-element
+            // would be a bit of a hack.
+            document.body = oldBody;
+            standIn.parentNode.replaceChild(map.parent, standIn);
+            minimizeElement(map.parent);
+            map.setSize(map._smallSize[0], map._smallSize[1]);
+            backDiv.style.display = 'none';
+            overlayDiv.style.display = 'block';
+        }
+    };
+    return mobile.add(map);
 };
 // Wax: Point Selector
 // -----------------
@@ -1148,7 +1313,7 @@ wax.pointselector = function(map, opts) {
             o.push(new MM.Location(locations[i].lat, locations[i].lon));
         }
         return o;
-    };
+    }
 
     var pointselector = {
         // Attach this control to a map by registering callbacks
@@ -1158,7 +1323,6 @@ wax.pointselector = function(map, opts) {
             overlayDiv.id = map.parent.id + '-boxselector';
             overlayDiv.className = 'pointselector-box-container';
             overlayDiv.innerHTML = '&nbsp;';
-            overlayDiv.style.backgroundImage = 'url(http://a.tiles.mapbox.com/mapbox/1.0.0/world-glass/6/23/39.png)';
             overlayDiv.style.width = map.dimensions.x + 'px';
             overlayDiv.style.height = map.dimensions.y + 'px';
 
@@ -1175,7 +1339,7 @@ wax.pointselector = function(map, opts) {
             }
         },
         drawPoints: function() {
-            return this._drawPoints = this._drawPoints || wax.util.bind(function() {
+            if (!this._drawPoints) this._drawPoints = wax.util.bind(function() {
                 var offset = new MM.Point(0, 0);
                 for (var i = 0; i < locations.length; i++) {
                     var point = map.locationPoint(locations[i]);
@@ -1200,12 +1364,14 @@ wax.pointselector = function(map, opts) {
                     locations[i].pointDiv.style.top = point.y + 'px';
                 }
             }, this);
+            return this._drawPoints;
         },
         mouseDown: function() {
-            return this._mouseDown = this._mouseDown || wax.util.bind(function(e) {
+            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(e) {
                 mouseDownPoint = makePoint(e);
                 MM.addEvent(map.parent, 'mouseup', this.mouseUp());
             }, this);
+            return this._mouseDown;
         },
         addLocation: function(location) {
             locations.push(location);
@@ -1214,7 +1380,7 @@ wax.pointselector = function(map, opts) {
         // Remove the awful circular reference from locations.
         // TODO: This function should be made unnecessary by not having it.
         mouseUp: function() {
-            return this._mouseUp = this._mouseUp || wax.util.bind(function(e) {
+            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(e) {
                 if (!mouseDownPoint) return;
                 mouseUpPoint = makePoint(e);
                 if (MM.Point.distance(mouseDownPoint, mouseUpPoint) < tolerance) {
@@ -1224,6 +1390,7 @@ wax.pointselector = function(map, opts) {
                 mouseDownPoint = null;
                 MM.removeEvent(map.parent, 'mouseup', pointselector.mouseUp());
             }, this);
+            return this._mouseUp;
         }
     };
 
@@ -1274,7 +1441,7 @@ wax.zoombox = function(map, opts) {
             return point;
         },
         mouseDown: function() {
-            return this._mouseDown = this._mouseDown || wax.util.bind(function(e) {
+            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(e) {
                 if (e.shiftKey) {
                     mouseDownPoint = this.getMousePoint(e);
 
@@ -1288,9 +1455,10 @@ wax.zoombox = function(map, opts) {
                     return com.modestmaps.cancelEvent(e);
                 }
             }, this);
+            return this._mouseDown;
         },
         mouseMove: function(e) {
-            return this._mouseMove = this._mouseMove || wax.util.bind(function(e) {
+            if (!this._mouseMove) this._mouseMove = wax.util.bind(function(e) {
                 var point = this.getMousePoint(e);
                 this.box.style.display = 'block';
                 if (point.x < mouseDownPoint.x) {
@@ -1307,9 +1475,10 @@ wax.zoombox = function(map, opts) {
                 this.box.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
                 return com.modestmaps.cancelEvent(e);
             }, this);
+            return this._mouseMove;
         },
         mouseUp: function(e) {
-            return this._mouseUp = this._mouseUp || wax.util.bind(function(e) {
+            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(e) {
                 var point = this.getMousePoint(e);
 
                 var l1 = map.pointLocation(point),
@@ -1325,6 +1494,7 @@ wax.zoombox = function(map, opts) {
 
                 return com.modestmaps.cancelEvent(e);
             }, this);
+            return this._mouseUp;
         }
     };
 

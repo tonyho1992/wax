@@ -30,6 +30,7 @@ wax.interaction = function(map, options) {
 
         clickAction: options.clickAction || 'full',
 
+        // Attach listeners to the map
         add: function() {
             for (var i = 0; i < this.modifyingEvents.length; i++) {
                 map.addCallback(this.modifyingEvents[i], this.clearMap);
@@ -79,6 +80,8 @@ wax.interaction = function(map, options) {
             return tile || false;
         },
 
+        // Clear the double-click timeout to prevent double-clicks from
+        // triggering popups.
         clearTimeout: function() {
             if (this.clickTimeout) {
                 window.clearTimeout(this.clickTimeout);
@@ -90,7 +93,7 @@ wax.interaction = function(map, options) {
         },
 
         onMove: function(evt) {
-            return this._onMove = this._onMove || wax.util.bind(function(evt) {
+            if (!this._onMove) this._onMove = wax.util.bind(function(evt) {
                 var tile = this.getTile(evt);
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(g) {
@@ -117,10 +120,11 @@ wax.interaction = function(map, options) {
                     }, this));
                 }
             }, this);
+            return this._onMove;
         },
 
         mouseDown: function(evt) {
-            return this._mouseDown = this._mouseDown || wax.util.bind(function(evt) {
+            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(evt) {
                 // Ignore double-clicks by ignoring clicks within 300ms of
                 // each other.
                 if (this.clearTimeout()) {
@@ -131,10 +135,11 @@ wax.interaction = function(map, options) {
                 this.downEvent = evt;
                 MM.addEvent(map.parent, 'mouseup', this.mouseUp());
             }, this);
+            return this._mouseDown;
         },
 
         mouseUp: function() {
-            return this._mouseUp = this._mouseUp || wax.util.bind(function(evt) {
+            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(evt) {
                 MM.removeEvent(map.parent, 'mouseup', this.mouseUp());
                 // Don't register clicks that are likely the boundaries
                 // of dragging the map
@@ -142,13 +147,15 @@ wax.interaction = function(map, options) {
                 if (Math.round(evt.pageY / tol) === Math.round(this.downEvent.pageY / tol) &&
                     Math.round(evt.pageX / tol) === Math.round(this.downEvent.pageX / tol)) {
                     // Contain the event data in a closure.
-                    this.clickTimeout = window.setTimeout(wax.util.bind(function() { this.click()(evt); }, this), 300);
+                    this.clickTimeout = window.setTimeout(
+                        wax.util.bind(function() { this.click()(evt); }, this), 300);
                 }
             }, this);
+            return this._mouseUp;
         },
 
         click: function(evt) {
-            return this._onClick = this._onClick || wax.util.bind(function(evt) {
+            if (!this._onClick) this._onClick = wax.util.bind(function(evt) {
                 var tile = this.getTile(evt);
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(g) {
@@ -170,6 +177,7 @@ wax.interaction = function(map, options) {
                     }, this));
                 }
             }, this);
+            return this._onClick;
         }
     };
 

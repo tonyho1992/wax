@@ -9,7 +9,7 @@ ext:
 	wget --no-check-certificate https://github.com/stamen/modestmaps-js/raw/c202b0a274f4235c4ebd8362fff11d88a2c0fc8f/modestmaps.min.js -O ext/modestmaps.js
 
 lint:
-	./node_modules/.bin/jshint control/lib/*.js control/*/*.js
+	./node_modules/.bin/jshint control/lib/*.js control/mm/*.js --config=jshint.json
 
 build/wax.ol.min.js:
 	cat lib/*.js control/lib/*.js control/ol/*.js > build/wax.ol.js

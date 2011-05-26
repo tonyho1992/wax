@@ -45,7 +45,7 @@ wax.pointselector = function(map, opts) {
             o.push(new MM.Location(locations[i].lat, locations[i].lon));
         }
         return o;
-    };
+    }
 
     var pointselector = {
         // Attach this control to a map by registering callbacks
@@ -71,7 +71,7 @@ wax.pointselector = function(map, opts) {
             }
         },
         drawPoints: function() {
-            return this._drawPoints = this._drawPoints || wax.util.bind(function() {
+            if (!this._drawPoints) this._drawPoints = wax.util.bind(function() {
                 var offset = new MM.Point(0, 0);
                 for (var i = 0; i < locations.length; i++) {
                     var point = map.locationPoint(locations[i]);
@@ -96,12 +96,14 @@ wax.pointselector = function(map, opts) {
                     locations[i].pointDiv.style.top = point.y + 'px';
                 }
             }, this);
+            return this._drawPoints;
         },
         mouseDown: function() {
-            return this._mouseDown = this._mouseDown || wax.util.bind(function(e) {
+            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(e) {
                 mouseDownPoint = makePoint(e);
                 MM.addEvent(map.parent, 'mouseup', this.mouseUp());
             }, this);
+            return this._mouseDown;
         },
         addLocation: function(location) {
             locations.push(location);
@@ -110,7 +112,7 @@ wax.pointselector = function(map, opts) {
         // Remove the awful circular reference from locations.
         // TODO: This function should be made unnecessary by not having it.
         mouseUp: function() {
-            return this._mouseUp = this._mouseUp || wax.util.bind(function(e) {
+            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(e) {
                 if (!mouseDownPoint) return;
                 mouseUpPoint = makePoint(e);
                 if (MM.Point.distance(mouseDownPoint, mouseUpPoint) < tolerance) {
@@ -120,6 +122,7 @@ wax.pointselector = function(map, opts) {
                 mouseDownPoint = null;
                 MM.removeEvent(map.parent, 'mouseup', pointselector.mouseUp());
             }, this);
+            return this._mouseUp;
         }
     };
 

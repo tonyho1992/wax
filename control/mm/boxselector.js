@@ -45,7 +45,7 @@ wax.boxselector = function(map, opts) {
             return point;
         },
         mouseDown: function() {
-            return this._mouseDown = this._mouseDown || wax.util.bind(function(e) {
+            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(e) {
                 if (e.shiftKey) {
                     mouseDownPoint = this.getMousePoint(e);
 
@@ -59,9 +59,10 @@ wax.boxselector = function(map, opts) {
                     return com.modestmaps.cancelEvent(e);
                 }
             }, this);
+            return this._mouseDown;
         },
         mouseMove: function(e) {
-            return this._mouseMove = this._mouseMove || wax.util.bind(function(e) {
+            if (!this._mouseMove) this._mouseMove = wax.util.bind(function(e) {
                 var point = this.getMousePoint(e);
                 this.boxDiv.style.display = 'block';
                 if (point.x < mouseDownPoint.x) {
@@ -78,9 +79,10 @@ wax.boxselector = function(map, opts) {
                 this.boxDiv.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
                 return com.modestmaps.cancelEvent(e);
             }, this);
+            return this._mouseMove;
         },
         mouseUp: function() {
-            return this._mouseUp = this._mouseUp || wax.util.bind(function(e) {
+            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(e) {
                 var point = boxselector.getMousePoint(e);
 
                 var l1 = map.pointLocation(point),
@@ -106,9 +108,10 @@ wax.boxselector = function(map, opts) {
 
                 return com.modestmaps.cancelEvent(e);
             }, this);
+            return this._mouseUp;
         },
         drawbox: function() {
-            return this._drawbox = this._drawbox || wax.util.bind(function(map, e) {
+            if (!this._drawbox) this._drawbox = wax.util.bind(function(map, e) {
                 if (this.boxDiv) {
                     this.boxDiv.style.display = 'block';
                     this.boxDiv.style.height = 'auto';
@@ -121,6 +124,7 @@ wax.boxselector = function(map, opts) {
                     this.boxDiv.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
                 }
             }, this);
+            return this._drawbox;
         }
     };
 

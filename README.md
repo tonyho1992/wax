@@ -18,6 +18,7 @@ Modest Maps is the primary target for Wax, given its simplicity and high quality
 * `wax.boxselect()`
 * `wax.pointselector()`
 * `wax.legend()`
+* `wax.mobile()`
 * `wax.fullscreen()`
 * `wax.zoombox()`
 * `wax.hash()`

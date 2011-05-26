@@ -422,7 +422,17 @@ wax.Legend.prototype.legendUrl = function(url) {
     return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
 };
 
-// TODO: rewrite without underscore
+// Like underscore's bind, except it runs a function
+// with no arguments off of an object.
+//
+//     var map = ...;
+//     w(map).melt(myFunction);
+//
+// is equivalent to
+//
+//     var map = ...;
+//     myFunction(map);
+//
 var w = function(self) {
     self.melt = function(func, obj) {
         func.apply(obj, [self, obj]);
@@ -439,29 +449,16 @@ var w = function(self) {
 var wax = wax || {};
 wax.tooltip = {};
 
+// TODO: make this a non-global
+var _currentTooltip;
+
 // Get the active tooltip for a layer or create a new one if no tooltip exists.
 // Hide any tooltips on layers underneath this one.
 wax.tooltip.getToolTip = function(feature, context, index, evt) {
-    // var tooltip = $(context).children('div.wax-tooltip-' +
-    //     index +
-    //     ':not(.removed)');
-
-    // if (tooltip.size() === 0) {
     tooltip = document.createElement('div');
     tooltip.className = 'wax-tooltip wax-tooltip-' + index;
     tooltip.innerHTML = feature;
-
-        // if (!$(context).triggerHandler('addedtooltip', [tooltip, context, evt])) {
-             context.appendChild(tooltip);
-        // }
-    // }
-
-    // for (var i = (index - 1); i > 0; i--) {
-    //     var fallback = $('div.wax-tooltip-' + i + ':not(.removed)');
-    //     if (fallback.size() > 0) {
-    //         fallback.addClass('hidden').hide();
-    //     }
-    // }
+    context.appendChild(tooltip);
     return tooltip;
 };
 
@@ -485,8 +482,7 @@ wax.tooltip.click = function(feature, context, index) {
 // Show a tooltip.
 wax.tooltip.select = function(feature, context, layer_id, evt) {
     if (!feature) return;
-
-    wax.tooltip.getToolTip(feature, context, layer_id, evt);
+    _currentTooltip = wax.tooltip.getToolTip(feature, context, layer_id, evt);
     context.style.cursor = 'pointer';
 };
 
@@ -494,30 +490,19 @@ wax.tooltip.select = function(feature, context, layer_id, evt) {
 // highest layer underneath if found.
 wax.tooltip.unselect = function(feature, context, layer_id, evt) {
     context.style.cursor = 'default';
-    /*
-    if (layer_id) {
-        $('div.wax-tooltip-' + layer_id + ':not(.wax-popup)')
-            .remove();
-    } else {
-        $('div.wax-tooltip:not(.wax-popup)')
-            .remove();
+    if (_currentTooltip) {
+      _currentTooltip.parentNode.removeChild(_currentTooltip);
+      _currentTooltip = undefined;
     }
-    */
-
-    // TODO: remove
-
-    // $('div.wax-tooltip:first')
-    //     .removeClass('hidden')
-    //     .show();
-
-    // $(context).triggerHandler('removedtooltip', [feature, context, evt]);
 };
 wax.util = wax.util || {};
 
-
+// Utils are extracted from other libraries or
+// written from scratch to plug holes in browser compatibility.
 wax.util = {
     // From Bonzo
     offset: function(el) {
+        // TODO: window margin offset
         var width = el.offsetWidth;
         var height = el.offsetHeight;
         var top = el.offsetTop;
@@ -536,6 +521,8 @@ wax.util = {
         };
     },
     // From underscore, minus funcbind for now.
+    // Returns a version of a function that always has the second parameter,
+    // `obj`, as `this`.
     bind: function(func, obj) {
       var args = Array.prototype.slice.call(arguments, 2);
       return function() {
@@ -546,7 +533,7 @@ wax.util = {
     isString: function(obj) {
       return !!(obj === '' || (obj && obj.charCodeAt && obj.substr));
     },
-
+    // IE doesn't have indexOf
     indexOf: function(array, item) {
       var nativeIndexOf = Array.prototype.indexOf;
       if (array === null) return -1;
@@ -555,11 +542,11 @@ wax.util = {
       for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
       return -1;
     },
-
+    // is this object an array?
     isArray: Array.isArray || function(obj) {
       return Object.prototype.toString.call(obj) === '[object Array]';
     },
-
+    // From underscore: reimplement the ECMA5 `Object.keys()` methodb
     keys: Object.keys || function(obj) {
       var hasOwnProperty = Object.prototype.hasOwnProperty;
       if (obj !== Object(obj)) throw new TypeError('Invalid object');
@@ -567,8 +554,8 @@ wax.util = {
       for (var key in obj) if (hasOwnProperty.call(obj, key)) keys[keys.length] = key;
       return keys;
     },
-
-    // From quirksmode
+    // From quirksmode: normalize the offset of an event from the top-left
+    // of the page.
     eventoffset: function(e) {
         var posx = 0;
         var posy = 0;
@@ -577,14 +564,14 @@ wax.util = {
             return {
                 x: e.pageX,
                 y: e.pageY
-            }
+            };
         } else if (e.clientX || e.clientY) {
             return {
-                x: e.clientX + document.body.scrollLeft
-                    + document.documentElement.scrollLeft,
-                y: e.clientY + document.body.scrollTop
-                    + document.documentElement.scrollTop
-            }
+                x: e.clientX + document.body.scrollLeft +
+                    document.documentElement.scrollLeft,
+                y: e.clientY + document.body.scrollTop +
+                    document.documentElement.scrollTop
+            };
         }
     }
 };

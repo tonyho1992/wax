@@ -25,7 +25,8 @@ wax.fullscreen = function(map, opts) {
         },
 
         click: function(map) {
-            return this._click = this._click || wax.util.bind(function(e) {
+            if (this._click) return this._click;
+            else this._click = wax.util.bind(function(e) {
                 if (e) com.modestmaps.cancelEvent(e);
 
                 if (this.state) {
@@ -42,6 +43,7 @@ wax.fullscreen = function(map, opts) {
                 }
                 this.state = !this.state;
             }, this);
+            return this._click;
         }
     };
 
