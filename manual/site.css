@@ -6,6 +6,11 @@ body {
 a {
   color:#b64c4c;
   }
+div.header {
+  font:normal 10px/20px Verdana,sans-serif;
+  background:#fff;
+  padding:5px;
+}
 div.page {
   width:800px;
   margin-left:225px;
@@ -68,7 +73,7 @@ code {
 .navigation {
   width:200px;
   position:fixed;
-  top:10px;
+  top:50px;
   left:10px;
 }
 
