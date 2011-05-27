@@ -2,6 +2,14 @@
 var wax = wax || {};
 wax.ol = wax.ol || {};
 
+var addEv = function(element, name, observer) {
+    if (element.addEventListener) {
+        element.addEventListener(name, observer, false);
+    } else if (element.attachEvent) {
+        element.attachEvent('on' + name, observer);
+    }
+};
+
 // An interaction toolkit for tiles that implement the
 // [MBTiles UTFGrid spec](https://github.com/mapbox/mbtiles-spec)
 wax.ol.Interaction =
@@ -25,8 +33,8 @@ wax.ol.Interaction =
     },
 
     setMap: function(map) {
-        $(map.viewPortDiv).bind('mousemove', $.proxy(this.getInfoForHover, this));
-        $(map.viewPortDiv).bind('mouseout', $.proxy(this.resetLayers, this));
+        addEv(map.viewPortDiv, 'mousemove', wax.util.bind(this.getInfoForHover, this));
+        addEv(map.viewPortDiv, 'mouseout', wax.util.bind(this.resetLayers, this));
         this.clickHandler = new OpenLayers.Handler.Click(
             this, {
                 click: this.getInfoForClick
@@ -58,7 +66,7 @@ wax.ol.Interaction =
         layerfound: for (var j = 0; j < layers.length; j++) {
             for (var x = 0; x < layers[j].grid.length; x++) {
                 for (var y = 0; y < layers[j].grid[x].length; y++) {
-                    var divpos = $(layers[j].grid[x][y].imgDiv).offset();
+                    var divpos = wax.util.offset(layers[j].grid[x][y].imgDiv);
                     if (divpos &&
                         ((divpos.top < sevt.pageY) &&
                          ((divpos.top + 256) > sevt.pageY) &&
@@ -76,14 +84,16 @@ wax.ol.Interaction =
     // Get all interactable layers
     viableLayers: function() {
         if (this._viableLayers) return this._viableLayers;
-        return this._viableLayers = $(this.map.layers).filter(
-            function(i) {
-                // TODO: make better indication of whether
-                // this is an interactive layer
-                return (this.map.layers[i].visibility === true) &&
-                    (this.map.layers[i].CLASS_NAME === 'OpenLayers.Layer.TMS');
+        this._viableLayers = [];
+        for (var i in this.map.layers) {
+            // TODO: make better indication of whether
+            // this is an interactive layer
+            if ((this.map.layers[i].visibility === true) &&
+                (this.map.layers[i].CLASS_NAME === 'OpenLayers.Layer.TMS')) {
+              this._viableLayers.push(this.map.layers[i]);
             }
-        );
+        }
+        return this._viableLayers;
     },
 
     resetLayers: function() {
