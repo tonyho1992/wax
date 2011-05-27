@@ -1410,22 +1410,14 @@ wax.zoombox = function(map, opts) {
 
     var zoombox = {
         add: function(map) {
-            this.boxDiv = document.createElement('div');
-            this.boxDiv.id = map.parent.id + '-zoombox';
-            this.boxDiv.className = 'zoombox-box-container';
-            this.boxDiv.style.width =  map.dimensions.x + 'px';
-            this.boxDiv.style.height = map.dimensions.y + 'px';
-
             this.box = document.createElement('div');
             this.box.id = map.parent.id + '-zoombox-box';
             this.box.className = 'zoombox-box';
-            this.boxDiv.appendChild(this.box);
-
-            com.modestmaps.addEvent(this.boxDiv, 'mousedown', this.mouseDown());
-            map.parent.appendChild(this.boxDiv);
+            map.parent.appendChild(this.box);
+            com.modestmaps.addEvent(map.parent, 'mousedown', this.mouseDown());
         },
         remove: function() {
-            this.boxDiv.parentNode.removeChild(this.boxDiv);
+            map.parent.removeChild(this.box);
             map.removeCallback('mousedown', this.mouseDown);
         },
         getMousePoint: function(e) {
@@ -1494,7 +1486,7 @@ wax.zoombox = function(map, opts) {
 
                 map.parent.style.cursor = 'auto';
 
-                return com.modestmaps.cancelEvent(e);
+                // return com.modestmaps.cancelEvent(e);
             }, this);
             return this._mouseUp;
         }
