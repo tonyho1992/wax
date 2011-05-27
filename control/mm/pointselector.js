@@ -51,15 +51,7 @@ wax.pointselector = function(map, opts) {
         // Attach this control to a map by registering callbacks
         // and adding the overlay
         add: function(map) {
-            overlayDiv = document.createElement('div');
-            overlayDiv.id = map.parent.id + '-boxselector';
-            overlayDiv.className = 'pointselector-box-container';
-            overlayDiv.innerHTML = '&nbsp;';
-            overlayDiv.style.width = map.dimensions.x + 'px';
-            overlayDiv.style.height = map.dimensions.y + 'px';
-
-            map.parent.appendChild(overlayDiv);
-            MM.addEvent(overlayDiv, 'mousedown', this.mouseDown());
+            MM.addEvent(map.parent, 'mousedown', this.mouseDown());
             map.addCallback('drawn', pointselector.drawPoints());
             return this;
         },
@@ -90,7 +82,7 @@ wax.pointselector = function(map, opts) {
                                 pointselector.deletePoint(l, e);
                             };
                         })());
-                        overlayDiv.appendChild(locations[i].pointDiv);
+                        map.parent.appendChild(locations[i].pointDiv);
                     }
                     locations[i].pointDiv.style.left = point.x + 'px';
                     locations[i].pointDiv.style.top = point.y + 'px';
@@ -120,7 +112,6 @@ wax.pointselector = function(map, opts) {
                     callback(cleanLocations(locations));
                 }
                 mouseDownPoint = null;
-                MM.removeEvent(map.parent, 'mouseup', pointselector.mouseUp());
             }, this);
             return this._mouseUp;
         }
