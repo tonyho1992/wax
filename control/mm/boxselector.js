@@ -11,23 +11,16 @@ wax.boxselector = function(map, opts) {
 
     var boxselector = {
         add: function(map) {
-            this.containerDiv = document.createElement('div');
-            this.containerDiv.id = map.parent.id + '-zoombox';
-            this.containerDiv.className = 'boxselector-box-container';
-            this.containerDiv.style.width =  map.dimensions.x + 'px';
-            this.containerDiv.style.height = map.dimensions.y + 'px';
-
             this.boxDiv = document.createElement('div');
             this.boxDiv.id = map.parent.id + '-boxselector-box';
             this.boxDiv.className = 'boxselector-box';
-            this.containerDiv.appendChild(this.boxDiv);
-            map.parent.appendChild(this.containerDiv);
+            map.parent.appendChild(this.boxDiv);
 
-            com.modestmaps.addEvent(this.containerDiv, 'mousedown', this.mouseDown());
+            com.modestmaps.addEvent(map.parent, 'mousedown', this.mouseDown());
             map.addCallback('drawn', this.drawbox());
         },
         remove: function() {
-            this.containerDiv.parentNode.removeChild(this.containerDiv);
+            map.parent.removeChild(this.boxDiv);
             map.removeCallback('mousedown', this.drawbox());
         },
         getMousePoint: function(e) {
@@ -105,8 +98,6 @@ wax.boxselector = function(map, opts) {
                 com.modestmaps.removeEvent(map.parent, 'mouseup', this.mouseUp());
 
                 map.parent.style.cursor = 'auto';
-
-                return com.modestmaps.cancelEvent(e);
             }, this);
             return this._mouseUp;
         },
