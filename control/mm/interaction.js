@@ -96,7 +96,8 @@ wax.interaction = function(map, options) {
             if (!this._onMove) this._onMove = wax.util.bind(function(evt) {
                 var tile = this.getTile(evt);
                 if (tile) {
-                    this.waxGM.getGrid(tile.src, wax.util.bind(function(g) {
+                    this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
+                        if (err) return;
                         if (g) {
                             var feature = g.getFeature(evt.pageX, evt.pageY, tile, {
                                 format: 'teaser'

@@ -14,7 +14,7 @@ wax.request = {
     get: function(url, callback) {
         // Cache hit.
         if (this.cache[url]) {
-            return callback(this.cache[url]);
+            return callback(this.cache[url][0], this.cache[url][1]);
         // Cache miss.
         } else {
             this.promises[url] = this.promises[url] || [];
@@ -30,16 +30,16 @@ wax.request = {
                 jsonpCallback: 'callback',
                 success: function(data) {
                     that.locks[url] = false;
-                    that.cache[url] = data;
+                    that.cache[url] = [null, data];
                     for (var i = 0; i < that.promises[url].length; i++) {
-                        that.promises[url][i](that.cache[url]);
+                        that.promises[url][i](that.cache[url][0], that.cache[url][1]);
                     }
                 },
-                error: function() {
+                error: function(err) {
                     that.locks[url] = false;
-                    that.cache[url] = null;
+                    that.cache[url] = [err, null];
                     for (var i = 0; i < that.promises[url].length; i++) {
-                        that.promises[url][i](that.cache[url]);
+                        that.promises[url][i](that.cache[url][0], that.cache[url][1]);
                     }
                 }
             });
@@ -76,8 +76,8 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
   var tileX = offset.left;
   var tileY = offset.top;
 
-  if (Math.floor((y - tileY) / this.tileRes) > 256 ||
-    Math.floor((x - tileX) / this.tileRes) > 256) return;
+  if (Math.floor((y - tileY) / this.tileRes) > 256) return;
+  if (Math.floor((x - tileX) / this.tileRes) > 256) return;
 
   var key = this.grid_tile.grid[
      Math.floor((y - tileY) / this.tileRes)
@@ -112,11 +112,12 @@ wax.GridManager = function() {
 // and gets grid data, and tries to avoid re-downloading either.
 wax.GridManager.prototype.getGrid = function(url, callback) {
     var that = this;
-    that.getFormatter(that.formatterUrl(url), function(f) {
-        if (!f) return callback(false);
+    that.getFormatter(that.formatterUrl(url), function(err, f) {
+        if (err || !f) return callback(err, null);
 
-        wax.request.get(that.tileDataUrl(url), function(t) {
-            callback(new wax.GridInstance(t, f));
+        wax.request.get(that.tileDataUrl(url), function(err, t) {
+            if (err) return callback(err, null);
+            callback(null, new wax.GridInstance(t, f));
         });
     });
 };
@@ -146,16 +147,16 @@ wax.GridManager.prototype.getFormatter = function(url, callback) {
   var that = this;
   // Formatter is cached.
   if (typeof this.formatters[url] !== 'undefined') {
-    callback(this.formatters[url]);
+    callback(null, this.formatters[url]);
     return;
   } else {
-    wax.request.get(url, function(data) {
+    wax.request.get(url, function(err, data) {
         if (data && data.formatter) {
             that.formatters[url] = new wax.Formatter(data);
         } else {
             that.formatters[url] = false;
         }
-        callback(that.formatters[url]);
+        callback(err, that.formatters[url]);
     });
   }
 };
