@@ -1,3 +1,5 @@
+UGLIFYJS = ./node_modules/.bin/uglifyjs
+
 doc:
 	./node_modules/.bin/docco control/mm/*.js
 
@@ -13,15 +15,15 @@ lint:
 
 build/wax.ol.min.js:
 	cat lib/*.js control/lib/*.js control/ol/*.js > build/wax.ol.js
-	uglifyjs build/wax.ol.js > build/wax.ol.min.js
+	$(UGLIFYJS) build/wax.ol.js > build/wax.ol.min.js
 
 build/wax.g.min.js:
 	cat lib/*.js control/lib/*.js control/g/*.js connectors/g/*.js > build/wax.g.js
-	uglifyjs build/wax.g.js > build/wax.g.min.js
+	$(UGLIFYJS) build/wax.g.js > build/wax.g.min.js
 
 build/wax.mm.min.js:
 	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/mm/*.js connectors/mm/*.js > build/wax.mm.js
-	uglifyjs build/wax.mm.js > build/wax.mm.min.js
+	$(UGLIFYJS) build/wax.mm.js > build/wax.mm.min.js
 
 build_setup:
 	mkdir build

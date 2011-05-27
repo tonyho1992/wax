@@ -17,6 +17,7 @@
     ],
     "devDependencies": {
       "jshint": "0.2.x",
+      "uglify-js": "= x.x.x",
       "docco": "0.3.x"
     }
 }
