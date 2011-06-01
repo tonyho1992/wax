@@ -32,12 +32,11 @@ wax.Legend.prototype.render = function(urls) {
             this.container.appendChild(this.legends[url]);
         }
     }, this);
-    var renderLegend = function(data) {
-        if (data && data.legend) render(url, data.legend);
-    };
     for (var i = 0; i < urls.length; i++) {
         url = this.legendUrl(urls[i]);
-        wax.request.get(url, renderLegend);
+        wax.request.get(url, function(err, data) {
+            if (data && data.legend) render(url, data.legend);
+        });
     }
 };
 
