@@ -122,7 +122,7 @@ wax.Record = function(obj, context) {
         // @TODO: This is currently a stopgap measure that calls methods like
         // `foo.bar()` in the context of `foo`. It will probably be necessary
         // in the future to be able to call `foo.bar()` from other contexts.
-        if (cur && wax.util.indexOf('.', fn_name) === -1) {
+        if (cur && fn_name.indexOf('.') === -1) {
             return fn_obj[1].apply(cur, fn_args);
         } else {
             return fn_obj[1].apply(fn_obj[0], fn_args);
@@ -521,6 +521,14 @@ wax.util = {
             top += el.offsetTop;
             left += el.offsetLeft;
         }
+
+        // Offsets from the body
+        top += document.body.offsetTop;
+        left += document.body.offsetLeft;
+
+        // Offsets from the HTML element
+        top += document.body.parentNode.offsetTop;
+        left += document.body.parentNode.offsetLeft;
 
         return {
             top: top,

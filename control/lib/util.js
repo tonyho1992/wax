@@ -16,6 +16,14 @@ wax.util = {
             left += el.offsetLeft;
         }
 
+        // Offsets from the body
+        top += document.body.offsetTop;
+        left += document.body.offsetLeft;
+
+        // Offsets from the HTML element
+        top += document.body.parentNode.offsetTop;
+        left += document.body.parentNode.offsetLeft;
+
         return {
             top: top,
             left: left,

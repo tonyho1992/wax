@@ -122,7 +122,7 @@ wax.Record = function(obj, context) {
         // @TODO: This is currently a stopgap measure that calls methods like
         // `foo.bar()` in the context of `foo`. It will probably be necessary
         // in the future to be able to call `foo.bar()` from other contexts.
-        if (cur && wax.util.indexOf('.', fn_name) === -1) {
+        if (cur && fn_name.indexOf('.') === -1) {
             return fn_obj[1].apply(cur, fn_args);
         } else {
             return fn_obj[1].apply(fn_obj[0], fn_args);
@@ -522,6 +522,14 @@ wax.util = {
             left += el.offsetLeft;
         }
 
+        // Offsets from the body
+        top += document.body.offsetTop;
+        left += document.body.offsetLeft;
+
+        // Offsets from the HTML element
+        top += document.body.parentNode.offsetTop;
+        left += document.body.parentNode.offsetLeft;
+
         return {
             top: top,
             left: left,
@@ -784,16 +792,19 @@ wax.g.MapType = function(options) {
 // Get a tile element from a coordinate, zoom level, and an ownerDocument.
 wax.g.MapType.prototype.getTile = function(coord, zoom, ownerDocument) {
     var key = zoom + '/' + coord.x + '/' + coord.y;
-    this.cache[key] = this.cache[key] || $('<div></div>')
-        .addClass('interactive-div-' + zoom)
-        .width(256).height(256)
-        .data('gTileKey', key)
-        .append(
-            $('<img />')
-            .width(256).height(256)
-            .attr('src', this.getTileUrl(coord, zoom))
-            .error(function() { $(this).hide() })
-        )[0];
+    if (!this.cache[key]) {
+        this.cache[key] = document.createElement('div');
+        this.cache[key].className = 'interactive-div-' + zoom;
+        this.cache[key].style.width = 256;
+        this.cache[key].style.height = 256;
+        this.cache[key].setAttribute('gTileKey', key);
+        var img = document.createElement('img');
+        img.width = 256;
+        img.height = 256;
+        img.src = this.getTileUrl(coord, zoom);
+        img.onerror = function() { img.style.display = 'none'; };
+        this.cache[key].appendChild(img);
+    }
     return this.cache[key];
 };
 
@@ -801,9 +812,9 @@ wax.g.MapType.prototype.getTile = function(coord, zoom, ownerDocument) {
 //
 // TODO: expire cache data in the gridmanager.
 wax.g.MapType.prototype.releaseTile = function(tile) {
-    var key = $(tile).data('gTileKey');
+    var key = tile.getAttribute('gTileKey');
     this.cache[key] && delete this.cache[key];
-    $(tile).remove();
+    tile.parentNode && tile.parentNode.removeChild(tile);
 };
 
 // Get a tile url, based on x, y coordinates and a z value.
