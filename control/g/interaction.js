@@ -80,7 +80,7 @@ wax.g.Controls.prototype.interaction = function(options) {
         var found = find(this.map, evt);
         if (!found) return;
         gm.getGrid(found.tile.src, function(err, g) {
-            if (err) return;
+            if (err || !g) return;
             var feature = g.getFeature(
                 evt.pixel.x + wax.util.offset(that.mapDiv).left,
                 evt.pixel.y + wax.util.offset(that.mapDiv).top,
@@ -101,8 +101,8 @@ wax.g.Controls.prototype.interaction = function(options) {
         };
         var found = find(this.map, evt);
         if (!found) return;
-        gm.getGrid(found.tile.src, function(g) {
-            if (!g) return;
+        gm.getGrid(found.tile.src, function(err, g) {
+            if (err || !g) return;
             var feature = g.getFeature(
                 evt.pixel.x + wax.util.offset(that.mapDiv).left,
                 evt.pixel.y + wax.util.offset(that.mapDiv).top,
