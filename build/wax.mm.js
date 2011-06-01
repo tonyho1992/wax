@@ -397,30 +397,38 @@ wax.Formatter.prototype.format = function(options, data) {
 var wax = wax || {};
 
 wax.Legend = function(context, container) {
-    this.context = context;
-    this.container = container || $('<div class="wax-legends"></div>')[0];
     this.legends = {};
-    $(this.context).append(this.container);
+    this.context = context;
+    this.container = container;
+    if (!this.container) {
+        this.container = document.createElement('div');
+        this.container.className = 'wax-legends';
+    }
+    this.context.appendChild(this.container);
 };
 
 wax.Legend.prototype.render = function(urls) {
-    $('.wax-legend', this.container).hide();
-
+    var url;
+    for (url in this.legends) {
+        this.legends[url].style.display = 'none';
+    }
     var render = wax.util.bind(function(url, content) {
         if (!content) {
             this.legends[url] = false;
         } else if (this.legends[url]) {
-            this.legends[url].show();
+            this.legends[url].style.display = 'block';
         } else {
-            this.legends[url] = $("<div class='wax-legend'></div>").append(content);
-            this.container.append(this.legends[url]);
+            this.legends[url] = document.createElement('div');
+            this.legends[url].className = 'wax-legend';
+            this.legends[url].innerHTML = content;
+            this.container.appendChild(this.legends[url]);
         }
     }, this);
     var renderLegend = function(data) {
         if (data && data.legend) render(url, data.legend);
     };
     for (var i = 0; i < urls.length; i++) {
-        var url = this.legendUrl(urls[i]);
+        url = this.legendUrl(urls[i]);
         wax.request.get(url, renderLegend);
     }
 };
