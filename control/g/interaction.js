@@ -8,39 +8,37 @@ wax.g = wax.g || {};
 // Controls constructor.
 wax.g.Controls = function(map) {
     this.map = map;
-
-    // Find the map div reference. Munging of the google maps codebase makes
-    // the key to this reference unpredictable, hence we iterate to find.
-    this.mapDiv = false;
-    for (var key in map) {
-        // IE safe check for whether object is a DOM element.
-        if (map[key] && map[key].nodeType > 0) {
-            this.mapDiv = map[key];
-            break;
-        }
-    }
+    this.mapDiv = map.getDiv();
 };
 
 // Since Google Maps obscures mouseover events, grids need to calculated
 // in order to simulate them, and eventually do multi-layer interaction.
 wax.g.Controls.prototype.calculateGrid = function() {
-    if (this.map.interaction_grid) return;
+    var tiles = [];
+    var zoom = this.map.getZoom();
+    var mapOffset = wax.util.offset(this.mapDiv);
+
     // Get all 'marked' tiles, added by the `wax.g.MapType` layer.
-    var interactive_tiles = $('div.interactive-div-' + this.map.getZoom() + ' img', this.mapDiv);
-    var start_offset = $(this.mapDiv).offset();
     // Return an array of objects which have the **relative** offset of
     // each tile, with a reference to the tile object in `tile`, since the API
     // returns evt coordinates as relative to the map object.
-    var tiles = $(interactive_tiles).map(function(t) {
-        var e_offset = $(interactive_tiles[t]).offset();
-        return {
-            xy: {
-                left: e_offset.left - start_offset.left,
-                top: e_offset.top - start_offset.top
-            },
-            tile: interactive_tiles[t]
-        };
-    });
+    for (var i in this.map.mapTypes) {
+        if (!this.map.mapTypes[i].interactive) continue;
+
+        var mapType = this.map.mapTypes[i];
+        for (var key in mapType.cache) {
+            if (key.split('/')[0] != zoom) continue;
+
+            var tileOffset = wax.util.offset(mapType.cache[key]);
+            tiles.push({
+                xy: {
+                    left: tileOffset.left - mapOffset.left,
+                    top: tileOffset.top - mapOffset.top
+                },
+                tile: mapType.cache[key]
+            });
+        }
+    }
     return tiles;
 };
 
@@ -66,7 +64,7 @@ wax.g.Controls.prototype.interaction = function(options) {
         }
     };
 
-    var find = $.proxy(function(map, evt) {
+    var find = wax.util.bind(function(map, evt) {
         var found = false;
         var interaction_grid = this.calculateGrid();
         for (var i = 0; i < interaction_grid.length && !found; i++) {
@@ -81,17 +79,17 @@ wax.g.Controls.prototype.interaction = function(options) {
         var opt = { format: 'teaser' };
         var found = find(this.map, evt);
         if (!found) return;
-        gm.getGrid($(found.tile).attr('src'), function(g) {
-            if (!g) return;
+        gm.getGrid(found.tile.src, function(err, g) {
+            if (err) return;
             var feature = g.getFeature(
-                evt.pixel.x + $(that.mapDiv).offset().left,
-                evt.pixel.y + $(that.mapDiv).offset().top,
+                evt.pixel.x + wax.util.offset(that.mapDiv).left,
+                evt.pixel.y + wax.util.offset(that.mapDiv).top,
                 found.tile,
                 opt
             );
             if (feature !== f) {
-                callbacks.out(feature, $(that.mapDiv), 0);
-                callbacks.over(feature, $(that.mapDiv), 0);
+                callbacks.out(feature, that.mapDiv, 0);
+                callbacks.over(feature, that.mapDiv, 0);
                 f = feature;
             }
         });
@@ -103,17 +101,17 @@ wax.g.Controls.prototype.interaction = function(options) {
         };
         var found = find(this.map, evt);
         if (!found) return;
-        gm.getGrid($(found.tile).attr('src'), function(g) {
+        gm.getGrid(found.tile.src, function(g) {
             if (!g) return;
             var feature = g.getFeature(
-                evt.pixel.x + $(that.mapDiv).offset().left,
-                evt.pixel.y + $(that.mapDiv).offset().top,
+                evt.pixel.x + wax.util.offset(that.mapDiv).left,
+                evt.pixel.y + wax.util.offset(that.mapDiv).top,
                 found.tile,
                 opt
             );
             if (feature) {
                 if (opt.format == 'full') {
-                    callbacks.click(feature, $(that.mapDiv), 0);
+                    callbacks.click(feature, that.mapDiv, 0);
                 } else {
                     window.location = feature;
                 }

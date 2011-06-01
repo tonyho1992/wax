@@ -18,7 +18,7 @@ build/wax.ol.min.js:
 	$(UGLIFYJS) build/wax.ol.js > build/wax.ol.min.js
 
 build/wax.g.min.js:
-	cat lib/*.js control/lib/*.js control/g/*.js connectors/g/*.js > build/wax.g.js
+	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/g/*.js connectors/g/*.js > build/wax.g.js
 	$(UGLIFYJS) build/wax.g.js > build/wax.g.min.js
 
 build/wax.mm.min.js:

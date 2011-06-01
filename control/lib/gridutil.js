@@ -76,6 +76,8 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
   var tileX = offset.left;
   var tileY = offset.top;
 
+  if (y - tileY < 0) return;
+  if (x - tileX < 0) return;
   if (Math.floor((y - tileY) / this.tileRes) > 256) return;
   if (Math.floor((x - tileX) / this.tileRes) > 256) return;
 

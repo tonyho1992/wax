@@ -44,17 +44,10 @@ wax.g.MapType = function(options) {
 wax.g.MapType.prototype.getTile = function(coord, zoom, ownerDocument) {
     var key = zoom + '/' + coord.x + '/' + coord.y;
     if (!this.cache[key]) {
-        this.cache[key] = document.createElement('div');
-        this.cache[key].className = 'interactive-div-' + zoom;
-        this.cache[key].style.width = 256;
-        this.cache[key].style.height = 256;
+        var img = this.cache[key] = new Image(256, 256);
+        this.cache[key].src = this.getTileUrl(coord, zoom);
         this.cache[key].setAttribute('gTileKey', key);
-        var img = document.createElement('img');
-        img.width = 256;
-        img.height = 256;
-        img.src = this.getTileUrl(coord, zoom);
-        img.onerror = function() { img.style.display = 'none'; };
-        this.cache[key].appendChild(img);
+        this.cache[key].onerror = function() { img.style.display = 'none'; };
     }
     return this.cache[key];
 };
