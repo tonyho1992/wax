@@ -33,7 +33,10 @@ wax.interaction = function(map, options) {
         // Attach listeners to the map
         add: function() {
             for (var i = 0; i < this.modifyingEvents.length; i++) {
-                map.addCallback(this.modifyingEvents[i], this.clearMap);
+                map.addCallback(
+                    this.modifyingEvents[i],
+                    wax.util.bind(this.clearTileGrid, this)
+                );
             }
             MM.addEvent(map.parent, 'mousemove', this.onMove());
             MM.addEvent(map.parent, 'mousedown', this.mouseDown());
@@ -62,7 +65,7 @@ wax.interaction = function(map, options) {
         },
 
         clearTileGrid: function(map, e) {
-            this._waxGetTileGrid = null;
+            this._getTileGrid = null;
         },
 
         getTile: function(evt) {
