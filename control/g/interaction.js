@@ -49,11 +49,7 @@ wax.g.Controls.prototype.interaction = function(options) {
     var f = null;
 
     // This requires wax.Tooltip or similar
-    var callbacks = options.callbacks || {
-        out: wax.tooltip.unselect,
-        over: wax.tooltip.select,
-        click: wax.tooltip.click
-    };
+    var callbacks = options.callbacks || new wax.tooltip();
 
     var inTile = function(sevt, xy) {
         if ((xy.top < sevt.y) &&
