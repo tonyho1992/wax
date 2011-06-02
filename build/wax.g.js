@@ -1,4 +1,10 @@
-// Instantiate objects based on a JSON "record". The record must be a statement
+/*!
+  * Reqwest! A x-browser general purpose XHR connection manager
+  * copyright Dustin Diaz 2011
+  * https://github.com/ded/reqwest
+  * license MIT
+  */
+!function(window){function serial(a){var b=a.name;if(a.disabled||!b)return"";b=enc(b);switch(a.tagName.toLowerCase()){case"input":switch(a.type){case"reset":case"button":case"image":case"file":return"";case"checkbox":case"radio":return a.checked?b+"="+(a.value?enc(a.value):!0)+"&":"";default:return b+"="+(a.value?enc(a.value):!0)+"&"}break;case"textarea":return b+"="+enc(a.value)+"&";case"select":return b+"="+enc(a.options[a.selectedIndex].value)+"&"}return""}function enc(a){return encodeURIComponent(a)}function reqwest(a,b){return new Reqwest(a,b)}function init(o,fn){function error(a){o.error&&o.error(a),complete(a)}function success(resp){o.timeout&&clearTimeout(self.timeout)&&(self.timeout=null);var r=resp.responseText;switch(type){case"json":resp=eval("("+r+")");break;case"js":resp=eval(r);break;case"html":resp=r}fn(resp),o.success&&o.success(resp),complete(resp)}function complete(a){o.complete&&o.complete(a)}this.url=typeof o=="string"?o:o.url,this.timeout=null;var type=o.type||setType(this.url),self=this;fn=fn||function(){},o.timeout&&(this.timeout=setTimeout(function(){self.abort(),error()},o.timeout)),this.request=getRequest(o,success,error)}function setType(a){if(/\.json$/.test(a))return"json";if(/\.jsonp$/.test(a))return"jsonp";if(/\.js$/.test(a))return"js";if(/\.html?$/.test(a))return"html";if(/\.xml$/.test(a))return"xml";return"js"}function Reqwest(a,b){this.o=a,this.fn=b,init.apply(this,arguments)}function getRequest(a,b,c){if(a.type!="jsonp"){var f=xhr();f.open(a.method||"GET",typeof a=="string"?a:a.url,!0),setHeaders(f,a),f.onreadystatechange=readyState(f,b,c),a.before&&a.before(f),f.send(a.data||null);return f}var d=doc.createElement("script"),e=getCallbackName(a);window[e]=generalCallback,d.type="text/javascript",d.src=a.url,d.async=!0,d.onload=function(){a.success&&a.success(lastValue),lastValue=undefined,head.removeChild(d)},head.insertBefore(d,topScript)}function generalCallback(a){lastValue=a}function getCallbackName(a){var b=a.jsonpCallback||"callback";if(a.url.substr(-(b.length+2))==b+"=?"){var c="reqwest_"+uniqid++;a.url=a.url.substr(0,a.url.length-1)+c;return c}var d=new RegExp(b+"=([\\w]+)");return a.url.match(d)[1]}function setHeaders(a,b){var c=b.headers||{};c.Accept="text/javascript, text/html, application/xml, text/xml, */*",c["X-Requested-With"]=c["X-Requested-With"]||"XMLHttpRequest";if(b.data){c["Content-type"]="application/x-www-form-urlencoded";for(var d in c)c.hasOwnProperty(d)&&a.setRequestHeader(d,c[d],!1)}}function readyState(a,b,c){return function(){a&&a.readyState==4&&(twoHundo.test(a.status)?b(a):c(a))}}var twoHundo=/^20\d$/,doc=document,byTag="getElementsByTagName",topScript=doc[byTag]("script")[0],head=topScript.parentNode,xhr="XMLHttpRequest"in window?function(){return new XMLHttpRequest}:function(){return new ActiveXObject("Microsoft.XMLHTTP")},uniqid=0,lastValue;Reqwest.prototype={abort:function(){this.request.abort()},retry:function(){init.call(this,this.o,this.fn)}},reqwest.serialize=function(a){var b=a[byTag]("input"),c=a[byTag]("select"),d=a[byTag]("textarea");return(v(b).chain().toArray().map(serial).value().join("")+v(c).chain().toArray().map(serial).value().join("")+v(d).chain().toArray().map(serial).value().join("")).replace(/&$/,"")},reqwest.serializeArray=function(a){for(var b=this.serialize(a).split("&"),c=0,d=b.length,e=[],f;c<d;c++)b[c]&&(f=b[c].split("="))&&e.push({name:f[0],value:f[1]});return e};var old=window.reqwest;reqwest.noConflict=function(){window.reqwest=old;return this},window.reqwest=reqwest}(this)// Instantiate objects based on a JSON "record". The record must be a statement
 // array in the following form:
 //
 //     [ "{verb} {subject}", arg0, arg1, arg2, ... argn ]
@@ -273,6 +279,8 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
   var tileX = offset.left;
   var tileY = offset.top;
 
+  if (y - tileY < 0) return;
+  if (x - tileX < 0) return;
   if (Math.floor((y - tileY) / this.tileRes) > 256) return;
   if (Math.floor((x - tileX) / this.tileRes) > 256) return;
 
@@ -418,12 +426,11 @@ wax.Legend.prototype.render = function(urls) {
             this.container.appendChild(this.legends[url]);
         }
     }, this);
-    var renderLegend = function(data) {
-        if (data && data.legend) render(url, data.legend);
-    };
     for (var i = 0; i < urls.length; i++) {
         url = this.legendUrl(urls[i]);
-        wax.request.get(url, renderLegend);
+        wax.request.get(url, function(err, data) {
+            if (data && data.legend) render(url, data.legend);
+        });
     }
 };
 
@@ -520,6 +527,19 @@ wax.util = {
         while (el = el.offsetParent) {
             top += el.offsetTop;
             left += el.offsetLeft;
+
+            // Add additional CSS3 transform handling.
+            // These features are used by Google Maps API V3.
+            var style = el.style['transform'] ||
+                el.style['-webkit-transform'] ||
+                el.style['MozTransform'];
+            if (style) {
+                var match = style.match(/translate\((.+)px, (.+)px\)/);
+                if (match) {
+                    top += parseInt(match[2]);
+                    left += parseInt(match[1]);
+                }
+            }
         }
 
         // Offsets from the body
@@ -602,39 +622,37 @@ wax.g = wax.g || {};
 // Controls constructor.
 wax.g.Controls = function(map) {
     this.map = map;
-
-    // Find the map div reference. Munging of the google maps codebase makes
-    // the key to this reference unpredictable, hence we iterate to find.
-    this.mapDiv = false;
-    for (var key in map) {
-        // IE safe check for whether object is a DOM element.
-        if (map[key] && map[key].nodeType > 0) {
-            this.mapDiv = map[key];
-            break;
-        }
-    }
+    this.mapDiv = map.getDiv();
 };
 
 // Since Google Maps obscures mouseover events, grids need to calculated
 // in order to simulate them, and eventually do multi-layer interaction.
 wax.g.Controls.prototype.calculateGrid = function() {
-    if (this.map.interaction_grid) return;
+    var tiles = [];
+    var zoom = this.map.getZoom();
+    var mapOffset = wax.util.offset(this.mapDiv);
+
     // Get all 'marked' tiles, added by the `wax.g.MapType` layer.
-    var interactive_tiles = $('div.interactive-div-' + this.map.getZoom() + ' img', this.mapDiv);
-    var start_offset = $(this.mapDiv).offset();
     // Return an array of objects which have the **relative** offset of
     // each tile, with a reference to the tile object in `tile`, since the API
     // returns evt coordinates as relative to the map object.
-    var tiles = $(interactive_tiles).map(function(t) {
-        var e_offset = $(interactive_tiles[t]).offset();
-        return {
-            xy: {
-                left: e_offset.left - start_offset.left,
-                top: e_offset.top - start_offset.top
-            },
-            tile: interactive_tiles[t]
-        };
-    });
+    for (var i in this.map.mapTypes) {
+        if (!this.map.mapTypes[i].interactive) continue;
+
+        var mapType = this.map.mapTypes[i];
+        for (var key in mapType.cache) {
+            if (key.split('/')[0] != zoom) continue;
+
+            var tileOffset = wax.util.offset(mapType.cache[key]);
+            tiles.push({
+                xy: {
+                    left: tileOffset.left - mapOffset.left,
+                    top: tileOffset.top - mapOffset.top
+                },
+                tile: mapType.cache[key]
+            });
+        }
+    }
     return tiles;
 };
 
@@ -660,7 +678,7 @@ wax.g.Controls.prototype.interaction = function(options) {
         }
     };
 
-    var find = $.proxy(function(map, evt) {
+    var find = wax.util.bind(function(map, evt) {
         var found = false;
         var interaction_grid = this.calculateGrid();
         for (var i = 0; i < interaction_grid.length && !found; i++) {
@@ -675,17 +693,17 @@ wax.g.Controls.prototype.interaction = function(options) {
         var opt = { format: 'teaser' };
         var found = find(this.map, evt);
         if (!found) return;
-        gm.getGrid($(found.tile).attr('src'), function(g) {
-            if (!g) return;
+        gm.getGrid(found.tile.src, function(err, g) {
+            if (err || !g) return;
             var feature = g.getFeature(
-                evt.pixel.x + $(that.mapDiv).offset().left,
-                evt.pixel.y + $(that.mapDiv).offset().top,
+                evt.pixel.x + wax.util.offset(that.mapDiv).left,
+                evt.pixel.y + wax.util.offset(that.mapDiv).top,
                 found.tile,
                 opt
             );
             if (feature !== f) {
-                callbacks.out(feature, $(that.mapDiv), 0);
-                callbacks.over(feature, $(that.mapDiv), 0);
+                callbacks.out(feature, that.mapDiv, 0);
+                callbacks.over(feature, that.mapDiv, 0);
                 f = feature;
             }
         });
@@ -697,17 +715,17 @@ wax.g.Controls.prototype.interaction = function(options) {
         };
         var found = find(this.map, evt);
         if (!found) return;
-        gm.getGrid($(found.tile).attr('src'), function(g) {
-            if (!g) return;
+        gm.getGrid(found.tile.src, function(err, g) {
+            if (err || !g) return;
             var feature = g.getFeature(
-                evt.pixel.x + $(that.mapDiv).offset().left,
-                evt.pixel.y + $(that.mapDiv).offset().top,
+                evt.pixel.x + wax.util.offset(that.mapDiv).left,
+                evt.pixel.y + wax.util.offset(that.mapDiv).top,
                 found.tile,
                 opt
             );
             if (feature) {
                 if (opt.format == 'full') {
-                    callbacks.click(feature, $(that.mapDiv), 0);
+                    callbacks.click(feature, that.mapDiv, 0);
                 } else {
                     window.location = feature;
                 }
@@ -720,33 +738,32 @@ wax.g.Controls.prototype.interaction = function(options) {
 };
 
 wax.g.Controls.prototype.legend = function() {
-    var legend = new wax.Legend($(this.mapDiv)),
+    var legend = new wax.Legend(this.mapDiv),
         url = null;
 
     // Ideally we would use the 'tilesloaded' event here. This doesn't seem to
     // work so we use the much less appropriate 'idle' event.
-    google.maps.event.addListener(this.map, 'idle', $.proxy(function() {
+    google.maps.event.addListener(this.map, 'idle', wax.util.bind(function() {
         if (url) return;
-        var img = $('div.interactive-div-' + this.map.getZoom() + ' img:first',
-            this.mapDiv);
-        img && (url = img.attr('src')) && legend.render([url]);
+
+        // Get a tile URL for each relevant layer, from which legend URLs
+        // are derived.
+        url = [];
+        for (var i in this.map.mapTypes) {
+            if (!this.map.mapTypes[i].interactive) continue;
+            var mapType = this.map.mapTypes[i];
+            for (var key in mapType.cache) {
+                url.push(mapType.cache[key].src);
+                break;
+            }
+        };
+        url.length && legend.render(url);
     }, this));
 
     // Ensure chainability
     return this;
 };
 
-wax.g.Controls.prototype.embedder = function(script_id) {
-    $(this.mapDiv).prepend($('<input type="text" class="embed-src" />')
-    .css({
-        'z-index': '9999999999',
-        'position': 'relative'
-    })
-    .val("<div id='" + script_id + "'>" + $('#' + script_id).html() + '</div>'));
-    
-    // Ensure chainability
-    return this;
-};
 // Wax for Google Maps API v3
 // --------------------------
 
@@ -793,17 +810,10 @@ wax.g.MapType = function(options) {
 wax.g.MapType.prototype.getTile = function(coord, zoom, ownerDocument) {
     var key = zoom + '/' + coord.x + '/' + coord.y;
     if (!this.cache[key]) {
-        this.cache[key] = document.createElement('div');
-        this.cache[key].className = 'interactive-div-' + zoom;
-        this.cache[key].style.width = 256;
-        this.cache[key].style.height = 256;
+        var img = this.cache[key] = new Image(256, 256);
+        this.cache[key].src = this.getTileUrl(coord, zoom);
         this.cache[key].setAttribute('gTileKey', key);
-        var img = document.createElement('img');
-        img.width = 256;
-        img.height = 256;
-        img.src = this.getTileUrl(coord, zoom);
-        img.onerror = function() { img.style.display = 'none'; };
-        this.cache[key].appendChild(img);
+        this.cache[key].onerror = function() { img.style.display = 'none'; };
     }
     return this.cache[key];
 };

@@ -279,6 +279,8 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
   var tileX = offset.left;
   var tileY = offset.top;
 
+  if (y - tileY < 0) return;
+  if (x - tileX < 0) return;
   if (Math.floor((y - tileY) / this.tileRes) > 256) return;
   if (Math.floor((x - tileX) / this.tileRes) > 256) return;
 
@@ -424,12 +426,11 @@ wax.Legend.prototype.render = function(urls) {
             this.container.appendChild(this.legends[url]);
         }
     }, this);
-    var renderLegend = function(data) {
-        if (data && data.legend) render(url, data.legend);
-    };
     for (var i = 0; i < urls.length; i++) {
         url = this.legendUrl(urls[i]);
-        wax.request.get(url, renderLegend);
+        wax.request.get(url, function(err, data) {
+            if (data && data.legend) render(url, data.legend);
+        });
     }
 };
 
@@ -526,6 +527,19 @@ wax.util = {
         while (el = el.offsetParent) {
             top += el.offsetTop;
             left += el.offsetLeft;
+
+            // Add additional CSS3 transform handling.
+            // These features are used by Google Maps API V3.
+            var style = el.style['transform'] ||
+                el.style['-webkit-transform'] ||
+                el.style['MozTransform'];
+            if (style) {
+                var match = style.match(/translate\((.+)px, (.+)px\)/);
+                if (match) {
+                    top += parseInt(match[2]);
+                    left += parseInt(match[1]);
+                }
+            }
         }
 
         // Offsets from the body
