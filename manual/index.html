@@ -138,7 +138,9 @@ var m = new mm.Map('modestmaps-interaction',
     new wax.provider({
       baseUrl: 'http://a.tiles.mapbox.com/devseed/',
       layerName: 'excess-properties'}), new mm.Point(448,300))
-wax.interaction(m);
+wax.interaction(m, {
+  callbacks: new wax.tooltip({ animationOut: 'wax-fade' })
+  });
 m.setCenterZoom(
   new com.modestmaps.Location(38.8225909, -97.5585),
   4);

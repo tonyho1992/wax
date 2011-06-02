@@ -17,14 +17,14 @@ wax.util = {
 
             // Add additional CSS3 transform handling.
             // These features are used by Google Maps API V3.
-            var style = el.style['transform'] ||
+            var style = el.style.transform ||
                 el.style['-webkit-transform'] ||
-                el.style['MozTransform'];
+                el.style.MozTransform;
             if (style) {
                 var match = style.match(/translate\((.+)px, (.+)px\)/);
                 if (match) {
-                    top += parseInt(match[2]);
-                    left += parseInt(match[1]);
+                    top += parseInt(match[2], 10);
+                    left += parseInt(match[1], 10);
                 }
             }
         }

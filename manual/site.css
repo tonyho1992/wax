@@ -125,3 +125,17 @@ a.wax-fullscreen {
   left:5px;
   z-index:99999;
   }
+
+  @-webkit-keyframes wax-fade {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  .wax-fade {
+     -webkit-animation-name:wax-fade;
+     -webkit-animation-duration:0.5s;
+     -webkit-animation-iteration-count:1;
+   }

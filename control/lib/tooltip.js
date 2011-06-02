@@ -10,9 +10,19 @@ wax.tooltip = {};
 // TODO: make this a non-global
 var _currentTooltip;
 
+var waxRemoveTooltip = function() {
+    this.parentNode.removeChild(this);
+};
+
+wax.tooltip = function(options) {
+    options = options || {};
+    if (options.animationOut) this.animationOut = options.animationOut;
+    if (options.animationIn) this.animationIn = options.animationIn;
+};
+
 // Get the active tooltip for a layer or create a new one if no tooltip exists.
 // Hide any tooltips on layers underneath this one.
-wax.tooltip.getToolTip = function(feature, context, index, evt) {
+wax.tooltip.prototype.getToolTip = function(feature, context, index, evt) {
     tooltip = document.createElement('div');
     tooltip.className = 'wax-tooltip wax-tooltip-' + index;
     tooltip.innerHTML = feature;
@@ -22,8 +32,8 @@ wax.tooltip.getToolTip = function(feature, context, index, evt) {
 
 // Expand a tooltip to be a "popup". Suspends all other tooltips from being
 // shown until this popup is closed or another popup is opened.
-wax.tooltip.click = function(feature, context, index) {
-    var tooltip = wax.tooltip.getToolTip(feature, context, index);
+wax.tooltip.prototype.click = function(feature, context, index) {
+    var tooltip = this.getToolTip(feature, context, index);
     var close = document.createElement('a');
     close.href = '#close';
     close.className = 'close';
@@ -38,18 +48,29 @@ wax.tooltip.click = function(feature, context, index) {
 };
 
 // Show a tooltip.
-wax.tooltip.select = function(feature, context, layer_id, evt) {
+wax.tooltip.prototype.select = function(feature, context, layer_id, evt) {
     if (!feature) return;
-    _currentTooltip = wax.tooltip.getToolTip(feature, context, layer_id, evt);
+    _currentTooltip = this.getToolTip(feature, context, layer_id, evt);
     context.style.cursor = 'pointer';
 };
 
+
 // Hide all tooltips on this layer and show the first hidden tooltip on the
 // highest layer underneath if found.
-wax.tooltip.unselect = function(feature, context, layer_id, evt) {
+wax.tooltip.prototype.unselect = function(feature, context, layer_id, evt) {
     context.style.cursor = 'default';
     if (_currentTooltip) {
-      _currentTooltip.parentNode.removeChild(_currentTooltip);
-      _currentTooltip = undefined;
+        // In WebKit browsers, support nice CSS animations.
+        // This is possible in -moz browsers but will need writing.
+        if (_currentTooltip.style['-webkit-animationName'] !== undefined && this.animationOut) {
+            _currentTooltip.addEventListener('webkitAnimationEnd', waxRemoveTooltip, false);
+            _currentTooltip.className += ' ' + this.animationOut;
+        } else {
+            _currentTooltip.parentNode.removeChild(_currentTooltip);
+        }
     }
 };
+
+wax.tooltip.prototype.out = wax.tooltip.prototype.unselect;
+wax.tooltip.prototype.over = wax.tooltip.prototype.select;
+wax.tooltip.prototype.click = wax.tooltip.prototype.click;

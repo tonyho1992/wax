@@ -22,11 +22,7 @@ wax.interaction = function(map, options) {
         waxGM: new wax.GridManager(),
 
         // This requires wax.Tooltip or similar
-        callbacks: options.callbacks || {
-            out: wax.tooltip.unselect,
-            over: wax.tooltip.select,
-            click: wax.tooltip.click
-        },
+        callbacks: options.callbacks || new wax.tooltip(),
 
         clickAction: options.clickAction || 'full',
 
