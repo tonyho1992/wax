@@ -106,15 +106,15 @@ wax.interaction = function(map, options) {
                             if (feature) {
                                 if (feature && this.feature !== feature) {
                                     this.feature = feature;
-                                    this.callbacks.out(feature, map.parent, 0, evt);
+                                    this.callbacks.out(map.parent);
                                     this.callbacks.over(feature, map.parent, 0, evt);
                                 } else if (!feature) {
                                     this.feature = null;
-                                    this.callbacks.out(feature, map.parent, 0, evt);
+                                    this.callbacks.out(map.parent);
                                 }
                             } else {
                                 this.feature = null;
-                                this.callbacks.out({}, map.parent, 0, evt);
+                                this.callbacks.out(map.parent);
                             }
                         }
                     }, this));

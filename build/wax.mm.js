@@ -470,6 +470,9 @@ var _currentTooltip;
 
 var waxRemoveTooltip = function() {
     this.parentNode.removeChild(this);
+    if (_currentTooltip) {
+        _currentTooltip = undefined;
+    }
 };
 
 wax.tooltip = function(options) {
@@ -515,7 +518,7 @@ wax.tooltip.prototype.select = function(feature, context, layer_id, evt) {
 
 // Hide all tooltips on this layer and show the first hidden tooltip on the
 // highest layer underneath if found.
-wax.tooltip.prototype.unselect = function(feature, context, layer_id, evt) {
+wax.tooltip.prototype.unselect = function(context) {
     context.style.cursor = 'default';
     if (_currentTooltip) {
         // In WebKit browsers, support nice CSS animations.
@@ -525,6 +528,7 @@ wax.tooltip.prototype.unselect = function(feature, context, layer_id, evt) {
             _currentTooltip.className += ' ' + this.animationOut;
         } else {
             _currentTooltip.parentNode.removeChild(_currentTooltip);
+            _currentTooltip = undefined;
         }
     }
 };
@@ -1045,15 +1049,15 @@ wax.interaction = function(map, options) {
                             if (feature) {
                                 if (feature && this.feature !== feature) {
                                     this.feature = feature;
-                                    this.callbacks.out(feature, map.parent, 0, evt);
+                                    this.callbacks.out(map.parent);
                                     this.callbacks.over(feature, map.parent, 0, evt);
                                 } else if (!feature) {
                                     this.feature = null;
-                                    this.callbacks.out(feature, map.parent, 0, evt);
+                                    this.callbacks.out(map.parent);
                                 }
                             } else {
                                 this.feature = null;
-                                this.callbacks.out({}, map.parent, 0, evt);
+                                this.callbacks.out(map.parent);
                             }
                         }
                     }, this));

@@ -74,7 +74,7 @@ wax.ol.Interaction =
                          (divpos.left < sevt.pageX) &&
                          ((divpos.left + 256) > sevt.pageX))) {
                         tiles.push(layers[j].grid[x][y]);
-                    continue layerfound;
+                        continue layerfound;
                     }
                 }
             }
@@ -99,7 +99,7 @@ wax.ol.Interaction =
 
     resetLayers: function() {
         this._viableLayers = null;
-        this.callbacks['out'](null, this.map.viewPortDiv, null);
+        this.callbacks.out(this.map.viewPortDiv);
     },
 
     // React to a click mouse event
@@ -153,21 +153,17 @@ wax.ol.Interaction =
                         if (!tiles[t]) return;
                         if (feature && that.feature[t] !== feature) {
                             that.feature[t] = feature;
-                            that.callbacks.out(feature, tiles[t].layer.map.div, t, evt);
+                            that.callbacks.out(tiles[t].layer.map.div);
                             that.callbacks.over(feature, tiles[t].layer.map.div, t, evt);
                         } else if (!feature) {
                             that.feature[t] = null;
-                            that.callbacks.out(feature, tiles[t].layer.map.div, t, evt);
+                            that.callbacks.out(tiles[t].layer.map.div);
                         }
                     } else {
                         // Request this feature
                         // TODO(tmcw) re-add layer
                         that.feature[t] = null;
-                        if (tiles[t]) {
-                            that.callbacks.out({}, tiles[t].layer.map.div, t, evt);
-                        } else {
-                            that.callbacks.out({}, false, t);
-                        }
+                        that.callbacks.out(tiles[t].layer.map.div);
                     }
                 }
             });
