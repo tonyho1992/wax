@@ -23,7 +23,7 @@ Modest Maps is the primary target for Wax, given its simplicity and high quality
 * `wax.zoombox()`
 * `wax.hash()`
 
-#### OpenLayers
+#### OpenLayers (tested in 2.9-2.10)
 
 * `wax.ol.Interaction`
 * `wax.ol.Legend`
