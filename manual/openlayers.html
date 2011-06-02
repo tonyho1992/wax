@@ -54,26 +54,26 @@ for which OpenLayers has a layer type.
 </pre>
 <div class='section'>
 <div id='openlayers-simple' class='map dark'>
-<span class='attribution'>
-    <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
-</span>
 </div>
 <pre class='sh_javascript run'>
-OpenLayers.ImgPath = "http://js.mapbox.com/theme/dark/";
+OpenLayers.ImgPath = 'http://js.mapbox.com/theme/dark/';
 var map = new OpenLayers.Map('openlayers-simple', {
   units: 'm',
-  projection: new OpenLayers.Projection("EPSG:900913"),
+  projection: new OpenLayers.Projection('EPSG:900913'),
   maxExtent: new OpenLayers.Bounds(-20037508.34,
     -20037508.34,
     20037508.34,
     20037508.34),
 });
+
 map.addLayer(new OpenLayers.Layer.TMS('world-glass',
-  'http://a.tiles.mapbox.com/mapbox/', {
+  'http://a.tiles.mapbox.com/devseed/', {
   maxResolution: 156543.0339,
   type: 'png',
-  layername: 'world-glass'
+  layername: 'excess-properties'
 }));
+
+map.addControl(new wax.ol.Interaction());
 map.zoomTo(1);
 </pre>
 </div>
@@ -86,15 +86,12 @@ map.zoomTo(1);
 </pre>
 <div class='section'>
 <div id='openlayers-interaction' class='map dark'>
-<span class='attribution'>
-    <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
-</span>
 </div>
 <pre class='sh_javascript run'>
-OpenLayers.ImgPath = "http://js.mapbox.com/theme/dark/";
+OpenLayers.ImgPath = 'http://js.mapbox.com/theme/dark/';
 var map = new OpenLayers.Map('openlayers-interaction', {
   units: 'm',
-  projection: new OpenLayers.Projection("EPSG:900913"),
+  projection: new OpenLayers.Projection('EPSG:900913'),
   maxExtent: new OpenLayers.Bounds(-20037508.34,
     -20037508.34,
     20037508.34,

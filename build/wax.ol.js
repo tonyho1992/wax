@@ -683,11 +683,7 @@ wax.ol.Interaction =
         this.clickAction = this.options.clickAction || 'full';
         OpenLayers.Control.prototype.initialize.apply(this, [this.options || {}]);
 
-        this.callbacks = {
-            out: wax.tooltip.unselect,
-            over: wax.tooltip.select,
-            click: wax.tooltip.click
-        };
+        this.callbacks = this.options.callbacks || new wax.tooltip();
     },
 
     setMap: function(map) {
@@ -724,7 +720,12 @@ wax.ol.Interaction =
         layerfound: for (var j = 0; j < layers.length; j++) {
             for (var x = 0; x < layers[j].grid.length; x++) {
                 for (var y = 0; y < layers[j].grid[x].length; y++) {
-                    var divpos = wax.util.offset(layers[j].grid[x][y].imgDiv);
+                    // Ah, the OpenLayers junkpile. Change everything in
+                    // 0.x.0 releases? Sure!
+                    if (layers[j].grid[x][y].imgDiv) {
+                        layers[j].grid[x][y].frame == layers[j].grid[x][y].imgDiv;
+                    }
+                    var divpos = wax.util.offset(layers[j].grid[x][y].frame);
                     if (divpos &&
                         ((divpos.top < sevt.pageY) &&
                          ((divpos.top + 256) > sevt.pageY) &&
@@ -756,7 +757,7 @@ wax.ol.Interaction =
 
     resetLayers: function() {
         this._viableLayers = null;
-        this.callbacks['out']();
+        this.callbacks['out'](null, this.map.viewPortDiv, null);
     },
 
     // React to a click mouse event
@@ -769,9 +770,9 @@ wax.ol.Interaction =
         var that = this;
 
         for (var t = 0; t < tiles.length; t++) {
-            this.gm.getGrid(tiles[t].url, function(g) {
+            this.gm.getGrid(tiles[t].url, function(err, g) {
                 if (!g) return;
-                var feature = g.getFeature(evt.pageX, evt.pageY, tiles[t].imgDiv, {
+                var feature = g.getFeature(evt.pageX, evt.pageY, tiles[t].frame, {
                     format: that.clickAction
                 });
                 if (feature) {
@@ -802,9 +803,10 @@ wax.ol.Interaction =
         for (var t = 0; t < tiles.length; t++) {
             // This features has already been loaded, or
             // is currently being requested.
-            this.gm.getGrid(tiles[t].url, function(g) {
+            this.gm.getGrid(tiles[t].url, function(err, g) {
                 if (g && tiles[t]) {
-                    var feature = g.getFeature(evt.pageX, evt.pageY, tiles[t].imgDiv, options);
+                    var feature = g.getFeature(evt.pageX, evt.pageY, tiles[t].frame, options);
+
                     if (feature) {
                         if (!tiles[t]) return;
                         if (feature && that.feature[t] !== feature) {
