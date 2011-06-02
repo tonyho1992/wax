@@ -124,30 +124,29 @@ wax.g.Controls.prototype.interaction = function(options) {
 };
 
 wax.g.Controls.prototype.legend = function() {
-    var legend = new wax.Legend($(this.mapDiv)),
+    var legend = new wax.Legend(this.mapDiv),
         url = null;
 
     // Ideally we would use the 'tilesloaded' event here. This doesn't seem to
     // work so we use the much less appropriate 'idle' event.
-    google.maps.event.addListener(this.map, 'idle', $.proxy(function() {
+    google.maps.event.addListener(this.map, 'idle', wax.util.bind(function() {
         if (url) return;
-        var img = $('div.interactive-div-' + this.map.getZoom() + ' img:first',
-            this.mapDiv);
-        img && (url = img.attr('src')) && legend.render([url]);
+
+        // Get a tile URL for each relevant layer, from which legend URLs
+        // are derived.
+        url = [];
+        for (var i in this.map.mapTypes) {
+            if (!this.map.mapTypes[i].interactive) continue;
+            var mapType = this.map.mapTypes[i];
+            for (var key in mapType.cache) {
+                url.push(mapType.cache[key].src);
+                break;
+            }
+        };
+        url.length && legend.render(url);
     }, this));
 
     // Ensure chainability
     return this;
 };
 
-wax.g.Controls.prototype.embedder = function(script_id) {
-    $(this.mapDiv).prepend($('<input type="text" class="embed-src" />')
-    .css({
-        'z-index': '9999999999',
-        'position': 'relative'
-    })
-    .val("<div id='" + script_id + "'>" + $('#' + script_id).html() + '</div>'));
-    
-    // Ensure chainability
-    return this;
-};
