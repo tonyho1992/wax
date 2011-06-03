@@ -72,8 +72,8 @@ var map = new google.maps.Map(document.getElementById('google-map'), {
     mapTypeId: google.maps.MapTypeId.ROADMAP
 });
 map.mapTypes.set('mb', new wax.g.MapType({
-    baseUrl: 'http://10.1.10.25:8888/admin/',
-    layerName: 'interaction',
+    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+    layerName: 'geography-class',
     name: 'Geography Class'
 }));
 map.setMapTypeId('mb');
