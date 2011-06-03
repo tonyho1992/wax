@@ -1,5 +1,5 @@
-// Wax: Hash
 wax = wax || {};
+wax.mm = wax.mm || {};
 
 // Ripped from underscore.js
 // Internal function used to implement `_.throttle` and `_.debounce`.
@@ -39,7 +39,9 @@ var locationHash = {
   }
 };
 
-wax.hash = function(map, options) {
+// Hash
+// ----
+wax.mm.hash = function(map, options) {
     // cached location.hash
     var s0,
         // allowable latitude range

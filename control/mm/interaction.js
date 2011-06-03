@@ -1,4 +1,5 @@
 wax = wax || {};
+wax.mm = wax.mm || {};
 
 // A chaining-style control that adds
 // interaction to a modestmaps.Map object.
@@ -9,7 +10,7 @@ wax = wax || {};
 //   If not given, the `wax.tooltip` library will be expected.
 // * `clickAction` (optional): **full** or **location**: default is
 //   **full**.
-wax.interaction = function(map, options) {
+wax.mm.interaction = function(map, options) {
     var MM = com.modestmaps;
     options = options || {};
     // Our GridManager (from `gridutil.js`). This will keep the

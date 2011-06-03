@@ -1,13 +1,12 @@
-// Wax: Zoom Control
-// -----------------
-
-// Wax
 wax = wax || {};
+wax.mm = wax.mm || {};
 
+// Zoomer
+// ------
 // Add zoom links, which can be styled as buttons, to a `modestmaps.Map`
 // control. This function can be used chaining-style with other
 // chaining-style controls.
-wax.zoomer = function(map) {
+wax.mm.zoomer = function(map) {
     var zoomin = document.createElement('a');
     zoomin.innerHTML = '+';
     zoomin.href = '#';

@@ -1,5 +1,5 @@
-// namespacing!
 wax = wax || {};
+wax.mm = wax.mm || {};
 
 // A layer connector for Modest Maps
 //
@@ -13,7 +13,7 @@ wax = wax || {};
 //
 // * `filetype`: like `.jpeg` (default `.png`)
 // * `zoomrange`: like [0, 10] (default [0, 18])
-wax.provider = function(options) {
+wax.mm.provider = function(options) {
     this.layerName = options.layerName;
     this.baseUrls = (typeof(options.baseUrl) == 'string') ?
             [options.baseUrl] : options.baseUrl;
@@ -22,7 +22,7 @@ wax.provider = function(options) {
     this.zoomRange = options.zoomRange || [0, 18];
 };
 
-wax.provider.prototype = {
+wax.mm.provider.prototype = {
     outerLimits: function() {
         return [
             new com.modestmaps.Coordinate(0,0,0).zoomTo(this.zoomRange[0]),
@@ -48,4 +48,4 @@ wax.provider.prototype = {
     }
 };
 
-com.modestmaps.extend(wax.provider, com.modestmaps.MapProvider);
+com.modestmaps.extend(wax.mm.provider, com.modestmaps.MapProvider);

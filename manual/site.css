@@ -118,7 +118,13 @@ div.wax-tooltip {
   background-color:#333;
   color:#fff;
   z-index:9999999999;
+  opacity:1;
+  -moz-transition:opacity .5s;
+  -webkit-transition:opacity .5s;
 }
+
+div.wax-fade { opacity:0; }
+
 a.wax-fullscreen {
   position:absolute;
   top:5px;
@@ -126,16 +132,3 @@ a.wax-fullscreen {
   z-index:99999;
   }
 
-  @-webkit-keyframes wax-fade {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
-  }
-  .wax-fade {
-     -webkit-animation-name:wax-fade;
-     -webkit-animation-duration:0.5s;
-     -webkit-animation-iteration-count:1;
-   }

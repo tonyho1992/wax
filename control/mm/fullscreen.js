@@ -1,12 +1,14 @@
-// Wax: Fullscreen
-// -----------------
-// A simple fullscreen control for Modest Maps
 wax = wax || {};
+wax.mm = wax.mm || {};
+
+// Fullscreen
+// ----------
+// A simple fullscreen control for Modest Maps
 
 // Add zoom links, which can be styled as buttons, to a `modestmaps.Map`
 // control. This function can be used chaining-style with other
 // chaining-style controls.
-wax.fullscreen = function(map, opts) {
+wax.mm.fullscreen = function(map, opts) {
 
     var fullscreen = {
         state: 1, // minimized
