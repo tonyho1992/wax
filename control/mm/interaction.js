@@ -69,10 +69,10 @@ wax.mm.interaction = function(map, options) {
             var tile;
             var grid = this.getTileGrid();
             for (var i = 0; i < grid.length; i++) {
-                if ((grid[i][0] < evt.pageY) &&
-                   ((grid[i][0] + 256) > evt.pageY) &&
-                    (grid[i][1] < evt.pageX) &&
-                   ((grid[i][1] + 256) > evt.pageX)) {
+                if ((grid[i][0] < evt.y) &&
+                   ((grid[i][0] + 256) > evt.y) &&
+                    (grid[i][1] < evt.x) &&
+                   ((grid[i][1] + 256) > evt.x)) {
                     tile = grid[i][2];
                     break;
                 }
@@ -94,12 +94,13 @@ wax.mm.interaction = function(map, options) {
 
         onMove: function(evt) {
             if (!this._onMove) this._onMove = wax.util.bind(function(evt) {
-                var tile = this.getTile(evt);
+                var pos = wax.util.eventoffset(evt);
+                var tile = this.getTile(pos);
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
                         if (err) return;
                         if (g) {
-                            var feature = g.getFeature(evt.pageX, evt.pageY, tile, {
+                            var feature = g.getFeature(pos.x, pos.y, tile, {
                                 format: 'teaser'
                             });
                             // This and other Modest Maps controls only support a single layer.
@@ -133,7 +134,7 @@ wax.mm.interaction = function(map, options) {
                 }
                 // Store this event so that we can compare it to the
                 // up event
-                this.downEvent = evt;
+                this.downEvent = wax.util.eventoffset(evt);
                 MM.addEvent(map.parent, 'mouseup', this.mouseUp());
             }, this);
             return this._mouseDown;
@@ -145,23 +146,24 @@ wax.mm.interaction = function(map, options) {
                 // Don't register clicks that are likely the boundaries
                 // of dragging the map
                 var tol = 4; // tolerance
-                if (Math.round(evt.pageY / tol) === Math.round(this.downEvent.pageY / tol) &&
-                    Math.round(evt.pageX / tol) === Math.round(this.downEvent.pageX / tol)) {
+                var pos = wax.util.eventoffset(evt);
+                if (Math.round(pos.y / tol) === Math.round(this.downEvent.y / tol) &&
+                    Math.round(pos.x / tol) === Math.round(this.downEvent.x / tol)) {
                     // Contain the event data in a closure.
                     this.clickTimeout = window.setTimeout(
-                        wax.util.bind(function() { this.click()(evt); }, this), 300);
+                        wax.util.bind(function() { this.click()(pos); }, this), 300);
                 }
             }, this);
             return this._mouseUp;
         },
 
         click: function(evt) {
-            if (!this._onClick) this._onClick = wax.util.bind(function(evt) {
-                var tile = this.getTile(evt);
+            if (!this._onClick) this._onClick = wax.util.bind(function(pos) {
+                var tile = this.getTile(pos);
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
                         if (g) {
-                            var feature = g.getFeature(evt.pageX, evt.pageY, tile, {
+                            var feature = g.getFeature(pos.x, pos.y, tile, {
                                 format: this.clickAction
                             });
                             if (feature) {
