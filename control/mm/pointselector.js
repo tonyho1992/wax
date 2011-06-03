@@ -1,10 +1,9 @@
-// Wax: Point Selector
-// -----------------
-
-// namespacing!
 wax = wax || {};
+wax.mm = wax.mm || {};
 
-wax.pointselector = function(map, opts) {
+// Point Selector
+// --------------
+wax.mm.pointselector = function(map, opts) {
     var mouseDownPoint = null,
         mouseUpPoint = null,
         tolerance = 5,

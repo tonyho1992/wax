@@ -1,16 +1,11 @@
-// Wax: Legend Control
-// -------------------
-// Requires:
-//
-// * modestmaps
-// * wax.Legend
-
-// namespacing!
 wax = wax || {};
+wax.mm = wax.mm || {};
 
+// Legend Control
+// --------------
 // The Modest Maps version of this control is a very, very
 // light wrapper around the `/lib` code for legends.
-wax.legend = function(map, options) {
+wax.mm.legend = function(map, options) {
     options = options || {};
     var legend = {
         add: function() {

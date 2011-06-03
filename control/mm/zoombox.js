@@ -1,10 +1,10 @@
-// Wax: ZoomBox
-// -----------------
-// An OL-style ZoomBox control, from the Modest Maps example.
-
 wax = wax || {};
+wax.mm = wax.mm || {};
 
-wax.zoombox = function(map, opts) {
+// ZoomBox
+// -------
+// An OL-style ZoomBox control, from the Modest Maps example.
+wax.mm.zoombox = function(map, opts) {
     // TODO: respond to resize
     var mouseDownPoint = null;
 

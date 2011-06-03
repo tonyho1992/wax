@@ -1,31 +1,10 @@
-// Wax: Hash
 wax = wax || {};
-
-// Ripped from underscore.js
-// Internal function used to implement `_.throttle` and `_.debounce`.
-var limit = function(func, wait, debounce) {
-  var timeout;
-  return function() {
-    var context = this, args = arguments;
-    var throttler = function() {
-      timeout = null;
-      func.apply(context, args);
-    };
-    if (debounce) clearTimeout(timeout);
-    if (debounce || !timeout) timeout = setTimeout(throttler, wait);
-  };
-};
-
-// Returns a function, that, when invoked, will only be triggered at most once
-// during a given window of time.
-var throttle = function(func, wait) {
-  return limit(func, wait, false);
-};
+wax.mm = wax.mm || {};
 
 // A basic manager dealing only in hashchange and `location.hash`.
 // This **will interfere** with anchors, so a HTML5 pushState
 // implementation will be prefered.
-var locationHash = {
+wax.mm.locationHash = {
   stateChange: function(callback) {
     com.modestmaps.addEvent(window, 'hashchange', function() {
       callback(location.hash);
@@ -39,11 +18,34 @@ var locationHash = {
   }
 };
 
-wax.hash = function(map, options) {
+// Hash
+// ----
+wax.mm.hash = function(map, options) {
     // cached location.hash
     var s0,
         // allowable latitude range
         lat = 90 - 1e-8;
+
+    // Ripped from underscore.js
+    // Internal function used to implement `_.throttle` and `_.debounce`.
+    var limit = function(func, wait, debounce) {
+      var timeout;
+      return function() {
+        var context = this, args = arguments;
+        var throttler = function() {
+          timeout = null;
+          func.apply(context, args);
+        };
+        if (debounce) clearTimeout(timeout);
+        if (debounce || !timeout) timeout = setTimeout(throttler, wait);
+      };
+    };
+
+    // Returns a function, that, when invoked, will only be triggered at most once
+    // during a given window of time.
+    var throttle = function(func, wait) {
+      return limit(func, wait, false);
+    };
 
     var hash = {
         map: this,

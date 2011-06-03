@@ -9,6 +9,9 @@
 * All Modest Maps controls are flipped - instead of being extensions of the
   `com.modestmaps.Map` object, they are off of the `wax` object and are
   called with the map as the first argument and an options object as the second
+* Modest Maps controls and provider moved from `wax.*` to `wax.mm.*`.
+* Google control API changed from `wax.g.Controls` object to `wax.g.*`
+  mirroring Modest Maps controls API.
 * jQuery, jQuery-jsonp, and Underscore dependency removed
 * `gridutil` now uses [reqwest](https://github.com/ded/reqwest) as its
   XMLHTTPRequest library.

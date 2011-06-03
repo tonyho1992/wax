@@ -1,10 +1,10 @@
+wax = wax || {};
+wax.mm = wax.mm || {};
+
 // Mobile
 // ------
 // For making maps on normal websites nicely mobile-ized
-
-wax = wax || {};
-
-wax.mobile = function(map, opts) {
+wax.mm.mobile = function(map, opts) {
     opts = opts || {};
     // Inspired by Leaflet
     var mm = com.modestmaps,

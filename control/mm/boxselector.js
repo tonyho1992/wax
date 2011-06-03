@@ -1,8 +1,9 @@
-// Wax: Box Selector
-// -----------------
 wax = wax || {};
+wax.mm = wax.mm || {};
 
-wax.boxselector = function(map, opts) {
+// Box Selector
+// ------------
+wax.mm.boxselector = function(map, opts) {
     var mouseDownPoint = null;
 
     var callback = (typeof opts === 'function') ?
