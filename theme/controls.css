@@ -65,7 +65,12 @@ a.zoomer {
   left:10px;
   top:10px;
   max-width:300px;
+  opacity:1;
+  -webkit-transition:opacity .5s;
+  -moz-transition:opacity .5s;
   }
+
+.wax-tooltip.hide { opacity:0; }
 
 .wax-tooltip .close {
   display:block;
