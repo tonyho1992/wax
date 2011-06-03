@@ -30,16 +30,31 @@
 
 <div class='section'>
 <pre class='md'>
+## OpenLayers
+
 The Wax toolkit also supports [OpenLayers](http://openlayers.org), though it is
 **not recommended for new projects**, because it has become extremely bulky and difficult
 to use correctly.
 
-## Starting Off
+### Including the Code
 
-You'll need
+- `wax/ext/OpenLayers.js` contains the core OpenLayers library. **Do not use
+  the hosted version** unless absolutely necessary - the openlayers.org server
+  is not very fast or reliable, and the version that's hosted includes all
+  dependencies, making it extremely large.
+- `wax/build/wax.ol.js` contains the Wax controls and integration code for
+  OpenLayers.
+- `wax/theme/controls.css` contains default styles for controls. You can always
+  swap in your own later on.
 
-* A div on your page
-* Including OpenLayers.js, the core library. **Do not use the hosted version** unless absolutely necessary - the openlayers.org server is not very fast or reliable, and the version that's hosted includes all dependencies, making it extremely large.
+<pre>
+&lt;html&gt;
+&lt;head&gt;
+  &lt;script src='wax/ext/OpenLayers.js' type='text/javascript'&gt;&lt;/script&gt;
+  &lt;script src='wax/build/wax.ol.js' type='text/javascript'&gt;&lt;/script&gt;
+  &lt;link href='wax/theme/controls.css' rel='stylesheet' type='text/css' /&gt;
+  ...
+</pre>
 </pre>
 </div>
 
@@ -56,7 +71,9 @@ for which OpenLayers has a layer type.
 <div id='openlayers-simple' class='map dark'>
 </div>
 <pre class='sh_javascript run'>
+// Use the mapbox openlayers zoom/pan control images.
 OpenLayers.ImgPath = 'http://js.mapbox.com/theme/dark/';
+// Set up a map in a div with the id 'openlayers-simple'
 var map = new OpenLayers.Map('openlayers-simple', {
   units: 'm',
   projection: new OpenLayers.Projection('EPSG:900913'),

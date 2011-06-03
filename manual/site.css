@@ -19,6 +19,7 @@ div.section {
   float:left;
   }
 div.map {
+  position:relative;
   border:1px solid #000;
   float:left;
   width:448px;
