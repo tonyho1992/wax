@@ -1,7 +1,8 @@
 wax = wax || {};
+wax.g = wax.g || {};
 
 // Adds legends to a google Map object.
-wax.legend = function(map, options) {
+wax.g.legend = function(map, options) {
     options = options || {};
     var legend = {
         add: function() {

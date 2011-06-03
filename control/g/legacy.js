@@ -8,10 +8,10 @@ wax.g.Controls = function(map) {
 };
 
 wax.g.Controls.prototype.legend = function(options) {
-    return wax.legend(this.map, options);
+    return wax.g.legend(this.map, options);
 };
-wax.g.Controls.prototype.interaction = function(options) {
 
-    return wax.interaction(this.map, options);
+wax.g.Controls.prototype.interaction = function(options) {
+    return wax.g.interaction(this.map, options);
 };
 

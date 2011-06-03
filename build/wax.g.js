@@ -665,6 +665,7 @@ wax.util = {
     }
 };
 wax = wax || {};
+wax.g = wax.g || {};
 
 // A control that adds interaction to a google Map object.
 //
@@ -674,7 +675,7 @@ wax = wax || {};
 //   If not given, the `wax.tooltip` library will be expected.
 // * `clickAction` (optional): **full** or **location**: default is
 //   **full**.
-wax.interaction = function(map, options) {
+wax.g.interaction = function(map, options) {
     options = options || {};
     // Our GridManager (from `gridutil.js`). This will keep the
     // cache of grid information and provide friendly utility methods
@@ -819,17 +820,18 @@ wax.g.Controls = function(map) {
 };
 
 wax.g.Controls.prototype.legend = function(options) {
-    return wax.legend(this.map, options);
+    return wax.g.legend(this.map, options);
 };
-wax.g.Controls.prototype.interaction = function(options) {
 
-    return wax.interaction(this.map, options);
+wax.g.Controls.prototype.interaction = function(options) {
+    return wax.g.interaction(this.map, options);
 };
 
 wax = wax || {};
+wax.g = wax.g || {};
 
 // Adds legends to a google Map object.
-wax.legend = function(map, options) {
+wax.g.legend = function(map, options) {
     options = options || {};
     var legend = {
         add: function() {
