@@ -1120,15 +1120,14 @@ wax.mm.interaction = function(map, options) {
                     Math.round(pos.x / tol) === Math.round(this.downEvent.x / tol)) {
                     // Contain the event data in a closure.
                     this.clickTimeout = window.setTimeout(
-                        wax.util.bind(function() { this.click()(evt); }, this), 300);
+                        wax.util.bind(function() { this.click()(pos); }, this), 300);
                 }
             }, this);
             return this._mouseUp;
         },
 
         click: function(evt) {
-            if (!this._onClick) this._onClick = wax.util.bind(function(evt) {
-                var pos = wax.util.eventoffset(evt);
+            if (!this._onClick) this._onClick = wax.util.bind(function(pos) {
                 var tile = this.getTile(pos);
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
