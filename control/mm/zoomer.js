@@ -11,6 +11,9 @@ wax.mm.zoomer = function(map) {
     zoomin.innerHTML = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
+    com.modestmaps.addEvent(zoomin, 'mousedown', function(e) {
+        com.modestmaps.cancelEvent(e);
+    });
     com.modestmaps.addEvent(zoomin, 'click', function(e) {
         com.modestmaps.cancelEvent(e);
         map.zoomIn();
@@ -21,6 +24,9 @@ wax.mm.zoomer = function(map) {
     zoomout.innerHTML = '-';
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
+    com.modestmaps.addEvent(zoomout, 'mousedown', function(e) {
+        com.modestmaps.cancelEvent(e);
+    });
     com.modestmaps.addEvent(zoomout, 'click', function(e) {
         com.modestmaps.cancelEvent(e);
         map.zoomOut();
