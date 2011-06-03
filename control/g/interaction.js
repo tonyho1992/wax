@@ -84,7 +84,7 @@ wax.g.Controls.prototype.interaction = function(options) {
                 opt
             );
             if (feature !== f) {
-                callbacks.out(feature, that.mapDiv, 0);
+                callbacks.out(that.mapDiv);
                 callbacks.over(feature, that.mapDiv, 0);
                 f = feature;
             }
