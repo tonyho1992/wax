@@ -788,29 +788,6 @@ wax.mm.boxselector = function(map, opts) {
 
     return boxselector.add(map);
 };
-// Wax: Embedder Control
-// -------------------
-
-// namespacing!
-if (!com) {
-    var com = { };
-    if (!com.modestmaps) {
-        com.modestmaps = { };
-    }
-}
-
-com.modestmaps.Map.prototype.embedder = function(options) {
-    options = options || {};
-    if ($('#' + this.el + '-script').length) {
-      $(this.parent).prepend($('<input type="text" class="embed-src" />')
-        .css({
-            'z-index': '9999999999',
-            'position': 'relative'
-        })
-        .val("<div id='" + this.el + "-script'>" + $('#' + this.el + '-script').html() + '</div>'));
-    }
-    return this;
-};
 wax = wax || {};
 wax.mm = wax.mm || {};
 
@@ -867,31 +844,10 @@ wax.mm.fullscreen = function(map, opts) {
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-// Ripped from underscore.js
-// Internal function used to implement `_.throttle` and `_.debounce`.
-var limit = function(func, wait, debounce) {
-  var timeout;
-  return function() {
-    var context = this, args = arguments;
-    var throttler = function() {
-      timeout = null;
-      func.apply(context, args);
-    };
-    if (debounce) clearTimeout(timeout);
-    if (debounce || !timeout) timeout = setTimeout(throttler, wait);
-  };
-};
-
-// Returns a function, that, when invoked, will only be triggered at most once
-// during a given window of time.
-var throttle = function(func, wait) {
-  return limit(func, wait, false);
-};
-
 // A basic manager dealing only in hashchange and `location.hash`.
 // This **will interfere** with anchors, so a HTML5 pushState
 // implementation will be prefered.
-var locationHash = {
+wax.mm.locationHash = {
   stateChange: function(callback) {
     com.modestmaps.addEvent(window, 'hashchange', function() {
       callback(location.hash);
@@ -912,6 +868,27 @@ wax.mm.hash = function(map, options) {
     var s0,
         // allowable latitude range
         lat = 90 - 1e-8;
+
+    // Ripped from underscore.js
+    // Internal function used to implement `_.throttle` and `_.debounce`.
+    var limit = function(func, wait, debounce) {
+      var timeout;
+      return function() {
+        var context = this, args = arguments;
+        var throttler = function() {
+          timeout = null;
+          func.apply(context, args);
+        };
+        if (debounce) clearTimeout(timeout);
+        if (debounce || !timeout) timeout = setTimeout(throttler, wait);
+      };
+    };
+
+    // Returns a function, that, when invoked, will only be triggered at most once
+    // during a given window of time.
+    var throttle = function(func, wait) {
+      return limit(func, wait, false);
+    };
 
     var hash = {
         map: this,
