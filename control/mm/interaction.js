@@ -166,7 +166,7 @@ wax.interaction = function(map, options) {
                             if (feature) {
                                 switch (this.clickAction) {
                                     case 'full':
-                                        this.callbacks.click(feature, this.parent, 0, evt);
+                                        this.callbacks.click(feature, map.parent, 0, evt);
                                         break;
                                     case 'location':
                                         window.location = feature;
