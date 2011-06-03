@@ -768,9 +768,12 @@ wax.g.interaction = function(map, options) {
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
                         if (err || !g) return;
-                        var feature = g.getFeature(evt.pixel.x, evt.pixel.y, tile, {
-                            format: 'teaser'
-                        });
+                        var feature = g.getFeature(
+                            evt.pixel.x + wax.util.offset(map.getDiv()).left,
+                            evt.pixel.y + wax.util.offset(map.getDiv()).top,
+                            tile,
+                            { format: 'teaser' }
+                        );
                         // Support only a single layer.
                         // Thus a layer index of **0** is given to the tooltip library
                         if (feature && this.feature !== feature) {
@@ -793,9 +796,12 @@ wax.g.interaction = function(map, options) {
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
                         if (err || !g) return;
-                        var feature = g.getFeature(evt.pixel.x, evt.pixel.y, tile, {
-                            format: this.clickAction
-                        });
+                        var feature = g.getFeature(
+                            evt.pixel.x + wax.util.offset(map.getDiv()).left,
+                            evt.pixel.y + wax.util.offset(map.getDiv()).top,
+                            tile,
+                            { format: this.clickAction }
+                        );
                         if (feature) {
                             switch (this.clickAction) {
                                 case 'full':
