@@ -14,7 +14,7 @@ lint:
 	./node_modules/.bin/jshint control/lib/*.js control/mm/*.js --config=jshint.json
 
 build/wax.ol.min.js:
-	cat lib/*.js control/lib/*.js control/ol/*.js > build/wax.ol.js
+	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/ol/*.js > build/wax.ol.js
 	$(UGLIFYJS) build/wax.ol.js > build/wax.ol.min.js
 
 build/wax.g.min.js:
