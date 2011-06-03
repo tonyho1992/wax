@@ -1,5 +1,9 @@
 ## Changelog
 
+### 2.0.1
+
+* Fix for interaction in Firefox with body margins.
+
 ### 2.0.0
 
 * All Modest Maps controls are flipped - instead of being extensions of the

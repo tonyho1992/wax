@@ -597,10 +597,18 @@ wax.util = {
         // Offsets from the body
         top += document.body.offsetTop;
         left += document.body.offsetLeft;
-
         // Offsets from the HTML element
         top += document.body.parentNode.offsetTop;
         left += document.body.parentNode.offsetLeft;
+
+        // Firefox and other weirdos. Similar technique to jQuery's
+        // `doesNotIncludeMarginInBodyOffset`.
+        var htmlComputed = window.getComputedStyle(document.body.parentNode);
+        if (document.body.parentNode.offsetTop !==
+            parseInt(htmlComputed.getPropertyValue('margin-top'), 10)) {
+            top += parseInt(htmlComputed.getPropertyValue('margin-top'), 10);
+            left += parseInt(htmlComputed.getPropertyValue('margin-left'), 10);
+        }
 
         return {
             top: top,
