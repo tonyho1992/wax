@@ -3,6 +3,8 @@
 ### 2.0.1
 
 * Fix for interaction in Firefox with body margins.
+* Added OpenLayers and Google manual pages.
+* Removed Google and Modest Maps embedder controls. Will return some day...
 
 ### 2.0.0
 
