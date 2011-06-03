@@ -11,22 +11,26 @@ wax.util = {
         var top = el.offsetTop;
         var left = el.offsetLeft;
 
-        while (el = el.offsetParent) {
-            top += el.offsetTop;
-            left += el.offsetLeft;
+        try {
+            while (el = el.offsetParent) {
+                top += el.offsetTop;
+                left += el.offsetLeft;
 
-            // Add additional CSS3 transform handling.
-            // These features are used by Google Maps API V3.
-            var style = el.style.transform ||
-                el.style['-webkit-transform'] ||
-                el.style.MozTransform;
-            if (style) {
-                var match = style.match(/translate\((.+)px, (.+)px\)/);
-                if (match) {
-                    top += parseInt(match[2], 10);
-                    left += parseInt(match[1], 10);
+                // Add additional CSS3 transform handling.
+                // These features are used by Google Maps API V3.
+                var style = el.style.transform ||
+                    el.style['-webkit-transform'] ||
+                    el.style.MozTransform;
+                if (style) {
+                    var match = style.match(/translate\((.+)px, (.+)px\)/);
+                    if (match) {
+                        top += parseInt(match[2], 10);
+                        left += parseInt(match[1], 10);
+                    }
                 }
             }
+        } catch(e) {
+            // Hello, internet explorer.
         }
 
         // Offsets from the body
@@ -38,11 +42,13 @@ wax.util = {
 
         // Firefox and other weirdos. Similar technique to jQuery's
         // `doesNotIncludeMarginInBodyOffset`.
-        var htmlComputed = window.getComputedStyle(document.body.parentNode);
+        var htmlComputed = document.defaultView ?
+          window.getComputedStyle(document.body.parentNode) :
+          document.body.parentNode.currentStyle;
         if (document.body.parentNode.offsetTop !==
-            parseInt(htmlComputed.getPropertyValue('margin-top'), 10)) {
-            top += parseInt(htmlComputed.getPropertyValue('margin-top'), 10);
-            left += parseInt(htmlComputed.getPropertyValue('margin-left'), 10);
+            parseInt(htmlComputed.marginTop, 10)) {
+            top += parseInt(htmlComputed.marginTop, 10);
+            left += parseInt(htmlComputed.marginLeft, 10);
         }
 
         return {
@@ -98,11 +104,14 @@ wax.util = {
                 y: e.pageY
             };
         } else if (e.clientX || e.clientY) {
+            // IE
+            var doc = document.documentElement, body = document.body;
+            var htmlComputed = document.body.parentNode.currentStyle;
+            var topMargin = parseInt(htmlComputed.marginTop, 10) || 0;
+            var leftMargin = parseInt(htmlComputed.marginLeft, 10) || 0;
             return {
-                x: e.clientX + document.body.scrollLeft +
-                    document.documentElement.scrollLeft,
-                y: e.clientY + document.body.scrollTop +
-                    document.documentElement.scrollTop
+                x: e.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0) + leftMargin,
+                y: e.clientY + (doc && doc.scrollTop  || body && body.scrollTop  || 0) - (doc && doc.clientTop  || body && body.clientTop  || 0) + topMargin
             };
         }
     }
