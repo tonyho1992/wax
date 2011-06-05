@@ -79,8 +79,8 @@ style:
 </pre>
 </div>
 
-You'll do the usual Modest Maps setup - just as you'll do the standard setup 
-process with the other APIs.
+The tilesets that TileStream serves and TileMill creates are supported by a
+custom Modest Maps provider supplied by Wax at `wax.mm.provider`.
 
 <div class='section'>
 <div id='modestmaps-setup' class='map'></div>
@@ -98,7 +98,7 @@ var m = new mm.Map('modestmaps-setup',
     baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
     // Called world-light
     layerName: 'world-light'}),
-  // And it'll be 240px by 160px
+  // And it'll be 300px by 200px
   new mm.Point(300,200));
 
 // Center it on the United States, at zoom level 2.
@@ -318,8 +318,7 @@ browser, because this could give a much higher level of performance.
 # OpenLayers
 
 The Wax toolkit also supports [OpenLayers](http://openlayers.org), though it is
-**not recommended for new projects**, because it has become extremely bulky and difficult
-to use correctly.
+**not recommended for new projects**, because it has become extremely bulky and difficult to use correctly.
 
 - `wax/ext/OpenLayers.js` contains the core OpenLayers library. **Do not use
   the hosted version** unless absolutely necessary - the openlayers.org server
@@ -340,8 +339,6 @@ to use correctly.
   ...
 </pre>
 </div>
-
-## MBTiles layers in OpenLayers
 
 The tilesets that TileStream serves and TileMill creates are valid in the
 [TMS specification](http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification),
@@ -393,8 +390,6 @@ The Google Maps API V3 is supported by Wax.
   ...
 </pre>
 </div>
-
-## MBTiles layers in Google Maps
 
 The tilesets that TileStream serves and TileMill creates are supported by a
 custom `MapType` provided by Wax at `wax.g.MapType`.
