@@ -1,71 +1,62 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-    <title>Wax Manual</title>
-    <script src='ender.js' type='text/javascript'></script>
-    <script src='../ext/modestmaps.js' type='text/javascript'></script>
-    <script src='../build/wax.mm.js' type='text/javascript'></script>
-    <script src='lib/showdown.js' type='text/javascript'></script>
-    <script src='lib/shjs.js' type='text/javascript'></script>
-    <script src='lib/sh_javascript.min.js' type='text/javascript'></script>
-    <script src='site.js' type='text/javascript'></script>
-    <link href='lib/shjs.css' rel='stylesheet' type='text/css' />
-    <link href='../theme/controls.css' rel='stylesheet' type='text/css' />
-    <link href='site.css' rel='stylesheet' type='text/css' />
-  </head>
-  <body>
-  <div class='header'>
-    Wax Documentation:
-    <a href='index.html'>Modest Maps</a> |
-    <a href='openlayers.html'>OpenLayers</a> |
-    <a href='google.html'>Google Maps</a>
-  </div>
-    <div class='page'>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <title>Wax Manual</title>
+  <script src='ender.js' type='text/javascript'></script>
+  <script src='../ext/modestmaps.js' type='text/javascript'></script>
+  <script src='../ext/OpenLayers.js' type='text/javascript'></script>
+  <script src='http://maps.google.com/maps/api/js?sensor=false' type='text/javascript' ></script>
+  <script src='../build/wax.mm.js' type='text/javascript'></script>
+  <script src='../build/wax.ol.js' type='text/javascript'></script>
+  <script src='../build/wax.g.js' type='text/javascript'></script>
+  <script src='lib/showdown.js' type='text/javascript'></script>
+  <script src='lib/shjs.js' type='text/javascript'></script>
+  <script src='lib/sh_javascript.min.js' type='text/javascript'></script>
+  <script src='site.js' type='text/javascript'></script>
+  <link href='lib/shjs.css' rel='stylesheet' type='text/css' />
+  <link href='../theme/controls.css' rel='stylesheet' type='text/css' />
+  <link href='site.css' rel='stylesheet' type='text/css' />
+</head>
+<body>
+<div class='page'>
 
 <div class='navigation'>
 <ul></ul>
 </div>
 
 <pre class='md'>
-## Publishing Maps
+# Wax
 
-**Wax** is a collection of extras and tools that make it easier to publish 
+Wax is a collection of extras and tools that make it easier to publish 
 custom maps on any website. It's an extension of 
-[different mapping APIs](#mapping-libraries), but we'll start out with Modest 
-Maps.
+[different mapping APIs](#mapping-libraries) including Modest Maps, OpenLayers and
+the Google Maps API client.
 
-But first, here's an intro into web maps from the very basics. Assuming that you've 
-been designing maps with [TileMill](http://tilemill.com/) or another design tool, and 
-have gotten them up on a server for your usage, what's next? It's actually 
-quite simple to get to the next step: your basic ingredients are
+## Intro to Web Maps
+
+Assuming that you've been designing maps with [TileMill](http://tilemill.com/) or
+another design tool, and  have gotten them up on a server for your usage,
+what's next? It's actually  quite simple to get to the next step: your basic
+ingredients are
 
 * A map server, like [TileStream](https://github.com/mapbox/tilestream)
 * A Javascript API, like [Modest Maps](https://github.com/stamen/modestmaps-js)
 * Your website
-</pre>
 
-<div class='section'>
-<pre class='md'>
 The mapping server serves up **tiles** of rendered data - tiles being 256 pixel 
 square images covering some of the world. Here's a tile of Europe from the 
 [World Light tileset](http://mapbox.com/tileset/world-light).
+
+![Europe](http://b.tile.mapbox.com/1.0.0/world-light/2/2/2.png)
 
 There are quite a few mapping APIs, but at their core, they're doing the same 
 sort of thing - adding these tiles to a page and managing them so that the 
 map seems like a continuous world instead of little squares. We'll start off with 
 **Modest Maps** because it's lightweight and fast.
-</pre>
-<div class='sidebar'>
-<pre class='md'>
-![Europe](http://b.tile.mapbox.com/1.0.0/world-light/2/2/2.png)
-</pre>
-</div>
-</div>
 
-<pre class='md'>
-### Including the Code
+# Modest Maps
 
 The first step is to actually download and include the necessary Javascript 
 code to make your map work. We'll also include a CSS file to start rolling with 
@@ -77,6 +68,7 @@ style:
 - `wax/theme/controls.css` contains default styles for controls. You can always
   swap in your own later on.
 
+<div class='section'>
 <pre>
 &lt;html&gt;
 &lt;head&gt;
@@ -85,107 +77,84 @@ style:
   &lt;link href='wax/theme/controls.css' rel='stylesheet' type='text/css' /&gt;
   ...
 </pre>
+</div>
 
 You'll do the usual Modest Maps setup - just as you'll do the standard setup 
 process with the other APIs.
-</pre>
 
 <div class='section'>
-<div id='modestmaps-setup' class='map'>
-<span class='attribution'>
-    <a href='http://mapbox.com/tileset/world-light'>World Light</a>
-</span>
-</div>
+<div id='modestmaps-setup' class='map'></div>
+<a class='attribution' href='http://mapbox.com/tileset/world-light'>World Light</a>
+
 <pre class='sh_javascript run'>
-// Alias com.modestmaps to mm. This isn't necessary - just
-// nice, because it makes the code shorter.
+// Alias com.modestmaps to mm. This isn't necessary -
+// just nice for shorter code.
 var mm = com.modestmaps;
 // Set up a map in a div with the id 'modestmaps-setup'
 var m = new mm.Map('modestmaps-setup',
-  // Use Wax's special 'provider' code to add a new custom layer
+  // Use Wax's to provider add a new custom layer
   new wax.mm.provider({
     // From the main MapBox server
     baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
     // Called world-light
     layerName: 'world-light'}),
-    // And it'll be 448px by 300px
-    new mm.Point(448,300));
+  // And it'll be 240px by 160px
+  new mm.Point(300,200));
 
-// Center it on the United States, at zoom level 4.
-m.setCenterZoom(
-  new com.modestmaps.Location(38.8225909, -97.5585),
-  4);
+// Center it on the United States, at zoom level 2.
+m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
-<pre class='md'>
-## Wax Extras
 
-Wax provides a set of map controls for Modest Maps that make common map
-tricks easier to do.
-</pre>
-<pre class='md'>
+## Controls
+
 ### Interaction
 
 The interaction control adds quite a bit of logic to the map, adding 
 interactivity - mouse hovers and clicks - to layers that support it, like those
 made with [TileMill](http://tilemill.com/) and the interactive 
-[UTFGrid section] [1]
-of the [MBTiles spec] [2].
+[UTFGrid section](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md)
+of the [MBTiles spec](https://github.com/mapbox/mbtiles-spec).
 
-[1]: https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md
-[2]: https://github.com/mapbox/mbtiles-spec
-</pre>
 <div class='section'>
-<div id='modestmaps-interaction' class='map'>
-</div>
-
+<div id='modestmaps-interaction' class='map'></div>
+<a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-interaction',
-    new wax.mm.provider({
-      baseUrl: 'http://a.tiles.mapbox.com/devseed/',
-      layerName: 'excess-properties'}), new mm.Point(448,300))
-wax.mm.interaction(m, {
-  callbacks: new wax.tooltip({ animationOut: 'wax-fade' })
-  });
-m.setCenterZoom(
-  new com.modestmaps.Location(38.8225909, -97.5585),
-  4);
+  new wax.mm.provider({
+    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+    layerName: 'geography-class'}),
+  new mm.Point(300,200));
+wax.mm.interaction(m, { callbacks:
+  new wax.tooltip({ animationOut: 'wax-fade' })
+});
+m.setCenterZoom(new mm.Location(39, -98), 1);
 </pre>
 </div>
 
-
-<pre class='md'>
 ### Mobile
 
 TODO
-</pre>
 
 <div class='section'>
-<div id='modestmaps-mobile' class='map dark'>
-<span class='attribution'>
-    <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
-</span>
-</div>
+<div id='modestmaps-mobile' class='map dark'></div>
+<a class='attribution' href='http://mapbox.com/tileset/world-glass'>World Glass</a>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-mobile',
-    new wax.mm.provider({
-      baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'world-glass'}), new mm.Point(448,300),
-      [new mm.MouseHandler(), new mm.TouchHandler()])
-wax.mm.mobile(m, {
-  bodyDraw: function(body) {
-    body.bgColor = '#000000';
-  }
-  });
-m.setCenterZoom(
-  new com.modestmaps.Location(38.8225909, -97.5585),
-  4);
+  new wax.mm.provider({
+    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+    layerName: 'world-glass'}),
+  new mm.Point(300,200),
+  [new mm.MouseHandler(), new mm.TouchHandler()]);
+wax.mm.mobile(m, { bodyDraw: function(body) {
+  body.bgColor = '#000000';
+}});
+m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
 
-<pre class='md'>
 ### Fullscreen
 
 The fullscreen control adds a link to the map that assigns a
@@ -195,197 +164,348 @@ You'll see that this control adds a fullscreen link to the map, and that it's
 a bit ugly right now. Until Wax's theming improves, keep in mind that its
 styling, which is contained in `theme/controls.css`, is completely optional
 and you can replace it with your own.
-</pre>
 
 <div class='section'>
-<div id='modestmaps-fullscreen' class='map'>
-<span class='attribution'>
-    <a href='http://mapbox.com/tileset/world-light'>World Light</a>
-</span>
-</div>
+<div id='modestmaps-fullscreen' class='map'></div>
+<a class='attribution' href='http://mapbox.com/tileset/world-light'>World Light</a>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-fullscreen',
-    new wax.mm.provider({
-      baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'world-light'}), new mm.Point(448,300));
+  new wax.mm.provider({
+    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+    layerName: 'world-light'}),
+  new mm.Point(300,200));
 wax.mm.fullscreen(m);
-m.setCenterZoom(
-  new com.modestmaps.Location(38.8225909, -97.5585),
-  4);
+m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
 
-<pre class='md'>
 ### Zoomer
 
 The Zoomer control is a stripped-down version of zoom controls, offering just
 zoom in &amp; out buttons.
-</pre>
 
 <div class='section'>
-<div id='modestmaps-zoomer' class='map dark'>
-<span class='attribution'>
-    <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
-</span>
-</div>
+<div id='modestmaps-zoomer' class='map dark'></div>
+<a class='attribution' href='http://mapbox.com/tileset/world-glass'>World Glass</a>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-zoomer',
-    new wax.mm.provider({
-      baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'world-glass'}), new mm.Point(448,300))
+  new wax.mm.provider({
+    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+    layerName: 'world-glass'}),
+  new mm.Point(300,200));
 wax.mm.zoomer(m);
-m.setCenterZoom(
-  new com.modestmaps.Location(38.8225909, -97.5585),
-  4);
+m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
 
-<pre class='md'>
-### ZoomBox
+### Zoombox
 
-The ZoomBox control is a control that lets you zoom using the shift-key and a box.
-</pre>
+The Zoombox control is a control that lets you zoom using the shift-key and a box.
 
 <div class='section'>
-<div id='modestmaps-zoombox' class='map dark'>
-<span class='attribution'>
-    <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
-</span>
-</div>
+<div id='modestmaps-zoombox' class='map dark'></div>
+<a class='attribution' href='http://mapbox.com/tileset/world-glass'>World Glass</a>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
-var zoombox_m = new mm.Map('modestmaps-zoombox',
-    new wax.mm.provider({
-      baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'world-glass'}), new mm.Point(448,300));
-wax.mm.zoombox(zoombox_m);
-zoombox_m.setCenterZoom(
-  new com.modestmaps.Location(38.8225909, -97.5585),
-  4);
+var m = new mm.Map('modestmaps-zoombox',
+  new wax.mm.provider({
+    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+    layerName: 'world-glass'}),
+  new mm.Point(300,200));
+wax.mm.zoombox(m);
+m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
 
-<pre class='md'>
-### boxselector
+### Boxselector
 
 The boxselector control is a control that lets you highlight a region of the
 map with the shift-key and a box.
-</pre>
 
 <div class='section'>
-<div id='modestmaps-boxselector' class='map dark'>
-<span class='attribution'>
-    <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
-</span>
-</div>
+<div id='modestmaps-boxselector' class='map dark'></div>
+<a class='attribution' href='http://mapbox.com/tileset/blue-marble-topo-bathy-jul'>Blue Marble Topography & Bathymetry (July)</a>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-boxselector',
-    new wax.mm.provider({
-      baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'blue-marble-topo-bathy-jul'}), new mm.Point(448,300))
+  new wax.mm.provider({
+    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+    layerName: 'blue-marble-topo-bathy-jul'}),
+    new mm.Point(300,200));
 wax.mm.boxselector(m, function(coords) {
-    $('#modestmaps-boxselector .attribution').text(
-      coords.map(function(c) {
-        return c.lat + ',' + c.lon;
-      }).join(' - '));
-    });
-m.setCenterZoom(
-  new com.modestmaps.Location(38.8225909, -97.5585),
-  2);
+  $('#boxselector-text').text(
+    coords.map(function(c) {
+      return c.lat + ',' + c.lon;
+    }).join(' - '));
+  });
+m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
+<div class='widget'>Selection: <span id='boxselector-text'></span></div>
 </div>
 
-<pre class='md'>
-### pointselector (BETA)
-</pre>
+### Pointselector (BETA)
 
 <div class='section'>
-<div id='modestmaps-pointselector' class='map dark'>
-<span class='attribution'>
-    <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
-</span>
-</div>
+<div id='modestmaps-pointselector' class='map dark'></div>
+<a class='attribution' href='http://mapbox.com/tileset/blue-marble-topo-bathy-jul'>Blue Marble Topography & Bathymetry (July)</a>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-pointselector',
     new wax.mm.provider({
       baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
       layerName: 'blue-marble-topo-bathy-jul'}),
-    new mm.Point(448,300))
+    new mm.Point(300,200))
 wax.mm.pointselector(m, function(coords) {
-  $('#modestmaps-pointselector .attribution').text(
+  $('#pointselector-text').text(
     coords.join(' - '))
   });
-m.setCenterZoom(
-  new com.modestmaps.Location(38.8225909, -97.5585),
-  2);
+m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
+<div class='widget'>Points: <span id='pointselector-text'></span></div>
 </div>
 
-<pre class='md'>
 ### Legend
 
 The legend control pulls legend information from an interactive layer and
 displays it on the map.
-</pre>
 
 <div class='section'>
-<div id='modestmaps-legend' class='map'>
-<span class='attribution'>
-    <a href='http://mapbox.com/tileset/world-print'>World Print</a>
-</span>
-</div>
+<div id='modestmaps-legend' class='map'></div>
+<a class='attribution' href='http://mapbox.com/tileset/world-print'>World Print</a>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-legend',
-    new wax.mm.provider({
-      baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'world-dark'}), new mm.Point(448,300));
+  new wax.mm.provider({
+    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+    layerName: 'world-print'}),
+  new mm.Point(300,200));
 wax.mm.legend(m);
-m.setCenterZoom(
-  new com.modestmaps.Location(38.8225909, -97.5585),
-  4);
+m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
 
-<pre class='md'>
 ### Hash (BETA)
 
 The hash control saves the map position so that links hit the map in
 the same state as the user was.
-</pre>
 
 <div class='section'>
-<div id='modestmaps-hash' class='map'>
-<span class='attribution'>
-    <a href='http://mapbox.com/tileset/world-print'>World Print</a>
-</span>
-</div>
+<div id='modestmaps-hash' class='map'></div>
+<a class='attribution' href='http://mapbox.com/tileset/natural-earth-2'>Natural Earth II</a>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-hash',
-    new wax.mm.provider({
-      baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'natural-earth-2'}), new mm.Point(448,300));
+  new wax.mm.provider({
+    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+    layerName: 'natural-earth-2'}),
+  new mm.Point(300,200));
 wax.mm.hash(m, {
-      defaultCenter: new com.modestmaps.Location(38.8225909, -97.5585),
-      defaultZoom: 4,
-      manager: wax.mm.locationHash
-      });
+  defaultCenter: new mm.Location(39, -98),
+  defaultZoom: 4,
+  manager: wax.mm.locationHash});
 </pre>
 </div>
 
-<pre class='md'>
-## Wax Records
+## Layering
+
+Modest Maps natively supports a single map layer at a time, unlike OpenLayers, 
+which has a flexible baselayer/overlay system. Currently we're working on 
+compositing layers server-side rather than supporting multiple layers in the 
+browser, because this could give a much higher level of performance.
+
+# OpenLayers
+
+The Wax toolkit also supports [OpenLayers](http://openlayers.org), though it is
+**not recommended for new projects**, because it has become extremely bulky and difficult
+to use correctly.
+
+- `wax/ext/OpenLayers.js` contains the core OpenLayers library. **Do not use
+  the hosted version** unless absolutely necessary - the openlayers.org server
+  is not very fast or reliable, and the version that's hosted includes all
+  dependencies, making it extremely large.
+- `wax/build/wax.ol.js` contains the Wax controls and integration code for
+  OpenLayers.
+- `wax/theme/controls.css` contains default styles for controls. You can always
+  swap in your own later on.
+
+<div class='section'>
+<pre>
+&lt;html&gt;
+&lt;head&gt;
+  &lt;script src='wax/ext/OpenLayers.js' type='text/javascript'&gt;&lt;/script&gt;
+  &lt;script src='wax/build/wax.ol.js' type='text/javascript'&gt;&lt;/script&gt;
+  &lt;link href='wax/theme/controls.css' rel='stylesheet' type='text/css' /&gt;
+  ...
+</pre>
+</div>
+
+## MBTiles layers in OpenLayers
+
+The tilesets that TileStream serves and TileMill creates are valid in the
+[TMS specification](http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification),
+for which OpenLayers has the `OpenLayers.Layer.TMS` layer type.
+
+<div class='section'>
+<div id='openlayers-simple' class='map'></div>
+<a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
+<pre class='sh_javascript run'>
+// Use the mapbox openlayers zoom/pan control images.
+OpenLayers.ImgPath = 'http://js.mapbox.com/theme/dark/';
+// Set up a map in a div with the id 'openlayers-simple'
+var m = new OpenLayers.Map('openlayers-simple', {
+  units: 'm',
+  projection: new OpenLayers.Projection('EPSG:900913'),
+  maxExtent: new OpenLayers.Bounds(-20037508.34,
+    -20037508.34,
+    20037508.34,
+    20037508.34)
+});
+m.addLayer(new OpenLayers.Layer.TMS('geography-class',
+  'http://a.tiles.mapbox.com/mapbox/', {
+  maxResolution: 156543.0339,
+  type: 'png',
+  layername: 'geography-class'
+}));
+m.addControl(new wax.ol.Interaction());
+m.zoomTo(1);
+</pre>
+</div>
+
+# Google Maps
+
+The Google Maps API V3 is supported by Wax.
+
+- Include the Google Maps API V3 according to the [API documentation](http://code.google.com/apis/maps/documentation/javascript/tutorial.html#Loading_the_Maps_API).
+- `wax/build/wax.g.js` contains the Wax controls and integration code for
+  Google Maps.
+- `wax/theme/controls.css` contains default styles for controls. You can always
+  swap in your own later on.
+
+<div class='section'>
+<pre>
+&lt;html&gt;
+&lt;head&gt;
+  &lt;script src='http://maps.google.com/maps/api/js?sensor=false' type='text/javascript'&gt;&lt;/script&gt;
+  &lt;script src='wax/build/wax.g.js' type='text/javascript'&gt;&lt;/script&gt;
+  &lt;link href='wax/theme/controls.css' rel='stylesheet' type='text/css' /&gt;
+  ...
+</pre>
+</div>
+
+## MBTiles layers in Google Maps
+
+The tilesets that TileStream serves and TileMill creates are supported by a
+custom `MapType` provided by Wax at `wax.g.MapType`.
+
+<div class='section'>
+<div id='google-map' class='map'></div>
+<a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
+<pre class='sh_javascript run'>
+var map = new google.maps.Map(
+  document.getElementById('google-map'),
+  { center: new google.maps.LatLng(0, 0),
+    disableDefaultUI: true,
+    zoom: 1,
+    mapTypeId: google.maps.MapTypeId.ROADMAP });
+map.mapTypes.set('mb', new wax.g.MapType({
+    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+    layerName: 'geography-class',
+    name: 'Geography Class'
+}));
+map.setMapTypeId('mb');
+wax.g.interaction(map);
+</pre>
+</div>
+
+# Comparison of Mapping Libraries
+
+Wax supports [Modest Maps] [1], [OpenLayers] [2], and [Google Maps] [3] APIs
+with custom map controls - the ability to interact with tooltips and links,
+a legend to illustrate map data, and other various utilities.
+
+Modest Maps is the recommended library for use with Wax. Being more compact 
+than OpenLayers, faster on older browsers than Polymaps, and more flexible 
+than the Google Maps makes it a good choice for custom mapping applications.
+The library was originally developed by Tom Carden and Mike Migurski of
+[Stamen](http://stamen.com/) as a port of [ActionScript and Python code](http://modestmaps.com/).
+
+The main reason that [Polymaps](http://polymaps.org/) is not recommended for
+mainstream usage is its lack of support for Internet Explorer. Modest Maps,
+OpenLayers, and Google Maps all have solid support for Internet Explorer 7
+and higher.
+
+[1]: https://github.com/stamen/modestmaps-js
+[2]: http://www.openlayers.org/
+[3]: http://code.google.com/apis/maps/documentation/javascript/
+
+# Protips
+
+## Multiple servers
+
+[Most browsers have a limit](https://encrypted.google.com/search?hl=en&q=browser+domain+connection+limit&aq=f&aqi=&aql=&oq=)
+for how many things they can ask a single server for at one time - for 
+instance, Modest Maps will aim to download 18 tiles as soon as you load a map, 
+but Internet Explorer decides that the server shouldn't handle more than two
+requests at a time. Thus, only two tiles are downloaded at a time, despite the 
+fact that modern servers can handle many more. For this problem, we use multiple 
+servers, or more often, multiple domain names. So, you can use
+
+* `a.tile.mapbox.com`
+* `b.tile.mapbox.com` and
+* `c.tile.mapbox.com`
+
+For tile requests. And you can easily specify them in Modest Maps - just give
+the `WaxProvider` function an array of domain names instead of just one.
+
+<div class='section'>
+<div id='modestmaps-cnames' class='map dark'></div>
+<a class='attribution' href='http://mapbox.com/tileset/world-glass'>World Glass</a>
+<pre class='sh_javascript run'>
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-cnames',
+  new wax.mm.provider({
+    baseUrl: [
+      'http://a.tile.mapbox.com/',
+      'http://b.tile.mapbox.com/',
+      'http://c.tile.mapbox.com/'],
+    layerName: 'world-glass'}),
+  new mm.Point(300,200));
+m.setCenterZoom(new mm.Location(39, -98), 2);
+</pre>
+</div>
+
+And, of course, there are other options you can set on the `wax.mm.provider` 
+object, not just layerName and baseUrl.
+
+* **filetype**: default `.png`, it can be `.jpg` or anything else.
+* **zoomRange**: default `[0, 18]`, it can be any restricted range of 
+zoom levels that you happen to have rendered.
+
+<div class='section'>
+<div id='modestmaps-options' class='map'></div>
+<a class='attribution' href='http://mapbox.com/tileset/pakistan-grey'>Pakistan Grey</a>
+<pre class='sh_javascript run'>
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-options',
+  new wax.mm.provider({
+    baseUrl: 'http://a.tile.mapbox.com/',
+    layerName: 'pakistan-grey',
+    zoomRange: [0, 9],
+    filetype: '.jpg'}),
+  new mm.Point(300,200));
+m.setCenterZoom(new mm.Location(30.5, 69.78), 4);
+</pre>
+</div>
+
+## Records
 
 Records are a feature of Wax aimed to simplify the configuration of sites that
 host many maps. They translate the configuration of any mapping API into 
 logic-free [JSON](http://json.org/), where it can be stored in a database and 
 easily modified by other code.
-</pre>
+
 <div class='section'>
 <pre class='sh_javascript'>
 new google.maps.Map(document.getElementById('gmap'), {
@@ -407,7 +527,8 @@ wax.Record({ 'wax':
   ]
 });
 </pre>
-<pre class='md'>
+</div>
+
 Records aim to be a very close translation from the actual Javascript. 
 You'll notice that the Javascript keyword `new` is represented by `@new`, 
 and the same with calling functions, using literal functions, etc.
@@ -419,123 +540,21 @@ are written in a chainable fashion, like Modest Maps and Polymaps.
 stops spinning. Although `wax.Record` returns the last object it was playing
 around with (most often the map object), this is more a convenience than a core 
 API guarantee.
-</pre>
-</div>
-<pre class='md'>
-## Mapping Libraries
 
-Wax supports [Modest Maps] [1], [OpenLayers] [2], and [Google Maps] [3] APIs
-with custom map controls - the ability to interact with tooltips and links,
-a legend to illustrate map data, and other various utilities.
-
-Modest Maps is the recommended library for use with Wax. Being more compact 
-than OpenLayers, faster on older browsers than Polymaps, and more flexible 
-than the Google Maps makes it a good choice for custom mapping applications.
-The library was originally developed by Tom Carden and Mike Migurski of
-[Stamen](http://stamen.com/) as a port of [ActionScript and Python code](http://modestmaps.com/).
-
-### Modest Maps and Layering
-
-Modest Maps natively supports a single map layer at a time, unlike OpenLayers, 
-which has a flexible baselayer/overlay system. Currently we're working on 
-compositing layers server-side rather than supporting multiple layers in the 
-browser, because this could give a much higher level of performance.
-
-The main reason that [Polymaps](http://polymaps.org/) is not recommended for
-mainstream usage is its lack of support for Internet Explorer. Modest Maps,
-OpenLayers, and Google Maps all have solid support for Internet Explorer 7
-and higher.
-
-[1]: https://github.com/stamen/modestmaps-js
-[2]: http://www.openlayers.org/
-[3]: http://code.google.com/apis/maps/documentation/javascript/
-</pre>
+<!-- @TODO
+## Currying
 
 <div class='section'>
-<pre class='md'>
-### Protips
-
-For faster maps, use multiple servers. [Most browsers have a limit](https://encrypted.google.com/search?hl=en&q=browser+domain+connection+limit&aq=f&aqi=&aql=&oq=)
-for how many things they can ask a single server for at one time - for 
-instance, Modest Maps will aim to download 18 tiles as soon as you load a map, 
-but Internet Explorer decides that the server shouldn't handle more than two
-requests at a time. Thus, only two tiles are downloaded at a time, despite the 
-fact that modern servers can handle many more. For this problem, we use multiple 
-servers, or more often, multiple domain names. So, you can use
-
-* `a.tile.mapbox.com`
-* `b.tile.mapbox.com` and
-* `c.tile.mapbox.com`
-
-For tile requests. And you can easily specify them in Modest Maps - just give
-the `WaxProvider` function an array of domain names instead of just one.
-</pre>
-<div id='modestmaps-cnames' class='map dark'>
-<span class='attribution'>
-  <a href='http://mapbox.com/tileset/world-glass'>World Glass</a>
-</span>
-</div>
+<div id='modestmaps-reverse' class='map'></div>
+<a class='attribution' href='http://mapbox.com/tileset/pakistan-grey'>Pakistan Grey</a>
 <pre class='sh_javascript run'>
-var mm = com.modestmaps;
-var m = new mm.Map('modestmaps-cnames',
-    new wax.mm.provider({
-      baseUrl: [
-        'http://a.tile.mapbox.com/',
-        'http://b.tile.mapbox.com/',
-        'http://c.tile.mapbox.com/'],
-      layerName: 'world-glass'}), new mm.Point(448,300));
-m.setCenterZoom(
-  new com.modestmaps.Location(38.8225909, -97.5585),
-  4);
-</pre>
-</div>
-
-<div class='section'>
-<pre class='md'>
-And, of course, there are other options you can set on the `wax.mm.provider` 
-object, not just layerName and baseUrl.
-
-* **filetype**: default `.png`, it can be `.jpg` or anything else.
-* **zoomRange**: default `[0, 18]`, it can be any restricted range of 
-zoom levels that you happen to have rendered.
-</pre>
-<div id='modestmaps-options' class='map'>
-<span class='attribution'>
-  <a href='http://mapbox.com/tileset/pakistan-grey'>Pakistan Grey</a>
-</span>
-</div>
-<pre class='sh_javascript run'>
-var mm = com.modestmaps;
-var m = new mm.Map('modestmaps-options',
-    new wax.mm.provider({
-      baseUrl: 'http://a.tile.mapbox.com/',
-      layerName: 'pakistan-grey',
-      zoomRange: [0, 9],
-      filetype: '.jpg'}), new mm.Point(448,300));
-m.setCenterZoom(
-  new com.modestmaps.Location(30.5, 69.78),
-  4);
-</pre>
-</div>
-
-<div class='section'>
-<p class='md'>
-### Currying
-</p>
-<div id='modestmaps-reverse' class='map'>
-<span class='attribution'>
-  <a href='http://mapbox.com/tileset/pakistan-grey'>Pakistan Grey</a>
-</span>
-</div>
-<pre class='sh_javascript run'>
-/*
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-reverse',
     new wax.mm.provider({
       baseUrl: 'http://a.tile.mapbox.com/',
       layerName: 'pakistan-grey',
       zoomRange: [0, 9],
-      filetype: '.jpg'}), new mm.Point(448,300));
+      filetype: '.jpg'}), new mm.Point(300,200));
 w(m).melt(wax.mm.pointselector, {
   callback: function(coords) {
     $('#modestmaps-pointselector .attribution').text(
@@ -547,9 +566,10 @@ w(m).melt(wax.mm.pointselector, {
 m.setCenterZoom(
   new com.modestmaps.Location(30.5, 69.78),
   4);
-  */
 </pre>
 </div>
-    </div>
-  </body>
+-->
+
+</div>
+</body>
 </html>

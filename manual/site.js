@@ -8,7 +8,8 @@ $.domReady(function() {
         html.className = this.className;
         html.id = this.id;
         // TODO: free from shackles of jQuery
-        $(this).hide().after(html);
+        $(this).after(html);
+        $(this).remove();
     });
     $('h1, h2, h3, h4, h5, h6').each(function(elem, i, wrapped) {
         this.setAttribute('id', $(this).text().replace(/[\s\W]+/g, '-').toLowerCase());
