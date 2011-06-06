@@ -1,5 +1,25 @@
 UGLIFYJS = ./node_modules/.bin/uglifyjs
 
+dist: dist_setup dist/wax.ol.min.js dist/wax.g.min.js dist/wax.mm.min.js lint
+
+dist/wax.ol.min.js:
+	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/ol/*.js > dist/wax.ol.js
+	$(UGLIFYJS) dist/wax.ol.js > dist/wax.ol.min.js
+
+dist/wax.g.min.js:
+	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/g/*.js connectors/g/*.js > dist/wax.g.js
+	$(UGLIFYJS) dist/wax.g.js > dist/wax.g.min.js
+
+dist/wax.mm.min.js:
+	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/mm/*.js connectors/mm/*.js > dist/wax.mm.js
+	$(UGLIFYJS) dist/wax.mm.js > dist/wax.mm.min.js
+
+dist_setup:
+	mkdir dist
+
+clean:
+	rm -rf dist
+
 doc:
 	./node_modules/.bin/docco control/mm/*.js
 
@@ -12,25 +32,5 @@ ext:
 
 lint:
 	./node_modules/.bin/jshint control/lib/*.js control/mm/*.js --config=jshint.json
-
-build/wax.ol.min.js:
-	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/ol/*.js > build/wax.ol.js
-	$(UGLIFYJS) build/wax.ol.js > build/wax.ol.min.js
-
-build/wax.g.min.js:
-	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/g/*.js connectors/g/*.js > build/wax.g.js
-	$(UGLIFYJS) build/wax.g.js > build/wax.g.min.js
-
-build/wax.mm.min.js:
-	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/mm/*.js connectors/mm/*.js > build/wax.mm.js
-	$(UGLIFYJS) build/wax.mm.js > build/wax.mm.min.js
-
-build_setup:
-	mkdir build
-
-build: build_setup build/wax.ol.min.js build/wax.g.min.js build/wax.mm.min.js lint
-
-clean:
-	rm -rf build
 
 .PHONY: ext doc clean
