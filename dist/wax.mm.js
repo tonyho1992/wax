@@ -996,6 +996,10 @@ wax.mm.interaction = function(map, options) {
 
         clickAction: options.clickAction || 'full',
 
+        clickHandler: options.clickHandler || function(url) {
+            window.location = url;
+        },
+
         // Attach listeners to the map
         add: function() {
             for (var i = 0; i < this.modifyingEvents.length; i++) {
@@ -1141,7 +1145,7 @@ wax.mm.interaction = function(map, options) {
                                         this.callbacks.click(feature, map.parent, 0, evt);
                                         break;
                                     case 'location':
-                                        window.location = feature;
+                                        this.clickHandler(feature);
                                         break;
                                 }
                             }
