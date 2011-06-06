@@ -1,20 +1,20 @@
 {
-    "author": "Development Seed <info@developmentseed.org>",
     "name": "wax",
-    "author": [
-        "Tom MacWright <macwright@gmail.com>"
-    ],
+    "version": "1.4.2",
+    "description": "Tools for improving web maps.",
+    "author": {
+        "name": "MapBox",
+        "url": "http://mapbox.com/",
+        "email": "info@mapbox.com"
+    },
     "contributors": [
+        "Tom MacWright <macwright@gmail.com>",
         "Young Hahn <young@developmentseed.org>",
         "Will White <will@developmentseed.org>"
     ],
     "licenses": [{
       "type": "BSD"
     }],
-    "version": "1.4.2",
-    "files": [
-      "build"
-    ],
     "devDependencies": {
       "jshint": "0.2.x",
       "uglify-js": "1.0.x",
