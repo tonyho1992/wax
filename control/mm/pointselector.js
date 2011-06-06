@@ -99,6 +99,7 @@ wax.mm.pointselector = function(map, opts) {
         addLocation: function(location) {
             locations.push(location);
             pointselector.drawPoints()();
+            callback(cleanLocations(locations));
         },
         // Remove the awful circular reference from locations.
         // TODO: This function should be made unnecessary by not having it.
