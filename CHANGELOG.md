@@ -1,13 +1,12 @@
 ## Changelog
 
-### 2.0.1
-
-* Fix for interaction in Firefox with body margins.
-* Added OpenLayers and Google manual pages.
-* Removed Google and Modest Maps embedder controls. Will return some day...
-
 ### 2.0.0
 
+* Stripped down the README, now references the manual.
+* Renamed `build` to `dist` to avoid `npm` cleanup problems.
+* Fix for interaction in Firefox with body margins.
+* Added OpenLayers and Google to manual.
+* Removed Google and Modest Maps embedder controls. Will return some day...
 * All Modest Maps controls are flipped - instead of being extensions of the
   `com.modestmaps.Map` object, they are off of the `wax` object and are
   called with the map as the first argument and an options object as the second
