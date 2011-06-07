@@ -3,7 +3,7 @@ wax.mm = wax.mm || {};
 
 // A basic manager dealing only in hashchange and `location.hash`.
 // This **will interfere** with anchors, so a HTML5 pushState
-// implementation will be prefered.
+// implementation will be preferred.
 wax.mm.locationHash = {
   stateChange: function(callback) {
     com.modestmaps.addEvent(window, 'hashchange', function() {

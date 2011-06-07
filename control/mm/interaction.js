@@ -10,16 +10,24 @@ wax.mm = wax.mm || {};
 //   If not given, the `wax.tooltip` library will be expected.
 // * `clickAction` (optional): **full** or **location**: default is
 //   **full**.
+// * `clickHandler` (optional): if not given, `clickAction: 'location'` will
+//   assign a location to your window with `window.location = 'location'`.
+//   To make location-getting work with other systems, like those based on
+//   pushState or Backbone, you can provide a custom function of the form
+//
+//
+//     `clickHandler: function(url) { ... go to url ... }`
 wax.mm.interaction = function(map, options) {
     var MM = com.modestmaps;
     options = options || {};
-    // Our GridManager (from `gridutil.js`). This will keep the
-    // cache of grid information and provide friendly utility methods
-    // that return `GridTile` objects instead of raw data.
+
     var interaction = {
         modifyingEvents: ['zoomed', 'panned', 'centered',
             'extentset', 'resized', 'drawn'],
 
+        // Our GridManager (from `gridutil.js`). This will keep the
+        // cache of grid information and provide friendly utility methods
+        // that return `GridTile` objects instead of raw data.
         waxGM: new wax.GridManager(),
 
         // This requires wax.Tooltip or similar
@@ -65,6 +73,7 @@ wax.mm.interaction = function(map, options) {
                 })(map.tiles));
         },
 
+        // When the map moves, the tile grid is no longer valid.
         clearTileGrid: function(map, e) {
             this._getTileGrid = null;
         },
@@ -149,7 +158,9 @@ wax.mm.interaction = function(map, options) {
                 MM.removeEvent(map.parent, 'mouseup', this.mouseUp());
                 // Don't register clicks that are likely the boundaries
                 // of dragging the map
-                var tol = 4; // tolerance
+                // The tolerance between the place where the mouse goes down
+                // and where where it comes up is set at 4px.
+                var tol = 4;
                 var pos = wax.util.eventoffset(evt);
                 if (Math.round(pos.y / tol) === Math.round(this.downEvent.y / tol) &&
                     Math.round(pos.x / tol) === Math.round(this.downEvent.x / tol)) {
