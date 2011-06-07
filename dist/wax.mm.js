@@ -260,6 +260,7 @@ wax.request = {
 wax.GridInstance = function(grid_tile, formatter) {
     this.grid_tile = grid_tile;
     this.formatter = formatter;
+    // tileRes is the grid-elements-per-pixel ratio of gridded data.
     this.tileRes = 4;
 };
 
@@ -275,34 +276,39 @@ wax.GridInstance.prototype.resolveCode = function(key) {
 };
 
 wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
-  if (!(this.grid_tile && this.grid_tile.grid)) return;
+    if (!(this.grid_tile && this.grid_tile.grid)) return;
 
-  // IE problem here - though recoverable, for whatever reason
-  var offset = wax.util.offset(tile_element);
-  var tileX = offset.left;
-  var tileY = offset.top;
+    // IE problem here - though recoverable, for whatever reason
+    var offset = wax.util.offset(tile_element);
+    var tileX = offset.left;
+    var tileY = offset.top;
 
-  if (y - tileY < 0) return;
-  if (x - tileX < 0) return;
-  if (Math.floor((y - tileY) / this.tileRes) > 256) return;
-  if (Math.floor((x - tileX) / this.tileRes) > 256) return;
+    if (y - tileY < 0) return;
+    if (x - tileX < 0) return;
+    if (Math.floor((y - tileY) / this.tileRes) > 256) return;
+    if (Math.floor((x - tileX) / this.tileRes) > 256) return;
 
-  var key = this.grid_tile.grid[
-     Math.floor((y - tileY) / this.tileRes)
-  ].charCodeAt(
-     Math.floor((x - tileX) / this.tileRes)
-  );
-
-  key = this.resolveCode(key);
-
-  // If this layers formatter hasn't been loaded yet,
-  // download and load it now.
-  if (this.grid_tile.keys[key]) {
-    return this.formatter.format(
-      options,
-      this.grid_tile.data[this.grid_tile.keys[key]]
+    var key = this.grid_tile.grid[
+       Math.floor((y - tileY) / this.tileRes)
+    ].charCodeAt(
+       Math.floor((x - tileX) / this.tileRes)
     );
-  }
+
+    key = this.resolveCode(key);
+
+    // If this layers formatter hasn't been loaded yet,
+    // download and load it now.
+    if (this.grid_tile.keys[key]) {
+        var data_val = this.grid_tile.data[this.grid_tile.keys[key]];
+        if (data_val) {
+            return this.formatter.format(
+                options,
+                data_val
+            );
+        } else {
+            return this.grid_tile.keys[key];
+        }
+    }
 };
 
 // GridManager
@@ -330,16 +336,6 @@ wax.GridManager.prototype.getGrid = function(url, callback) {
     });
 };
 
-// Create a cross-browser event object
-wax.GridManager.prototype.makeEvent = function(evt) {
-  return {
-    target: evt.target || evt.srcElement,
-    pX: evt.pageX || evt.clientX,
-    pY: evt.pageY || evt.clientY,
-    evt: evt
-  };
-};
-
 // Simplistically derive the URL of the grid data endpoint from a tile URL
 wax.GridManager.prototype.tileDataUrl = function(url) {
   return url.replace(/(\.png|\.jpg|\.jpeg)(\d*)/, '.grid.json');
@@ -352,21 +348,21 @@ wax.GridManager.prototype.formatterUrl = function(url) {
 
 // Request and save a formatter, passed to `callback()` when finished.
 wax.GridManager.prototype.getFormatter = function(url, callback) {
-  var that = this;
-  // Formatter is cached.
-  if (typeof this.formatters[url] !== 'undefined') {
-    callback(null, this.formatters[url]);
-    return;
-  } else {
-    wax.request.get(url, function(err, data) {
-        if (data && data.formatter) {
-            that.formatters[url] = new wax.Formatter(data);
-        } else {
-            that.formatters[url] = false;
-        }
-        callback(err, that.formatters[url]);
-    });
-  }
+    var that = this;
+    // Formatter is cached.
+    if (typeof this.formatters[url] !== 'undefined') {
+        callback(null, this.formatters[url]);
+        return;
+    } else {
+        wax.request.get(url, function(err, data) {
+            if (data && data.formatter) {
+                that.formatters[url] = new wax.Formatter(data);
+            } else {
+                that.formatters[url] = false;
+            }
+            callback(err, that.formatters[url]);
+        });
+    }
 };
 
 // Formatter
@@ -863,7 +859,7 @@ wax.mm = wax.mm || {};
 
 // A basic manager dealing only in hashchange and `location.hash`.
 // This **will interfere** with anchors, so a HTML5 pushState
-// implementation will be prefered.
+// implementation will be preferred.
 wax.mm.locationHash = {
   stateChange: function(callback) {
     com.modestmaps.addEvent(window, 'hashchange', function() {
@@ -979,16 +975,24 @@ wax.mm = wax.mm || {};
 //   If not given, the `wax.tooltip` library will be expected.
 // * `clickAction` (optional): **full** or **location**: default is
 //   **full**.
+// * `clickHandler` (optional): if not given, `clickAction: 'location'` will
+//   assign a location to your window with `window.location = 'location'`.
+//   To make location-getting work with other systems, like those based on
+//   pushState or Backbone, you can provide a custom function of the form
+//
+//
+//     `clickHandler: function(url) { ... go to url ... }`
 wax.mm.interaction = function(map, options) {
     var MM = com.modestmaps;
     options = options || {};
-    // Our GridManager (from `gridutil.js`). This will keep the
-    // cache of grid information and provide friendly utility methods
-    // that return `GridTile` objects instead of raw data.
+
     var interaction = {
         modifyingEvents: ['zoomed', 'panned', 'centered',
             'extentset', 'resized', 'drawn'],
 
+        // Our GridManager (from `gridutil.js`). This will keep the
+        // cache of grid information and provide friendly utility methods
+        // that return `GridTile` objects instead of raw data.
         waxGM: new wax.GridManager(),
 
         // This requires wax.Tooltip or similar
@@ -1034,6 +1038,7 @@ wax.mm.interaction = function(map, options) {
                 })(map.tiles));
         },
 
+        // When the map moves, the tile grid is no longer valid.
         clearTileGrid: function(map, e) {
             this._getTileGrid = null;
         },
@@ -1118,7 +1123,9 @@ wax.mm.interaction = function(map, options) {
                 MM.removeEvent(map.parent, 'mouseup', this.mouseUp());
                 // Don't register clicks that are likely the boundaries
                 // of dragging the map
-                var tol = 4; // tolerance
+                // The tolerance between the place where the mouse goes down
+                // and where where it comes up is set at 4px.
+                var tol = 4;
                 var pos = wax.util.eventoffset(evt);
                 if (Math.round(pos.y / tol) === Math.round(this.downEvent.y / tol) &&
                     Math.round(pos.x / tol) === Math.round(this.downEvent.x / tol)) {
@@ -1346,6 +1353,14 @@ wax.mm = wax.mm || {};
 
 // Point Selector
 // --------------
+//
+// This takes an object of options:
+//
+// * `callback`: a function called with an array of `com.modestmaps.Location`
+//   objects when the map is edited
+//
+// It also exposes a public API function: `addLocation`, which adds a point
+// to the map as if added by the user.
 wax.mm.pointselector = function(map, opts) {
     var mouseDownPoint = null,
         mouseUpPoint = null,
@@ -1373,6 +1388,7 @@ wax.mm.pointselector = function(map, opts) {
         if (!isNaN(body.x)) point.x -= body.x;
         if (!isNaN(body.y)) point.y -= body.y;
 
+        // TODO: use wax.util.offset
         // correct for nested offsets in DOM
         for (var node = map.parent; node; node = node.offsetParent) {
             point.x -= node.offsetLeft;
@@ -1381,6 +1397,9 @@ wax.mm.pointselector = function(map, opts) {
         return point;
     };
 
+    // Currently locations in this control contain circular references to elements.
+    // These can't be JSON encoded, so here's a utility to clean the data that's
+    // spit back.
     function cleanLocations(locations) {
         var o = [];
         for (var i = 0; i < locations.length; i++) {
@@ -1404,6 +1423,8 @@ wax.mm.pointselector = function(map, opts) {
                 callback(cleanLocations(locations));
             }
         },
+        // Redraw the points when the map is moved, so that they stay in the
+        // correct geographic locations.
         drawPoints: function() {
             if (!this._drawPoints) this._drawPoints = wax.util.bind(function() {
                 var offset = new MM.Point(0, 0);
@@ -1417,7 +1438,8 @@ wax.mm.pointselector = function(map, opts) {
                         // TODO: avoid circular reference
                         locations[i].pointDiv.location = locations[i];
                         // Create this closure once per point
-                        MM.addEvent(locations[i].pointDiv, 'mouseup', (function selectPointWrap(e) {
+                        MM.addEvent(locations[i].pointDiv, 'mouseup',
+                            (function selectPointWrap(e) {
                             var l = locations[i];
                             return function(e) {
                                 MM.removeEvent(map.parent, 'mouseup', pointselector.mouseUp());
@@ -1439,6 +1461,9 @@ wax.mm.pointselector = function(map, opts) {
             }, this);
             return this._mouseDown;
         },
+        // API for programmatically adding points to the map - this
+        // calls the callback for ever point added, so it can be symmetrical.
+        // Useful for initializing the map when it's a part of a form.
         addLocation: function(location) {
             locations.push(location);
             pointselector.drawPoints()();

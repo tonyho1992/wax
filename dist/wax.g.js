@@ -260,6 +260,7 @@ wax.request = {
 wax.GridInstance = function(grid_tile, formatter) {
     this.grid_tile = grid_tile;
     this.formatter = formatter;
+    // tileRes is the grid-elements-per-pixel ratio of gridded data.
     this.tileRes = 4;
 };
 
@@ -275,34 +276,39 @@ wax.GridInstance.prototype.resolveCode = function(key) {
 };
 
 wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
-  if (!(this.grid_tile && this.grid_tile.grid)) return;
+    if (!(this.grid_tile && this.grid_tile.grid)) return;
 
-  // IE problem here - though recoverable, for whatever reason
-  var offset = wax.util.offset(tile_element);
-  var tileX = offset.left;
-  var tileY = offset.top;
+    // IE problem here - though recoverable, for whatever reason
+    var offset = wax.util.offset(tile_element);
+    var tileX = offset.left;
+    var tileY = offset.top;
 
-  if (y - tileY < 0) return;
-  if (x - tileX < 0) return;
-  if (Math.floor((y - tileY) / this.tileRes) > 256) return;
-  if (Math.floor((x - tileX) / this.tileRes) > 256) return;
+    if (y - tileY < 0) return;
+    if (x - tileX < 0) return;
+    if (Math.floor((y - tileY) / this.tileRes) > 256) return;
+    if (Math.floor((x - tileX) / this.tileRes) > 256) return;
 
-  var key = this.grid_tile.grid[
-     Math.floor((y - tileY) / this.tileRes)
-  ].charCodeAt(
-     Math.floor((x - tileX) / this.tileRes)
-  );
-
-  key = this.resolveCode(key);
-
-  // If this layers formatter hasn't been loaded yet,
-  // download and load it now.
-  if (this.grid_tile.keys[key]) {
-    return this.formatter.format(
-      options,
-      this.grid_tile.data[this.grid_tile.keys[key]]
+    var key = this.grid_tile.grid[
+       Math.floor((y - tileY) / this.tileRes)
+    ].charCodeAt(
+       Math.floor((x - tileX) / this.tileRes)
     );
-  }
+
+    key = this.resolveCode(key);
+
+    // If this layers formatter hasn't been loaded yet,
+    // download and load it now.
+    if (this.grid_tile.keys[key]) {
+        var data_val = this.grid_tile.data[this.grid_tile.keys[key]];
+        if (data_val) {
+            return this.formatter.format(
+                options,
+                data_val
+            );
+        } else {
+            return this.grid_tile.keys[key];
+        }
+    }
 };
 
 // GridManager
@@ -330,16 +336,6 @@ wax.GridManager.prototype.getGrid = function(url, callback) {
     });
 };
 
-// Create a cross-browser event object
-wax.GridManager.prototype.makeEvent = function(evt) {
-  return {
-    target: evt.target || evt.srcElement,
-    pX: evt.pageX || evt.clientX,
-    pY: evt.pageY || evt.clientY,
-    evt: evt
-  };
-};
-
 // Simplistically derive the URL of the grid data endpoint from a tile URL
 wax.GridManager.prototype.tileDataUrl = function(url) {
   return url.replace(/(\.png|\.jpg|\.jpeg)(\d*)/, '.grid.json');
@@ -352,21 +348,21 @@ wax.GridManager.prototype.formatterUrl = function(url) {
 
 // Request and save a formatter, passed to `callback()` when finished.
 wax.GridManager.prototype.getFormatter = function(url, callback) {
-  var that = this;
-  // Formatter is cached.
-  if (typeof this.formatters[url] !== 'undefined') {
-    callback(null, this.formatters[url]);
-    return;
-  } else {
-    wax.request.get(url, function(err, data) {
-        if (data && data.formatter) {
-            that.formatters[url] = new wax.Formatter(data);
-        } else {
-            that.formatters[url] = false;
-        }
-        callback(err, that.formatters[url]);
-    });
-  }
+    var that = this;
+    // Formatter is cached.
+    if (typeof this.formatters[url] !== 'undefined') {
+        callback(null, this.formatters[url]);
+        return;
+    } else {
+        wax.request.get(url, function(err, data) {
+            if (data && data.formatter) {
+                that.formatters[url] = new wax.Formatter(data);
+            } else {
+                that.formatters[url] = false;
+            }
+            callback(err, that.formatters[url]);
+        });
+    }
 };
 
 // Formatter
