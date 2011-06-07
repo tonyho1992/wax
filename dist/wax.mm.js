@@ -262,6 +262,8 @@ wax.GridInstance = function(grid_tile, formatter) {
     this.formatter = formatter;
     // tileRes is the grid-elements-per-pixel ratio of gridded data.
     this.tileRes = 4;
+    // The size of a tile element. For now we expect tiles to be squares.
+    this.tileSize = 256;
 };
 
 // Resolve the UTF-8 encoding stored in grids to simple
@@ -283,15 +285,20 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
     var tileX = offset.left;
     var tileY = offset.top;
 
+    // This tile's resolution. larger tiles will have lower, aka coarser, resolutions
+    var res = (offset.width / this.tileSize) * this.tileRes;
+
     if (y - tileY < 0) return;
     if (x - tileX < 0) return;
-    if (Math.floor((y - tileY) / this.tileRes) > 256) return;
-    if (Math.floor((x - tileX) / this.tileRes) > 256) return;
+    if (Math.floor(y - tileY) > this.tileSize) return;
+    if (Math.floor(x - tileX) > this.tileSize) return;
 
+    // Find the key in the grid. The above calls should ensure that
+    // the grid's array is large enough to make this work.
     var key = this.grid_tile.grid[
-       Math.floor((y - tileY) / this.tileRes)
+       Math.floor((y - tileY) / res)
     ].charCodeAt(
-       Math.floor((x - tileX) / this.tileRes)
+       Math.floor((x - tileX) / res)
     );
 
     key = this.resolveCode(key);
@@ -1036,7 +1043,6 @@ wax.mm.interaction = function(map, options) {
                             o.push([offset.top, offset.left, t[key]]);
                         }
                     }
-                    if (o.length === 0) console.log('fail');
                     return o;
                 })(map.tiles));
         },
