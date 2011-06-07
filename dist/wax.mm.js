@@ -1013,7 +1013,8 @@ wax.mm.interaction = function(map, options) {
                 );
             }
             MM.addEvent(map.parent, 'mousemove', this.onMove());
-            MM.addEvent(map.parent, 'mousedown', this.mouseDown());
+            MM.addEvent(map.parent, 'mousedown', this.onDown());
+            MM.addEvent(map.parent, 'touchstart', this.onDown());
             return this;
         },
 
@@ -1103,8 +1104,9 @@ wax.mm.interaction = function(map, options) {
             return this._onMove;
         },
 
-        mouseDown: function(evt) {
-            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(evt) {
+        // A handler for 'down' events - which means `mousedown` and `touchstart`
+        onDown: function(evt) {
+            if (!this._onDown) this._onDown = wax.util.bind(function(evt) {
                 // Ignore double-clicks by ignoring clicks within 300ms of
                 // each other.
                 if (this.clearTimeout()) {
@@ -1112,15 +1114,20 @@ wax.mm.interaction = function(map, options) {
                 }
                 // Store this event so that we can compare it to the
                 // up event
-                this.downEvent = wax.util.eventoffset(evt);
-                MM.addEvent(map.parent, 'mouseup', this.mouseUp());
+                if (evt.type === 'mousedown') {
+                    this.downEvent = wax.util.eventoffset(evt);
+                    MM.addEvent(map.parent, 'mouseup', this.onUp());
+                } else if (evt.type === 'touchstart' && evt.touches.length === 1) {
+                    console.log('good touch');
+                    MM.addEvent(map.parent, 'touchend', this.onUp());
+                }
             }, this);
-            return this._mouseDown;
+            return this._onDown;
         },
 
-        mouseUp: function() {
-            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(evt) {
-                MM.removeEvent(map.parent, 'mouseup', this.mouseUp());
+        onUp: function() {
+            if (!this._onUp) this._onUp = wax.util.bind(function(evt) {
+                MM.removeEvent(map.parent, 'mouseup', this.onUp());
                 // Don't register clicks that are likely the boundaries
                 // of dragging the map
                 // The tolerance between the place where the mouse goes down
@@ -1134,7 +1141,7 @@ wax.mm.interaction = function(map, options) {
                         wax.util.bind(function() { this.click()(pos); }, this), 300);
                 }
             }, this);
-            return this._mouseUp;
+            return this._onUp;
         },
 
         click: function(evt) {

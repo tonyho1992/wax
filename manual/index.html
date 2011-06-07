@@ -45,21 +45,21 @@ ingredients are
 * A Javascript API, like [Modest Maps](https://github.com/stamen/modestmaps-js)
 * Your website
 
-The mapping server serves up **tiles** of rendered data - tiles being 256 pixel 
-square images covering some of the world. Here's a tile of Europe from the 
+The mapping server serves up **tiles** of rendered data - tiles being 256 pixel
+square images covering some of the world. Here's a tile of Europe from the
 [World Light tileset](http://mapbox.com/tileset/world-light).
 
 ![Europe](http://b.tile.mapbox.com/1.0.0/world-light/2/2/2.png)
 
-There are quite a few mapping APIs, but at their core, they're doing the same 
-sort of thing - adding these tiles to a page and managing them so that the 
-map seems like a continuous world instead of little squares. We'll start off with 
+There are quite a few mapping APIs, but at their core, they're doing the same
+sort of thing - adding these tiles to a page and managing them so that the
+map seems like a continuous world instead of little squares. We'll start off with
 **Modest Maps** because it's lightweight and fast.
 
 # Modest Maps
 
-The first step is to actually download and include the necessary Javascript 
-code to make your map work. We'll also include a CSS file to start rolling with 
+The first step is to actually download and include the necessary Javascript
+code to make your map work. We'll also include a CSS file to start rolling with
 style:
 
 - `wax/ext/modestmaps.min.js` contains the Modest Maps library.
@@ -145,12 +145,17 @@ var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-mobile',
   new wax.mm.provider({
     baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    layerName: 'world-glass'}),
+    layerName: 'geography-class'}),
   new mm.Point(300,200),
   [new mm.MouseHandler(), new mm.TouchHandler()]);
-wax.mm.mobile(m, { bodyDraw: function(body) {
-  body.bgColor = '#000000';
-}});
+wax.mm.mobile(m, {
+  bodyDraw: function(body) {
+    body.bgColor = '#000000';
+  }
+});
+wax.mm.interaction(m, { callbacks:
+  new wax.tooltip({ animationOut: 'wax-fade' })
+});
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
