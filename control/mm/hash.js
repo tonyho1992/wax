@@ -11,10 +11,34 @@ wax.mm.locationHash = {
     }, false);
   },
   getState: function() {
-    return location.hash;
+    return location.hash.substring(1);
   },
   pushState: function(state) {
-    location.hash = state;
+    location.hash = '#' + state;
+  }
+};
+
+// a HTML5 pushstate-based hash changer.
+//
+// This **does not degrade** with non-supporting browsers - it simply
+// does nothing.
+wax.mm.pushState = {
+  stateChange: function(callback) {
+      com.modestmaps.addEvent(window, 'popstate', function(e) {
+          if (e.state && e.state.map_location) {
+              callback(e.state.map_location);
+          }
+      }, false);
+  },
+  getState: function() {
+     if (!(window.history && window.history.state)) return;
+     return history.state && history.state.map_location;
+  },
+  // Push states - so each substantial movement of the map
+  // is a history object.
+  pushState: function(state) {
+      if (!(window.history && window.history.pushState)) return;
+      window.history.pushState({ map_location: state });
   }
 };
 
@@ -29,22 +53,22 @@ wax.mm.hash = function(map, options) {
     // Ripped from underscore.js
     // Internal function used to implement `_.throttle` and `_.debounce`.
     var limit = function(func, wait, debounce) {
-      var timeout;
-      return function() {
-        var context = this, args = arguments;
-        var throttler = function() {
-          timeout = null;
-          func.apply(context, args);
-        };
-        if (debounce) clearTimeout(timeout);
-        if (debounce || !timeout) timeout = setTimeout(throttler, wait);
-      };
+        var timeout;
+          return function() {
+              var context = this, args = arguments;
+              var throttler = function() {
+                  timeout = null;
+                  func.apply(context, args);
+              };
+              if (debounce) clearTimeout(timeout);
+              if (debounce || !timeout) timeout = setTimeout(throttler, wait);
+          };
     };
 
     // Returns a function, that, when invoked, will only be triggered at most once
     // during a given window of time.
     var throttle = function(func, wait) {
-      return limit(func, wait, false);
+        return limit(func, wait, false);
     };
 
     var hash = {
@@ -52,8 +76,8 @@ wax.mm.hash = function(map, options) {
         parser: function(s) {
             var args = s.split('/');
             for (var i = 0; i < args.length; i++) {
+                args[i] = Number(args[i]);
                 if (isNaN(args[i])) return true;
-                args[i] = Number(args);
             }
             if (args.length < 3) {
                 // replace bogus hash
@@ -78,7 +102,7 @@ wax.mm.hash = function(map, options) {
             var center = map.getCenter(),
                 zoom = map.getZoom(),
                 precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
-            return '#' + [zoom.toFixed(2),
+            return [zoom.toFixed(2),
               center.lat.toFixed(precision),
               center.lon.toFixed(precision)].join('/');
         },
@@ -93,9 +117,9 @@ wax.mm.hash = function(map, options) {
         stateChange: function(state) {
             // ignore spurious hashchange events
             if (state === s0) return;
-            if (hash.parser((s0 = state).substring(1))) {
-              // replace bogus hash
-              hash.move();
+            if (hash.parser(s0 = state)) {
+                // replace bogus hash
+                hash.move();
             }
         },
         // If a state isn't present when you initially load the map, the map should
