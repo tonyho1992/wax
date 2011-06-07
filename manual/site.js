@@ -15,17 +15,30 @@ $.domReady(function() {
         this.setAttribute('id', $(this).text().replace(/[\s\W]+/g, '-').toLowerCase());
 
         var para = document.createElement('a'),
+            api = document.createElement('a'),
             sectionLi = document.createElement('li'),
             sectionA = document.createElement('a');
 
-        para.innerHTML = '&para;'
-        para.className = 'para'
+        para.innerHTML = '&para;';
+        para.setAttribute('title', 'permalink');
+        para.className = 'para';
         para.href = '#' + this.id;
+
+
         sectionA.href = '#' + this.id;
         $(sectionA).text($(this).text());
         sectionLi.className = this.nodeName;
         sectionLi.appendChild(sectionA);
         nav.append(sectionLi);
+
+        if (this.nodeName === 'H3') {
+            api.innerHTML = 'api';
+            api.setAttribute('title', 'API Documentation');
+            api.className = 'api';
+            api.href = '../docs/' + this.id + '.html';
+            $(this).append(api);
+        }
+
         $(this).append(para);
     });
     $('.run').each(function() {

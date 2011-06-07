@@ -112,7 +112,8 @@ div.section .widget {
 /**
  * Paragraph markers
  */
-.md a.para {
+.md a.para,
+.md a.api {
   position:absolute;
   left:-40px;
   top:2px;
@@ -131,11 +132,19 @@ div.section .widget {
   -webkit-transition:background-color .5s;
   }
 
+.md a.api {
+  top:25px;
+  -moz-transition:background-color .5s;
+  -webkit-transition:background-color .5s;
+  }
+
+
 /**
  * Prose/text styles
  */
 h1:hover a.para,
 h2:hover a.para,
+h3:hover a.api,
 h3:hover a.para { background:#333; }
 
 h1, h2, h3, h4, h5, h6, p {
