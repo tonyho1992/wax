@@ -298,16 +298,8 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
 
     // If this layers formatter hasn't been loaded yet,
     // download and load it now.
-    if (this.grid_tile.keys[key]) {
-        var data_val = this.grid_tile.data[this.grid_tile.keys[key]];
-        if (data_val) {
-            return this.formatter.format(
-                options,
-                data_val
-            );
-        } else {
-            return this.grid_tile.keys[key];
-        }
+    if (this.grid_tile.keys[key] && this.grid_tile.data[this.grid_tile.keys[key]]) {
+        return this.formatter.format(options, data_val);
     }
 };
 
