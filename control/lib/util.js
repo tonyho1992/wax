@@ -110,8 +110,15 @@ wax.util = {
             var topMargin = parseInt(htmlComputed.marginTop, 10) || 0;
             var leftMargin = parseInt(htmlComputed.marginLeft, 10) || 0;
             return {
-                x: e.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0) + leftMargin,
-                y: e.clientY + (doc && doc.scrollTop  || body && body.scrollTop  || 0) - (doc && doc.clientTop  || body && body.clientTop  || 0) + topMargin
+                x: e.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
+                  (doc && doc.clientLeft || body && body.clientLeft || 0) + leftMargin,
+                y: e.clientY + (doc && doc.scrollTop  || body && body.scrollTop  || 0) -
+                  (doc && doc.clientTop  || body && body.clientTop  || 0) + topMargin
+            };
+        } else if (e.touches && e.touches.length === 1) {
+            return {
+                x: e.touches[0].pageX,
+                y: e.touches[0].pageY
             };
         }
     }

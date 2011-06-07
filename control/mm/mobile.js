@@ -114,6 +114,7 @@ wax.mm.mobile = function(map, opts) {
                 oldBody = document.body;
 
                 newBody = document.createElement('body');
+                newBody.className = 'wax-mobile-body';
                 newBody.appendChild(backDiv);
 
                 mm.addEvent(overlayDiv, 'touchstart', this.toTouch);

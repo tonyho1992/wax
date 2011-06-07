@@ -33,7 +33,7 @@ wax.mm.interaction = function(map, options) {
         // This requires wax.Tooltip or similar
         callbacks: options.callbacks || new wax.tooltip(),
 
-        clickAction: options.clickAction || 'full',
+        clickAction: options.clickAction || ['full'],
 
         clickHandler: options.clickHandler || function(url) {
             window.location = url;
@@ -47,6 +47,7 @@ wax.mm.interaction = function(map, options) {
                     wax.util.bind(this.clearTileGrid, this)
                 );
             }
+            if (!wax.util.isArray(this.clickAction)) this.clickAction = [this.clickAction];
             MM.addEvent(map.parent, 'mousemove', this.onMove());
             MM.addEvent(map.parent, 'mousedown', this.onDown());
             MM.addEvent(map.parent, 'touchstart', this.onDown());
@@ -58,7 +59,8 @@ wax.mm.interaction = function(map, options) {
         // so that `mousemove` events don't always recalculate.
         getTileGrid: function() {
             // TODO: don't build for tiles outside of viewport
-            var zoom = map.getZoom();
+            // Touch interaction leads to intermediate
+            var zoom = Math.round(map.getZoom());
             // Calculate a tile grid and cache it, by using the `.tiles`
             // element on this map.
             return this._getTileGrid || (this._getTileGrid =
@@ -149,27 +151,50 @@ wax.mm.interaction = function(map, options) {
                 }
                 // Store this event so that we can compare it to the
                 // up event
+                this.downEvent = wax.util.eventoffset(evt);
                 if (evt.type === 'mousedown') {
-                    this.downEvent = wax.util.eventoffset(evt);
                     MM.addEvent(map.parent, 'mouseup', this.onUp());
+                // Only track single-touches. Double-touches will not affect this
+                // control
                 } else if (evt.type === 'touchstart' && evt.touches.length === 1) {
-                    console.log('good touch');
+                    // turn this into touch-mode. Fallback to teaser and full.
+                    this.clickAction = ['full', 'teaser'];
+                    // Don't make the user click close if they hit another tooltip
+                    if (this.callbacks._currentTooltip) {
+                        this.callbacks.hideTooltip(this.callbacks._currentTooltip);
+                    }
+                    // Touch moves invalidate touches
                     MM.addEvent(map.parent, 'touchend', this.onUp());
+                    MM.addEvent(map.parent, 'touchmove', this.touchCancel());
                 }
             }, this);
             return this._onDown;
         },
 
+        // If we get a touchMove event, it isn't a tap.
+        touchCancel: function() {
+            if (!this._touchCancel) this._touchCancel = wax.util.bind(function(evt) {
+                MM.removeEvent(map.parent, 'touchend', this.onUp());
+                MM.removeEvent(map.parent, 'touchmove', this.onUp());
+            }, this);
+            return this._touchCancel;
+        },
+
         onUp: function() {
             if (!this._onUp) this._onUp = wax.util.bind(function(evt) {
                 MM.removeEvent(map.parent, 'mouseup', this.onUp());
+                MM.removeEvent(map.parent, 'touchend', this.onUp());
+                MM.removeEvent(map.parent, 'touchmove', this.touchCancel());
                 // Don't register clicks that are likely the boundaries
                 // of dragging the map
                 // The tolerance between the place where the mouse goes down
                 // and where where it comes up is set at 4px.
                 var tol = 4;
                 var pos = wax.util.eventoffset(evt);
-                if (Math.round(pos.y / tol) === Math.round(this.downEvent.y / tol) &&
+                if (evt.type === 'touchend') {
+                    // If this was a touch and it survived, there's no need to avoid a double-tap
+                    this.click()(this.downEvent);
+                } else if (Math.round(pos.y / tol) === Math.round(this.downEvent.y / tol) &&
                     Math.round(pos.x / tol) === Math.round(this.downEvent.x / tol)) {
                     // Contain the event data in a closure.
                     this.clickTimeout = window.setTimeout(
@@ -179,23 +204,28 @@ wax.mm.interaction = function(map, options) {
             return this._onUp;
         },
 
+        // Handle a click event. Takes a second
         click: function(evt) {
             if (!this._onClick) this._onClick = wax.util.bind(function(pos) {
                 var tile = this.getTile(pos);
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
                         if (g) {
-                            var feature = g.getFeature(pos.x, pos.y, tile, {
-                                format: this.clickAction
-                            });
-                            if (feature) {
-                                switch (this.clickAction) {
-                                    case 'full':
-                                        this.callbacks.click(feature, map.parent, 0, evt);
-                                        break;
-                                    case 'location':
-                                        this.clickHandler(feature);
-                                        break;
+                            for (var i = 0; i < this.clickAction.length; i++) {
+                                var feature = g.getFeature(pos.x, pos.y, tile, {
+                                    format: this.clickAction[i]
+                                });
+                                if (feature) {
+                                    switch (this.clickAction[i]) {
+                                        case 'full':
+                                        // clickAction can be teaser in touch interaction
+                                        case 'teaser':
+                                            return this.callbacks.click(feature, map.parent, 0, evt);
+                                            break;
+                                        case 'location':
+                                            return this.clickHandler(feature);
+                                            break;
+                                    }
                                 }
                             }
                         }

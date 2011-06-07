@@ -79,6 +79,11 @@ a.zoomer {
   right:0px;
   }
 
+.wax-mobile-body .wax-tooltip {
+  position:absolute;
+  top:50px;
+  }
+
 .zoombox-box,
 .boxselector-box {
   margin:0;
