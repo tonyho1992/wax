@@ -566,13 +566,13 @@ wax.util = {
     // From Bonzo
     offset: function(el) {
         // TODO: window margin offset
-        var width = el.offsetWidth;
-        var height = el.offsetHeight;
-        var top = el.offsetTop;
-        var left = el.offsetLeft;
+        var width = el.offsetWidth,
+            height = el.offsetHeight,
+            top = 0,
+            left = 0;
 
         try {
-            while (el = el.offsetParent) {
+            do {
                 top += el.offsetTop;
                 left += el.offsetLeft;
 
@@ -582,13 +582,15 @@ wax.util = {
                     el.style['-webkit-transform'] ||
                     el.style.MozTransform;
                 if (style) {
-                    var match = style.match(/translate\((.+)px, (.+)px\)/);
-                    if (match) {
+                    if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
+                        top += parseInt(match[2], 10);
+                        left += parseInt(match[1], 10);
+                    } else if (match = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/)) {
                         top += parseInt(match[2], 10);
                         left += parseInt(match[1], 10);
                     }
                 }
-            }
+            } while (el = el.offsetParent);
         } catch(e) {
             // Hello, internet explorer.
         }

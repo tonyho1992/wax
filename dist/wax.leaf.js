@@ -685,381 +685,193 @@ wax.util = {
         }
     }
 };
-// Wax header
-var wax = wax || {};
-wax.ol = wax.ol || {};
+wax = wax || {};
+wax.leaf = wax.leaf || {};
 
-// An interaction toolkit for tiles that implement the
-// [MBTiles UTFGrid spec](https://github.com/mapbox/mbtiles-spec)
-wax.ol.Embedder =
-    OpenLayers.Class(OpenLayers.Control, {
-    initialize: function(options) {
-      options = options || {};
-      OpenLayers.Control.prototype.initialize.apply(this, [options || {}]);
-    },
+// A chaining-style control that adds
+// interaction to a Leaflet.Map object.
+//
+// Takes an options object with the following keys:
+//
+// * `callbacks` (optional): an `out`, `over`, and `click` callback.
+//   If not given, the `wax.tooltip` library will be expected.
+// * `clickAction` (optional): **full** or **location**: default is
+//   **full**.
+wax.leaf.interaction = function(map, options) {
+    options = options || {};
+    // Our GridManager (from `gridutil.js`). This will keep the
+    // cache of grid information and provide friendly utility methods
+    // that return `GridTile` objects instead of raw data.
+    var interaction = {
+        modifyingEvents: ['move'],
 
-    // Add handlers to the map
-    setMap: function(map) {
-      if ($('#' + this.el + '-script').length) {
-        OpenLayers.Control.prototype.setMap.apply(this, arguments);
-        $(map.div).prepend($('<input type="text" class="embed-src" />')
-          .css({
-              'z-index': '9999999999',
-              'position': 'relative'
-          })
-          .val("<div id='" + this.el + "-script'>" + $('#' + this.el + '-script').html() + '</div>'));
-      }
-      this.activate();
-    },
+        waxGM: new wax.GridManager(),
 
-    CLASS_NAME: 'wax.ol.Embedder'
-});
-// Wax header
-var wax = wax || {};
-wax.ol = wax.ol || {};
+        // This requires wax.Tooltip or similar
+        callbacks: options.callbacks || new wax.tooltip(),
 
-var addEv = function(element, name, observer) {
-    if (element.addEventListener) {
-        element.addEventListener(name, observer, false);
-    } else if (element.attachEvent) {
-        element.attachEvent('on' + name, observer);
-    }
-};
+        clickAction: options.clickAction || 'full',
 
-// An interaction toolkit for tiles that implement the
-// [MBTiles UTFGrid spec](https://github.com/mapbox/mbtiles-spec)
-wax.ol.Interaction =
-    OpenLayers.Class(OpenLayers.Control, {
-    feature: {},
-    handlerOptions: null,
-    handlers: null,
-
-    gm: new wax.GridManager(),
-
-    initialize: function(options) {
-        this.options = options || {};
-        this.clickAction = this.options.clickAction || 'full';
-        OpenLayers.Control.prototype.initialize.apply(this, [this.options || {}]);
-
-        this.callbacks = this.options.callbacks || new wax.tooltip();
-    },
-
-    setMap: function(map) {
-        addEv(map.viewPortDiv, 'mousemove', wax.util.bind(this.getInfoForHover, this));
-        addEv(map.viewPortDiv, 'mouseout', wax.util.bind(this.resetLayers, this));
-        this.clickHandler = new OpenLayers.Handler.Click(
-            this, {
-                click: this.getInfoForClick
+        // Attach listeners to the map
+        add: function() {
+            for (var i = 0; i < this.modifyingEvents.length; i++) {
+                map.on(
+                    this.modifyingEvents[i],
+                    wax.util.bind(this.clearTileGrid, this)
+                );
             }
-        );
+            L.DomEvent.addListener(map._container, 'mousemove', this.onMove(), this);
+            L.DomEvent.addListener(map._container, 'mousemove', this.mouseDown(), this);
+            return this;
+        },
 
-        this.clickHandler.setMap(map);
-        this.clickHandler.activate();
-
-        map.events.on({
-            addlayer: this.resetLayers,
-            changelayer: this.resetLayers,
-            removelayer: this.resetLayers,
-            changebaselayer: this.resetLayers,
-            scope: this
-        });
-
-        OpenLayers.Control.prototype.setMap.apply(this, arguments);
-    },
-
-    // Get an Array of the stack of tiles under the mouse.
-    // This operates with pixels only, since there's no way
-    // to bubble through an element which is sitting on the map
-    // (like an SVG overlay).
-    //
-    // If no tiles are under the mouse, returns an empty array.
-    getTileStack: function(layers, sevt) {
-        var tiles = [];
-        layerfound: for (var j = 0; j < layers.length; j++) {
-            for (var x = 0; x < layers[j].grid.length; x++) {
-                for (var y = 0; y < layers[j].grid[x].length; y++) {
-                    // Ah, the OpenLayers junkpile. Change everything in
-                    // 0.x.0 releases? Sure!
-                    if (layers[j].grid[x][y].imgDiv) {
-                        layers[j].grid[x][y].frame = layers[j].grid[x][y].imgDiv;
-                    }
-                    var divpos = wax.util.offset(layers[j].grid[x][y].frame);
-                    if (divpos &&
-                        ((divpos.top < sevt.pageY) &&
-                         ((divpos.top + 256) > sevt.pageY) &&
-                         (divpos.left < sevt.pageX) &&
-                         ((divpos.left + 256) > sevt.pageX))) {
-                        tiles.push(layers[j].grid[x][y]);
-                        continue layerfound;
-                    }
-                }
-            }
-        }
-        return tiles;
-    },
-
-    // Get all interactable layers
-    viableLayers: function() {
-        if (this._viableLayers) return this._viableLayers;
-        this._viableLayers = [];
-        for (var i in this.map.layers) {
-            // TODO: make better indication of whether
-            // this is an interactive layer
-            if ((this.map.layers[i].visibility === true) &&
-                (this.map.layers[i].CLASS_NAME === 'OpenLayers.Layer.TMS')) {
-              this._viableLayers.push(this.map.layers[i]);
-            }
-        }
-        return this._viableLayers;
-    },
-
-    resetLayers: function() {
-        this._viableLayers = null;
-        this.callbacks.out(this.map.viewPortDiv);
-    },
-
-    // React to a click mouse event
-    // This is the `pause` handler attached to the map.
-    getInfoForClick: function(evt) {
-        var layers = this.viableLayers();
-        var tiles = this.getTileStack(this.viableLayers(), evt);
-        var feature = null,
-        g = null;
-        var that = this;
-
-        for (var t = 0; t < tiles.length; t++) {
-            this.gm.getGrid(tiles[t].url, function(err, g) {
-                if (!g) return;
-                var feature = g.getFeature(evt.pageX, evt.pageY, tiles[t].frame, {
-                    format: that.clickAction
-                });
-                if (feature) {
-                    switch (that.clickAction) {
-                        case 'full':
-                            that.callbacks.click(feature, tiles[t].layer.map.viewPortDiv, t);
-                        break;
-                        case 'location':
-                            window.location = feature;
-                        break;
-                    }
-                }
-            });
-        }
-    },
-
-    // React to a hover mouse event, by finding all tiles,
-    // finding features, and calling `this.callbacks[]`
-    // This is the `click` handler attached to the map.
-    getInfoForHover: function(evt) {
-        var options = { format: 'teaser' };
-        var layers = this.viableLayers();
-        var tiles = this.getTileStack(this.viableLayers(), evt);
-        var feature = null,
-        g = null;
-        var that = this;
-
-        for (var t = 0; t < tiles.length; t++) {
-            // This features has already been loaded, or
-            // is currently being requested.
-            this.gm.getGrid(tiles[t].url, function(err, g) {
-                if (g && tiles[t]) {
-                    var feature = g.getFeature(evt.pageX, evt.pageY, tiles[t].frame, options);
-
-                    if (feature) {
-                        if (!tiles[t]) return;
-                        if (feature && that.feature[t] !== feature) {
-                            that.feature[t] = feature;
-                            that.callbacks.out(tiles[t].layer.map.div);
-                            that.callbacks.over(feature, tiles[t].layer.map.div, t, evt);
-                        } else if (!feature) {
-                            that.feature[t] = null;
-                            that.callbacks.out(tiles[t].layer.map.div);
+        // Search through `._layers` and determine the position,
+        // from the top-left of the **document**, and cache that data
+        // so that `mousemove` events don't always recalculate.
+        getTileGrid: function() {
+            // TODO: don't build for tiles outside of viewport
+            // var zoom = map.getZoom();
+            // Calculate a tile grid and cache it, by using the `.tiles`
+            // element on this map.
+            //
+            // For now assume only one layer
+            return this._getTileGrid || (this._getTileGrid =
+                (function(layers) {
+                    var o = [];
+                    for (var layerId in layers) {
+                        // This only supports tiled layers
+                        if (layers[layerId]._tiles) {
+                            for (var tile in layers[layerId]._tiles) {
+                                var offset = wax.util.offset(layers[layerId]._tiles[tile]);
+                                o.push([offset.top, offset.left, layers[layerId]._tiles[tile]]);
+                            }
                         }
-                    } else {
-                        // Request this feature
-                        // TODO(tmcw) re-add layer
-                        that.feature[t] = null;
-                        that.callbacks.out(tiles[t].layer.map.div);
                     }
-                }
-            });
-        }
-    },
-    CLASS_NAME: 'wax.ol.Interaction'
-});
-// Wax: Legend Control
-// -------------------
+                    return o;
+                })(map._layers));
+        },
 
-// Wax header
-var wax = wax || {};
-wax.ol = wax.ol || {};
+        clearTileGrid: function(map, e) {
+            this._getTileGrid = null;
+        },
 
-wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
-    CLASS_NAME: 'wax.ol.Legend',
-    legend: null,
-    options: null,
-
-    initialize: function(options) {
-        this.options = options || {};
-        OpenLayers.Control.prototype.initialize.apply(this, [options || {}]);
-    },
-
-    activate: function() {
-        this.legend = new wax.Legend(this.map.viewPortDiv, this.options.container);
-        return OpenLayers.Control.prototype.activate.apply(this, arguments);
-    },
-
-    setMap: function(map) {
-        OpenLayers.Control.prototype.setMap.apply(this, arguments);
-        this.activate();
-        this.map.events.on({
-            'addlayer': this.setLegend,
-            'changelayer': this.setLegend,
-            'removelayer': this.setLegend,
-            'changebaselayer': this.setLegend,
-            scope: this
-        });
-    },
-
-    setLegend: function() {
-        var urls = [];
-        for (var i = 0; i < this.map.layers.length; i++) {
-            var layer = this.map.layers[i];
-            if (layer && layer.getURL && layer.visibility) {
-                urls.push(layer.getURL(new OpenLayers.Bounds()));
-            }
-        }
-        this.legend.render(urls);
-    }
-});
-
-// Wax: Legend Control
-// -------------------
-// This is a simple layer switcher for OpenLayers, based loosely
-// off of the strategy of the openlayers_plus blockswitcher.
-// See the last lines for the `layeradded` event, which is the
-// way to style layer switcher elements.
-
-// Wax header
-var wax = wax || {};
-wax.ol = wax.ol || {};
-
-wax.ol.Switcher = OpenLayers.Class(OpenLayers.Control, {
-    CLASS_NAME: 'wax.ol.Switcher',
-
-    // Called on `new`. In the tradition of BackBone.js, this control takes
-    // an option `e` in its settings object which is a reference to a DOM
-    // element it will own.
-    initialize: function(options) {
-        this.$element = $(options.e);
-        this.options = options || {};
-        OpenLayers.Control.prototype.initialize.apply(this, [options || {}]);
-    },
-
-    // Called from OpenLayers. Attach event handlers to call `this.redraw`
-    // when the map state has changed.
-    setMap: function(map) {
-        OpenLayers.Control.prototype.setMap.apply(this, arguments);
-        this.map.events.on({
-            addlayer: this.redraw,
-            changelayer: this.redraw,
-            removelayer: this.redraw,
-            changebaselayer: this.redraw,
-            scope: this
-        });
-        this.redraw();
-    },
-
-    // The callback of a click on a layer switcher layer element (usually a
-    // link element).
-    layerClick: function(evt) {
-      var element = evt.currentTarget;
-      var layer = $(element).data('layer');
-      $('a.active', this.$element).removeClass('active');
-      $.each(this.map.getLayersBy('isBaseLayer', false),
-        function() {
-          // Only make visible, non-RootContainer layers invisible.
-          // RootContainer layers are behind-the-scenes OpenLayers-created
-          // layers that help manage interaction with multiple Vector layers.
-          if (this.CLASS_NAME !== 'OpenLayers.Layer.Vector.RootContainer' &&
-             this.displayInLayerSwitcher) {
-            this.setVisibility(false);
-          }
-        }
-      );
-      layer.setVisibility(true);
-      $(element).addClass('active');
-    },
-
-    // Evaluate whether the map state has changed enough to justify a
-    // redraw of this element
-    needsRedraw: function() {
-        if (!this.layerStates || this.layerStates.length ||
-           (this.map.layers.length != this.layerStates.length)) {
-            return true;
-        }
-        for (var i = 0, len = this.layerStates.length; i < len; i++) {
-            var layerState = this.layerStates[i];
-            var layer = this.map.layers[i];
-            if ((layerState.name != layer.name) ||
-                (layerState.inRange != layer.inRange) ||
-                (layerState.id != layer.id) ||
-                (layerState.visibility != layer.visibility)) {
-              return true;
-            }
-        }
-        return false;
-    },
-
-    // Rebuild this layer switcher by clearing out its `$element` (aka `e`)
-    // and rebuilding its DOM structure.
-    redraw: function() {
-      if (this.needsRedraw()) {
-        // Clear out previous layers
-        this.$element.html('');
-
-        // Save state -- for checking layer if the map state changed.
-        // We save this before redrawing, because in the process of redrawing
-        // we will trigger more visibility changes, and we want to not redraw
-        // and enter an infinite loop.
-        var len = this.map.layers.length;
-        this.layerStates = [];
-        for (var i = 0; i < len; i++) {
-          var layerState = this.map.layers[i];
-          this.layerStates[i] = {
-              name: layerState.name,
-              visibility: layerState.visibility,
-              inRange: layerState.inRange,
-              id: layerState.id
-          };
-        }
-
-        var layers = this.map.layers.slice();
-        for (i = 0, len = layers.length; i < len; i++) {
-          var layer = layers[i];
-          if (layer.displayInLayerSwitcher) {
-            // Only check a baselayer if it is *the* baselayer, check data layers if they are visible
-            var checked = layer.isBaseLayer ? (layer === this.map.baseLayer) : layer.getVisibility();
-            var clickLayer = $.proxy(function(e) { this.layerClick(e); return false; }, this);
-            var $layer_element = $('<a></a>');
-            // Add states and click handler
-            $layer_element
-                .click(clickLayer)
-                .attr('href', '#')
-                .text(layer.name)
-                .addClass('layer-toggle')
-                .data('layer', layer)
-                .attr('disabled', !layer.inRange);
-                if (checked) {
-                  $layer_element.addClass('active');
+        getTile: function(evt) {
+            var tile;
+            var grid = this.getTileGrid();
+            for (var i = 0; i < grid.length; i++) {
+                if ((grid[i][0] < evt.pageY) &&
+                   ((grid[i][0] + 256) > evt.pageY) &&
+                    (grid[i][1] < evt.pageX) &&
+                   ((grid[i][1] + 256) > evt.pageX)) {
+                    tile = grid[i][2];
+                    break;
                 }
             }
-            this.$element.append($layer_element);
-            // Trigger a `layeradded` event on the element we own. This is
-            // the way to style layer switcher elements: attach a listener
-            // to this event, and then modify on addition.
-            this.$element.trigger('layeradded', $layer_element);
-          }
+            return tile || false;
+        },
+
+        // Clear the double-click timeout to prevent double-clicks from
+        // triggering popups.
+        clearTimeout: function() {
+            if (this.clickTimeout) {
+                window.clearTimeout(this.clickTimeout);
+                this.clickTimeout = null;
+                return true;
+            } else {
+                return false;
+            }
+        },
+
+        onMove: function(evt) {
+            if (!this._onMove) this._onMove = wax.util.bind(function(evt) {
+                var tile = this.getTile(evt);
+                if (tile) {
+                    this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
+                        if (err) return;
+                        if (g) {
+                            var feature = g.getFeature(evt.pageX, evt.pageY, tile, {
+                                format: 'teaser'
+                            });
+                            // This and other Modest Maps controls only support a single layer.
+                            // Thus a layer index of **0** is given to the tooltip library
+                            if (feature) {
+                                if (feature && this.feature !== feature) {
+                                    this.feature = feature;
+                                    this.callbacks.out(map._container);
+                                    this.callbacks.over(feature, map._container, 0, evt);
+                                } else if (!feature) {
+                                    this.feature = null;
+                                    this.callbacks.out(map._container);
+                                }
+                            } else {
+                                this.feature = null;
+                                this.callbacks.out(map._container);
+                            }
+                        }
+                    }, this));
+                }
+            }, this);
+            return this._onMove;
+        },
+
+        mouseDown: function(evt) {
+            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(evt) {
+                // Ignore double-clicks by ignoring clicks within 300ms of
+                // each other.
+                if (this.clearTimeout()) {
+                    return;
+                }
+                // Store this event so that we can compare it to the
+                // up event
+                this.downEvent = evt;
+                L.DomEvent.addListener(map._container, 'mouseup', this.mouseUp(), this);
+            }, this);
+            return this._mouseDown;
+        },
+
+        mouseUp: function() {
+            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(evt) {
+                L.DomEvent.removeListener(map._container, 'mouseup', this.mouseUp(), this);
+                // Don't register clicks that are likely the boundaries
+                // of dragging the map
+                var tol = 4; // tolerance
+                if (Math.round(evt.pageY / tol) === Math.round(this.downEvent.pageY / tol) &&
+                    Math.round(evt.pageX / tol) === Math.round(this.downEvent.pageX / tol)) {
+                    // Contain the event data in a closure.
+                    this.clickTimeout = window.setTimeout(
+                        wax.util.bind(function() { this.click()(evt); }, this), 300);
+                }
+            }, this);
+            return this._mouseUp;
+        },
+
+        click: function(evt) {
+            if (!this._onClick) this._onClick = wax.util.bind(function(evt) {
+                var tile = this.getTile(evt);
+                if (tile) {
+                    this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
+                        if (g) {
+                            var feature = g.getFeature(evt.pageX, evt.pageY, tile, {
+                                format: this.clickAction
+                            });
+                            if (feature) {
+                                switch (this.clickAction) {
+                                    case 'full':
+                                        this.callbacks.click(feature, this.parent, 0, evt);
+                                        break;
+                                    case 'location':
+                                        window.location = feature;
+                                        break;
+                                }
+                            }
+                        }
+                    }, this));
+                }
+            }, this);
+            return this._onClick;
         }
-    }
-});
+    };
+
+    // Ensure chainability
+    return interaction.add(map);
+};
