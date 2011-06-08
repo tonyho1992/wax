@@ -50,7 +50,9 @@ wax.mm.interaction = function(map, options) {
             if (!wax.util.isArray(this.clickAction)) this.clickAction = [this.clickAction];
             MM.addEvent(map.parent, 'mousemove', this.onMove());
             MM.addEvent(map.parent, 'mousedown', this.onDown());
-            MM.addEvent(map.parent, 'touchstart', this.onDown());
+            if (map.parent.ontouchstart) {
+                MM.addEvent(map.parent, 'touchstart', this.onDown());
+            }
             return this;
         },
 
@@ -183,8 +185,10 @@ wax.mm.interaction = function(map, options) {
         onUp: function() {
             if (!this._onUp) this._onUp = wax.util.bind(function(evt) {
                 MM.removeEvent(map.parent, 'mouseup', this.onUp());
-                MM.removeEvent(map.parent, 'touchend', this.onUp());
-                MM.removeEvent(map.parent, 'touchmove', this.touchCancel());
+                if (map.parent.ontouchend) {
+                    MM.removeEvent(map.parent, 'touchend', this.onUp());
+                    MM.removeEvent(map.parent, 'touchmove', this.touchCancel());
+                }
                 // Don't register clicks that are likely the boundaries
                 // of dragging the map
                 // The tolerance between the place where the mouse goes down
