@@ -11,26 +11,31 @@ wax.util = {
             top = 0,
             left = 0;
 
-        try {
-            do {
-                top += el.offsetTop;
-                left += el.offsetLeft;
+        var calculateOffset = function(el) {
+            if (el === document.body || el === document.documentElement) return;
+            top += el.offsetTop;
+            left += el.offsetLeft;
 
-                // Add additional CSS3 transform handling.
-                // These features are used by Google Maps API V3.
-                var style = el.style.transform ||
-                    el.style['-webkit-transform'] ||
-                    el.style.MozTransform;
-                if (style) {
-                    if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
-                        top += parseInt(match[2], 10);
-                        left += parseInt(match[1], 10);
-                    } else if (match = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/)) {
-                        top += parseInt(match[2], 10);
-                        left += parseInt(match[1], 10);
-                    }
+            // Add additional CSS3 transform handling.
+            // These features are used by Google Maps API V3.
+            var style = el.style.transform ||
+                el.style['-webkit-transform'] ||
+                el.style.MozTransform;
+            if (style) {
+                if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
+                    top += parseInt(match[2], 10);
+                    left += parseInt(match[1], 10);
+                } else if (match = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/)) {
+                    top += parseInt(match[2], 10);
+                    left += parseInt(match[1], 10);
                 }
-            } while (el = el.offsetParent);
+            }
+        };
+
+        calculateOffset(el);
+
+        try {
+            while (el = el.offsetParent) calculateOffset(el);
         } catch(e) {
             // Hello, internet explorer.
         }
@@ -48,7 +53,8 @@ wax.util = {
           window.getComputedStyle(document.body.parentNode) :
           document.body.parentNode.currentStyle;
         if (document.body.parentNode.offsetTop !==
-            parseInt(htmlComputed.marginTop, 10)) {
+            parseInt(htmlComputed.marginTop, 10) &&
+            !isNaN(parseInt(htmlComputed.marginTop, 10))) {
             top += parseInt(htmlComputed.marginTop, 10);
             left += parseInt(htmlComputed.marginLeft, 10);
         }
@@ -101,12 +107,13 @@ wax.util = {
         var posy = 0;
         if (!e) var e = window.event;
         if (e.pageX || e.pageY) {
+            // Good browsers
             return {
                 x: e.pageX,
                 y: e.pageY
             };
         } else if (e.clientX || e.clientY) {
-            // IE
+            // Internet Explorer
             var doc = document.documentElement, body = document.body;
             var htmlComputed = document.body.parentNode.currentStyle;
             var topMargin = parseInt(htmlComputed.marginTop, 10) || 0;
@@ -118,6 +125,7 @@ wax.util = {
                   (doc && doc.clientTop  || body && body.clientTop  || 0) + topMargin
             };
         } else if (e.touches && e.touches.length === 1) {
+            // Touch browsers
             return {
                 x: e.touches[0].pageX,
                 y: e.touches[0].pageY

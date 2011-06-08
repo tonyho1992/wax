@@ -571,26 +571,31 @@ wax.util = {
             top = 0,
             left = 0;
 
-        try {
-            do {
-                top += el.offsetTop;
-                left += el.offsetLeft;
+        var calculateOffset = function(el) {
+            if (el === document.body || el === document.documentElement) return;
+            top += el.offsetTop;
+            left += el.offsetLeft;
 
-                // Add additional CSS3 transform handling.
-                // These features are used by Google Maps API V3.
-                var style = el.style.transform ||
-                    el.style['-webkit-transform'] ||
-                    el.style.MozTransform;
-                if (style) {
-                    if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
-                        top += parseInt(match[2], 10);
-                        left += parseInt(match[1], 10);
-                    } else if (match = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/)) {
-                        top += parseInt(match[2], 10);
-                        left += parseInt(match[1], 10);
-                    }
+            // Add additional CSS3 transform handling.
+            // These features are used by Google Maps API V3.
+            var style = el.style.transform ||
+                el.style['-webkit-transform'] ||
+                el.style.MozTransform;
+            if (style) {
+                if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
+                    top += parseInt(match[2], 10);
+                    left += parseInt(match[1], 10);
+                } else if (match = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/)) {
+                    top += parseInt(match[2], 10);
+                    left += parseInt(match[1], 10);
                 }
-            } while (el = el.offsetParent);
+            }
+        };
+
+        calculateOffset(el);
+
+        try {
+            while (el = el.offsetParent) calculateOffset(el);
         } catch(e) {
             // Hello, internet explorer.
         }
@@ -608,7 +613,8 @@ wax.util = {
           window.getComputedStyle(document.body.parentNode) :
           document.body.parentNode.currentStyle;
         if (document.body.parentNode.offsetTop !==
-            parseInt(htmlComputed.marginTop, 10)) {
+            parseInt(htmlComputed.marginTop, 10) &&
+            !isNaN(parseInt(htmlComputed.marginTop, 10))) {
             top += parseInt(htmlComputed.marginTop, 10);
             left += parseInt(htmlComputed.marginLeft, 10);
         }
@@ -661,12 +667,13 @@ wax.util = {
         var posy = 0;
         if (!e) var e = window.event;
         if (e.pageX || e.pageY) {
+            // Good browsers
             return {
                 x: e.pageX,
                 y: e.pageY
             };
         } else if (e.clientX || e.clientY) {
-            // IE
+            // Internet Explorer
             var doc = document.documentElement, body = document.body;
             var htmlComputed = document.body.parentNode.currentStyle;
             var topMargin = parseInt(htmlComputed.marginTop, 10) || 0;
@@ -678,6 +685,7 @@ wax.util = {
                   (doc && doc.clientTop  || body && body.clientTop  || 0) + topMargin
             };
         } else if (e.touches && e.touches.length === 1) {
+            // Touch browsers
             return {
                 x: e.touches[0].pageX,
                 y: e.touches[0].pageY
@@ -759,10 +767,10 @@ wax.leaf.interaction = function(map, options) {
             var tile;
             var grid = this.getTileGrid();
             for (var i = 0; i < grid.length; i++) {
-                if ((grid[i][0] < evt.pageY) &&
-                   ((grid[i][0] + 256) > evt.pageY) &&
-                    (grid[i][1] < evt.pageX) &&
-                   ((grid[i][1] + 256) > evt.pageX)) {
+                if ((grid[i][0] < evt.y) &&
+                   ((grid[i][0] + 256) > evt.y) &&
+                    (grid[i][1] < evt.x) &&
+                   ((grid[i][1] + 256) > evt.x)) {
                     tile = grid[i][2];
                     break;
                 }
@@ -784,12 +792,13 @@ wax.leaf.interaction = function(map, options) {
 
         onMove: function(evt) {
             if (!this._onMove) this._onMove = wax.util.bind(function(evt) {
-                var tile = this.getTile(evt);
+                var pos = wax.util.eventoffset(evt);
+                var tile = this.getTile(pos);
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
                         if (err) return;
                         if (g) {
-                            var feature = g.getFeature(evt.pageX, evt.pageY, tile, {
+                            var feature = g.getFeature(pos.x, pos.y, tile, {
                                 format: 'teaser'
                             });
                             // This and other Modest Maps controls only support a single layer.

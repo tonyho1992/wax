@@ -72,10 +72,10 @@ wax.leaf.interaction = function(map, options) {
             var tile;
             var grid = this.getTileGrid();
             for (var i = 0; i < grid.length; i++) {
-                if ((grid[i][0] < evt.pageY) &&
-                   ((grid[i][0] + 256) > evt.pageY) &&
-                    (grid[i][1] < evt.pageX) &&
-                   ((grid[i][1] + 256) > evt.pageX)) {
+                if ((grid[i][0] < evt.y) &&
+                   ((grid[i][0] + 256) > evt.y) &&
+                    (grid[i][1] < evt.x) &&
+                   ((grid[i][1] + 256) > evt.x)) {
                     tile = grid[i][2];
                     break;
                 }
@@ -97,12 +97,13 @@ wax.leaf.interaction = function(map, options) {
 
         onMove: function(evt) {
             if (!this._onMove) this._onMove = wax.util.bind(function(evt) {
-                var tile = this.getTile(evt);
+                var pos = wax.util.eventoffset(evt);
+                var tile = this.getTile(pos);
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
                         if (err) return;
                         if (g) {
-                            var feature = g.getFeature(evt.pageX, evt.pageY, tile, {
+                            var feature = g.getFeature(pos.x, pos.y, tile, {
                                 format: 'teaser'
                             });
                             // This and other Modest Maps controls only support a single layer.
