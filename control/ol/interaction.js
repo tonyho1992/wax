@@ -65,7 +65,7 @@ wax.ol.Interaction =
                     // Ah, the OpenLayers junkpile. Change everything in
                     // 0.x.0 releases? Sure!
                     if (layers[j].grid[x][y].imgDiv) {
-                        layers[j].grid[x][y].frame == layers[j].grid[x][y].imgDiv;
+                        layers[j].grid[x][y].frame = layers[j].grid[x][y].imgDiv;
                     }
                     var divpos = wax.util.offset(layers[j].grid[x][y].frame);
                     if (divpos &&
