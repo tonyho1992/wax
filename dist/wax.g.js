@@ -257,13 +257,14 @@ wax.request = {
 // ------------
 // GridInstances are queryable, fully-formed
 // objects for acquiring features from events.
-wax.GridInstance = function(grid_tile, formatter) {
+wax.GridInstance = function(grid_tile, formatter, options) {
+    options = options || {};
     this.grid_tile = grid_tile;
     this.formatter = formatter;
-    // tileRes is the grid-elements-per-pixel ratio of gridded data.
-    this.tileRes = 4;
+    // resolution is the grid-elements-per-pixel ratio of gridded data.
+    this.resolution = options.resolution || 4;
     // The size of a tile element. For now we expect tiles to be squares.
-    this.tileSize = 256;
+    this.tileSize = options.tileSize || 256;
 };
 
 // Resolve the UTF-8 encoding stored in grids to simple
@@ -277,6 +278,12 @@ wax.GridInstance.prototype.resolveCode = function(key) {
   return key;
 };
 
+// Get a feature:
+//
+// * `x` and `y`: the screen coordinates of an event
+// * `tile_element`: a DOM element of a tile, from which we can get an offset.
+// * `options` options to give to the formatter: minimally having a `format`
+//   member, being `full`, `teaser`, or something else.
 wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
     if (!(this.grid_tile && this.grid_tile.grid)) return;
 
@@ -286,7 +293,7 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
     var tileY = offset.top;
 
     // This tile's resolution. larger tiles will have lower, aka coarser, resolutions
-    var res = (offset.width / this.tileSize) * this.tileRes;
+    var res = (offset.width / this.tileSize) * this.resolution;
 
     if (y - tileY < 0) return;
     if (x - tileX < 0) return;
@@ -313,7 +320,13 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
 // GridManager
 // -----------
 // Generally one GridManager will be used per map.
-wax.GridManager = function() {
+//
+// It takes one options object, which current accepts a single option:
+// `resolution` determines the number of pixels per grid element in the grid.
+// The default is 4.
+wax.GridManager = function(options) {
+    options = options || {};
+    this.resolution = options.resolution || 4;
     this.grid_tiles = {};
     this.key_maps = {};
     this.formatters = {};
@@ -330,7 +343,9 @@ wax.GridManager.prototype.getGrid = function(url, callback) {
 
         wax.request.get(that.tileDataUrl(url), function(err, t) {
             if (err) return callback(err, null);
-            callback(null, new wax.GridInstance(t, f));
+            callback(null, new wax.GridInstance(t, f, {
+                resolution: that.resolution || 4
+            }));
         });
     });
 };

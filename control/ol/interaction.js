@@ -23,6 +23,8 @@ wax.ol.Interaction =
     initialize: function(options) {
         this.options = options || {};
         this.clickAction = this.options.clickAction || 'full';
+        this.gm = new wax.GridManager(this.options);
+
         OpenLayers.Control.prototype.initialize.apply(this, [this.options || {}]);
 
         this.callbacks = this.options.callbacks || new wax.tooltip();
@@ -112,6 +114,7 @@ wax.ol.Interaction =
         var that = this;
 
         for (var t = 0; t < tiles.length; t++) {
+            if (!tiles[t].url) continue;
             this.gm.getGrid(tiles[t].url, function(err, g) {
                 if (!g) return;
                 var feature = g.getFeature(evt.pageX, evt.pageY, tiles[t].frame, {
@@ -143,6 +146,7 @@ wax.ol.Interaction =
         var that = this;
 
         for (var t = 0; t < tiles.length; t++) {
+            if (!tiles[t].url) continue;
             // This features has already been loaded, or
             // is currently being requested.
             this.gm.getGrid(tiles[t].url, function(err, g) {
