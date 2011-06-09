@@ -798,7 +798,9 @@ wax.ol.Interaction =
     // (like an SVG overlay).
     //
     // If no tiles are under the mouse, returns an empty array.
-    getTileStack: function(layers, sevt) {
+    getTileStack: function(layers, pos) {
+        // If we don't have both an event and some tiles, it's nothing.
+        if (!layers || !pos) return [];
         var tiles = [];
         layerfound: for (var j = 0; j < layers.length; j++) {
             for (var x = 0; x < layers[j].grid.length; x++) {
@@ -810,10 +812,10 @@ wax.ol.Interaction =
                     }
                     var divpos = wax.util.offset(layers[j].grid[x][y].frame);
                     if (divpos &&
-                        ((divpos.top < sevt.pageY) &&
-                         ((divpos.top + 256) > sevt.pageY) &&
-                         (divpos.left < sevt.pageX) &&
-                         ((divpos.left + 256) > sevt.pageX))) {
+                        ((divpos.top < pos.y) &&
+                         ((divpos.top + 256) > pos.y) &&
+                         (divpos.left < pos.x) &&
+                         ((divpos.left + 256) > pos.x))) {
                         tiles.push(layers[j].grid[x][y]);
                         continue layerfound;
                     }
@@ -838,16 +840,24 @@ wax.ol.Interaction =
         return this._viableLayers;
     },
 
-    resetLayers: function() {
+    resetLayers: function(evt) {
         this._viableLayers = null;
-        this.callbacks.out(this.map.viewPortDiv);
+        // Fix a condition in which mouseout is called, but the user is really mousing
+        // over to a different tile.
+        var newTarget = evt.relatedTarget || evt.toElement;
+        if (newTarget && newTarget.className !== 'olTileImage') {
+            this.callbacks.out(this.map.viewPortDiv);
+        }
     },
 
     // React to a click mouse event
     // This is the `pause` handler attached to the map.
     getInfoForClick: function(evt) {
+        // If there's no event, this handler should not continue.
+        if (!evt) return;
         var layers = this.viableLayers();
-        var tiles = this.getTileStack(this.viableLayers(), evt);
+        var pos = wax.util.eventoffset(evt);
+        var tiles = this.getTileStack(this.viableLayers(), pos);
         var feature = null,
         g = null;
         var that = this;
@@ -856,7 +866,7 @@ wax.ol.Interaction =
             if (!tiles[t].url) continue;
             this.gm.getGrid(tiles[t].url, function(err, g) {
                 if (!g) return;
-                var feature = g.getFeature(evt.pageX, evt.pageY, tiles[t].frame, {
+                var feature = g.getFeature(pos.x, pos.y, tiles[t].frame, {
                     format: that.clickAction
                 });
                 if (feature) {
@@ -877,9 +887,12 @@ wax.ol.Interaction =
     // finding features, and calling `this.callbacks[]`
     // This is the `click` handler attached to the map.
     getInfoForHover: function(evt) {
+        // If there's no event, this handler should not proceed.
+        if (!evt) return;
         var options = { format: 'teaser' };
         var layers = this.viableLayers();
-        var tiles = this.getTileStack(this.viableLayers(), evt);
+        var pos = wax.util.eventoffset(evt);
+        var tiles = this.getTileStack(this.viableLayers(), pos);
         var feature = null,
         g = null;
         var that = this;
@@ -890,7 +903,7 @@ wax.ol.Interaction =
             // is currently being requested.
             this.gm.getGrid(tiles[t].url, function(err, g) {
                 if (g && tiles[t]) {
-                    var feature = g.getFeature(evt.pageX, evt.pageY, tiles[t].frame, options);
+                    var feature = g.getFeature(pos.x, pos.y, tiles[t].frame, options);
 
                     if (feature) {
                         if (!tiles[t]) return;
@@ -901,6 +914,7 @@ wax.ol.Interaction =
                         } else if (!feature) {
                             that.feature[t] = null;
                             that.callbacks.out(tiles[t].layer.map.div);
+                        } else {
                         }
                     } else {
                         // Request this feature
