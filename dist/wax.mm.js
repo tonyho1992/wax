@@ -1780,4 +1780,8 @@ wax.mm.provider.prototype = {
     }
 };
 
-com.modestmaps.extend(wax.mm.provider, com.modestmaps.MapProvider);
+// Wax shouldn't throw any exceptions if the external it relies on isn't
+// present, so check for modestmaps.
+if (com && com.modestmaps) {
+    com.modestmaps.extend(wax.mm.provider, com.modestmaps.MapProvider);
+}
