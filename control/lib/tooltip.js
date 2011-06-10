@@ -28,7 +28,7 @@ wax.tooltip.prototype.hideTooltip = function(el) {
     if (!el) return;
     var event;
     var remove = function() {
-        this.parentNode.removeChild(this);
+        if (this.parentNode) this.parentNode.removeChild(this);
     };
     if (el.style['-webkit-transition'] !== undefined && this.animationOut) {
         event = 'webkitTransitionEnd';
@@ -40,7 +40,7 @@ wax.tooltip.prototype.hideTooltip = function(el) {
         el.addEventListener('transitionend', remove, false);
         el.className += ' ' + this.animationOut;
     } else {
-        el.parentNode.removeChild(el);
+        if (el.parentNode) el.parentNode.removeChild(el);
     }
 };
 

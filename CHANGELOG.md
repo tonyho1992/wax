@@ -1,5 +1,9 @@
 ## Changelog
 
+### 2.1.3
+
+* Fixing a touch javascript error.
+
 ### 2.1.1
 
 * Overeager touch-events handling fixed.
