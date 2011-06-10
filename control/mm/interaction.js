@@ -50,7 +50,8 @@ wax.mm.interaction = function(map, options) {
             if (!wax.util.isArray(this.clickAction)) this.clickAction = [this.clickAction];
             MM.addEvent(map.parent, 'mousemove', this.onMove());
             MM.addEvent(map.parent, 'mousedown', this.onDown());
-            if (map.parent.ontouchstart) {
+            this.touchable = ('ontouchstart' in document.documentElement);
+            if (this.touchable) {
                 MM.addEvent(map.parent, 'touchstart', this.onDown());
             }
             return this;

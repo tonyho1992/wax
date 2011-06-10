@@ -1,5 +1,9 @@
 ## Changelog
 
+### 2.1.1
+
+* Overeager touch-events handling fixed.
+
 ### 2.1.0
 
 * Leaflet compatibility - interaction control and documentation.
