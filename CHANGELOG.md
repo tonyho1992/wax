@@ -1,5 +1,12 @@
 ## Changelog
 
+### 2.1.0
+
+* Leaflet compatibility - interaction control and documentation.
+* New pushState-based hash manager, used by default.
+* Interaction support on mobile devices, with fallback to
+  teaser if full formatter isnt available.
+
 ### 2.0.0
 
 * Stripped down the README, now references the manual.
