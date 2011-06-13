@@ -180,8 +180,12 @@ wax.ol.Interaction =
                     } else {
                         // Request this feature
                         // TODO(tmcw) re-add layer
+                        // Only nix this tooltip if the current tooltip is
+                        // owned by this layer
+                        if (that.feature[t]) {
+                            that.callbacks.out(tiles[t].layer.map.div);
+                        }
                         that.feature[t] = null;
-                        that.callbacks.out(tiles[t].layer.map.div);
                     }
                 }
             });
