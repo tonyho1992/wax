@@ -805,12 +805,11 @@ wax.ol.Interaction =
         layerfound: for (var j = 0; j < layers.length; j++) {
             for (var x = 0; x < layers[j].grid.length; x++) {
                 for (var y = 0; y < layers[j].grid[x].length; y++) {
-                    // Ah, the OpenLayers junkpile. Change everything in
-                    // 0.x.0 releases? Sure!
                     if (layers[j].grid[x][y].imgDiv) {
-                        layers[j].grid[x][y].frame = layers[j].grid[x][y].imgDiv;
+                        var divpos = wax.util.offset(layers[j].grid[x][y].imgDiv);
+                    } else {
+                        var divpos = wax.util.offset(layers[j].grid[x][y].frame);
                     }
-                    var divpos = wax.util.offset(layers[j].grid[x][y].frame);
                     if (divpos &&
                         ((divpos.top < pos.y) &&
                          ((divpos.top + 256) > pos.y) &&
