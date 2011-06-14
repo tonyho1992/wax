@@ -30,6 +30,9 @@ wax.mm.interaction = function(map, options) {
         // that return `GridTile` objects instead of raw data.
         waxGM: new wax.GridManager(),
 
+        // A lock on recalculating the grid while the user is dragging
+        _downLock: false,
+
         // This requires wax.Tooltip or similar
         callbacks: options.callbacks || new wax.tooltip(),
 
@@ -113,6 +116,10 @@ wax.mm.interaction = function(map, options) {
 
         onMove: function(evt) {
             if (!this._onMove) this._onMove = wax.util.bind(function(evt) {
+                // If the user is actually dragging the map, exit early
+                // to avoid performance hits.
+                if (this._downLock) return;
+
                 var pos = wax.util.eventoffset(evt);
                 var tile = this.getTile(pos);
                 if (tile) {
@@ -147,25 +154,33 @@ wax.mm.interaction = function(map, options) {
         // A handler for 'down' events - which means `mousedown` and `touchstart`
         onDown: function(evt) {
             if (!this._onDown) this._onDown = wax.util.bind(function(evt) {
+
                 // Ignore double-clicks by ignoring clicks within 300ms of
                 // each other.
-                if (this.clearTimeout()) {
-                    return;
-                }
+                if (this.clearTimeout()) { return; }
+
+                // Prevent interaction offset calculations happening while
+                // the user is dragging the map.
+                this._downLock = true;
+
                 // Store this event so that we can compare it to the
                 // up event
                 this.downEvent = wax.util.eventoffset(evt);
                 if (evt.type === 'mousedown') {
                     MM.addEvent(map.parent, 'mouseup', this.onUp());
+
                 // Only track single-touches. Double-touches will not affect this
                 // control
                 } else if (evt.type === 'touchstart' && evt.touches.length === 1) {
+
                     // turn this into touch-mode. Fallback to teaser and full.
                     this.clickAction = ['full', 'teaser'];
+
                     // Don't make the user click close if they hit another tooltip
                     if (this.callbacks._currentTooltip) {
                         this.callbacks.hideTooltip(this.callbacks._currentTooltip);
                     }
+
                     // Touch moves invalidate touches
                     MM.addEvent(map.parent, 'touchend', this.onUp());
                     MM.addEvent(map.parent, 'touchmove', this.touchCancel());
@@ -179,6 +194,9 @@ wax.mm.interaction = function(map, options) {
             if (!this._touchCancel) this._touchCancel = wax.util.bind(function(evt) {
                 MM.removeEvent(map.parent, 'touchend', this.onUp());
                 MM.removeEvent(map.parent, 'touchmove', this.onUp());
+
+                // Release the _downLock lock
+                this._downLock = false;
             }, this);
             return this._touchCancel;
         },
@@ -190,6 +208,10 @@ wax.mm.interaction = function(map, options) {
                     MM.removeEvent(map.parent, 'touchend', this.onUp());
                     MM.removeEvent(map.parent, 'touchmove', this.touchCancel());
                 }
+
+                // Release the _downLock lock
+                this._downLock = false;
+
                 // Don't register clicks that are likely the boundaries
                 // of dragging the map
                 // The tolerance between the place where the mouse goes down
