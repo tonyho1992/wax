@@ -1,5 +1,11 @@
 ## Changelog
 
+### 2.1.4
+
+* Fixed Interaction in FF 3.6.x
+* Optimized Modest Maps scrolling behavior on interactive maps
+* Fixed OpenLayers compatibility bug between 2.9 and 2.10
+
 ### 2.1.3
 
 * Fixing a touch javascript error.
