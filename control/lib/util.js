@@ -50,7 +50,7 @@ wax.util = {
         // Firefox and other weirdos. Similar technique to jQuery's
         // `doesNotIncludeMarginInBodyOffset`.
         var htmlComputed = document.defaultView ?
-          window.getComputedStyle(document.body.parentNode) :
+          window.getComputedStyle(document.body.parentNode, null) :
           document.body.parentNode.currentStyle;
         if (document.body.parentNode.offsetTop !==
             parseInt(htmlComputed.marginTop, 10) &&
