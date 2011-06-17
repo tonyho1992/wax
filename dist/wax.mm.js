@@ -315,12 +315,14 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
     var key_counter = 0;
     if (this.grid_tile.v && this.grid_tile.v > 1) {
         for (var layer = 0; layer < this.grid_tile.keys.length; layer++) {
-            key_counter += this.grid_tile.keys[layer].length;
-            if (key < key_counter) {
-                return this.formatter[layer].format(
+            if ((key < (key_counter + this.grid_tile.keys[layer].length)) &&
+                this.grid_tile.data[layer][this.grid_tile.keys[layer][key - key_counter]]) {
+                return this.formatter.format(
                     options,
-                    this.grid_tile.data[layer][this.grid_tile.keys[layer][key]])
+                    this.grid_tile.data[layer][this.grid_tile.keys[layer][key - key_counter]],
+                    layer);
             }
+            key_counter += this.grid_tile.keys[layer].length;
         }
     } else if (this.grid_tile.keys[key] && this.grid_tile.data[this.grid_tile.keys[key]]) {
         return this.formatter.format(options, this.grid_tile.data[this.grid_tile.keys[key]]);
@@ -413,11 +415,15 @@ wax.Formatter = function(obj) {
 
 // Wrap the given formatter function in order to
 // catch exceptions that it may throw.
-wax.Formatter.prototype.format = function(options, data) {
+wax.Formatter.prototype.format = function(options, data, n) {
     try {
-        return this.f(options, data);
+        if (n !== undefined) {
+            return this.f[n](options, data);
+        } else {
+            return this.f(options, data);
+        }
     } catch (e) {
-        if (console) console.log(e);
+        if (console) console.log(e, typeof this.f[n], options, data);
     }
 };
 // Wax Legend
@@ -1159,7 +1165,6 @@ wax.mm.interaction = function(map, options) {
                 var tile = this.getTile(pos);
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
-                        console.log(arguments);
                         if (err) return;
                         if (g) {
                             var feature = g.getFeature(pos.x, pos.y, tile, {

@@ -124,7 +124,6 @@ wax.mm.interaction = function(map, options) {
                 var tile = this.getTile(pos);
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
-                        console.log(arguments);
                         if (err) return;
                         if (g) {
                             var feature = g.getFeature(pos.x, pos.y, tile, {
