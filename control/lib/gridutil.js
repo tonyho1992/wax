@@ -107,19 +107,15 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
     // If this layers formatter hasn't been loaded yet,
     // download and load it now.
     var key_counter = 0;
-    if (this.grid_tile.v && this.grid_tile.v > 1) {
-        for (var layer = 0; layer < this.grid_tile.keys.length; layer++) {
-            if ((key < (key_counter + this.grid_tile.keys[layer].length)) &&
-                this.grid_tile.data[layer][this.grid_tile.keys[layer][key - key_counter]]) {
-                return this.formatter.format(
-                    options,
-                    this.grid_tile.data[layer][this.grid_tile.keys[layer][key - key_counter]],
-                    layer);
-            }
-            key_counter += this.grid_tile.keys[layer].length;
+    for (var layer = 0; layer < this.grid_tile.keys.length; layer++) {
+        if ((key < (key_counter + this.grid_tile.keys[layer].length)) &&
+            this.grid_tile.data[layer][this.grid_tile.keys[layer][key - key_counter]]) {
+            return this.formatter.format(
+                options,
+                this.grid_tile.data[layer][this.grid_tile.keys[layer][key - key_counter]],
+                layer);
         }
-    } else if (this.grid_tile.keys[key] && this.grid_tile.data[this.grid_tile.keys[key]]) {
-        return this.formatter.format(options, this.grid_tile.data[this.grid_tile.keys[key]]);
+        key_counter += this.grid_tile.keys[layer].length;
     }
 };
 
@@ -190,16 +186,9 @@ wax.GridManager.prototype.getFormatter = function(url, callback) {
 wax.Formatter = function(obj) {
     // Prevent against just any input being used.
     try {
-        if (obj.formatter && typeof obj.formatter === 'string') {
-             // Ugly, dangerous use of eval.
-             eval('this.f = ' + obj.formatter);
-        } else if (obj.v && obj.v > 1 && typeof obj.formatter === 'object') {
-            this.f = [];
-            for (var i = 0; i < obj.formatter.length; i++) {
-                eval('this.f.push(' + obj.formatter[i] + ')');
-            }
-        } else {
-            this.f = function() {};
+        this.f = [];
+        for (var i = 0; i < obj.formatter.length; i++) {
+            eval('this.f.push(' + obj.formatter[i] + ')');
         }
     } catch (e) {
         // Syntax errors in formatter
