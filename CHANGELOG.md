@@ -1,5 +1,9 @@
 ## Changelog
 
+### 2.1.5
+
+* Fixed Hash in FF 4.x
+
 ### 2.1.4
 
 * Fixed Interaction in FF 3.6.x

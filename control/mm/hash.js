@@ -38,7 +38,7 @@ wax.mm.pushState = {
   // is a history object.
   pushState: function(state) {
       if (!(window.history && window.history.pushState)) return;
-      window.history.pushState({ map_location: state });
+      window.history.pushState({ map_location: state }, document.title, window.location.href);
   }
 };
 
