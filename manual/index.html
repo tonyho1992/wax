@@ -117,6 +117,19 @@ made with [TileMill](http://tilemill.com/) and the interactive
 [UTFGrid section](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md)
 of the [MBTiles spec](https://github.com/mapbox/mbtiles-spec).
 
+The interaction control takes a parameter, `callbacks`, that has the
+default value of `new wax.tooltip()` - the default tooltip library that comes
+with wax. Any other library that implements the same interface
+(see `tooltips.js`) can be passed into the callbacks parameter.
+
+The default tooltip implementation also takes a single optional parameter -
+`animationOut`. This is the name of a CSS class that is applied to the tooltip
+to remove it from view - with the assumption that the base CSS class,
+`.wax-tooltip`, has a [CSS transition](http://www.w3.org/TR/css3-transitions/)
+defined. Note that if this CSS class **is not included in the page's stylesheet**,
+but is still specified, tooltips will not operate correctly. One can safely
+simply not specify `animationOut` and tooltips will disappear from the view
+immediately.
 <div class='section'>
 <div id='modestmaps-interaction' class='map'></div>
 <a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
