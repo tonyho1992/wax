@@ -200,11 +200,7 @@ wax.Formatter = function(obj) {
 // catch exceptions that it may throw.
 wax.Formatter.prototype.format = function(options, data, n) {
     try {
-        if (n !== undefined) {
-            return this.f[n](options, data);
-        } else {
-            return this.f(options, data);
-        }
+        return this.f[n](options, data);
     } catch (e) {
         if (console) console.log(e, typeof this.f[n], options, data);
     }

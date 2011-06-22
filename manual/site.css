@@ -85,6 +85,10 @@ div.map {
   border:1px solid #999;
   }
 
+pre.hide {
+  display:none;
+  }
+
 div.dark { background-color:#222; }
 
 div.section .attribution {
@@ -204,3 +208,23 @@ a.wax-fullscreen {
   z-index:99999;
   }
 
+  /** Teaching section **/
+.ui-2 {
+  padding:20px;
+}
+#grids-display {
+  background-color:#D8E7DA;
+  border:1px dotted #A7B6A9;
+  border-spacing:0;
+  border-collapse:collapse;
+}
+#grids-display pre {
+  font: normal 10px/10px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
+}
+#keys-display span, #data-display ul li {
+  font: normal 10px/10px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
+  padding:2px;
+  margin:2px;
+  overflow:scroll;
+  background-color:#D5E1E2;
+}

@@ -30,16 +30,16 @@ how single characters are translated to indexes by the Wax UTFGrid system.
 
 <div class='section'>
 <style type='text/css'>
-.ui {
-  padding:10px;
+.ui-1 {
+  padding:50px;
   font-size:40px;
 }
-.ui input {
+.ui-1 input {
   font-size:40px;
 }
 </style>
 <div id='decoding-grids' class='map'>
-  <div class='ui'>
+  <div class='ui-1'>
     <input type='text' maxlength='1' size='1' id='char' /> = 
     <span id='result'></span>
   </div>
@@ -55,6 +55,75 @@ $('#char').keyup(function() {
   );
 });
 </pre>
+
+# Grid Viewer
+
+<div id='decoding-grids' class='full'>
+  <div class='ui-2'>
+    <input type='text' id='url' />
+    <button id='url-set'>set</button>
+    <table id='grids-display'></table>
+    <ol id='keys-display'></ol>
+    <ol id='data-display'></ol>
+  </div>
+</div>
+<pre class='sh_javascript run hide'>
+$('#url-set').click(function() {
+
+  function kHighlight(char) {
+    var code = char.charCodeAt(0)
+  }
+
+  $.ajax({
+      url: $('#url').val() +  '?callback=grid',
+      type: 'jsonp',
+      jsonpCallback: 'callback',
+      success: function(data) {
+        for (var y = 0; y < data.grid.length; y++) {
+          var row = document.createElement('tr');
+          $('#grids-display')
+            .append(row);
+          for (var x = 0; x < data.grid[y].length; x++) {
+            var column = document.createElement('td');
+            var char = document.createElement('pre');
+            char.innerHTML = data.grid[y][x];
+            $(char).click(function() {
+              kHighlight($(this).text());
+            });
+            column.appendChild(char);
+            $(row).append(column);
+          }
+        }
+        for (var l = 0; l < data.keys.length; l++) {
+          var li = document.createElement('li');
+          for (var i = 0; i < data.keys[l].length; i++) {
+            var item = document.createElement('span');
+            var space = document.createTextNode(' ');
+            item.innerHTML = data.keys[l][i];
+            li.appendChild(item);
+            li.appendChild(space);
+          }
+          $('#keys-display').append(li);
+        }
+        for (var d = 0; d < data.data.length; d++) {
+          var ul = document.createElement('ul');
+          for (var k in data.data[d]) {
+            var li = document.createElement('li');
+            li.innerHTML = k + ': ' + JSON.stringify(data.data[d][k]);
+            ul.appendChild(li);
+          }
+          $('#data-display').append(ul);
+        }
+      },
+      error: function(err) { alert(err); }
+  });
+
+});
+</pre>
+
+
+
+
 </div>
 </div>
 </body>

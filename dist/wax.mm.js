@@ -406,11 +406,7 @@ wax.Formatter = function(obj) {
 // catch exceptions that it may throw.
 wax.Formatter.prototype.format = function(options, data, n) {
     try {
-        if (n !== undefined) {
-            return this.f[n](options, data);
-        } else {
-            return this.f(options, data);
-        }
+        return this.f[n](options, data);
     } catch (e) {
         if (console) console.log(e, typeof this.f[n], options, data);
     }
@@ -590,9 +586,12 @@ wax.util = wax.util || {};
 wax.util = {
     // From Bonzo
     offset: function(el) {
-        // TODO: window margin offset
-        var width = el.offsetWidth,
-            height = el.offsetHeight,
+        // TODO: window margins
+        //
+        // Okay, so fall back to styles if offsetWidth and height are botched
+        // by Firefox.
+        var width = el.offsetWidth || parseInt(el.style.width),
+            height = el.offsetHeight || parseInt(el.style.height),
             top = 0,
             left = 0;
 
@@ -618,12 +617,14 @@ wax.util = {
         };
 
         calculateOffset(el);
+        console.log('after first revision: ' + top + ': ' + left);
 
         try {
             while (el = el.offsetParent) calculateOffset(el);
         } catch(e) {
             // Hello, internet explorer.
         }
+        console.log('after second revision: ' + top + ': ' + left);
 
         // Offsets from the body
         top += document.body.offsetTop;
@@ -631,6 +632,7 @@ wax.util = {
         // Offsets from the HTML element
         top += document.body.parentNode.offsetTop;
         left += document.body.parentNode.offsetLeft;
+        console.log('after third revision: ' + top + ': ' + left);
 
         // Firefox and other weirdos. Similar technique to jQuery's
         // `doesNotIncludeMarginInBodyOffset`.
@@ -643,6 +645,7 @@ wax.util = {
             top += parseInt(htmlComputed.marginTop, 10);
             left += parseInt(htmlComputed.marginLeft, 10);
         }
+        console.log('after fourth revision: ' + top + ': ' + left);
 
         return {
             top: top,
@@ -1096,14 +1099,17 @@ wax.mm.interaction = function(map, options) {
         getTileGrid: function() {
             // TODO: don't build for tiles outside of viewport
             // Touch interaction leads to intermediate
-            var zoom = Math.round(map.getZoom());
+            var zoomLayer = map.createOrGetLayer(Math.round(map.getZoom()));
             // Calculate a tile grid and cache it, by using the `.tiles`
             // element on this map.
             return this._getTileGrid || (this._getTileGrid =
                 (function(t) {
                     var o = [];
                     for (var key in t) {
-                        if (key.split(',')[0] == zoom) {
+                        if (
+                            // Ensure that this tile is in the correct zoom level,
+                            // and in the DOM, at the same time.
+                            t[key].parentNode === zoomLayer) {
                             var offset = wax.util.offset(t[key]);
                             o.push([offset.top, offset.left, t[key]]);
                         }

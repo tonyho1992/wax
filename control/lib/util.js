@@ -5,9 +5,12 @@ wax.util = wax.util || {};
 wax.util = {
     // From Bonzo
     offset: function(el) {
-        // TODO: window margin offset
-        var width = el.offsetWidth,
-            height = el.offsetHeight,
+        // TODO: window margins
+        //
+        // Okay, so fall back to styles if offsetWidth and height are botched
+        // by Firefox.
+        var width = el.offsetWidth || parseInt(el.style.width),
+            height = el.offsetHeight || parseInt(el.style.height),
             top = 0,
             left = 0;
 
@@ -33,12 +36,14 @@ wax.util = {
         };
 
         calculateOffset(el);
+        console.log('after first revision: ' + top + ': ' + left);
 
         try {
             while (el = el.offsetParent) calculateOffset(el);
         } catch(e) {
             // Hello, internet explorer.
         }
+        console.log('after second revision: ' + top + ': ' + left);
 
         // Offsets from the body
         top += document.body.offsetTop;
@@ -46,6 +51,7 @@ wax.util = {
         // Offsets from the HTML element
         top += document.body.parentNode.offsetTop;
         left += document.body.parentNode.offsetLeft;
+        console.log('after third revision: ' + top + ': ' + left);
 
         // Firefox and other weirdos. Similar technique to jQuery's
         // `doesNotIncludeMarginInBodyOffset`.
@@ -58,6 +64,7 @@ wax.util = {
             top += parseInt(htmlComputed.marginTop, 10);
             left += parseInt(htmlComputed.marginLeft, 10);
         }
+        console.log('after fourth revision: ' + top + ': ' + left);
 
         return {
             top: top,
