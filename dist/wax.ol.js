@@ -617,14 +617,12 @@ wax.util = {
         };
 
         calculateOffset(el);
-        console.log('after first revision: ' + top + ': ' + left);
 
         try {
             while (el = el.offsetParent) calculateOffset(el);
         } catch(e) {
             // Hello, internet explorer.
         }
-        console.log('after second revision: ' + top + ': ' + left);
 
         // Offsets from the body
         top += document.body.offsetTop;
@@ -632,7 +630,6 @@ wax.util = {
         // Offsets from the HTML element
         top += document.body.parentNode.offsetTop;
         left += document.body.parentNode.offsetLeft;
-        console.log('after third revision: ' + top + ': ' + left);
 
         // Firefox and other weirdos. Similar technique to jQuery's
         // `doesNotIncludeMarginInBodyOffset`.
@@ -645,7 +642,6 @@ wax.util = {
             top += parseInt(htmlComputed.marginTop, 10);
             left += parseInt(htmlComputed.marginLeft, 10);
         }
-        console.log('after fourth revision: ' + top + ': ' + left);
 
         return {
             top: top,
