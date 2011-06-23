@@ -1,5 +1,9 @@
 ## Changelog
 
+### 3.0.0
+
+* Supporting multi-interactive layers: breaks compatibility with `1.0.0` endpoints, requiring `2.0.0` endpoints.
+
 ### 2.1.4
 
 * Fixed Interaction in FF 3.6.x
