@@ -9,8 +9,8 @@ wax.util = {
         //
         // Okay, so fall back to styles if offsetWidth and height are botched
         // by Firefox.
-        var width = el.offsetWidth || parseInt(el.style.width),
-            height = el.offsetHeight || parseInt(el.style.height),
+        var width = el.offsetWidth || parseInt(el.style.width, 10),
+            height = el.offsetHeight || parseInt(el.style.height, 10),
             top = 0,
             left = 0;
 

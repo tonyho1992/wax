@@ -1,5 +1,8 @@
 ## Changelog
 
+### 3.0.1
+
+* Updating reqwest dependency to gain IE support.
 
 ### 3.0.0
 
