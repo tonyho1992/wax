@@ -5,9 +5,12 @@ wax.util = wax.util || {};
 wax.util = {
     // From Bonzo
     offset: function(el) {
-        // TODO: window margin offset
-        var width = el.offsetWidth,
-            height = el.offsetHeight,
+        // TODO: window margins
+        //
+        // Okay, so fall back to styles if offsetWidth and height are botched
+        // by Firefox.
+        var width = el.offsetWidth || parseInt(el.style.width),
+            height = el.offsetHeight || parseInt(el.style.height),
             top = 0,
             left = 0;
 

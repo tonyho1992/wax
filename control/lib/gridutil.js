@@ -106,8 +106,16 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
 
     // If this layers formatter hasn't been loaded yet,
     // download and load it now.
-    if (this.grid_tile.keys[key] && this.grid_tile.data[this.grid_tile.keys[key]]) {
-        return this.formatter.format(options, this.grid_tile.data[this.grid_tile.keys[key]]);
+    var key_counter = 0;
+    for (var layer = 0; layer < this.grid_tile.keys.length; layer++) {
+        if ((key < (key_counter + this.grid_tile.keys[layer].length)) &&
+            this.grid_tile.data[layer][this.grid_tile.keys[layer][key - key_counter]]) {
+            return this.formatter.format(
+                options,
+                this.grid_tile.data[layer][this.grid_tile.keys[layer][key - key_counter]],
+                layer);
+        }
+        key_counter += this.grid_tile.keys[layer].length;
     }
 };
 
@@ -177,25 +185,23 @@ wax.GridManager.prototype.getFormatter = function(url, callback) {
 // ---------
 wax.Formatter = function(obj) {
     // Prevent against just any input being used.
-    if (obj.formatter && typeof obj.formatter === 'string') {
-        try {
-            // Ugly, dangerous use of eval.
-            eval('this.f = ' + obj.formatter);
-        } catch (e) {
-            // Syntax errors in formatter
-            if (console) console.log(e);
+    try {
+        this.f = [];
+        for (var i = 0; i < obj.formatter.length; i++) {
+            eval('this.f.push(' + obj.formatter[i] + ')');
         }
-    } else {
-        this.f = function() {};
+    } catch (e) {
+        // Syntax errors in formatter
+        if (console) console.log(e);
     }
 };
 
 // Wrap the given formatter function in order to
 // catch exceptions that it may throw.
-wax.Formatter.prototype.format = function(options, data) {
+wax.Formatter.prototype.format = function(options, data, n) {
     try {
-        return this.f(options, data);
+        return this.f[n](options, data);
     } catch (e) {
-        if (console) console.log(e);
+        if (console) console.log(e, typeof this.f[n], options, data);
     }
 };
