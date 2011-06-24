@@ -18,6 +18,7 @@ wax.mm.legend = function(map, options) {
                 })
             ]);
         }
+        return this;
     };
     return legend.add(map);
 };
