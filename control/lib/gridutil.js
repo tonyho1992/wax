@@ -118,7 +118,7 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
                 layer);
         }
 
-        key_counter += this.grid_tile.keys[layer].length + 1;
+        key_counter += this.grid_tile.keys[layer].length;
     }
 };
 
