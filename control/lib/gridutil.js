@@ -108,14 +108,17 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
     // download and load it now.
     var key_counter = 0;
     for (var layer = 0; layer < this.grid_tile.keys.length; layer++) {
+
         if ((key < (key_counter + this.grid_tile.keys[layer].length)) &&
             this.grid_tile.data[layer][this.grid_tile.keys[layer][key - key_counter]]) {
+
             return this.formatter.format(
                 options,
                 this.grid_tile.data[layer][this.grid_tile.keys[layer][key - key_counter]],
                 layer);
         }
-        key_counter += this.grid_tile.keys[layer].length;
+
+        key_counter += this.grid_tile.keys[layer].length + 1;
     }
 };
 

@@ -219,7 +219,8 @@ a.wax-fullscreen {
   border-collapse:collapse;
 }
 #grids-display pre {
-  font: normal 10px/10px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
+  font: normal 8px/8px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
+  width:8px;
 }
 #keys-display span, #data-display ul li {
   font: normal 10px/10px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
