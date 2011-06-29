@@ -1,4 +1,4 @@
-# Wax 3
+# Wax
 
 Tools for improving web maps. The centerpiece of the code is a client implementation of the [MBTiles interaction specification](https://github.com/mapbox/mbtiles-spec).
 
