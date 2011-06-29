@@ -73,10 +73,7 @@ wax.mm.interaction = function(map, options) {
                 (function(t) {
                     var o = [];
                     for (var key in t) {
-                        if (
-                            // Ensure that this tile is in the correct zoom level,
-                            // and in the DOM, at the same time.
-                            t[key].parentNode === zoomLayer) {
+                        if (t[key].parentNode === zoomLayer) {
                             var offset = wax.util.offset(t[key]);
                             o.push([offset.top, offset.left, t[key]]);
                         }

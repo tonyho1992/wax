@@ -309,19 +309,8 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
 
     // If this layers formatter hasn't been loaded yet,
     // download and load it now.
-    var key_counter = 0;
-    for (var layer = 0; layer < this.grid_tile.keys.length; layer++) {
-
-        if ((key < (key_counter + this.grid_tile.keys[layer].length)) &&
-            this.grid_tile.data[layer][this.grid_tile.keys[layer][key - key_counter]]) {
-
-            return this.formatter.format(
-                options,
-                this.grid_tile.data[layer][this.grid_tile.keys[layer][key - key_counter]],
-                layer);
-        }
-
-        key_counter += this.grid_tile.keys[layer].length;
+    if (this.grid_tile.keys[key] && this.grid_tile.data[this.grid_tile.keys[key]]) {
+        return this.formatter.format(options, this.grid_tile.data[this.grid_tile.keys[key]]);
     }
 };
 
@@ -391,24 +380,26 @@ wax.GridManager.prototype.getFormatter = function(url, callback) {
 // ---------
 wax.Formatter = function(obj) {
     // Prevent against just any input being used.
-    try {
-        this.f = [];
-        for (var i = 0; i < obj.formatter.length; i++) {
-            eval('this.f.push(' + obj.formatter[i] + ')');
+    if (obj.formatter && typeof obj.formatter === 'string') {
+        try {
+            // Ugly, dangerous use of eval.
+            eval('this.f = ' + obj.formatter);
+        } catch (e) {
+            // Syntax errors in formatter
+            if (console) console.log(e);
         }
-    } catch (e) {
-        // Syntax errors in formatter
-        if (console) console.log(e);
+    } else {
+        this.f = function() {};
     }
 };
 
 // Wrap the given formatter function in order to
 // catch exceptions that it may throw.
-wax.Formatter.prototype.format = function(options, data, n) {
+wax.Formatter.prototype.format = function(options, data) {
     try {
-        return this.f[n](options, data);
+        return this.f(options, data);
     } catch (e) {
-        if (console) console.log(e, typeof this.f[n], options, data);
+        if (console) console.log(e);
     }
 };
 // Wax Legend
@@ -1102,10 +1093,7 @@ wax.mm.interaction = function(map, options) {
                 (function(t) {
                     var o = [];
                     for (var key in t) {
-                        if (
-                            // Ensure that this tile is in the correct zoom level,
-                            // and in the DOM, at the same time.
-                            t[key].parentNode === zoomLayer) {
+                        if (t[key].parentNode === zoomLayer) {
                             var offset = wax.util.offset(t[key]);
                             o.push([offset.top, offset.left, t[key]]);
                         }
