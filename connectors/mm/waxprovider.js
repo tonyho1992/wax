@@ -43,7 +43,7 @@ wax.mm.provider.prototype = {
         } else {
             server = this.baseUrls[parseInt(worldSize * coord.row + coord.column, 10) % this.n_urls];
         }
-        var imgPath = ['2.0.0', this.layerName, coord.zoom, coord.column, coord.row].join('/');
+        var imgPath = ['1.0.0', this.layerName, coord.zoom, coord.column, coord.row].join('/');
         return server + imgPath + this.filetype;
     }
 };
