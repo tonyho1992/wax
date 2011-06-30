@@ -1,17 +1,5 @@
 ## Changelog
 
-### 3.0.2 & 3.0.3
-
-* Tuning multi-interactivity.
-
-### 3.0.1
-
-* Updating reqwest dependency to gain IE support.
-
-### 3.0.0
-
-* Supporting multi-interactive layers: breaks compatibility with `1.0.0` endpoints, requiring `2.0.0` endpoints.
-
 ### 2.1.5
 
 * Fixed Hash in FF 4.x
