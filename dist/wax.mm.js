@@ -1619,6 +1619,10 @@ wax.mm.zoombox = function(map, opts) {
 
     var zoombox = {
         add: function(map) {
+            // Use a flag to determine whether the zoombox is currently being
+            // drawn. Necessary only for IE because `mousedown` is triggered
+            // twice.
+            this.drawing = false;
             this.box = document.createElement('div');
             this.box.id = map.parent.id + '-zoombox-box';
             this.box.className = 'zoombox-box';
@@ -1645,7 +1649,8 @@ wax.mm.zoombox = function(map, opts) {
         },
         mouseDown: function() {
             if (!this._mouseDown) this._mouseDown = wax.util.bind(function(e) {
-                if (e.shiftKey) {
+                if (e.shiftKey && !this.drawing) {
+                    this.drawing = true;
                     mouseDownPoint = this.getMousePoint(e);
 
                     this.box.style.left = mouseDownPoint.x + 'px';
@@ -1662,6 +1667,8 @@ wax.mm.zoombox = function(map, opts) {
         },
         mouseMove: function(e) {
             if (!this._mouseMove) this._mouseMove = wax.util.bind(function(e) {
+                if (!this.drawing) return;
+
                 var point = this.getMousePoint(e);
                 this.box.style.display = 'block';
                 if (point.x < mouseDownPoint.x) {
@@ -1682,6 +1689,9 @@ wax.mm.zoombox = function(map, opts) {
         },
         mouseUp: function(e) {
             if (!this._mouseUp) this._mouseUp = wax.util.bind(function(e) {
+                if (!this.drawing) return;
+
+                this.drawing = false;
                 var point = this.getMousePoint(e);
 
                 var l1 = map.pointLocation(point),
