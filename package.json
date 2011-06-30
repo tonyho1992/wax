@@ -16,7 +16,7 @@
       "type": "BSD"
     }],
     "devDependencies": {
-      "jshint": "0.2.x",
+      "jshint": "0.2.1",
       "uglify-js": "1.0.x",
       "docco": "0.3.x"
     }
