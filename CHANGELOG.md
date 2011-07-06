@@ -1,5 +1,10 @@
 ## Changelog
 
+### 2.1.6
+
+* Fix for window margin offset calculation.
+* Fix zoombox control in IE.
+
 ### 2.1.5
 
 * Fixed Hash in FF 4.x
