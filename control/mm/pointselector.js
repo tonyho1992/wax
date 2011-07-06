@@ -17,6 +17,7 @@ wax.mm.pointselector = function(map, opts) {
         tolerance = 5,
         overlayDiv,
         MM = com.modestmaps,
+        pointselector = {},
         locations = [];
 
     var callback = (typeof opts === 'function') ?
@@ -24,7 +25,7 @@ wax.mm.pointselector = function(map, opts) {
         opts.callback;
 
     // Create a `com.modestmaps.Point` from a screen event, like a click.
-    var makePoint = function(e) {
+    function makePoint(e) {
         var coords = wax.util.eventoffset(e);
         var point = new MM.Point(coords.x, coords.y);
         // correct for scrolled document
@@ -45,7 +46,7 @@ wax.mm.pointselector = function(map, opts) {
             point.y -= node.offsetTop;
         }
         return point;
-    };
+    }
 
     // Currently locations in this control contain circular references to elements.
     // These can't be JSON encoded, so here's a utility to clean the data that's
@@ -58,80 +59,75 @@ wax.mm.pointselector = function(map, opts) {
         return o;
     }
 
-    var pointselector = {
-        // Attach this control to a map by registering callbacks
-        // and adding the overlay
-        add: function(map) {
-            MM.addEvent(map.parent, 'mousedown', this.mouseDown());
-            map.addCallback('drawn', pointselector.drawPoints());
-            return this;
-        },
-        deletePoint: function(location, e) {
-            if (confirm('Delete this point?')) {
-                location.pointDiv.parentNode.removeChild(location.pointDiv);
-                locations.splice(wax.util.indexOf(locations, location), 1);
-                callback(cleanLocations(locations));
+    // Attach this control to a map by registering callbacks
+    // and adding the overlay
+
+    // Redraw the points when the map is moved, so that they stay in the
+    // correct geographic locations.
+    function drawPoints() {
+        var offset = new MM.Point(0, 0);
+        for (var i = 0; i < locations.length; i++) {
+            var point = map.locationPoint(locations[i]);
+            if (!locations[i].pointDiv) {
+                locations[i].pointDiv = document.createElement('div');
+                locations[i].pointDiv.className = 'wax-point-div';
+                locations[i].pointDiv.style.position = 'absolute';
+                locations[i].pointDiv.style.display = 'block';
+                // TODO: avoid circular reference
+                locations[i].pointDiv.location = locations[i];
+                // Create this closure once per point
+                MM.addEvent(locations[i].pointDiv, 'mouseup',
+                    (function selectPointWrap(e) {
+                    var l = locations[i];
+                    return function(e) {
+                        MM.removeEvent(map.parent, 'mouseup', mouseUp);
+                        pointselector.deletePoint(l, e);
+                    };
+                })());
+                map.parent.appendChild(locations[i].pointDiv);
             }
-        },
-        // Redraw the points when the map is moved, so that they stay in the
-        // correct geographic locations.
-        drawPoints: function() {
-            if (!this._drawPoints) this._drawPoints = wax.util.bind(function() {
-                var offset = new MM.Point(0, 0);
-                for (var i = 0; i < locations.length; i++) {
-                    var point = map.locationPoint(locations[i]);
-                    if (!locations[i].pointDiv) {
-                        locations[i].pointDiv = document.createElement('div');
-                        locations[i].pointDiv.className = 'wax-point-div';
-                        locations[i].pointDiv.style.position = 'absolute';
-                        locations[i].pointDiv.style.display = 'block';
-                        // TODO: avoid circular reference
-                        locations[i].pointDiv.location = locations[i];
-                        // Create this closure once per point
-                        MM.addEvent(locations[i].pointDiv, 'mouseup',
-                            (function selectPointWrap(e) {
-                            var l = locations[i];
-                            return function(e) {
-                                MM.removeEvent(map.parent, 'mouseup', pointselector.mouseUp());
-                                pointselector.deletePoint(l, e);
-                            };
-                        })());
-                        map.parent.appendChild(locations[i].pointDiv);
-                    }
-                    locations[i].pointDiv.style.left = point.x + 'px';
-                    locations[i].pointDiv.style.top = point.y + 'px';
-                }
-            }, this);
-            return this._drawPoints;
-        },
-        mouseDown: function() {
-            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(e) {
-                mouseDownPoint = makePoint(e);
-                MM.addEvent(map.parent, 'mouseup', this.mouseUp());
-            }, this);
-            return this._mouseDown;
-        },
-        // API for programmatically adding points to the map - this
-        // calls the callback for ever point added, so it can be symmetrical.
-        // Useful for initializing the map when it's a part of a form.
-        addLocation: function(location) {
-            locations.push(location);
-            pointselector.drawPoints()();
+            locations[i].pointDiv.style.left = point.x + 'px';
+            locations[i].pointDiv.style.top = point.y + 'px';
+        }
+    }
+
+    function mouseDown(e) {
+        mouseDownPoint = makePoint(e);
+        MM.addEvent(map.parent, 'mouseup', mouseUp);
+    }
+
+    // Remove the awful circular reference from locations.
+    // TODO: This function should be made unnecessary by not having it.
+    function mouseUp(e) {
+        if (!mouseDownPoint) return;
+        mouseUpPoint = makePoint(e);
+        if (MM.Point.distance(mouseDownPoint, mouseUpPoint) < tolerance) {
+            pointselector.addLocation(map.pointLocation(mouseDownPoint));
             callback(cleanLocations(locations));
-        },
-        // Remove the awful circular reference from locations.
-        // TODO: This function should be made unnecessary by not having it.
-        mouseUp: function() {
-            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(e) {
-                if (!mouseDownPoint) return;
-                mouseUpPoint = makePoint(e);
-                if (MM.Point.distance(mouseDownPoint, mouseUpPoint) < tolerance) {
-                    this.addLocation(map.pointLocation(mouseDownPoint));
-                    callback(cleanLocations(locations));
-                }
-                mouseDownPoint = null;
-            }, this);
-            return this._mouseUp;
+        }
+        mouseDownPoint = null;
+    }
+
+    // API for programmatically adding points to the map - this
+    // calls the callback for ever point added, so it can be symmetrical.
+    // Useful for initializing the map when it's a part of a form.
+    pointselector.addLocation = function(location) {
+        locations.push(location);
+        drawPoints();
+        callback(cleanLocations(locations));
+    };
+
+    pointselector.add = function(map) {
+        MM.addEvent(map.parent, 'mousedown', mouseDown);
+        map.addCallback('drawn', drawPoints());
+        return this;
+    };
+
+    pointselector.deletePoint = function(location, e) {
+        if (confirm('Delete this point?')) {
+            location.pointDiv.parentNode.removeChild(location.pointDiv);
+            locations.splice(wax.util.indexOf(locations, location), 1);
+            callback(cleanLocations(locations));
         }
     };
 

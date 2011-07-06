@@ -4,120 +4,114 @@ wax.mm = wax.mm || {};
 // Box Selector
 // ------------
 wax.mm.boxselector = function(map, opts) {
-    var mouseDownPoint = null;
+    var mouseDownPoint = null,
+        MM = com.modestmaps,
+        callback = ((typeof opts === 'function') ?
+            opts :
+            opts.callback),
+        boxDiv,
+        box,
+        boxselector = {};
 
-    var callback = (typeof opts === 'function') ?
-        opts :
-        opts.callback;
+    function getMousePoint(e) {
+        // start with just the mouse (x, y)
+        var point = new MM.Point(e.clientX, e.clientY);
+        // correct for scrolled document
+        point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
+        point.y += document.body.scrollTop + document.documentElement.scrollTop;
 
-    var boxselector = {
-        add: function(map) {
-            this.boxDiv = document.createElement('div');
-            this.boxDiv.id = map.parent.id + '-boxselector-box';
-            this.boxDiv.className = 'boxselector-box';
-            map.parent.appendChild(this.boxDiv);
-
-            com.modestmaps.addEvent(map.parent, 'mousedown', this.mouseDown());
-            map.addCallback('drawn', this.drawbox());
-        },
-        remove: function() {
-            map.parent.removeChild(this.boxDiv);
-            map.removeCallback('mousedown', this.drawbox());
-        },
-        getMousePoint: function(e) {
-            // start with just the mouse (x, y)
-            var point = new com.modestmaps.Point(e.clientX, e.clientY);
-            // correct for scrolled document
-            point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
-            point.y += document.body.scrollTop + document.documentElement.scrollTop;
-
-            // correct for nested offsets in DOM
-            for (var node = map.parent; node; node = node.offsetParent) {
-                point.x -= node.offsetLeft;
-                point.y -= node.offsetTop;
-            }
-            return point;
-        },
-        mouseDown: function() {
-            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(e) {
-                if (e.shiftKey) {
-                    mouseDownPoint = this.getMousePoint(e);
-
-                    this.boxDiv.style.left = mouseDownPoint.x + 'px';
-                    this.boxDiv.style.top = mouseDownPoint.y + 'px';
-
-                    com.modestmaps.addEvent(map.parent, 'mousemove', this.mouseMove());
-                    com.modestmaps.addEvent(map.parent, 'mouseup', this.mouseUp());
-
-                    map.parent.style.cursor = 'crosshair';
-                    return com.modestmaps.cancelEvent(e);
-                }
-            }, this);
-            return this._mouseDown;
-        },
-        mouseMove: function(e) {
-            if (!this._mouseMove) this._mouseMove = wax.util.bind(function(e) {
-                var point = this.getMousePoint(e);
-                this.boxDiv.style.display = 'block';
-                if (point.x < mouseDownPoint.x) {
-                    this.boxDiv.style.left = point.x + 'px';
-                } else {
-                    this.boxDiv.style.left = mouseDownPoint.x + 'px';
-                }
-                this.boxDiv.style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
-                if (point.y < mouseDownPoint.y) {
-                    this.boxDiv.style.top = point.y + 'px';
-                } else {
-                    this.boxDiv.style.top = mouseDownPoint.y + 'px';
-                }
-                this.boxDiv.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
-                return com.modestmaps.cancelEvent(e);
-            }, this);
-            return this._mouseMove;
-        },
-        mouseUp: function() {
-            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(e) {
-                var point = boxselector.getMousePoint(e);
-
-                var l1 = map.pointLocation(point),
-                    l2 = map.pointLocation(mouseDownPoint);
-
-                // Format coordinates like mm.map.getExtent().
-                var extent = [
-                    new com.modestmaps.Location(
-                        Math.max(l1.lat, l2.lat),
-                        Math.min(l1.lon, l2.lon)),
-                    new com.modestmaps.Location(
-                        Math.min(l1.lat, l2.lat),
-                        Math.max(l1.lon, l2.lon))
-                ];
-
-                this.box = [l1, l2];
-                callback(extent);
-
-                com.modestmaps.removeEvent(map.parent, 'mousemove', this.mouseMove());
-                com.modestmaps.removeEvent(map.parent, 'mouseup', this.mouseUp());
-
-                map.parent.style.cursor = 'auto';
-            }, this);
-            return this._mouseUp;
-        },
-        drawbox: function() {
-            if (!this._drawbox) this._drawbox = wax.util.bind(function(map, e) {
-                if (this.boxDiv) {
-                    this.boxDiv.style.display = 'block';
-                    this.boxDiv.style.height = 'auto';
-                    this.boxDiv.style.width = 'auto';
-                    var br = map.locationPoint(this.box[0]);
-                    var tl = map.locationPoint(this.box[1]);
-                    this.boxDiv.style.left = Math.max(0, tl.x) + 'px';
-                    this.boxDiv.style.top = Math.max(0, tl.y) + 'px';
-                    this.boxDiv.style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
-                    this.boxDiv.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
-                }
-            }, this);
-            return this._drawbox;
+        // correct for nested offsets in DOM
+        for (var node = map.parent; node; node = node.offsetParent) {
+            point.x -= node.offsetLeft;
+            point.y -= node.offsetTop;
         }
+        return point;
+    }
+
+    function mouseDown(e) {
+        if (!e.shiftKey) return;
+
+        mouseDownPoint = getMousePoint(e);
+
+        boxDiv.style.left = mouseDownPoint.x + 'px';
+        boxDiv.style.top = mouseDownPoint.y + 'px';
+
+        MM.addEvent(map.parent, 'mousemove', mouseMove);
+        MM.addEvent(map.parent, 'mouseup', mouseUp);
+
+        map.parent.style.cursor = 'crosshair';
+        return MM.cancelEvent(e);
+    }
+
+
+    function mouseMove(e) {
+        var point = getMousePoint(e);
+        boxDiv.style.display = 'block';
+        if (point.x < mouseDownPoint.x) {
+            boxDiv.style.left = point.x + 'px';
+        } else {
+            boxDiv.style.left = mouseDownPoint.x + 'px';
+        }
+        if (point.y < mouseDownPoint.y) {
+            boxDiv.style.top = point.y + 'px';
+        } else {
+            boxDiv.style.top = mouseDownPoint.y + 'px';
+        }
+        boxDiv.style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
+        boxDiv.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
+        return MM.cancelEvent(e);
+    }
+
+    function mouseUp(e) {
+        var point = getMousePoint(e),
+            l1 = map.pointLocation(point),
+            l2 = map.pointLocation(mouseDownPoint),
+            // Format coordinates like mm.map.getExtent().
+            extent = [
+                new MM.Location(
+                    Math.max(l1.lat, l2.lat),
+                    Math.min(l1.lon, l2.lon)),
+                new MM.Location(
+                    Math.min(l1.lat, l2.lat),
+                    Math.max(l1.lon, l2.lon))
+            ];
+
+        box = [l1, l2];
+        callback(extent);
+
+        MM.removeEvent(map.parent, 'mousemove', mouseMove);
+        MM.removeEvent(map.parent, 'mouseup', mouseUp);
+
+        map.parent.style.cursor = 'auto';
+    }
+
+    function drawbox(map, e) {
+        if (!boxDiv || !box) return;
+        boxDiv.style.display = 'block';
+        boxDiv.style.height = 'auto';
+        boxDiv.style.width = 'auto';
+        var br = map.locationPoint(box[0]);
+        var tl = map.locationPoint(box[1]);
+        boxDiv.style.left = Math.max(0, tl.x) + 'px';
+        boxDiv.style.top = Math.max(0, tl.y) + 'px';
+        boxDiv.style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
+        boxDiv.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
+    }
+
+    boxselector.add = function(map) {
+        boxDiv = document.createElement('div');
+        boxDiv.id = map.parent.id + '-boxselector-box';
+        boxDiv.className = 'boxselector-box';
+        map.parent.appendChild(boxDiv);
+
+        MM.addEvent(map.parent, 'mousedown', mouseDown);
+        map.addCallback('drawn', drawbox);
+        return this;
+    };
+
+    boxselector.remove = function() {
+        map.parent.removeChild(boxDiv);
+        map.removeCallback('mousedown', drawbox);
     };
 
     return boxselector.add(map);

@@ -15,6 +15,9 @@ wax.mm = wax.mm || {};
 // * `zoomrange`: like [0, 10] (default [0, 18])
 wax.mm.provider = function(options) {
     this.layerName = options.layerName;
+    
+    options.baseUrl = options.baseUrl || options.tiles;
+
     this.baseUrls = (typeof(options.baseUrl) == 'string') ?
             [options.baseUrl] : options.baseUrl;
     this.n_urls = this.baseUrls.length;

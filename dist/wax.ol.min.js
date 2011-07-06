@@ -1,4 +1,4 @@
-/*!
+/* wax - 2.1.7 - d4e9042417 *//*!
   * Reqwest! A x-browser general purpose XHR connection manager
   * copyright Dustin Diaz 2011
   * https://github.com/ded/reqwest
