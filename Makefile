@@ -1,25 +1,27 @@
 UGLIFYJS = ./node_modules/.bin/uglifyjs
+BANNER = ./node_modules/.bin/banner
 
 dist: dist_setup dist/wax.ol.min.js dist/wax.g.min.js dist/wax.mm.min.js dist/wax.leaf.min.js lint
 
 dist/wax.ol.min.js:
-	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/ol/*.js > dist/wax.ol.js
+	cat dist/header.js ext/reqwest.min.js lib/*.js control/lib/*.js control/ol/*.js > dist/wax.ol.js
 	$(UGLIFYJS) dist/wax.ol.js > dist/wax.ol.min.js
 
 dist/wax.g.min.js:
-	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/g/*.js connectors/g/*.js > dist/wax.g.js
+	cat dist/header.js ext/reqwest.min.js lib/*.js control/lib/*.js control/g/*.js connectors/g/*.js > dist/wax.g.js
 	$(UGLIFYJS) dist/wax.g.js > dist/wax.g.min.js
 
 dist/wax.mm.min.js:
-	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/mm/*.js connectors/mm/*.js > dist/wax.mm.js
+	cat dist/header.js ext/reqwest.min.js lib/*.js control/lib/*.js control/mm/*.js connectors/mm/*.js > dist/wax.mm.js
 	$(UGLIFYJS) dist/wax.mm.js > dist/wax.mm.min.js
 
 dist/wax.leaf.min.js:
-	cat ext/reqwest.min.js lib/*.js control/lib/*.js control/leaf/*.js > dist/wax.leaf.js
+	cat dist/header.js ext/reqwest.min.js lib/*.js control/lib/*.js control/leaf/*.js > dist/wax.leaf.js
 	$(UGLIFYJS) dist/wax.leaf.js > dist/wax.leaf.min.js
 
 dist_setup:
 	mkdir dist
+	$(BANNER) package.json dist/header.js
 
 clean:
 	rm -rf dist

@@ -13,6 +13,7 @@
   <script src='../dist/wax.ol.js' type='text/javascript'></script>
   <script src='../dist/wax.leaf.js' type='text/javascript'></script>
   <script src='../dist/wax.g.js' type='text/javascript'></script>
+  <script src='../connectors/mm/tilejson.js' type='text/javascript'></script>
   <script src='lib/showdown.js' type='text/javascript'></script>
   <script src='lib/shjs.js' type='text/javascript'></script>
   <script src='lib/sh_javascript.min.js' type='text/javascript'></script>
@@ -106,6 +107,32 @@ var m = new mm.Map('modestmaps-setup',
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
+
+
+
+
+
+### TileJSON
+
+<div class='section'>
+<div id='modestmaps-tilejson' class='map'></div>
+<a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
+<pre class='sh_javascript run'>
+var mm = com.modestmaps;
+wax.mm.tilejson(
+  'http://localhost:8888/admin/api/Tileset/geography-class',
+  function(provider) {
+  var m = new mm.Map('modestmaps-tilejson', provider,
+    new mm.Point(300,200));
+    m.provider = 'something lse';
+  var i = wax.mm.interaction(m);
+  m.setCenterZoom(new mm.Location(39, -98), 1);
+});
+</pre>
+</div>
+
+
+
 
 ## Controls
 
