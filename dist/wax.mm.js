@@ -1,4 +1,6 @@
-/* wax - 2.1.6 - 2207ce6e38 *//*!
+/* wax - 2.1.6 - c1b89c649a */
+
+/*!
   * Reqwest! A x-browser general purpose XHR connection manager
   * copyright Dustin Diaz 2011
   * https://github.com/ded/reqwest
@@ -700,6 +702,23 @@ wax.util = {
                 y: e.touches[0].pageY
             };
         }
+    }
+};
+wax = wax || {};
+wax.mm = wax.mm || {};
+
+// Attribution
+// -----------
+wax.mm.attribution = function(map, options) {
+    options = options || {};
+    this.map = map;
+    if (!this.container) {
+        this.container = document.createElement('div');
+        this.container.className = 'wax-attribution';
+    }
+    this.map.parent.appendChild(this.container);
+    if (options.attribution) {
+        this.container.innerHTML = options.attribution;
     }
 };
 wax = wax || {};
