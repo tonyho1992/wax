@@ -327,6 +327,27 @@ wax.mm.hash(m, {
 </pre>
 </div>
 
+### Attribution
+
+The attribution control adds a container capable of displaying arbitrary HTML
+to the map. It is useful for citing data sources.
+
+<div class='section'>
+<div id='modestmaps-attribution' class='map'></div>
+<pre class='sh_javascript run'>
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-attribution',
+  new wax.mm.provider({
+    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+    layerName: 'geography-class'}),
+  new mm.Point(300,200));
+wax.mm.attribution(m, {
+  attribution: "Geography Class"
+});
+m.setCenterZoom(new mm.Location(39, -98), 2);
+</pre>
+</div>
+
 ## Layering
 
 Modest Maps natively supports a single map layer at a time, unlike OpenLayers, 
