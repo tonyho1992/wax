@@ -87,11 +87,12 @@ wax.mm.boxselector = function(map, opts) {
 
     function drawbox(map, e) {
         if (!boxDiv || !box) return;
+        var br = map.locationPoint(box[0]),
+            tl = map.locationPoint(box[1]);
+
         boxDiv.style.display = 'block';
         boxDiv.style.height = 'auto';
         boxDiv.style.width = 'auto';
-        var br = map.locationPoint(box[0]);
-        var tl = map.locationPoint(box[1]);
         boxDiv.style.left = Math.max(0, tl.x) + 'px';
         boxDiv.style.top = Math.max(0, tl.y) + 'px';
         boxDiv.style.right = Math.max(0, map.dimensions.x - br.x) + 'px';

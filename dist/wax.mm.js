@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - ef6fcb7e0d *//*!
+/* wax - 2.1.6 - 2207ce6e38 *//*!
   * Reqwest! A x-browser general purpose XHR connection manager
   * copyright Dustin Diaz 2011
   * https://github.com/ded/reqwest
@@ -201,119 +201,98 @@ wax.Record = function(obj, context) {
         return obj;
     }
 };
-// Wax GridUtil
-// ------------
-
-// Wax header
-var wax = wax || {};
-
-// Request
-// -------
-// Request data cache. `callback(data)` where `data` is the response data.
-wax.request = {
-    cache: {},
-    locks: {},
-    promises: {},
-    get: function(url, callback) {
-        // Cache hit.
-        if (this.cache[url]) {
-            return callback(this.cache[url][0], this.cache[url][1]);
-        // Cache miss.
-        } else {
-            this.promises[url] = this.promises[url] || [];
-            this.promises[url].push(callback);
-            // Lock hit.
-            if (this.locks[url]) return;
-            // Request.
-            var that = this;
-            this.locks[url] = true;
-            reqwest({
-                url: url + '?callback=grid',
-                type: 'jsonp',
-                jsonpCallback: 'callback',
-                success: function(data) {
-                    that.locks[url] = false;
-                    that.cache[url] = [null, data];
-                    for (var i = 0; i < that.promises[url].length; i++) {
-                        that.promises[url][i](that.cache[url][0], that.cache[url][1]);
-                    }
-                },
-                error: function(err) {
-                    that.locks[url] = false;
-                    that.cache[url] = [err, null];
-                    for (var i = 0; i < that.promises[url].length; i++) {
-                        that.promises[url][i](that.cache[url][0], that.cache[url][1]);
-                    }
-                }
-            });
+// Formatter
+// ---------
+wax.formatter = function(obj) {
+    var formatter = {},
+        f;
+    // Prevent against just any input being used.
+    if (obj.formatter && typeof obj.formatter === 'string') {
+        try {
+            // Ugly, dangerous use of eval.
+            eval('f = ' + obj.formatter);
+        } catch (e) {
+            // Syntax errors in formatter
+            if (console) console.log(e);
         }
+    } else {
+        this.f = function() {};
     }
-};
+        
+    // Wrap the given formatter function in order to
+    // catch exceptions that it may throw.
+    formatter.format = function(options, data) {
+        try {
+            return f(options, data);
+        } catch (e) {
+            if (console) console.log(e);
+        }
+    };
 
+    return formatter;
+};
 // GridInstance
 // ------------
 // GridInstances are queryable, fully-formed
 // objects for acquiring features from events.
 wax.GridInstance = function(grid_tile, formatter, options) {
     options = options || {};
-    this.grid_tile = grid_tile;
-    this.formatter = formatter;
     // resolution is the grid-elements-per-pixel ratio of gridded data.
-    this.resolution = options.resolution || 4;
     // The size of a tile element. For now we expect tiles to be squares.
-    this.tileSize = options.tileSize || 256;
+    var instance = {},
+        resolution = options.resolution || 4;
+        tileSize = options.tileSize || 256;
+
+    // Resolve the UTF-8 encoding stored in grids to simple
+    // number values.
+    // See the [utfgrid section of the mbtiles spec](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md)
+    // for details.
+    function resolveCode(key) {
+      if (key >= 93) key--;
+      if (key >= 35) key--;
+      key -= 32;
+      return key;
+    };
+
+    // Get a feature:
+    //
+    // * `x` and `y`: the screen coordinates of an event
+    // * `tile_element`: a DOM element of a tile, from which we can get an offset.
+    // * `options` options to give to the formatter: minimally having a `format`
+    //   member, being `full`, `teaser`, or something else.
+    instance.getFeature = function(x, y, tile_element, options) {
+        if (!(grid_tile && grid_tile.grid)) return;
+
+        // IE problem here - though recoverable, for whatever reason
+        var offset = wax.util.offset(tile_element),
+            tileX = offset.left,
+            tileY = offset.top,
+            res = (offset.width / tileSize) * resolution;
+
+        // This tile's resolution. larger tiles will have lower, aka coarser, resolutions
+        if ((y - tileY < 0) || (x - tileX < 0)) return;
+        if ((Math.floor(y - tileY) > tileSize) ||
+            (Math.floor(x - tileX) > tileSize)) return;
+
+        // Find the key in the grid. The above calls should ensure that
+        // the grid's array is large enough to make this work.
+        var key = grid_tile.grid[
+           Math.floor((y - tileY) / res)
+        ].charCodeAt(
+           Math.floor((x - tileX) / res)
+        );
+
+        key = resolveCode(key);
+
+        // If this layers formatter hasn't been loaded yet,
+        // download and load it now.
+        if (grid_tile.keys[key] && grid_tile.data[grid_tile.keys[key]]) {
+            return formatter.format(options, grid_tile.data[grid_tile.keys[key]]);
+        }
+    };
+
+    return instance;
 };
-
-// Resolve the UTF-8 encoding stored in grids to simple
-// number values.
-// See the [utfgrid section of the mbtiles spec](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md)
-// for details.
-wax.GridInstance.prototype.resolveCode = function(key) {
-  if (key >= 93) key--;
-  if (key >= 35) key--;
-  key -= 32;
-  return key;
-};
-
-// Get a feature:
-//
-// * `x` and `y`: the screen coordinates of an event
-// * `tile_element`: a DOM element of a tile, from which we can get an offset.
-// * `options` options to give to the formatter: minimally having a `format`
-//   member, being `full`, `teaser`, or something else.
-wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
-    if (!(this.grid_tile && this.grid_tile.grid)) return;
-
-    // IE problem here - though recoverable, for whatever reason
-    var offset = wax.util.offset(tile_element);
-    var tileX = offset.left;
-    var tileY = offset.top;
-
-    // This tile's resolution. larger tiles will have lower, aka coarser, resolutions
-    var res = (offset.width / this.tileSize) * this.resolution;
-
-    if (y - tileY < 0) return;
-    if (x - tileX < 0) return;
-    if (Math.floor(y - tileY) > this.tileSize) return;
-    if (Math.floor(x - tileX) > this.tileSize) return;
-
-    // Find the key in the grid. The above calls should ensure that
-    // the grid's array is large enough to make this work.
-    var key = this.grid_tile.grid[
-       Math.floor((y - tileY) / res)
-    ].charCodeAt(
-       Math.floor((x - tileX) / res)
-    );
-
-    key = this.resolveCode(key);
-
-    // If this layers formatter hasn't been loaded yet,
-    // download and load it now.
-    if (this.grid_tile.keys[key] && this.grid_tile.data[this.grid_tile.keys[key]]) {
-        return this.formatter.format(options, this.grid_tile.data[this.grid_tile.keys[key]]);
-    }
-};
-
 // GridManager
 // -----------
 // Generally one GridManager will be used per map.
@@ -323,84 +302,51 @@ wax.GridInstance.prototype.getFeature = function(x, y, tile_element, options) {
 // The default is 4.
 wax.GridManager = function(options) {
     options = options || {};
-    this.resolution = options.resolution || 4;
-    this.grid_tiles = {};
-    this.key_maps = {};
-    this.formatters = {};
-    this.locks = {};
-};
+    var resolution = options.resolution || 4,
+        grid_tiles = {},
+        key_maps = {},
+        formatters = {},
+        manager = {}
+        locks = {};
 
-// Get a grid - calls `callback` with either a `GridInstance`
-// object or false. Behind the scenes, this calls `getFormatter`
-// and gets grid data, and tries to avoid re-downloading either.
-wax.GridManager.prototype.getGrid = function(url, callback) {
-    var that = this;
-    that.getFormatter(that.formatterUrl(url), function(err, f) {
-        if (err || !f) return callback(err, null);
-
-        wax.request.get(that.tileDataUrl(url), function(err, t) {
-            if (err) return callback(err, null);
-            callback(null, new wax.GridInstance(t, f, {
-                resolution: that.resolution || 4
-            }));
-        });
-    });
-};
-
-// Simplistically derive the URL of the grid data endpoint from a tile URL
-wax.GridManager.prototype.tileDataUrl = function(url) {
-  return url.replace(/(\.png|\.jpg|\.jpeg)(\d*)/, '.grid.json');
-};
-
-// Simplistically derive the URL of the formatter function from a tile URL
-wax.GridManager.prototype.formatterUrl = function(url) {
-  return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
-};
-
-// Request and save a formatter, passed to `callback()` when finished.
-wax.GridManager.prototype.getFormatter = function(url, callback) {
-    var that = this;
-    // Formatter is cached.
-    if (typeof this.formatters[url] !== 'undefined') {
-        callback(null, this.formatters[url]);
-        return;
-    } else {
-        wax.request.get(url, function(err, data) {
-            if (data && data.formatter) {
-                that.formatters[url] = new wax.Formatter(data);
-            } else {
-                that.formatters[url] = false;
-            }
-            callback(err, that.formatters[url]);
-        });
-    }
-};
-
-// Formatter
-// ---------
-wax.Formatter = function(obj) {
-    // Prevent against just any input being used.
-    if (obj.formatter && typeof obj.formatter === 'string') {
-        try {
-            // Ugly, dangerous use of eval.
-            eval('this.f = ' + obj.formatter);
-        } catch (e) {
-            // Syntax errors in formatter
-            if (console) console.log(e);
+    function getFormatter(url, callback) {
+        // Formatter is cached.
+        if (typeof formatters[url] !== 'undefined') {
+            return callback(null, formatters[url]);
+        } else {
+            wax.request.get(url, function(err, data) {
+                if (data && data.formatter) {
+                    formatters[url] = wax.formatter(data);
+                } else {
+                    formatters[url] = false;
+                }
+                return callback(err, formatters[url]);
+            });
         }
-    } else {
-        this.f = function() {};
-    }
-};
+    };
 
-// Wrap the given formatter function in order to
-// catch exceptions that it may throw.
-wax.Formatter.prototype.format = function(options, data) {
-    try {
-        return this.f(options, data);
-    } catch (e) {
-        if (console) console.log(e);
-    }
+    manager.tileDataUrl = function(url) {
+        return url.replace(/(\.png|\.jpg|\.jpeg)(\d*)/, '.grid.json');
+    };
+    
+    manager.formatterUrl = function(url) {
+        return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
+    };
+
+     manager.getGrid = function(url, callback) {
+        getFormatter(formatterUrl(url), function(err, f) {
+            if (err || !f) return callback(err, null);
+
+            wax.request.get(tileDataUrl(url), function(err, t) {
+                if (err) return callback(err, null);
+                callback(null, wax.GridInstance(t, f, {
+                    resolution: resolution || 4
+                }));
+            });
+        });
+    };
+
+    return manager;
 };
 // Wax Legend
 // ----------
@@ -465,6 +411,54 @@ var w = function(self) {
         return self;
     };
     return self;
+};
+// Wax GridUtil
+// ------------
+
+// Wax header
+var wax = wax || {};
+
+// Request
+// -------
+// Request data cache. `callback(data)` where `data` is the response data.
+wax.request = {
+    cache: {},
+    locks: {},
+    promises: {},
+    get: function(url, callback) {
+        // Cache hit.
+        if (this.cache[url]) {
+            return callback(this.cache[url][0], this.cache[url][1]);
+        // Cache miss.
+        } else {
+            this.promises[url] = this.promises[url] || [];
+            this.promises[url].push(callback);
+            // Lock hit.
+            if (this.locks[url]) return;
+            // Request.
+            var that = this;
+            this.locks[url] = true;
+            reqwest({
+                url: url + '?callback=grid',
+                type: 'jsonp',
+                jsonpCallback: 'callback',
+                success: function(data) {
+                    that.locks[url] = false;
+                    that.cache[url] = [null, data];
+                    for (var i = 0; i < that.promises[url].length; i++) {
+                        that.promises[url][i](that.cache[url][0], that.cache[url][1]);
+                    }
+                },
+                error: function(err) {
+                    that.locks[url] = false;
+                    that.cache[url] = [err, null];
+                    for (var i = 0; i < that.promises[url].length; i++) {
+                        that.promises[url][i](that.cache[url][0], that.cache[url][1]);
+                    }
+                }
+            });
+        }
+    }
 };
 var wax = wax || {};
 wax.tooltip = {};
@@ -797,11 +791,12 @@ wax.mm.boxselector = function(map, opts) {
 
     function drawbox(map, e) {
         if (!boxDiv || !box) return;
+        var br = map.locationPoint(box[0]),
+            tl = map.locationPoint(box[1]);
+
         boxDiv.style.display = 'block';
         boxDiv.style.height = 'auto';
         boxDiv.style.width = 'auto';
-        var br = map.locationPoint(box[0]);
-        var tl = map.locationPoint(box[1]);
         boxDiv.style.left = Math.max(0, tl.x) + 'px';
         boxDiv.style.top = Math.max(0, tl.y) + 'px';
         boxDiv.style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
@@ -920,14 +915,18 @@ wax.mm.pushState = {
 // Hash
 // ----
 wax.mm.hash = function(map, options) {
-    // cached location.hash
+    options = options || {};
+
     var s0,
+        hash = {},
         // allowable latitude range
         lat = 90 - 1e-8;
 
+    options.manager = options.manager || wax.mm.pushState;
+
     // Ripped from underscore.js
     // Internal function used to implement `_.throttle` and `_.debounce`.
-    var limit = function(func, wait, debounce) {
+    function limit(func, wait, debounce) {
         var timeout;
           return function() {
               var context = this, args = arguments;
@@ -938,72 +937,72 @@ wax.mm.hash = function(map, options) {
               if (debounce) clearTimeout(timeout);
               if (debounce || !timeout) timeout = setTimeout(throttler, wait);
           };
-    };
+    }
 
     // Returns a function, that, when invoked, will only be triggered at most once
     // during a given window of time.
-    var throttle = function(func, wait) {
+    function throttle(func, wait) {
         return limit(func, wait, false);
-    };
+    }
 
-    var hash = {
-        map: this,
-        parser: function(s) {
-            var args = s.split('/');
-            for (var i = 0; i < args.length; i++) {
-                args[i] = Number(args[i]);
-                if (isNaN(args[i])) return true;
-            }
-            if (args.length < 3) {
-                // replace bogus hash
-                return true;
-            } else if (args.length == 3) {
-                map.setCenterZoom(new com.modestmaps.Location(args[1], args[2]), args[0]);
-            }
-        },
-        add: function(map) {
-            if (options.manager.getState()) {
-                hash.stateChange(options.manager.getState());
-            } else {
-                hash.initialize();
-                hash.move();
-            }
-            map.addCallback('drawn', throttle(hash.move, 500));
-            options.manager.stateChange(hash.stateChange);
-        },
-        // Currently misnamed. Get the hash string that will go in the URL,
-        // pulling from the map object
-        formatter: function() {
-            var center = map.getCenter(),
-                zoom = map.getZoom(),
-                precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
-            return [zoom.toFixed(2),
-              center.lat.toFixed(precision),
-              center.lon.toFixed(precision)].join('/');
-        },
-        move: function() {
-            var s1 = hash.formatter();
-            if (s0 !== s1) {
-                s0 = s1;
-                // don't recenter the map!
-                options.manager.pushState(s0);
-            }
-        },
-        stateChange: function(state) {
-            // ignore spurious hashchange events
-            if (state === s0) return;
-            if (hash.parser(s0 = state)) {
-                // replace bogus hash
-                hash.move();
-            }
-        },
-        // If a state isn't present when you initially load the map, the map should
-        // still get a center and zoom level.
-        initialize: function() {
-            if (options.defaultCenter) map.setCenter(options.defaultCenter);
-            if (options.defaultZoom) map.setZoom(options.defaultZoom);
+    var parser = function(s) {
+        var args = s.split('/');
+        for (var i = 0; i < args.length; i++) {
+            args[i] = Number(args[i]);
+            if (isNaN(args[i])) return true;
+        }
+        if (args.length < 3) {
+            // replace bogus hash
+            return true;
+        } else if (args.length == 3) {
+            map.setCenterZoom(new com.modestmaps.Location(args[1], args[2]), args[0]);
         }
     };
+
+    var formatter = function() {
+        var center = map.getCenter(),
+            zoom = map.getZoom(),
+            precision = Math.max(0, Math.ceil(Math.log(zoom) / Math.LN2));
+        return [zoom.toFixed(2),
+          center.lat.toFixed(precision),
+          center.lon.toFixed(precision)].join('/');
+    };
+
+    function move() {
+        var s1 = formatter();
+        if (s0 !== s1) {
+            s0 = s1;
+            // don't recenter the map!
+            options.manager.pushState(s0);
+        }
+    }
+
+    function stateChange(state) {
+        // ignore spurious hashchange events
+        if (state === s0) return;
+        if (hash.parser(s0 = state)) {
+            // replace bogus hash
+            hash.move();
+        }
+    }
+
+    var initialize = function() {
+        if (options.defaultCenter) map.setCenter(options.defaultCenter);
+        if (options.defaultZoom) map.setZoom(options.defaultZoom);
+    };
+
+    hash.add = function(map) {
+        if (options.manager.getState()) {
+            hash.stateChange(options.manager.getState());
+        } else {
+            initialize();
+            move();
+        }
+        map.addCallback('drawn', throttle(move, 500));
+        options.manager.stateChange(hash.stateChange);
+        return this;
+    };
+
     return hash.add(map);
 };
 wax = wax || {};
