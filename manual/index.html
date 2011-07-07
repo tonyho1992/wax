@@ -292,13 +292,13 @@ displays it on the map.
 
 <div class='section'>
 <div id='modestmaps-legend' class='map'></div>
-<a class='attribution' href='http://mapbox.com/tileset/world-print'>World Print</a>
+<a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-legend',
   new wax.mm.provider({
     baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    layerName: 'world-print'}),
+    layerName: 'geography-class'}),
   new mm.Point(300,200));
 wax.mm.legend(m);
 m.setCenterZoom(new mm.Location(39, -98), 2);
