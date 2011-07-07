@@ -1,14 +1,14 @@
 wax = wax || {};
-wax.mm = wax.mm || {};
+wax.g = wax.g || {};
 
 // Attribution
 // -----------
-// Attribution wrapper for Modest Maps.
-wax.mm.attribution = function(map, options) {
+// Attribution wrapper for Google Maps API.
+wax.g.attribution = function(map, options) {
     options = options || {};
     var attribution = {
         add: function() {
-            this.attribution = new wax.Attribution(map.parent, options.container, 'wax-mm');
+            this.attribution = new wax.Attribution(map.getDiv(), options.container, 'wax-g');
             this.attribution.render(options.attribution);
         }
     };
