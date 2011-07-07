@@ -5,24 +5,11 @@ wax.mm = wax.mm || {};
 // or default MM implementation if the tiles are in XYZ format
 
 wax.mm.tilejson = function(url, callback) {
-    var urls = (typeof(url) == 'string') ?
-            [url] : url,
-    tj = function(url, cb) {
-        reqwest({
-            url: url + '?callback=grid',
-            type: 'jsonp',
-            jsonpCallback: 'callback',
-            success: cb,
-            error: callback
-        });
-    };
-
-    for (var i = 0, count = 0, res = []; i < urls.length; i++) {
-        tj(urls[i], (function(i) {
-            return function(data) {
-                res[i] = new wax.mm.connector(data);
-                if (++count === urls.length) callback(res.length === 1 ? res[0] : res);
-            };
-        })(i));
-    }
+    reqwest({
+        url: url + '?callback=grid',
+        type: 'jsonp',
+        jsonpCallback: 'callback',
+        success: callback,
+        error: callback
+    });
 };

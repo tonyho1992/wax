@@ -19,7 +19,7 @@ wax.mm = wax.mm || {};
 //     `clickHandler: function(url) { ... go to url ... }`
 wax.mm.interaction = function(map, options) {
     var MM = com.modestmaps,
-        waxGM = new wax.GridManager(),
+        waxGM = wax.GridManager(options),
         options = options || {},
         callbacks = options.callbacks || new wax.tooltip(),
         clickAction = options.clickAction || ['full'],
@@ -35,23 +35,6 @@ wax.mm.interaction = function(map, options) {
         // Down event
         _d,
         tileGrid;
-
-    // Attach listeners to the map
-    interaction.add = function() {
-        var l = ['zoomed', 'panned', 'centered',
-            'extentset', 'resized', 'drawn'];
-        for (var i = 0; i < l.length; i++) {
-            map.addCallback(
-                l[i], interaction.clearTileGrid
-            );
-        }
-        MM.addEvent(map.parent, 'mousemove', onMove);
-        MM.addEvent(map.parent, 'mousedown', onDown);
-        if (touchable) {
-            MM.addEvent(map.parent, 'touchstart', onDown);
-        }
-        return this;
-    };
 
     // Search through `.tiles` and determine the position,
     // from the top-left of the **document**, and cache that data
@@ -221,6 +204,23 @@ wax.mm.interaction = function(map, options) {
             }
         });
     }
+
+    // Attach listeners to the map
+    interaction.add = function() {
+        var l = ['zoomed', 'panned', 'centered',
+            'extentset', 'resized', 'drawn'];
+        for (var i = 0; i < l.length; i++) {
+            map.addCallback(
+                l[i], interaction.clearTileGrid
+            );
+        }
+        MM.addEvent(map.parent, 'mousemove', onMove);
+        MM.addEvent(map.parent, 'mousedown', onDown);
+        if (touchable) {
+            MM.addEvent(map.parent, 'touchstart', onDown);
+        }
+        return this;
+    };
 
     // Ensure chainability
     return interaction.add(map);

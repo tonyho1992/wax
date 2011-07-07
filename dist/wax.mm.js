@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - c1b89c649a */
+/* wax - 2.1.6 - com.modest */
 
 /*!
   * Reqwest! A x-browser general purpose XHR connection manager
@@ -205,20 +205,22 @@ wax.Record = function(obj, context) {
 };
 // Formatter
 // ---------
-wax.formatter = function(obj) {
+wax.formatter = function(x) {
     var formatter = {},
         f;
+
     // Prevent against just any input being used.
-    if (obj.formatter && typeof obj.formatter === 'string') {
+    if (x && typeof x === 'string') {
         try {
             // Ugly, dangerous use of eval.
-            eval('f = ' + obj.formatter);
+            eval('f = ' + x);
         } catch (e) {
-            // Syntax errors in formatter
             if (console) console.log(e);
         }
+    } else if (x && typeof x === 'function') {
+        f = x;
     } else {
-        this.f = function() {};
+        f = function() {};
     }
         
     // Wrap the given formatter function in order to
@@ -250,11 +252,11 @@ wax.GridInstance = function(grid_tile, formatter, options) {
     // See the [utfgrid section of the mbtiles spec](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md)
     // for details.
     function resolveCode(key) {
-      if (key >= 93) key--;
-      if (key >= 35) key--;
-      key -= 32;
-      return key;
-    };
+        if (key >= 93) key--;
+        if (key >= 35) key--;
+        key -= 32;
+        return key;
+    }
 
     // Get a feature:
     //
@@ -304,49 +306,87 @@ wax.GridInstance = function(grid_tile, formatter, options) {
 // The default is 4.
 wax.GridManager = function(options) {
     options = options || {};
+
     var resolution = options.resolution || 4,
         grid_tiles = {},
-        key_maps = {},
-        formatters = {},
-        manager = {}
-        locks = {};
+        manager = {},
+        xyzFinder = new RegExp(/(\d+)\/(\d+)\/(\d+)\.[\w\._]+$/g),
+        formatter;
 
-    function getFormatter(url, callback) {
-        // Formatter is cached.
-        if (typeof formatters[url] !== 'undefined') {
-            return callback(null, formatters[url]);
-        } else {
-            wax.request.get(url, function(err, data) {
-                if (data && data.formatter) {
-                    formatters[url] = wax.formatter(data);
-                } else {
-                    formatters[url] = false;
-                }
-                return callback(err, formatters[url]);
-            });
-        }
-    };
-
-    manager.tileDataUrl = function(url) {
-        return url.replace(/(\.png|\.jpg|\.jpeg)(\d*)/, '.grid.json');
-    };
-    
-    manager.formatterUrl = function(url) {
+    var formatterUrl = function(url) {
+        throw new Error('this should not run!');
         return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
     };
 
-     manager.getGrid = function(url, callback) {
-        getFormatter(formatterUrl(url), function(err, f) {
-            if (err || !f) return callback(err, null);
+    var gridUrl = function(url) {
+        return url.replace(/(\.png|\.jpg|\.jpeg)(\d*)/, '.grid.json');
+    };
 
-            wax.request.get(tileDataUrl(url), function(err, t) {
+    function getFormatter(url, callback) {
+        if (typeof formatter !== 'undefined') {
+            return callback(null, formatter);
+        } else {
+            wax.request.get(formatterUrl(url), function(err, data) {
+                if (data && data.formatter) {
+                    formatter = wax.formatter(data);
+                } else {
+                    formatter = false;
+                }
+                return callback(err, formatter);
+            });
+        }
+    }
+
+    function templatedGridUrl(template) {
+        if (typeof template === 'string') template = [template];
+        return function templatedGridFinder(url) {
+            if (!url) return;
+            var xyz = xyzFinder.exec(url);
+            if (!xyz) return;
+            return template[parseInt(xyz[2], 10) % template.length]
+                .replace('{z}', xyz[1])
+                .replace('{x}', xyz[2])
+                .replace('{y}', xyz[3]);
+        };
+    }
+
+    manager.formatter = function(x) {
+        if (!arguments.length) return formatter;
+        formatter =  wax.formatter(x);
+        return manager;
+    };
+
+    manager.formatterUrl = function(x) {
+        if (!arguments.length) return formatterUrl;
+        formatterUrl = typeof x === 'string' ?
+            function() { return x; } : x;
+        return manager;
+    };
+
+    manager.gridUrl = function(x) {
+        if (!arguments.length) return gridUrl;
+        gridUrl = typeof x === 'function' ?
+            x : templatedGridUrl(x);
+        return manager;
+    };
+
+     manager.getGrid = function(url, callback) {
+        getFormatter(url, function(err, f) {
+            var gurl = gridUrl(url);
+            if (err || !f || !gurl) return callback(err, null);
+
+            wax.request.get(gurl, function(err, t) {
                 if (err) return callback(err, null);
                 callback(null, wax.GridInstance(t, f, {
                     resolution: resolution || 4
                 }));
             });
         });
+        return manager;
     };
+
+    if (options.formatter) manager.formatter(options.formatter);
+    if (options.grids) manager.gridUrl(options.grids);
 
     return manager;
 };
@@ -1045,7 +1085,7 @@ wax.mm = wax.mm || {};
 //     `clickHandler: function(url) { ... go to url ... }`
 wax.mm.interaction = function(map, options) {
     var MM = com.modestmaps,
-        waxGM = new wax.GridManager(),
+        waxGM = wax.GridManager(options),
         options = options || {},
         callbacks = options.callbacks || new wax.tooltip(),
         clickAction = options.clickAction || ['full'],
@@ -1061,23 +1101,6 @@ wax.mm.interaction = function(map, options) {
         // Down event
         _d,
         tileGrid;
-
-    // Attach listeners to the map
-    interaction.add = function() {
-        var l = ['zoomed', 'panned', 'centered',
-            'extentset', 'resized', 'drawn'];
-        for (var i = 0; i < l.length; i++) {
-            map.addCallback(
-                l[i], interaction.clearTileGrid
-            );
-        }
-        MM.addEvent(map.parent, 'mousemove', onMove);
-        MM.addEvent(map.parent, 'mousedown', onDown);
-        if (touchable) {
-            MM.addEvent(map.parent, 'touchstart', onDown);
-        }
-        return this;
-    };
 
     // Search through `.tiles` and determine the position,
     // from the top-left of the **document**, and cache that data
@@ -1247,6 +1270,23 @@ wax.mm.interaction = function(map, options) {
             }
         });
     }
+
+    // Attach listeners to the map
+    interaction.add = function() {
+        var l = ['zoomed', 'panned', 'centered',
+            'extentset', 'resized', 'drawn'];
+        for (var i = 0; i < l.length; i++) {
+            map.addCallback(
+                l[i], interaction.clearTileGrid
+            );
+        }
+        MM.addEvent(map.parent, 'mousemove', onMove);
+        MM.addEvent(map.parent, 'mousedown', onDown);
+        if (touchable) {
+            MM.addEvent(map.parent, 'touchstart', onDown);
+        }
+        return this;
+    };
 
     // Ensure chainability
     return interaction.add(map);
@@ -1731,26 +1771,13 @@ wax.mm = wax.mm || {};
 // or default MM implementation if the tiles are in XYZ format
 
 wax.mm.tilejson = function(url, callback) {
-    var urls = (typeof(url) == 'string') ?
-            [url] : url,
-    tj = function(url, cb) {
-        reqwest({
-            url: url + '?callback=grid',
-            type: 'jsonp',
-            jsonpCallback: 'callback',
-            success: cb,
-            error: callback
-        });
-    };
-
-    for (var i = 0, count = 0, res = []; i < urls.length; i++) {
-        tj(urls[i], (function(i) {
-            return function(data) {
-                res[i] = new wax.mm.connector(data);
-                if (++count === urls.length) callback(res.length === 1 ? res[0] : res);
-            };
-        })(i));
-    }
+    reqwest({
+        url: url + '?callback=grid',
+        type: 'jsonp',
+        jsonpCallback: 'callback',
+        success: callback,
+        error: callback
+    });
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
