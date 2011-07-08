@@ -8,8 +8,9 @@ wax.g.attribution = function(map, options) {
     options = options || {};
     var attribution = {
         add: function() {
-            this.attribution = new wax.Attribution(map.getDiv(), options.container, 'wax-g');
+            this.attribution = new wax.Attribution(map.getDiv(), options.container);
             this.attribution.render(options.attribution);
+            this.attribution.container.className = 'wax-attribution wax-g';
         }
     };
     return attribution.add();
