@@ -14,7 +14,7 @@ wax.mm.attribution = function(map, options) {
     };
 
     attribution.appendTo = function(elem) {
-        elem.appendChild(a.element());
+        wax.util.$(elem).appendChild(a.element());
         return this;
     };
 

@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-289-g3097ee2 */
+/* wax - 2.1.6 - 1.0.4-290-g0b39aad */
 
 
 /*!
@@ -701,13 +701,13 @@ wax.util = {
         // Firefox and other weirdos. Similar technique to jQuery's
         // `doesNotIncludeMarginInBodyOffset`.
         var htmlComputed = document.defaultView ?
-          window.getComputedStyle(document.body.parentNode, null) :
-          document.body.parentNode.currentStyle;
+            window.getComputedStyle(document.body.parentNode, null) :
+            document.body.parentNode.currentStyle;
         if (document.body.parentNode.offsetTop !==
             parseInt(htmlComputed.marginTop, 10) &&
             !isNaN(parseInt(htmlComputed.marginTop, 10))) {
             top += parseInt(htmlComputed.marginTop, 10);
-            left += parseInt(htmlComputed.marginLeft, 10);
+        left += parseInt(htmlComputed.marginLeft, 10);
         }
 
         return {
@@ -717,6 +717,13 @@ wax.util = {
             width: width
         };
     },
+
+    '$': function(x) {
+        return (typeof x === 'string') ?
+            document.getElementById(x) :
+            x;
+    },
+
     // From underscore, minus funcbind for now.
     // Returns a version of a function that always has the second parameter,
     // `obj`, as `this`.
@@ -732,24 +739,24 @@ wax.util = {
     },
     // IE doesn't have indexOf
     indexOf: function(array, item) {
-      var nativeIndexOf = Array.prototype.indexOf;
-      if (array === null) return -1;
-      var i, l;
-      if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item);
-      for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
-      return -1;
+        var nativeIndexOf = Array.prototype.indexOf;
+        if (array === null) return -1;
+        var i, l;
+        if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item);
+        for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
+        return -1;
     },
     // is this object an array?
     isArray: Array.isArray || function(obj) {
-      return Object.prototype.toString.call(obj) === '[object Array]';
+        return Object.prototype.toString.call(obj) === '[object Array]';
     },
     // From underscore: reimplement the ECMA5 `Object.keys()` methodb
     keys: Object.keys || function(obj) {
-      var hasOwnProperty = Object.prototype.hasOwnProperty;
-      if (obj !== Object(obj)) throw new TypeError('Invalid object');
-      var keys = [];
-      for (var key in obj) if (hasOwnProperty.call(obj, key)) keys[keys.length] = key;
-      return keys;
+        var hasOwnProperty = Object.prototype.hasOwnProperty;
+        if (obj !== Object(obj)) throw new TypeError('Invalid object');
+        var keys = [];
+        for (var key in obj) if (hasOwnProperty.call(obj, key)) keys[keys.length] = key;
+        return keys;
     },
     // From quirksmode: normalize the offset of an event from the top-left
     // of the page.
@@ -800,7 +807,7 @@ wax.mm.attribution = function(map, options) {
     };
 
     attribution.appendTo = function(elem) {
-        elem.appendChild(a.element());
+        wax.util.$(elem).appendChild(a.element());
         return this;
     };
 
@@ -1372,7 +1379,7 @@ wax.mm.legend = function(map, options) {
     };
 
     legend.appendTo = function(elem) {
-        elem.appendChild(l.element());
+        wax.util.$(elem).appendChild(l.element());
         return this;
     };
 

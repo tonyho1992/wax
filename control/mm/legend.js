@@ -31,7 +31,7 @@ wax.mm.legend = function(map, options) {
     };
 
     legend.appendTo = function(elem) {
-        elem.appendChild(l.element());
+        wax.util.$(elem).appendChild(l.element());
         return this;
     };
 
