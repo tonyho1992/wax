@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - com.modest */
+/* wax - 2.1.6 - e338633b65 */
 
 /*!
   * Reqwest! A x-browser general purpose XHR connection manager
@@ -203,6 +203,24 @@ wax.Record = function(obj, context) {
         return obj;
     }
 };
+wax = wax || {};
+
+// Attribution
+// -----------
+wax.Attribution = function(context, container, className) {
+    this.context = context;
+    this.container = container;
+    if (!this.container) {
+        this.container = document.createElement('div');
+        this.container.className = 'wax-attribution ' + className;
+    }
+    this.context.appendChild(this.container);
+};
+
+wax.Attribution.prototype.render = function(content) {
+    this.container.innerHTML = content;
+}
+
 // Formatter
 // ---------
 wax.formatter = function(x) {
@@ -314,7 +332,6 @@ wax.GridManager = function(options) {
         formatter;
 
     var formatterUrl = function(url) {
-        throw new Error('this should not run!');
         return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
     };
 
@@ -743,6 +760,22 @@ wax.util = {
             };
         }
     }
+};
+wax = wax || {};
+wax.g = wax.g || {};
+
+// Attribution
+// -----------
+// Attribution wrapper for Google Maps API.
+wax.g.attribution = function(map, options) {
+    options = options || {};
+    var attribution = {
+        add: function() {
+            this.attribution = new wax.Attribution(map.getDiv(), options.container, 'wax-g');
+            this.attribution.render(options.attribution);
+        }
+    };
+    return attribution.add();
 };
 wax = wax || {};
 wax.g = wax.g || {};

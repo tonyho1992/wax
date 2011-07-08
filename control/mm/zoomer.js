@@ -7,15 +7,20 @@ wax.mm = wax.mm || {};
 // control. This function can be used chaining-style with other
 // chaining-style controls.
 wax.mm.zoomer = function(map) {
+    var mm = com.modestmaps;
+
     var zoomin = document.createElement('a');
     zoomin.innerHTML = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
-    com.modestmaps.addEvent(zoomin, 'mousedown', function(e) {
-        com.modestmaps.cancelEvent(e);
+    mm.addEvent(zoomin, 'mousedown', function(e) {
+        mm.cancelEvent(e);
     });
-    com.modestmaps.addEvent(zoomin, 'click', function(e) {
-        com.modestmaps.cancelEvent(e);
+    mm.addEvent(zoomin, 'dblclick', function(e) {
+        mm.cancelEvent(e);
+    });
+    mm.addEvent(zoomin, 'click', function(e) {
+        mm.cancelEvent(e);
         map.zoomIn();
     }, false);
     map.parent.appendChild(zoomin);
@@ -24,11 +29,14 @@ wax.mm.zoomer = function(map) {
     zoomout.innerHTML = '-';
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
-    com.modestmaps.addEvent(zoomout, 'mousedown', function(e) {
-        com.modestmaps.cancelEvent(e);
+    mm.addEvent(zoomout, 'mousedown', function(e) {
+        mm.cancelEvent(e);
     });
-    com.modestmaps.addEvent(zoomout, 'click', function(e) {
-        com.modestmaps.cancelEvent(e);
+    mm.addEvent(zoomout, 'dblclick', function(e) {
+        mm.cancelEvent(e);
+    });
+    mm.addEvent(zoomout, 'click', function(e) {
+        mm.cancelEvent(e);
         map.zoomOut();
     }, false);
     map.parent.appendChild(zoomout);
