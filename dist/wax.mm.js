@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-290-g0b39aad */
+/* wax - 2.1.6 - 1.0.4-291-g756cc37 */
 
 
 /*!
@@ -797,7 +797,7 @@ wax.mm = wax.mm || {};
 // Attribution
 // -----------
 // Attribution wrapper for Modest Maps.
-wax.mm.attribution = function(map, options) {
+wax.mm.attribution = function(options) {
     options = options || {};
     var a, // internal attribution control
         attribution = {};
