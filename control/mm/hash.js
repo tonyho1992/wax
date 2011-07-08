@@ -23,23 +23,23 @@ wax.mm.locationHash = {
 // This **does not degrade** with non-supporting browsers - it simply
 // does nothing.
 wax.mm.pushState = {
-  stateChange: function(callback) {
-      com.modestmaps.addEvent(window, 'popstate', function(e) {
-          if (e.state && e.state.map_location) {
-              callback(e.state.map_location);
-          }
-      }, false);
-  },
-  getState: function() {
-     if (!(window.history && window.history.state)) return;
-     return history.state && history.state.map_location;
-  },
-  // Push states - so each substantial movement of the map
-  // is a history object.
-  pushState: function(state) {
-      if (!(window.history && window.history.pushState)) return;
-      window.history.pushState({ map_location: state }, document.title, window.location.href);
-  }
+    stateChange: function(callback) {
+        com.modestmaps.addEvent(window, 'popstate', function(e) {
+            if (e.state && e.state.map_location) {
+                callback(e.state.map_location);
+            }
+        }, false);
+    },
+    getState: function() {
+       if (!(window.history && window.history.state)) return;
+       return history.state && history.state.map_location;
+    },
+    // Push states - so each substantial movement of the map
+    // is a history object.
+    pushState: function(state) {
+        if (!(window.history && window.history.pushState)) return;
+        window.history.pushState({ map_location: state }, document.title, window.location.href);
+    }
 };
 
 // Hash
@@ -110,7 +110,7 @@ wax.mm.hash = function(map, options) {
     function stateChange(state) {
         // ignore spurious hashchange events
         if (state === s0) return;
-        if (hash.parser(s0 = state)) {
+        if (parser(s0 = state)) {
             // replace bogus hash
             hash.move();
         }
@@ -129,7 +129,7 @@ wax.mm.hash = function(map, options) {
             move();
         }
         map.addCallback('drawn', throttle(move, 500));
-        options.manager.stateChange(hash.stateChange);
+        options.manager.stateChange(stateChange);
         return this;
     };
 

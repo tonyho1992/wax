@@ -1,4 +1,5 @@
-/* wax - 2.1.6 - e338633b65 */
+/* wax - 2.1.6 - 1.0.4-280-gbca783a */
+
 
 /*!
   * Reqwest! A x-browser general purpose XHR connection manager

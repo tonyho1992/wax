@@ -1,4 +1,5 @@
-/* wax - 2.1.6 - e338633b65 */
+/* wax - 2.1.6 - 1.0.4-280-gbca783a */
+
 
 /*!
   * Reqwest! A x-browser general purpose XHR connection manager
@@ -968,23 +969,23 @@ wax.mm.locationHash = {
 // This **does not degrade** with non-supporting browsers - it simply
 // does nothing.
 wax.mm.pushState = {
-  stateChange: function(callback) {
-      com.modestmaps.addEvent(window, 'popstate', function(e) {
-          if (e.state && e.state.map_location) {
-              callback(e.state.map_location);
-          }
-      }, false);
-  },
-  getState: function() {
-     if (!(window.history && window.history.state)) return;
-     return history.state && history.state.map_location;
-  },
-  // Push states - so each substantial movement of the map
-  // is a history object.
-  pushState: function(state) {
-      if (!(window.history && window.history.pushState)) return;
-      window.history.pushState({ map_location: state }, document.title, window.location.href);
-  }
+    stateChange: function(callback) {
+        com.modestmaps.addEvent(window, 'popstate', function(e) {
+            if (e.state && e.state.map_location) {
+                callback(e.state.map_location);
+            }
+        }, false);
+    },
+    getState: function() {
+       if (!(window.history && window.history.state)) return;
+       return history.state && history.state.map_location;
+    },
+    // Push states - so each substantial movement of the map
+    // is a history object.
+    pushState: function(state) {
+        if (!(window.history && window.history.pushState)) return;
+        window.history.pushState({ map_location: state }, document.title, window.location.href);
+    }
 };
 
 // Hash
@@ -1055,7 +1056,7 @@ wax.mm.hash = function(map, options) {
     function stateChange(state) {
         // ignore spurious hashchange events
         if (state === s0) return;
-        if (hash.parser(s0 = state)) {
+        if (parser(s0 = state)) {
             // replace bogus hash
             hash.move();
         }
@@ -1074,7 +1075,7 @@ wax.mm.hash = function(map, options) {
             move();
         }
         map.addCallback('drawn', throttle(move, 500));
-        options.manager.stateChange(hash.stateChange);
+        options.manager.stateChange(stateChange);
         return this;
     };
 
@@ -1632,98 +1633,95 @@ wax.mm = wax.mm || {};
 // An OL-style ZoomBox control, from the Modest Maps example.
 wax.mm.zoombox = function(map, opts) {
     // TODO: respond to resize
-    var mouseDownPoint = null;
+    var zoombox = {},
+        mm = com.modestmaps,
+        drawing = false,
+        box,
+        mouseDownPoint = null;
 
-    var zoombox = {
-        add: function(map) {
-            // Use a flag to determine whether the zoombox is currently being
-            // drawn. Necessary only for IE because `mousedown` is triggered
-            // twice.
-            this.drawing = false;
-            this.box = document.createElement('div');
-            this.box.id = map.parent.id + '-zoombox-box';
-            this.box.className = 'zoombox-box';
-            map.parent.appendChild(this.box);
-            com.modestmaps.addEvent(map.parent, 'mousedown', this.mouseDown());
-        },
-        remove: function() {
-            map.parent.removeChild(this.box);
-            map.removeCallback('mousedown', this.mouseDown);
-        },
-        getMousePoint: function(e) {
-            // start with just the mouse (x, y)
-            var point = new com.modestmaps.Point(e.clientX, e.clientY);
-            // correct for scrolled document
-            point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
-            point.y += document.body.scrollTop + document.documentElement.scrollTop;
+    function getMousePoint(e) {
+        // start with just the mouse (x, y)
+        var point = new mm.Point(e.clientX, e.clientY);
+        // correct for scrolled document
+        point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
+        point.y += document.body.scrollTop + document.documentElement.scrollTop;
 
-            // correct for nested offsets in DOM
-            for (var node = map.parent; node; node = node.offsetParent) {
-                point.x -= node.offsetLeft;
-                point.y -= node.offsetTop;
-            }
-            return point;
-        },
-        mouseDown: function() {
-            if (!this._mouseDown) this._mouseDown = wax.util.bind(function(e) {
-                if (e.shiftKey && !this.drawing) {
-                    this.drawing = true;
-                    mouseDownPoint = this.getMousePoint(e);
-
-                    this.box.style.left = mouseDownPoint.x + 'px';
-                    this.box.style.top = mouseDownPoint.y + 'px';
-
-                    com.modestmaps.addEvent(map.parent, 'mousemove', this.mouseMove());
-                    com.modestmaps.addEvent(map.parent, 'mouseup', this.mouseUp());
-
-                    map.parent.style.cursor = 'crosshair';
-                    return com.modestmaps.cancelEvent(e);
-                }
-            }, this);
-            return this._mouseDown;
-        },
-        mouseMove: function(e) {
-            if (!this._mouseMove) this._mouseMove = wax.util.bind(function(e) {
-                if (!this.drawing) return;
-
-                var point = this.getMousePoint(e);
-                this.box.style.display = 'block';
-                if (point.x < mouseDownPoint.x) {
-                    this.box.style.left = point.x + 'px';
-                } else {
-                    this.box.style.left = mouseDownPoint.x + 'px';
-                }
-                this.box.style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
-                if (point.y < mouseDownPoint.y) {
-                    this.box.style.top = point.y + 'px';
-                } else {
-                    this.box.style.top = mouseDownPoint.y + 'px';
-                }
-                this.box.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
-                return com.modestmaps.cancelEvent(e);
-            }, this);
-            return this._mouseMove;
-        },
-        mouseUp: function(e) {
-            if (!this._mouseUp) this._mouseUp = wax.util.bind(function(e) {
-                if (!this.drawing) return;
-
-                this.drawing = false;
-                var point = this.getMousePoint(e);
-
-                var l1 = map.pointLocation(point),
-                    l2 = map.pointLocation(mouseDownPoint);
-
-                map.setExtent([l1, l2]);
-
-                this.box.style.display = 'none';
-                com.modestmaps.removeEvent(map.parent, 'mousemove', this.mouseMove());
-                com.modestmaps.removeEvent(map.parent, 'mouseup', this.mouseUp());
-
-                map.parent.style.cursor = 'auto';
-            }, this);
-            return this._mouseUp;
+        // correct for nested offsets in DOM
+        for (var node = map.parent; node; node = node.offsetParent) {
+            point.x -= node.offsetLeft;
+            point.y -= node.offsetTop;
         }
+        return point;
+    }
+
+    function mouseUp(e) {
+        if (!drawing) return;
+
+        drawing = false;
+        var point = getMousePoint(e);
+
+        var l1 = map.pointLocation(point),
+            l2 = map.pointLocation(mouseDownPoint);
+
+        map.setExtent([l1, l2]);
+
+        box.style.display = 'none';
+        mm.removeEvent(map.parent, 'mousemove', mouseMove);
+        mm.removeEvent(map.parent, 'mouseup', mouseUp);
+
+        map.parent.style.cursor = 'auto';
+    }
+
+    function mouseDown(e) {
+        if (!(e.shiftKey && !this.drawing)) return;
+
+        drawing = true;
+        mouseDownPoint = getMousePoint(e);
+
+        box.style.left = mouseDownPoint.x + 'px';
+        box.style.top = mouseDownPoint.y + 'px';
+
+        mm.addEvent(map.parent, 'mousemove', mouseMove);
+        mm.addEvent(map.parent, 'mouseup', mouseUp);
+
+        map.parent.style.cursor = 'crosshair';
+        return mm.cancelEvent(e);
+    }
+
+    function mouseMove(e) {
+        if (!drawing) return;
+
+        var point = getMousePoint(e);
+        box.style.display = 'block';
+        if (point.x < mouseDownPoint.x) {
+            box.style.left = point.x + 'px';
+        } else {
+            box.style.left = mouseDownPoint.x + 'px';
+        }
+        box.style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
+        if (point.y < mouseDownPoint.y) {
+            box.style.top = point.y + 'px';
+        } else {
+            box.style.top = mouseDownPoint.y + 'px';
+        }
+        box.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
+        return mm.cancelEvent(e);
+    }
+
+    zoombox.add = function(map) {
+        // Use a flag to determine whether the zoombox is currently being
+        // drawn. Necessary only for IE because `mousedown` is triggered
+        // twice.
+        box = document.createElement('div');
+        box.id = map.parent.id + '-zoombox-box';
+        box.className = 'zoombox-box';
+        map.parent.appendChild(box);
+        mm.addEvent(map.parent, 'mousedown', mouseDown);
+    };
+
+    zoombox.remove = function() {
+        map.parent.removeChild(box);
+        map.removeCallback('mousedown', mouseDown);
     };
 
     return zoombox.add(map);
