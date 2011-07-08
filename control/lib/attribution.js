@@ -13,6 +13,8 @@ wax.Attribution = function(context, container, className) {
 };
 
 wax.Attribution.prototype.render = function(content) {
-    this.container.innerHTML = content;
+    if (typeof content !== 'undefined') {
+        this.container.innerHTML = content;
+    }
 }
 
