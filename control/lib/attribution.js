@@ -16,5 +16,4 @@ wax.Attribution.prototype.render = function(content) {
     if (typeof content !== 'undefined') {
         this.container.innerHTML = content;
     }
-}
-
+};

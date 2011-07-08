@@ -6,12 +6,14 @@ wax.mm = wax.mm || {};
 // Attribution wrapper for Modest Maps.
 wax.mm.attribution = function(map, options) {
     options = options || {};
-    var attribution = {
-        add: function() {
-            this.attribution = new wax.Attribution(map.parent, options.container);
-            this.attribution.render(options.attribution);
-            this.attribution.container.className = 'wax-attribution wax-mm';
-        }
+    var a, // internal attribution control
+        attribution = {};
+
+    attribution.add = function() {
+        a = new wax.Attribution(map.parent);
+        a.render(options.attribution);
+        a.container.className = 'wax-attribution wax-mm';
     };
+
     return attribution.add();
 };

@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-286-ge8a59aa */
+/* wax - 2.1.6 - 1.0.4-287-g2996eba */
 
 
 /*!
@@ -222,8 +222,7 @@ wax.Attribution.prototype.render = function(content) {
     if (typeof content !== 'undefined') {
         this.container.innerHTML = content;
     }
-}
-
+};
 // Formatter
 // ---------
 wax.formatter = function(x) {
@@ -415,46 +414,61 @@ wax.GridManager = function(options) {
 // Wax header
 var wax = wax || {};
 
-wax.Legend = function(context, container) {
-    this.legends = {};
-    this.context = context;
-    this.container = container;
-    if (!this.container) {
-        this.container = document.createElement('div');
-        this.container.className = 'wax-legends';
-    }
-    this.context.appendChild(this.container);
-};
+wax.Legend = function(context) {
+    var legend = {},
+        legends = {},
+        container;
 
-wax.Legend.prototype.render = function(urls) {
-    var url;
-    for (url in this.legends) {
-        this.legends[url].style.display = 'none';
+    function legendUrl(url) {
+        return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
     }
-    var render = wax.util.bind(function(url, content) {
-        if (!content) {
-            this.legends[url] = false;
-        } else if (this.legends[url]) {
-            this.legends[url].style.display = 'block';
-        } else {
-            this.legends[url] = document.createElement('div');
-            this.legends[url].className = 'wax-legend';
-            this.legends[url].innerHTML = content;
-            this.container.appendChild(this.legends[url]);
+
+    legend.element = function() {
+        return container;
+    };
+
+    legend.write = function(content) {
+        legends[0] = document.createElement('div');
+        legends[0].className = 'wax-legend';
+        legends[0].innerHTML = content;
+        container.appendChild(legends[0]);
+    };
+
+    legend.render = function(urls) {
+        var url;
+        for (url in legends) {
+            legends[url].style.display = 'none';
         }
-    }, this);
-    for (var i = 0; i < urls.length; i++) {
-        url = this.legendUrl(urls[i]);
-        wax.request.get(url, function(err, data) {
-            if (data && data.legend) render(url, data.legend);
-        });
-    }
-};
 
-wax.Legend.prototype.legendUrl = function(url) {
-    return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
-};
+        var subrender = function(url, content) {
+            if (!content) {
+                legends[url] = false;
+            } else if (legends[url]) {
+                legends[url].style.display = 'block';
+            } else {
+                legends[url] = document.createElement('div');
+                legends[url].className = 'wax-legend';
+                legends[url].innerHTML = content;
+                container.appendChild(legends[url]);
+            }
+        };
 
+        for (var i = 0; i < urls.length; i++) {
+            url = legendUrl(urls[i]);
+            wax.request.get(url, function(err, data) {
+                if (data && data.legend) subrender(url, data.legend);
+            });
+        }
+    };
+
+    legend.add = function() {
+        container = document.createElement('div');
+        container.className = 'wax-legends';
+        return this;
+    };
+
+    return legend.add();
+}
 // Like underscore's bind, except it runs a function
 // with no arguments off of an object.
 //

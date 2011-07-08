@@ -121,7 +121,8 @@ wax.mm.tilejson(
   var m = new mm.Map('modestmaps-tilejson',
     new wax.mm.connector(d),
     new mm.Point(300,200));
-  var i = wax.mm.interaction(m, d);
+  wax.mm.interaction(m, d);
+  wax.mm.legend(m, d).appendTo(m.parent);
   m.setCenterZoom(new mm.Location(39, -98), 1);
 });
 </pre>
@@ -320,7 +321,7 @@ var m = new mm.Map('modestmaps-legend',
     baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
     layerName: 'geography-class'}),
   new mm.Point(300,200));
-wax.mm.legend(m);
+wax.mm.legend(m).appendTo(m.parent);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
@@ -363,7 +364,7 @@ var m = new mm.Map('modestmaps-attribution',
   new mm.Point(300,200));
 wax.mm.attribution(m, {
   attribution: "Geography Class"
-});
+}).appendTo(m.parent);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
