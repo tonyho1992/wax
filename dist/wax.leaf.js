@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-280-gbca783a */
+/* wax - 2.1.6 - 1.0.4-284-gc8ab32d */
 
 
 /*!
@@ -208,18 +208,20 @@ wax = wax || {};
 
 // Attribution
 // -----------
-wax.Attribution = function(context, container, className) {
+wax.Attribution = function(context, container) {
     this.context = context;
     this.container = container;
     if (!this.container) {
         this.container = document.createElement('div');
-        this.container.className = 'wax-attribution ' + className;
+        this.container.className = 'wax-attribution';
     }
     this.context.appendChild(this.container);
 };
 
 wax.Attribution.prototype.render = function(content) {
-    this.container.innerHTML = content;
+    if (typeof content !== 'undefined') {
+        this.container.innerHTML = content;
+    }
 }
 
 // Formatter
@@ -239,9 +241,11 @@ wax.formatter = function(x) {
     } else if (x && typeof x === 'function') {
         f = x;
     } else {
+        console.log('assigning to null');
+        console.log(x);
         f = function() {};
     }
-        
+
     // Wrap the given formatter function in order to
     // catch exceptions that it may throw.
     formatter.format = function(options, data) {
@@ -346,7 +350,7 @@ wax.GridManager = function(options) {
         } else {
             wax.request.get(formatterUrl(url), function(err, data) {
                 if (data && data.formatter) {
-                    formatter = wax.formatter(data);
+                    formatter = wax.formatter(data.formatter);
                 } else {
                     formatter = false;
                 }

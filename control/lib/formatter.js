@@ -17,7 +17,7 @@ wax.formatter = function(x) {
     } else {
         f = function() {};
     }
-        
+
     // Wrap the given formatter function in order to
     // catch exceptions that it may throw.
     formatter.format = function(options, data) {

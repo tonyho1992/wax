@@ -34,6 +34,8 @@ wax.mm.interaction = function(map, options) {
         _af,
         // Down event
         _d,
+        // Touch tolerance
+        tol = 4,
         tileGrid;
 
     // Search through `.tiles` and determine the position,
@@ -149,7 +151,6 @@ wax.mm.interaction = function(map, options) {
         }
     }
 
-    // If we get a touchMove event, it isn't a tap.
     function touchCancel() {
         MM.removeEvent(map.parent, 'touchend', onUp);
         MM.removeEvent(map.parent, 'touchmove', onUp);
@@ -157,16 +158,15 @@ wax.mm.interaction = function(map, options) {
     }
 
     function onUp(e) {
+        var pos = wax.util.eventoffset(e);
+
         MM.removeEvent(map.parent, 'mouseup', onUp);
         if (map.parent.ontouchend) {
             MM.removeEvent(map.parent, 'touchend', onUp);
             MM.removeEvent(map.parent, 'touchmove', _touchCancel);
         }
+
         _downLock = false;
-
-        var tol = 4,
-            pos = wax.util.eventoffset(e);
-
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
             click(_d);

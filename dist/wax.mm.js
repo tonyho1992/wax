@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-280-gbca783a */
+/* wax - 2.1.6 - 1.0.4-284-gc8ab32d */
 
 
 /*!
@@ -208,18 +208,20 @@ wax = wax || {};
 
 // Attribution
 // -----------
-wax.Attribution = function(context, container, className) {
+wax.Attribution = function(context, container) {
     this.context = context;
     this.container = container;
     if (!this.container) {
         this.container = document.createElement('div');
-        this.container.className = 'wax-attribution ' + className;
+        this.container.className = 'wax-attribution';
     }
     this.context.appendChild(this.container);
 };
 
 wax.Attribution.prototype.render = function(content) {
-    this.container.innerHTML = content;
+    if (typeof content !== 'undefined') {
+        this.container.innerHTML = content;
+    }
 }
 
 // Formatter
@@ -239,9 +241,11 @@ wax.formatter = function(x) {
     } else if (x && typeof x === 'function') {
         f = x;
     } else {
+        console.log('assigning to null');
+        console.log(x);
         f = function() {};
     }
-        
+
     // Wrap the given formatter function in order to
     // catch exceptions that it may throw.
     formatter.format = function(options, data) {
@@ -346,7 +350,7 @@ wax.GridManager = function(options) {
         } else {
             wax.request.get(formatterUrl(url), function(err, data) {
                 if (data && data.formatter) {
-                    formatter = wax.formatter(data);
+                    formatter = wax.formatter(data.formatter);
                 } else {
                     formatter = false;
                 }
@@ -772,8 +776,9 @@ wax.mm.attribution = function(map, options) {
     options = options || {};
     var attribution = {
         add: function() {
-            this.attribution = new wax.Attribution(map.parent, options.container, 'wax-mm');
+            this.attribution = new wax.Attribution(map.parent, options.container);
             this.attribution.render(options.attribution);
+            this.attribution.container.className = 'wax-attribution wax-mm';
         }
     };
     return attribution.add();
@@ -1117,6 +1122,8 @@ wax.mm.interaction = function(map, options) {
         _af,
         // Down event
         _d,
+        // Touch tolerance
+        tol = 4,
         tileGrid;
 
     // Search through `.tiles` and determine the position,
@@ -1232,7 +1239,6 @@ wax.mm.interaction = function(map, options) {
         }
     }
 
-    // If we get a touchMove event, it isn't a tap.
     function touchCancel() {
         MM.removeEvent(map.parent, 'touchend', onUp);
         MM.removeEvent(map.parent, 'touchmove', onUp);
@@ -1240,16 +1246,15 @@ wax.mm.interaction = function(map, options) {
     }
 
     function onUp(e) {
+        var pos = wax.util.eventoffset(e);
+
         MM.removeEvent(map.parent, 'mouseup', onUp);
         if (map.parent.ontouchend) {
             MM.removeEvent(map.parent, 'touchend', onUp);
             MM.removeEvent(map.parent, 'touchmove', _touchCancel);
         }
+
         _downLock = false;
-
-        var tol = 4,
-            pos = wax.util.eventoffset(e);
-
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
             click(_d);

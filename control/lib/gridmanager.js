@@ -28,7 +28,7 @@ wax.GridManager = function(options) {
         } else {
             wax.request.get(formatterUrl(url), function(err, data) {
                 if (data && data.formatter) {
-                    formatter = wax.formatter(data);
+                    formatter = wax.formatter(data.formatter);
                 } else {
                     formatter = false;
                 }
