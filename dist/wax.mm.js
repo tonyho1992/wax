@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-287-g2996eba */
+/* wax - 2.1.6 - 1.0.4-288-g09508a3 */
 
 
 /*!
@@ -208,20 +208,27 @@ wax = wax || {};
 
 // Attribution
 // -----------
-wax.Attribution = function(context, container) {
-    this.context = context;
-    this.container = container;
-    if (!this.container) {
-        this.container = document.createElement('div');
-        this.container.className = 'wax-attribution';
-    }
-    this.context.appendChild(this.container);
-};
+wax.attribution = function() {
+    var container,
+        a = {};
 
-wax.Attribution.prototype.render = function(content) {
-    if (typeof content !== 'undefined') {
-        this.container.innerHTML = content;
-    }
+    a.set = function(content) {
+        if (typeof content === 'undefined') return;
+        container.innerHTML = content;
+        return this;
+    };
+
+    a.element = function() {
+        return container;
+    };
+
+    a.init = function() {
+        container = document.createElement('div');
+        container.className = 'wax-attribution';
+        return this;
+    };
+
+    return a.init();
 };
 // Formatter
 // ---------
@@ -468,7 +475,7 @@ wax.Legend = function(context) {
     };
 
     return legend.add();
-}
+};
 // Like underscore's bind, except it runs a function
 // with no arguments off of an object.
 //
@@ -788,13 +795,22 @@ wax.mm.attribution = function(map, options) {
     var a, // internal attribution control
         attribution = {};
 
-    attribution.add = function() {
-        a = new wax.Attribution(map.parent, options.container);
-        a.render(options.attribution);
-        a.container.className = 'wax-attribution wax-mm';
+    attribution.element = function() {
+        return a.element();
     };
 
-    return attribution.add();
+    attribution.appendTo = function(elem) {
+        elem.appendChild(a.element());
+        return this;
+    };
+
+    attribution.init = function() {
+        a = wax.attribution();
+        a.set(options.attribution);
+        return this;
+    };
+
+    return attribution.init();
 };
 wax = wax || {};
 wax.mm = wax.mm || {};

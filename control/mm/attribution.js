@@ -9,11 +9,20 @@ wax.mm.attribution = function(map, options) {
     var a, // internal attribution control
         attribution = {};
 
-    attribution.add = function() {
-        a = new wax.Attribution(map.parent);
-        a.render(options.attribution);
-        a.container.className = 'wax-attribution wax-mm';
+    attribution.element = function() {
+        return a.element();
     };
 
-    return attribution.add();
+    attribution.appendTo = function(elem) {
+        elem.appendChild(a.element());
+        return this;
+    };
+
+    attribution.init = function() {
+        a = wax.attribution();
+        a.set(options.attribution);
+        return this;
+    };
+
+    return attribution.init();
 };

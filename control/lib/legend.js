@@ -58,4 +58,4 @@ wax.Legend = function(context) {
     };
 
     return legend.add();
-}
+};
