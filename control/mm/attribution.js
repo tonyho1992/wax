@@ -21,6 +21,7 @@ wax.mm.attribution = function(options) {
     attribution.init = function() {
         a = wax.attribution();
         a.set(options.attribution);
+        a.element().className = 'wax-attribution wax-mm';
         return this;
     };
 
