@@ -3,15 +3,27 @@ wax.g = wax.g || {};
 
 // Attribution
 // -----------
-// Attribution wrapper for Google Maps API.
-wax.g.attribution = function(map, options) {
+// Attribution wrapper for Google Maps.
+wax.g.attribution = function(options) {
     options = options || {};
-    var attribution = {
-        add: function() {
-            this.attribution = new wax.Attribution(map.getDiv(), options.container);
-            this.attribution.render(options.attribution);
-            this.attribution.container.className = 'wax-attribution wax-g';
-        }
+    var a, // internal attribution control
+        attribution = {};
+
+    attribution.element = function() {
+        return a.element();
     };
-    return attribution.add();
+
+    attribution.appendTo = function(elem) {
+        wax.util.$(elem).appendChild(a.element());
+        return this;
+    };
+
+    attribution.init = function() {
+        a = wax.attribution();
+        a.set(options.attribution);
+        a.element().className = 'wax-attribution wax-g';
+        return this;
+    };
+
+    return attribution.init();
 };
