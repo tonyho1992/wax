@@ -501,19 +501,19 @@ custom `MapType` provided by Wax at `wax.g.MapType`.
 <div id='google-map' class='map'></div>
 <a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
 <pre class='sh_javascript run'>
+wax.mm.tilejson(
+'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
+  function(d) {
 var map = new google.maps.Map(
-  document.getElementById('google-map'),
-  { center: new google.maps.LatLng(0, 0),
+  document.getElementById('google-map'), {
+    center: new google.maps.LatLng(0, 0),
     disableDefaultUI: true,
     zoom: 1,
     mapTypeId: google.maps.MapTypeId.ROADMAP });
-map.mapTypes.set('mb', new wax.g.MapType({
-    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    layerName: 'geography-class',
-    name: 'Geography Class'
-}));
+map.mapTypes.set('mb', new wax.g.connector(d));
 map.setMapTypeId('mb');
 wax.g.interaction(map);
+});
 </pre>
 </div>
 

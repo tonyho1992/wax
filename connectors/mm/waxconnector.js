@@ -6,8 +6,6 @@ wax.mm = wax.mm || {};
 wax.mm.connector = function(options) {
     this.options = {
         tiles: options.tiles,
-        formatter: options.formatter || null,
-        legend: options.legend || null,
         scheme: options.scheme || 'xyz',
         minzoom: options.minzoom,
         maxzoom: options.maxzoom
