@@ -316,13 +316,17 @@ displays it on the map.
 <a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
-var m = new mm.Map('modestmaps-legend',
-  new wax.mm.provider({
-    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    layerName: 'geography-class'}),
-  new mm.Point(300,200));
-wax.mm.legend(m).appendTo(m.parent);
-m.setCenterZoom(new mm.Location(39, -98), 2);
+wax.mm.tilejson(
+'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
+function(d) {
+  var m = new mm.Map('modestmaps-legend',
+    new wax.mm.provider({
+      baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+      layerName: 'geography-class'}),
+    new mm.Point(300,200));
+  wax.mm.legend(d).appendTo(m.parent);
+  m.setCenterZoom(new mm.Location(39, -98), 2);
+});
 </pre>
 </div>
 

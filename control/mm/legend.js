@@ -5,24 +5,14 @@ wax.mm = wax.mm || {};
 // --------------
 // The Modest Maps version of this control is a very, very
 // light wrapper around the `/lib` code for legends.
-wax.mm.legend = function(map, options) {
+wax.mm.legend = function(options) {
     options = options || {};
     var l, // parent legend
         legend = {};
 
     legend.add = function() {
-        l = wax.Legend(map.parent);
-        if (options.legend) {
-            l.write(options.legend);
-        } else {
-            l.render([
-                map.provider.getTileUrl({
-                    zoom: 0,
-                    column: 0,
-                    row: 0
-                })
-            ]);
-        }
+        l = wax.legend()
+            .content(options.legend || '');
         return this;
     };
 
@@ -35,5 +25,5 @@ wax.mm.legend = function(map, options) {
         return this;
     };
 
-    return legend.add(map);
+    return legend.add();
 };
