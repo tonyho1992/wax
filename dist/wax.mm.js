@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-285-g8a2caf9 */
+/* wax - 2.1.6 - 1.0.4-286-ge8a59aa */
 
 
 /*!
@@ -298,7 +298,6 @@ wax.GridInstance = function(grid_tile, formatter, options) {
         if ((y - tileY < 0) || (x - tileX < 0)) return;
         if ((Math.floor(y - tileY) > tileSize) ||
             (Math.floor(x - tileX) > tileSize)) return;
-
         // Find the key in the grid. The above calls should ensure that
         // the grid's array is large enough to make this work.
         var key = grid_tile.grid[
@@ -1152,8 +1151,7 @@ wax.mm.interaction = function(map, options) {
     }
 
     function getTile(e) {
-        for (var i = 0, grid = getTileGrid(), tile;
-            i < grid.length; i++) {
+        for (var i = 0, grid = getTileGrid(); i < grid.length; i++) {
             if ((grid[i][0] < e.y) &&
                ((grid[i][0] + 256) > e.y) &&
                 (grid[i][1] < e.x) &&
@@ -1296,9 +1294,7 @@ wax.mm.interaction = function(map, options) {
         var l = ['zoomed', 'panned', 'centered',
             'extentset', 'resized', 'drawn'];
         for (var i = 0; i < l.length; i++) {
-            map.addCallback(
-                l[i], interaction.clearTileGrid
-            );
+            map.addCallback(l[i], clearTileGrid);
         }
         MM.addEvent(map.parent, 'mousemove', onMove);
         MM.addEvent(map.parent, 'mousedown', onDown);

@@ -66,8 +66,7 @@ wax.mm.interaction = function(map, options) {
     }
 
     function getTile(e) {
-        for (var i = 0, grid = getTileGrid(), tile;
-            i < grid.length; i++) {
+        for (var i = 0, grid = getTileGrid(); i < grid.length; i++) {
             if ((grid[i][0] < e.y) &&
                ((grid[i][0] + 256) > e.y) &&
                 (grid[i][1] < e.x) &&
@@ -210,9 +209,7 @@ wax.mm.interaction = function(map, options) {
         var l = ['zoomed', 'panned', 'centered',
             'extentset', 'resized', 'drawn'];
         for (var i = 0; i < l.length; i++) {
-            map.addCallback(
-                l[i], interaction.clearTileGrid
-            );
+            map.addCallback(l[i], clearTileGrid);
         }
         MM.addEvent(map.parent, 'mousemove', onMove);
         MM.addEvent(map.parent, 'mousedown', onDown);

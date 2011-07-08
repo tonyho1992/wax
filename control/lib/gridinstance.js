@@ -40,7 +40,6 @@ wax.GridInstance = function(grid_tile, formatter, options) {
         if ((y - tileY < 0) || (x - tileX < 0)) return;
         if ((Math.floor(y - tileY) > tileSize) ||
             (Math.floor(x - tileX) > tileSize)) return;
-
         // Find the key in the grid. The above calls should ensure that
         // the grid's array is large enough to make this work.
         var key = grid_tile.grid[

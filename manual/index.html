@@ -108,10 +108,6 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
 
-
-
-
-
 ### TileJSON
 
 <div class='section'>
@@ -120,18 +116,16 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 wax.mm.tilejson(
-  'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
+'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
   function(d) {
-  var m = new mm.Map('modestmaps-tilejson', new wax.mm.connector(d),
+  var m = new mm.Map('modestmaps-tilejson',
+    new wax.mm.connector(d),
     new mm.Point(300,200));
-  var i = wax.mm.interaction(m);
+  var i = wax.mm.interaction(m, d);
   m.setCenterZoom(new mm.Location(39, -98), 1);
 });
 </pre>
 </div>
-
-
-
 
 ## Controls
 
