@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-292-g5d34341 */
+/* wax - 2.1.6 - 1.0.4-298-g295b1ab */
 
 
 /*!
@@ -794,6 +794,7 @@ wax.mm.attribution = function(options) {
     attribution.init = function() {
         a = wax.attribution();
         a.set(options.attribution);
+        a.element().className = 'wax-attribution wax-mm';
         return this;
     };
 

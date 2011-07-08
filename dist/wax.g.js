@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-292-g5d34341 */
+/* wax - 2.1.6 - 1.0.4-298-g295b1ab */
 
 
 /*!
@@ -776,17 +776,29 @@ wax.g = wax.g || {};
 
 // Attribution
 // -----------
-// Attribution wrapper for Google Maps API.
-wax.g.attribution = function(map, options) {
+// Attribution wrapper for Google Maps.
+wax.g.attribution = function(options) {
     options = options || {};
-    var attribution = {
-        add: function() {
-            this.attribution = new wax.Attribution(map.getDiv(), options.container);
-            this.attribution.render(options.attribution);
-            this.attribution.container.className = 'wax-attribution wax-g';
-        }
+    var a, // internal attribution control
+        attribution = {};
+
+    attribution.element = function() {
+        return a.element();
     };
-    return attribution.add();
+
+    attribution.appendTo = function(elem) {
+        wax.util.$(elem).appendChild(a.element());
+        return this;
+    };
+
+    attribution.init = function() {
+        a = wax.attribution();
+        a.set(options.attribution);
+        a.element().className = 'wax-attribution wax-g';
+        return this;
+    };
+
+    return attribution.init();
 };
 wax = wax || {};
 wax.g = wax.g || {};
@@ -943,37 +955,31 @@ wax.g.interaction = function(map, options) {
 wax = wax || {};
 wax.g = wax.g || {};
 
+// Legend Control
+// --------------
 // Adds legends to a google Map object.
-wax.g.legend = function(map, options) {
+wax.g.legend = function(options) {
     options = options || {};
-    var legend = {
-        add: function() {
-            var url;
-            this.legend = new wax.Legend(map.getDiv(), options.container);
-            // Ideally we would use the 'tilesloaded' event here. This doesn't seem to
-            // work so we use the much less appropriate 'idle' event.
-            google.maps.event.addListener(map, 'idle', wax.util.bind(function() {
-                if (url) return;
+    var l, // parent legend
+        legend = {};
 
-                // Get a tile URL for each relevant layer, from which legend URLs
-                // are derived.
-                url = [];
-                for (var i in map.mapTypes) {
-                    if (!map.mapTypes[i].interactive) continue;
-                    var mapType = map.mapTypes[i];
-                    for (var key in mapType.cache) {
-                        url.push(mapType.cache[key].src);
-                        break;
-                    }
-                };
-                url.length && this.legend.render(url);
-            }, this));
-            return this;
-        }
+    legend.add = function() {
+        l = wax.legend()
+            .content(options.legend || '');
+        return this;
     };
-    return legend.add(map);
-};
 
+    legend.element = function() {
+        return l.element();
+    };
+
+    legend.appendTo = function(elem) {
+        wax.util.$(elem).appendChild(l.element());
+        return this;
+    };
+
+    return legend.add();
+};
 // Wax for Google Maps API v3
 // --------------------------
 
