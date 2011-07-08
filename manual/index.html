@@ -120,11 +120,10 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
 wax.mm.tilejson(
-  'http://localhost:8888/admin/api/Tileset/geography-class',
-  function(provider) {
-  var m = new mm.Map('modestmaps-tilejson', provider,
+  'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
+  function(d) {
+  var m = new mm.Map('modestmaps-tilejson', new wax.mm.connector(d),
     new mm.Point(300,200));
-    m.provider = 'something lse';
   var i = wax.mm.interaction(m);
   m.setCenterZoom(new mm.Location(39, -98), 1);
 });

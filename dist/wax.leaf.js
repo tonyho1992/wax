@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-284-gc8ab32d */
+/* wax - 2.1.6 - 1.0.4-285-g8a2caf9 */
 
 
 /*!
@@ -241,8 +241,6 @@ wax.formatter = function(x) {
     } else if (x && typeof x === 'function') {
         f = x;
     } else {
-        console.log('assigning to null');
-        console.log(x);
         f = function() {};
     }
 
