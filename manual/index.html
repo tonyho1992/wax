@@ -362,7 +362,7 @@ var m = new mm.Map('modestmaps-attribution',
     baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
     layerName: 'geography-class'}),
   new mm.Point(300,200));
-wax.mm.attribution(m, {
+wax.mm.attribution({
   attribution: "Geography Class"
 }).appendTo('modestmaps-attribution');
 m.setCenterZoom(new mm.Location(39, -98), 2);
