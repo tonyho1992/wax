@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-304-gc4dd2d3 */
+/* wax - 2.1.6 - 1.0.4-307-g8863944 */
 
 
 /*!
@@ -831,7 +831,7 @@ wax.g.interaction = function(map, options) {
         modifyingEvents: ['dragstart', 'dragend', 'drag', 'zoom_changed',
             'resize', 'center_changed', 'bounds_changed'],
 
-        waxGM: new wax.GridManager(),
+        waxGM: new wax.GridManager(options),
 
         // This requires wax.Tooltip or similar
         callbacks: options.callbacks || new wax.tooltip(),
@@ -864,10 +864,8 @@ wax.g.interaction = function(map, options) {
                 this._getTileGrid = [];
                 var zoom = map.getZoom();
                 var mapOffset = wax.util.offset(map.getDiv());
-                for (var i in map.mapTypes) {
-                    if (!map.mapTypes[i].interactive) continue;
-
-                    var mapType = map.mapTypes[i];
+                var get = wax.util.bind(function(mapType) {
+                    if (!mapType.interactive) return;
                     for (var key in mapType.cache) {
                         if (key.split('/')[0] != zoom) continue;
                         var tileOffset = wax.util.offset(mapType.cache[key]);
@@ -877,7 +875,10 @@ wax.g.interaction = function(map, options) {
                             mapType.cache[key]
                         ]);
                     }
-                }
+                }, this);
+                // Iterate over base mapTypes and overlayMapTypes.
+                for (var i in map.mapTypes) get(map.mapTypes[i]);
+                map.overlayMapTypes.forEach(get);
             }
             return this._getTileGrid;
         },
