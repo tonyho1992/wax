@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-301-g8c2db80 */
+/* wax - 2.1.6 - 1.0.4-302-g2796b42 */
 
 
 /*!
@@ -1831,8 +1831,8 @@ wax.mm.connector = function(options) {
     this.options = {
         tiles: options.tiles,
         scheme: options.scheme || 'xyz',
-        minzoom: options.minzoom,
-        maxzoom: options.maxzoom
+        minzoom: options.minzoom || 0,
+        maxzoom: options.maxzoom || 22
     };
 };
 

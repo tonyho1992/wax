@@ -7,8 +7,8 @@ wax.mm.connector = function(options) {
     this.options = {
         tiles: options.tiles,
         scheme: options.scheme || 'xyz',
-        minzoom: options.minzoom,
-        maxzoom: options.maxzoom
+        minzoom: options.minzoom || 0,
+        maxzoom: options.maxzoom || 22
     };
 };
 

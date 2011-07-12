@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-301-g8c2db80 */
+/* wax - 2.1.6 - 1.0.4-302-g2796b42 */
 
 
 /*!
@@ -1018,7 +1018,7 @@ wax.g.connector = function(options) {
     };
 
     this.minZoom = options.minzoom || 0;
-    this.maxZoom = options.maxzoom || 18;
+    this.maxZoom = options.maxzoom || 22;
 
     this.name = options.name || '';
     this.description = options.description || '';

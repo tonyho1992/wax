@@ -25,7 +25,7 @@ wax.g.connector = function(options) {
     };
 
     this.minZoom = options.minzoom || 0;
-    this.maxZoom = options.maxzoom || 18;
+    this.maxZoom = options.maxzoom || 22;
 
     this.name = options.name || '';
     this.description = options.description || '';
