@@ -5,11 +5,9 @@
 * TileJSON support in new map connectors: `wax.mm.connector`,
   `wax.leaf.connector` and `wax.g.connector`. The old `wax.g.maptype` and
   `wax.mm.provider` have been removed.
-* All `g`, `leaf` and `mm` controls now use the following function signature
-
-        function (map, options) {}
-
-  where relevant TileJSON keys in `options` are used if present.
+* All `g`, `leaf` and `mm` controls now use the signature
+  `function (map, options) {}` where relevant TileJSON keys in `options` are
+  used if present.
 * Attribution and legend controls no longer append themselves to the map div.
   Use the `#appendTo` method to add the DOM element to the map.
 
