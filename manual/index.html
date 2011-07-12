@@ -13,7 +13,6 @@
   <script src='../dist/wax.ol.js' type='text/javascript'></script>
   <script src='../dist/wax.leaf.js' type='text/javascript'></script>
   <script src='../dist/wax.g.js' type='text/javascript'></script>
-  <script src='../connectors/mm/tilejson.js' type='text/javascript'></script>
   <script src='lib/showdown.js' type='text/javascript'></script>
   <script src='lib/shjs.js' type='text/javascript'></script>
   <script src='lib/sh_javascript.min.js' type='text/javascript'></script>
@@ -51,7 +50,37 @@ The mapping server serves up **tiles** of rendered data - tiles being 256 pixel
 square images covering some of the world. Here's a tile of Europe from the
 [World Light tileset](http://mapbox.com/tileset/world-light).
 
-![Europe](http://b.tile.mapbox.com/1.0.0/world-light/2/2/2.png)
+![Europe](http://a.tile.mapbox.com/1.0.0/world-light/2/2/2.png)
+
+## TileJSON
+
+The Wax API makes use of [TileJSON](https://github.com/mapbox/tilejson).
+TileJSON is a format that contains metadata and information necessary for using
+a tileset.
+
+To start you'll need to know the URL of the tileset you want to use. Most
+tilesets follow the convention of ending in `/{z}/{x}/{y}.[image format]`
+where `{z}` is the *zoom level*, `{x}` is the *x coordinate* and `{y}` is
+the *y coordinate*. TileJSON represents tileset URLs using these placeholders
+so that a tile at any coordinate can be requested.
+
+The URL of the tile above is `http://a.tile.mapbox.com/1.0.0/world-light/2/2/2.png`. By inference we can write the TileJSON needed to use the World Light tileset:
+
+<div class='section'>
+<pre class='sh_javascript'>
+{
+  "version": "1.0.0",
+  "scheme": "tms",
+  "tiles" ["http://a.tile.mapbox.com/1.0.0/world-light/{z}/{x}/{y}.png"]
+}
+</pre>
+</div>
+
+- The `version` key declares that we are implementing version `1.0.0` of the
+  TileJSON spec.
+- The `scheme` key describes the coordinate system used for the tiles. MapBox
+  tilesets currently use the scheme `tms`.
+- The `tiles` key contains an array of URLs from which tiles can be requested.
 
 There are quite a few mapping APIs, but at their core, they're doing the same
 sort of thing - adding these tiles to a page and managing them so that the
@@ -60,9 +89,8 @@ map seems like a continuous world instead of little squares. We'll start off wit
 
 # Modest Maps
 
-The first step is to actually download and include the necessary Javascript
-code to make your map work. We'll also include a CSS file to start rolling with
-style:
+The first step is to download and include the necessary Javascript code to
+make your map work. We'll also include a CSS file to start rolling with style:
 
 - `wax/ext/modestmaps.min.js` contains the Modest Maps library.
 - `wax/dist/wax.mm.js` contains the Wax controls and integration code for
@@ -81,8 +109,8 @@ style:
 </pre>
 </div>
 
-The tilesets that TileStream serves and TileMill creates are supported by a
-custom Modest Maps provider supplied by Wax at `wax.mm.provider`.
+Wax has a custom Modest Maps provider that can display tilesets described
+by TileJSON format at `wax.mm.connector`.
 
 <div class='section'>
 <div id='modestmaps-setup' class='map'></div>
@@ -99,33 +127,13 @@ var tilejson = {
 var mm = com.modestmaps;
 // Set up a map in a div with the id 'modestmaps-setup'
 var m = new mm.Map('modestmaps-setup',
-  // Use Wax's to provider add a new custom layer
+  // Use Wax's connector to add a new custom layer
   new wax.mm.connector(tilejson),
-  // And it'll be 300px by 200px
-  new mm.Point(300,200));
+  // And it'll be 240px by 120px
+  new mm.Point(240,120));
 
 // Center it on the United States, at zoom level 2.
 m.setCenterZoom(new mm.Location(39, -98), 2);
-</pre>
-</div>
-
-### TileJSON
-
-<div class='section'>
-<div id='modestmaps-tilejson' class='map'></div>
-<a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
-<pre class='sh_javascript run'>
-var mm = com.modestmaps;
-wax.mm.tilejson(
-'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
-  function(d) {
-  var m = new mm.Map('modestmaps-tilejson',
-    new wax.mm.connector(d),
-    new mm.Point(300,200));
-  wax.mm.interaction(m, d);
-  wax.mm.legend(m, d).appendTo(m.parent);
-  m.setCenterZoom(new mm.Location(39, -98), 1);
-});
 </pre>
 </div>
 
@@ -143,15 +151,6 @@ The interaction control takes a parameter, `callbacks`, that has the
 default value of `new wax.tooltip()` - the default tooltip library that comes
 with wax. Any other library that implements the same interface
 (see `tooltips.js`) can be passed into the callbacks parameter.
-
-The default tooltip implementation also takes a single optional parameter -
-`animationOut`. This is the name of a CSS class that is applied to the tooltip
-to remove it from view - with the assumption that the base CSS class,
-`.wax-tooltip`, has a [CSS transition](http://www.w3.org/TR/css3-transitions/)
-defined. Note that if this CSS class **is not included in the page's stylesheet**,
-but is still specified, tooltips will not operate correctly. One can safely
-simply not specify `animationOut` and tooltips will disappear from the view
-immediately.
 <div class='section'>
 <div id='modestmaps-interaction' class='map'></div>
 <a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
@@ -166,7 +165,7 @@ var tilejson = {
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-interaction',
   new wax.mm.connector(tilejson),
-  new mm.Point(300,200));
+  new mm.Point(240,120));
 wax.mm.interaction(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 1);
 </pre>
@@ -191,7 +190,7 @@ var tilejson = {
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-mobile',
   new wax.mm.connector(tilejson),
-  new mm.Point(300,200),
+  new mm.Point(240,120),
   [new mm.MouseHandler(), new mm.TouchHandler()]);
 wax.mm.mobile(m, tilejson);
 wax.mm.interaction(m, tilejson);
@@ -221,7 +220,7 @@ var tilejson = {
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-fullscreen',
   new wax.mm.connector(tilejson),
-  new mm.Point(300,200));
+  new mm.Point(240,120));
 wax.mm.fullscreen(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
@@ -229,8 +228,7 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 
 ### Zoomer
 
-The Zoomer control is a stripped-down version of zoom controls, offering just
-zoom in &amp; out buttons.
+A simple zoom control offering zoom in &amp; out buttons.
 
 <div class='section'>
 <div id='modestmaps-zoomer' class='map dark'></div>
@@ -244,7 +242,7 @@ var tilejson = {
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-zoomer',
   new wax.mm.connector(tilejson),
-  new mm.Point(300,200));
+  new mm.Point(240,120));
 wax.mm.zoomer(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
@@ -252,7 +250,7 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 
 ### Zoombox
 
-The Zoombox control is a control that lets you zoom using the shift-key and a box.
+Control that allows you to zoom with the shift-key and a draggable box.
 
 <div class='section'>
 <div id='modestmaps-zoombox' class='map dark'></div>
@@ -266,7 +264,7 @@ var tilejson = {
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-zoombox',
   new wax.mm.connector(tilejson),
-  new mm.Point(300,200));
+  new mm.Point(240,120));
 wax.mm.zoombox(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
@@ -274,8 +272,7 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 
 ### Boxselector
 
-The boxselector control is a control that lets you highlight a region of the
-map with the shift-key and a box.
+A control that lets you highlight a region of the map with the shift-key and a draggable box.
 
 <div class='section'>
 <div id='modestmaps-boxselector' class='map dark'></div>
@@ -295,7 +292,7 @@ var tilejson = {
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-boxselector',
   new wax.mm.connector(tilejson),
-  new mm.Point(300,200));
+  new mm.Point(240,120));
 wax.mm.boxselector(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
@@ -320,7 +317,7 @@ var tilejson = {
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-pointselector',
   new wax.mm.connector(tilejson),
-  new mm.Point(300,200))
+  new mm.Point(240,120))
 wax.mm.pointselector(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
@@ -345,7 +342,7 @@ var tilejson = {
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-legend',
   new wax.mm.connector(tilejson),
-  new mm.Point(300,200));
+  new mm.Point(240,120));
 wax.mm.legend(m, tilejson).appendTo(m.parent);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
@@ -371,7 +368,7 @@ var tilejson = {
 };
 var m = new mm.Map('modestmaps-hash',
   new wax.mm.connector(tilejson),
-  new mm.Point(300,200));
+  new mm.Point(240,120));
 wax.mm.hash(m, tilejson);
 </pre>
 </div>
@@ -393,7 +390,7 @@ var tilejson = {
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-attribution',
   new wax.mm.connector(tilejson),
-  new mm.Point(300,200));
+  new mm.Point(240,120));
 wax.mm.attribution(m, tilejson).appendTo(m.parent);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
@@ -410,39 +407,36 @@ browser, because this could give a much higher level of performance.
 
 [Leaflet](http://leaflet.cloudmade.com/index.html) is a new mapping library written by
 Vladimir Agafonkin at CloudMade that delivers much of the interface of OpenLayers, but
-with higher performance and a slimmer profile. With `scheme='tms'`, it's simple to
-add layers to Leaflet.
+with higher performance and a slimmer profile.
+
+- `wax/ext/leaflet.js` contains the core Leaflet library.
+- `wax/ext/leaflet.css` contains the CSS styling for Leaflet.
+- `wax/dist/wax.leaf.js` containsthe Wax controls and integration code for
+  Leaflet.
+
+<div class='section'>
+<pre>
+&lt;html&gt;
+&lt;head&gt;
+  &lt;script src='wax/ext/leaflet.js' type='text/javascript'&gt;&lt;/script&gt;
+  &lt;script src='wax/dist/wax.leaf.js' type='text/javascript'&gt;&lt;/script&gt;
+  &lt;link href='wax/ext/leaflet.css' rel='stylesheet' type='text/css' /&gt;
+  ...
+</pre>
+</div>
+
+With `scheme='tms'` it's simple to add layers to Leaflet.
 
 <div class='section'>
 <div id='leaflet-simple' class='map'></div>
 <a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
 <pre class='sh_javascript run'>
 var map = new L.Map('leaflet-simple');
-// Don't show the 'Powered by Leaflet' text
-map.attributionControl.setPrefix('');
-map.setView(new L.LatLng(51.505, -0.09), 1).addLayer(
-    new L.TileLayer('http://a.tiles.mapbox.com/mapbox/1.0.0/natural-earth-2/{z}/{x}/{y}.png', {
-        maxZoom: 5,
-        scheme: 'tms',
-        attribution: "Natural Earth"
-    }));
-</pre>
-</div>
-
-### Leaflet Interaction
-
-<div class='section'>
-<div id='leaflet-interaction-map' class='map'></div>
-<a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
-<pre class='sh_javascript run'>
-var map = new L.Map('leaflet-interaction-map');
-// Don't show the 'Powered by Leaflet' text
-map.attributionControl.setPrefix('');
+map.attributionControl.setPrefix(''); // Hide "powered by Leaflet"
 map.setView(new L.LatLng(51.505, -0.09), 1).addLayer(
     new L.TileLayer('http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png', {
         maxZoom: 5,
-        scheme: 'tms',
-        attribution: "MapBox - Geography Class"
+        scheme: 'tms'
     }));
 wax.leaf.interaction(map);
 </pre>
@@ -574,6 +568,31 @@ and higher.
 
 # Protips
 
+## TileJSON URLs
+
+Servers like [TileStream](http://github.com/mapbox/tilestream) offer TileJSON
+for their tilesets at public URLs. Wax provides a basic JSONP loader for
+grabbing TileJSON from a server and using it to generate your map.
+
+<div class='section'>
+<div id='tilejson-url' class='map'></div>
+<a class='attribution' href='http://mapbox.com/tileset/world-light'>World Light</a>
+
+<pre class='sh_javascript run'>
+var url = 'http://tiles.mapbox.com/mapbox/api/Tileset/dc-nightvision';
+wax.tilejson(url, function(tilejson) {
+  var mm = com.modestmaps;
+  var m = new mm.Map('tilejson-url',
+    new wax.mm.connector(tilejson),
+    new mm.Point(240,120));
+  m.setCenterZoom(new mm.Location(
+    tilejson.center[1],  // lon
+    tilejson.center[0]), // lat
+    tilejson.center[2]); // zoom
+});
+</pre>
+</div>
+
 ## Multiple servers
 
 [Most browsers have a limit](https://encrypted.google.com/search?hl=en&q=browser+domain+connection+limit&aq=f&aqi=&aql=&oq=)
@@ -588,13 +607,11 @@ servers, or more often, multiple domain names. So, you can use
 * `b.tile.mapbox.com` and
 * `c.tile.mapbox.com`
 
-For tile requests. And you can easily specify them in Modest Maps - just give
-the `WaxProvider` function an array of domain names instead of just one.
+For tile requests. Specify additional servers in your TileJSON `tiles` key
+instead of just one:
 
 <div class='section'>
-<div id='modestmaps-cnames' class='map dark'></div>
-<a class='attribution' href='http://mapbox.com/tileset/world-glass'>World Glass</a>
-<pre class='sh_javascript run'>
+<pre class='sh_javascript'>
 var tilejson = {
   scheme: 'tms',
   tiles: [
@@ -603,38 +620,6 @@ var tilejson = {
     'http://c.tile.mapbox.com/mapbox/1.0.0/world-glass/{z}/{x}/{y}.png'
   ]
 };
-var mm = com.modestmaps;
-var m = new mm.Map('modestmaps-cnames',
-  new wax.mm.connector(tilejson),
-  new mm.Point(300,200));
-m.setCenterZoom(new mm.Location(39, -98), 2);
-</pre>
-</div>
-
-And, of course, there are other options you can set on the `wax.mm.provider` 
-object, not just layerName and baseUrl.
-
-* **filetype**: default `.png`, it can be `.jpg` or anything else.
-* **zoomRange**: default `[0, 18]`, it can be any restricted range of 
-zoom levels that you happen to have rendered.
-
-<div class='section'>
-<div id='modestmaps-options' class='map'></div>
-<a class='attribution' href='http://mapbox.com/tileset/pakistan-grey'>Pakistan Grey</a>
-<pre class='sh_javascript run'>
-var tilejson = {
-  scheme: 'tms',
-  tiles: [
-    'http://a.tile.mapbox.com/mapbox/1.0.0/pakistan-grey/{z}/{x}/{y}.jpg',
-    'http://b.tile.mapbox.com/mapbox/1.0.0/pakistan-grey/{z}/{x}/{y}.jpg',
-    'http://c.tile.mapbox.com/mapbox/1.0.0/pakistan-grey/{z}/{x}/{y}.jpg'
-  ]
-};
-var mm = com.modestmaps;
-var m = new mm.Map('modestmaps-options',
-  new wax.mm.connector(tilejson),
-  new mm.Point(300,200));
-m.setCenterZoom(new mm.Location(30.5, 69.78), 4);
 </pre>
 </div>
 
@@ -693,7 +678,7 @@ var m = new mm.Map('modestmaps-reverse',
       baseUrl: 'http://a.tile.mapbox.com/',
       layerName: 'pakistan-grey',
       zoomRange: [0, 9],
-      filetype: '.jpg'}), new mm.Point(300,200));
+      filetype: '.jpg'}), new mm.Point(240,120));
 w(m).melt(wax.mm.pointselector, {
   callback: function(coords) {
     $('#modestmaps-pointselector .attribution').text(

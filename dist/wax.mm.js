@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-299-g65e73ad */
+/* wax - 2.1.6 - 1.0.4-301-g8c2db80 */
 
 
 /*!
@@ -520,6 +520,18 @@ wax.request = {
             });
         }
     }
+};
+wax = wax || {};
+
+// A wrapper for reqwest jsonp to easily load TileJSON from a URL.
+wax.tilejson = function(url, callback) {
+    reqwest({
+        url: url + '?callback=grid',
+        type: 'jsonp',
+        jsonpCallback: 'callback',
+        success: callback,
+        error: callback
+    });
 };
 var wax = wax || {};
 wax.tooltip = {};
@@ -1809,21 +1821,6 @@ wax.mm.zoomer = function(map) {
         }
     };
     return zoomer.add(map);
-};
-wax = wax || {};
-wax.mm = wax.mm || {};
-
-// An adapter for the TileJSON spec that connects to the mm provider,
-// or default MM implementation if the tiles are in XYZ format
-
-wax.mm.tilejson = function(url, callback) {
-    reqwest({
-        url: url + '?callback=grid',
-        type: 'jsonp',
-        jsonpCallback: 'callback',
-        success: callback,
-        error: callback
-    });
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
