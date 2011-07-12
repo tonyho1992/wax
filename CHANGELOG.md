@@ -10,6 +10,7 @@
   used if present.
 * Attribution and legend controls no longer append themselves to the map div.
   Use the `#appendTo` method to add the DOM element to the map.
+* `w.melt(func)` now has the same return value as `func`.
 
 ### 2.1.6
 
