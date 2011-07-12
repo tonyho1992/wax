@@ -4,7 +4,7 @@ wax.g = wax.g || {};
 // Attribution
 // -----------
 // Attribution wrapper for Google Maps.
-wax.g.attribution = function(options) {
+wax.g.attribution = function(map, options) {
     options = options || {};
     var a, // internal attribution control
         attribution = {};

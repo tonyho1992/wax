@@ -4,7 +4,7 @@ wax.g = wax.g || {};
 // Legend Control
 // --------------
 // Adds legends to a google Map object.
-wax.g.legend = function(options) {
+wax.g.legend = function(map, options) {
     options = options || {};
     var l, // parent legend
         legend = {};

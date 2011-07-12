@@ -4,7 +4,7 @@ wax.mm = wax.mm || {};
 // Attribution
 // -----------
 // Attribution wrapper for Modest Maps.
-wax.mm.attribution = function(options) {
+wax.mm.attribution = function(map, options) {
     options = options || {};
     var a, // internal attribution control
         attribution = {};

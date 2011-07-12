@@ -89,17 +89,18 @@ custom Modest Maps provider supplied by Wax at `wax.mm.provider`.
 <a class='attribution' href='http://mapbox.com/tileset/world-light'>World Light</a>
 
 <pre class='sh_javascript run'>
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/world-light/{z}/{x}/{y}.png']
+};
 // Alias com.modestmaps to mm. This isn't necessary -
 // just nice for shorter code.
 var mm = com.modestmaps;
 // Set up a map in a div with the id 'modestmaps-setup'
 var m = new mm.Map('modestmaps-setup',
   // Use Wax's to provider add a new custom layer
-  new wax.mm.provider({
-    // From the main MapBox server
-    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    // Called world-light
-    layerName: 'world-light'}),
+  new wax.mm.connector(tilejson),
   // And it'll be 300px by 200px
   new mm.Point(300,200));
 
@@ -155,15 +156,18 @@ immediately.
 <div id='modestmaps-interaction' class='map'></div>
 <a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
 <pre class='sh_javascript run'>
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
+  grids: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.grid.json'],
+  formatter: function(options, data) { return data.NAME }
+};
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-interaction',
-  new wax.mm.provider({
-    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    layerName: 'geography-class'}),
+  new wax.mm.connector(tilejson),
   new mm.Point(300,200));
-wax.mm.interaction(m, { callbacks:
-  new wax.tooltip({ animationOut: 'wax-fade' })
-});
+wax.mm.interaction(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 1);
 </pre>
 </div>
@@ -175,24 +179,24 @@ TODO
 <div class='section'>
 <div id='modestmaps-mobile' class='map dark'></div>
 <a class='attribution' href='http://mapbox.com/tileset/world-glass'>World Glass</a>
-<pre class='sh_javascript run'>
+<!--<pre class='sh_javascript run'>
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
+  grids: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.grid.json'],
+  formatter: function(options, data) { return data.NAME },
+  bodyDraw: function(body) { body.bgColor = '#000000'; }
+};
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-mobile',
-  new wax.mm.provider({
-    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    layerName: 'geography-class'}),
+  new.wax.mm.connector(tilejson),
   new mm.Point(300,200),
   [new mm.MouseHandler(), new mm.TouchHandler()]);
-wax.mm.mobile(m, {
-  bodyDraw: function(body) {
-    body.bgColor = '#000000';
-  }
-});
-wax.mm.interaction(m, { callbacks:
-  new wax.tooltip({ animationOut: 'wax-fade' })
-});
+wax.mm.mobile(m, tilejson);
+wax.mm.interaction(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 2);
-</pre>
+</pre>-->
 </div>
 
 ### Fullscreen
@@ -209,13 +213,16 @@ and you can replace it with your own.
 <div id='modestmaps-fullscreen' class='map'></div>
 <a class='attribution' href='http://mapbox.com/tileset/world-light'>World Light</a>
 <pre class='sh_javascript run'>
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/world-light/{z}/{x}/{y}.png']
+};
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-fullscreen',
-  new wax.mm.provider({
-    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    layerName: 'world-light'}),
+  new wax.mm.connector(tilejson),
   new mm.Point(300,200));
-wax.mm.fullscreen(m);
+wax.mm.fullscreen(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
@@ -229,13 +236,16 @@ zoom in &amp; out buttons.
 <div id='modestmaps-zoomer' class='map dark'></div>
 <a class='attribution' href='http://mapbox.com/tileset/world-glass'>World Glass</a>
 <pre class='sh_javascript run'>
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/world-glass/{z}/{x}/{y}.png']
+};
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-zoomer',
-  new wax.mm.provider({
-    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    layerName: 'world-glass'}),
+  new wax.mm.connector(tilejson),
   new mm.Point(300,200));
-wax.mm.zoomer(m);
+wax.mm.zoomer(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
@@ -248,13 +258,16 @@ The Zoombox control is a control that lets you zoom using the shift-key and a bo
 <div id='modestmaps-zoombox' class='map dark'></div>
 <a class='attribution' href='http://mapbox.com/tileset/world-glass'>World Glass</a>
 <pre class='sh_javascript run'>
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/world-glass/{z}/{x}/{y}.png']
+};
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-zoombox',
-  new wax.mm.provider({
-    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    layerName: 'world-glass'}),
+  new wax.mm.connector(tilejson),
   new mm.Point(300,200));
-wax.mm.zoombox(m);
+wax.mm.zoombox(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
@@ -268,18 +281,22 @@ map with the shift-key and a box.
 <div id='modestmaps-boxselector' class='map dark'></div>
 <a class='attribution' href='http://mapbox.com/tileset/blue-marble-topo-bathy-jul'>Blue Marble Topography & Bathymetry (July)</a>
 <pre class='sh_javascript run'>
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/{z}/{x}/{y}.png'],
+  callback: function(c) {
+    $('#boxselector-text').text(
+      coords.map(function(c) {
+        return c.lat + ',' + c.lon;
+      }).join(' - '));
+  }
+};
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-boxselector',
-  new wax.mm.provider({
-    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    layerName: 'blue-marble-topo-bathy-jul'}),
-    new mm.Point(300,200));
-wax.mm.boxselector(m, function(coords) {
-  $('#boxselector-text').text(
-    coords.map(function(c) {
-      return c.lat + ',' + c.lon;
-    }).join(' - '));
-  });
+  new wax.mm.connector(tilejson),
+  new mm.Point(300,200));
+wax.mm.boxselector(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 <div class='widget'>Selection: <span id='boxselector-text'></span></div>
@@ -291,16 +308,20 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 <div id='modestmaps-pointselector' class='map dark'></div>
 <a class='attribution' href='http://mapbox.com/tileset/blue-marble-topo-bathy-jul'>Blue Marble Topography & Bathymetry (July)</a>
 <pre class='sh_javascript run'>
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/{z}/{x}/{y}.png'],
+  callback: function(coords) {
+    $('#pointselector-text').text(
+      coords.join(' - '))
+  }
+};
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-pointselector',
-    new wax.mm.provider({
-      baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'blue-marble-topo-bathy-jul'}),
-    new mm.Point(300,200))
-wax.mm.pointselector(m, function(coords) {
-  $('#pointselector-text').text(
-    coords.join(' - '))
-  });
+  new wax.mm.connector(tilejson),
+  new mm.Point(300,200))
+wax.mm.pointselector(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 <div class='widget'>Points: <span id='pointselector-text'></span></div>
@@ -315,18 +336,18 @@ displays it on the map.
 <div id='modestmaps-legend' class='map'></div>
 <a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
 <pre class='sh_javascript run'>
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
+  legend: 'Geography Class by MapBox'
+};
 var mm = com.modestmaps;
-wax.mm.tilejson(
-'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
-function(d) {
-  var m = new mm.Map('modestmaps-legend',
-    new wax.mm.provider({
-      baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-      layerName: 'geography-class'}),
-    new mm.Point(300,200));
-  wax.mm.legend(d).appendTo(m.parent);
-  m.setCenterZoom(new mm.Location(39, -98), 2);
-});
+var m = new mm.Map('modestmaps-legend',
+  new wax.mm.connector(tilejson),
+  new mm.Point(300,200));
+wax.mm.legend(m, tilejson).appendTo(m.parent);
+m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
 
@@ -340,15 +361,18 @@ the same state as the user was.
 <a class='attribution' href='http://mapbox.com/tileset/natural-earth-2'>Natural Earth II</a>
 <pre class='sh_javascript run'>
 var mm = com.modestmaps;
-var m = new mm.Map('modestmaps-hash',
-  new wax.mm.provider({
-    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    layerName: 'natural-earth-2'}),
-  new mm.Point(300,200));
-wax.mm.hash(m, {
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/natural-earth-2/{z}/{x}/{y}.png'],
   defaultCenter: new mm.Location(39, -98),
   defaultZoom: 4,
-  manager: wax.mm.pushState});
+  manager: wax.mm.pushState
+};
+var m = new mm.Map('modestmaps-hash',
+  new wax.mm.connector(tilejson),
+  new mm.Point(300,200));
+wax.mm.hash(m, tilejson);
 </pre>
 </div>
 
@@ -360,15 +384,17 @@ to the map. It is useful for citing data sources.
 <div class='section'>
 <div id='modestmaps-attribution' class='map'></div>
 <pre class='sh_javascript run'>
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
+  attribution: '&copy; MapBox'
+};
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-attribution',
-  new wax.mm.provider({
-    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
-    layerName: 'geography-class'}),
+  new wax.mm.connector(tilejson),
   new mm.Point(300,200));
-wax.mm.attribution({
-  attribution: "Geography Class"
-}).appendTo('modestmaps-attribution');
+wax.mm.attribution(m, tilejson).appendTo(m.parent);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
@@ -505,19 +531,23 @@ custom `MapType` provided by Wax at `wax.g.MapType`.
 <div id='google-map' class='map'></div>
 <a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
 <pre class='sh_javascript run'>
-wax.mm.tilejson(
-'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
-  function(d) {
-var map = new google.maps.Map(
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
+  grids: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.grid.json'],
+  formatter: function(options, data) { return data.NAME }
+};
+
+var m = new google.maps.Map(
   document.getElementById('google-map'), {
     center: new google.maps.LatLng(0, 0),
     disableDefaultUI: true,
     zoom: 1,
     mapTypeId: google.maps.MapTypeId.ROADMAP });
-map.mapTypes.set('mb', new wax.g.connector(d));
-map.setMapTypeId('mb');
-wax.g.interaction(map);
-});
+m.mapTypes.set('mb', new wax.g.connector(tilejson));
+m.setMapTypeId('mb');
+wax.g.interaction(m, tilejson);
 </pre>
 </div>
 
@@ -565,14 +595,17 @@ the `WaxProvider` function an array of domain names instead of just one.
 <div id='modestmaps-cnames' class='map dark'></div>
 <a class='attribution' href='http://mapbox.com/tileset/world-glass'>World Glass</a>
 <pre class='sh_javascript run'>
+var tilejson = {
+  scheme: 'tms',
+  tiles: [
+    'http://a.tile.mapbox.com/mapbox/1.0.0/world-glass/{z}/{x}/{y}.png',
+    'http://b.tile.mapbox.com/mapbox/1.0.0/world-glass/{z}/{x}/{y}.png',
+    'http://c.tile.mapbox.com/mapbox/1.0.0/world-glass/{z}/{x}/{y}.png'
+  ]
+};
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-cnames',
-  new wax.mm.provider({
-    baseUrl: [
-      'http://a.tile.mapbox.com/',
-      'http://b.tile.mapbox.com/',
-      'http://c.tile.mapbox.com/'],
-    layerName: 'world-glass'}),
+  new wax.mm.connector(tilejson),
   new mm.Point(300,200));
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
@@ -589,13 +622,17 @@ zoom levels that you happen to have rendered.
 <div id='modestmaps-options' class='map'></div>
 <a class='attribution' href='http://mapbox.com/tileset/pakistan-grey'>Pakistan Grey</a>
 <pre class='sh_javascript run'>
+var tilejson = {
+  scheme: 'tms',
+  tiles: [
+    'http://a.tile.mapbox.com/mapbox/1.0.0/pakistan-grey/{z}/{x}/{y}.jpg',
+    'http://b.tile.mapbox.com/mapbox/1.0.0/pakistan-grey/{z}/{x}/{y}.jpg',
+    'http://c.tile.mapbox.com/mapbox/1.0.0/pakistan-grey/{z}/{x}/{y}.jpg'
+  ]
+};
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-options',
-  new wax.mm.provider({
-    baseUrl: 'http://a.tile.mapbox.com/',
-    layerName: 'pakistan-grey',
-    zoomRange: [0, 9],
-    filetype: '.jpg'}),
+  new wax.mm.connector(tilejson),
   new mm.Point(300,200));
 m.setCenterZoom(new mm.Location(30.5, 69.78), 4);
 </pre>

@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-298-g295b1ab */
+/* wax - 2.1.6 - 1.0.4-299-g65e73ad */
 
 
 /*!
@@ -469,8 +469,7 @@ wax.legend = function() {
 //
 var w = function(self) {
     self.melt = function(func, obj) {
-        func.apply(obj, [self, obj]);
-        return self;
+        return func.apply(obj, [self, obj]);
     };
     return self;
 };
@@ -777,7 +776,7 @@ wax.g = wax.g || {};
 // Attribution
 // -----------
 // Attribution wrapper for Google Maps.
-wax.g.attribution = function(options) {
+wax.g.attribution = function(map, options) {
     options = options || {};
     var a, // internal attribution control
         attribution = {};
@@ -958,7 +957,7 @@ wax.g = wax.g || {};
 // Legend Control
 // --------------
 // Adds legends to a google Map object.
-wax.g.legend = function(options) {
+wax.g.legend = function(map, options) {
     options = options || {};
     var l, // parent legend
         legend = {};
@@ -1006,8 +1005,8 @@ wax.g.connector = function(options) {
         blankImage: options.blankImage
     };
 
-    this.minZoom = options.minzoom;
-    this.maxZoom = options.maxzoom;
+    this.minZoom = options.minzoom || 0;
+    this.maxZoom = options.maxzoom || 18;
 
     this.name = options.name || '';
     this.description = options.description || '';
@@ -1060,80 +1059,4 @@ wax.g.connector.prototype.getTileUrl = function(coord, z) {
                 .replace('{z}', z)
                 .replace('{x}', x)
                 .replace('{y}', y);
-};
-// Wax for Google Maps API v3
-// --------------------------
-
-// Wax header
-var wax = wax || {};
-wax.g = wax.g || {};
-
-// Wax Google Maps MapType: takes an object of options in the form
-//
-//     {
-//       name: '',
-//       filetype: '.png',
-//       layerName: 'world-light',
-//       alt: '',
-//       zoomRange: [0, 18],
-//       baseUrl: 'a url',
-//     }
-wax.g.MapType = function(options) {
-    options = options || {};
-    this.name = options.name || '';
-    this.alt = options.alt || '';
-    this.filetype = options.filetype || '.png';
-    this.layerName = options.layerName || 'world-light';
-    if (options.zoomRange) {
-        this.minZoom = options.zoomRange[0];
-        this.maxZoom = options.zoomRange[1];
-    } else {
-        this.minZoom = 0;
-        this.maxZoom = 18;
-    }
-    this.baseUrl = options.baseUrl ||
-        'http://a.tile.mapbox.com/';
-    this.blankImage = options.blankImage || '';
-
-    // non-configurable options
-    this.interactive = true;
-    this.tileSize = new google.maps.Size(256, 256);
-
-    // DOM element cache
-    this.cache = {};
-};
-
-// Get a tile element from a coordinate, zoom level, and an ownerDocument.
-wax.g.MapType.prototype.getTile = function(coord, zoom, ownerDocument) {
-    var key = zoom + '/' + coord.x + '/' + coord.y;
-    if (!this.cache[key]) {
-        var img = this.cache[key] = new Image(256, 256);
-        this.cache[key].src = this.getTileUrl(coord, zoom);
-        this.cache[key].setAttribute('gTileKey', key);
-        this.cache[key].onerror = function() { img.style.display = 'none'; };
-    }
-    return this.cache[key];
-};
-
-// Remove a tile that has fallen out of the map's viewport.
-//
-// TODO: expire cache data in the gridmanager.
-wax.g.MapType.prototype.releaseTile = function(tile) {
-    var key = tile.getAttribute('gTileKey');
-    this.cache[key] && delete this.cache[key];
-    tile.parentNode && tile.parentNode.removeChild(tile);
-};
-
-// Get a tile url, based on x, y coordinates and a z value.
-wax.g.MapType.prototype.getTileUrl = function(coord, z) {
-    // Y coordinate is flipped in Mapbox, compared to Google
-    var mod = Math.pow(2, z),
-        y = (mod - 1) - coord.y,
-        x = (coord.x % mod);
-        x = (x < 0) ? (coord.x % mod) + mod : x;
-
-    return (y >= 0)
-        ? (this.baseUrl + '1.0.0/' + this.layerName + '/' + z + '/' +
-           x + '/' + y + this.filetype)
-        : this.blankImage;
 };

@@ -24,8 +24,8 @@ wax.g.connector = function(options) {
         blankImage: options.blankImage
     };
 
-    this.minZoom = options.minzoom;
-    this.maxZoom = options.maxzoom;
+    this.minZoom = options.minzoom || 0;
+    this.maxZoom = options.maxzoom || 18;
 
     this.name = options.name || '';
     this.description = options.description || '';

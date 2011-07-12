@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-298-g295b1ab */
+/* wax - 2.1.6 - 1.0.4-299-g65e73ad */
 
 
 /*!
@@ -469,8 +469,7 @@ wax.legend = function() {
 //
 var w = function(self) {
     self.melt = function(func, obj) {
-        func.apply(obj, [self, obj]);
-        return self;
+        return func.apply(obj, [self, obj]);
     };
     return self;
 };
