@@ -543,7 +543,14 @@ m.addLayer(new OpenLayers.Layer.TMS('geography-class',
   type: 'png',
   layername: 'geography-class'
 }));
-m.addControl(new wax.ol.Interaction());
+// The Wax OL interaction control can accept TileJSON.
+m.addControl(new wax.ol.Interaction({
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
+  grids: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.grid.json'],
+  formatter: function(options, data) { return data.NAME }
+}));
 m.zoomTo(1);
 </pre>
 </div>
