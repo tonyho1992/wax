@@ -179,24 +179,24 @@ TODO
 <div class='section'>
 <div id='modestmaps-mobile' class='map dark'></div>
 <a class='attribution' href='http://mapbox.com/tileset/world-glass'>World Glass</a>
-<!--<pre class='sh_javascript run'>
+<pre class='sh_javascript run'>
 var tilejson = {
   tilejson: '1.0.0',
   scheme: 'tms',
   tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
   grids: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.grid.json'],
   formatter: function(options, data) { return data.NAME },
-  bodyDraw: function(body) { body.bgColor = '#000000'; }
+  bodyDraw: function(body) { body.bgColor = '#000000' }
 };
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-mobile',
-  new.wax.mm.connector(tilejson),
+  new wax.mm.connector(tilejson),
   new mm.Point(300,200),
   [new mm.MouseHandler(), new mm.TouchHandler()]);
 wax.mm.mobile(m, tilejson);
 wax.mm.interaction(m, tilejson);
 m.setCenterZoom(new mm.Location(39, -98), 2);
-</pre>-->
+</pre>
 </div>
 
 ### Fullscreen
@@ -285,7 +285,7 @@ var tilejson = {
   tilejson: '1.0.0',
   scheme: 'tms',
   tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/{z}/{x}/{y}.png'],
-  callback: function(c) {
+  callback: function(coords) {
     $('#boxselector-text').text(
       coords.map(function(c) {
         return c.lat + ',' + c.lon;
