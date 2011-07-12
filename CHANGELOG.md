@@ -7,7 +7,7 @@
   `wax.mm.provider` have been removed.
 * All `g`, `leaf` and `mm` controls now use the following function signature
 
-      function (map, options) {}
+        function (map, options) {}
 
   where relevant TileJSON keys in `options` are used if present.
 * Attribution and legend controls no longer append themselves to the map div.
