@@ -432,7 +432,6 @@ With `scheme='tms'` it's simple to add layers to Leaflet.
 <a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
 <pre class='sh_javascript run'>
 var map = new L.Map('leaflet-simple');
-map.attributionControl.setPrefix(''); // Hide "powered by Leaflet"
 map.setView(new L.LatLng(51.505, -0.09), 1).addLayer(
     new L.TileLayer('http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png', {
         maxZoom: 5,
