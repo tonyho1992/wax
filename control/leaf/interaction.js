@@ -18,7 +18,7 @@ wax.leaf.interaction = function(map, options) {
     var interaction = {
         modifyingEvents: ['move'],
 
-        waxGM: new wax.GridManager(),
+        waxGM: new wax.GridManager(options),
 
         // This requires wax.Tooltip or similar
         callbacks: options.callbacks || new wax.tooltip(),

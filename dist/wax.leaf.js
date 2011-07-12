@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-302-g2796b42 */
+/* wax - 2.1.6 - 1.0.4-304-gc4dd2d3 */
 
 
 /*!
@@ -802,7 +802,7 @@ wax.leaf.interaction = function(map, options) {
     var interaction = {
         modifyingEvents: ['move'],
 
-        waxGM: new wax.GridManager(),
+        waxGM: new wax.GridManager(options),
 
         // This requires wax.Tooltip or similar
         callbacks: options.callbacks || new wax.tooltip(),
@@ -973,3 +973,14 @@ wax.leaf.interaction = function(map, options) {
     // Ensure chainability
     return interaction.add(map);
 };
+wax = wax || {};
+wax.leaf = wax.leaf || {};
+
+wax.leaf.connector = L.TileLayer.extend({
+    initialize: function(options) {
+        options = options || {};
+        options.minZoom = options.minzoom || 0;
+        options.maxZoom = options.maxzoom || 22;
+        L.TileLayer.prototype.initialize.call(this, options.tiles[0], options);
+    }
+});

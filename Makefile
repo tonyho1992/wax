@@ -16,7 +16,7 @@ dist/wax.mm.min.js:
 	$(UGLIFYJS) dist/wax.mm.js > dist/wax.mm.min.js
 
 dist/wax.leaf.min.js:
-	cat build/header.js ext/reqwest.min.js lib/*.js control/lib/*.js control/leaf/*.js > dist/wax.leaf.js
+	cat build/header.js ext/reqwest.min.js lib/*.js control/lib/*.js control/leaf/*.js connectors/leaf/*.js > dist/wax.leaf.js
 	$(UGLIFYJS) dist/wax.leaf.js > dist/wax.leaf.min.js
 
 dist_setup:

@@ -110,7 +110,7 @@ make your map work. We'll also include a CSS file to start rolling with style:
 </div>
 
 Wax has a custom Modest Maps provider that can display tilesets described
-by TileJSON format at `wax.mm.connector`.
+by the TileJSON format at `wax.mm.connector`.
 
 <div class='section'>
 <div id='modestmaps-setup' class='map'></div>
@@ -425,19 +425,72 @@ with higher performance and a slimmer profile.
 </pre>
 </div>
 
-With `scheme='tms'` it's simple to add layers to Leaflet.
+Wax has a custom Leaflet tile layer that can display tilesets described by
+the TileJSON format at `wax.leaf.connector`.
 
 <div class='section'>
 <div id='leaflet-simple' class='map'></div>
 <a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
 <pre class='sh_javascript run'>
-var map = new L.Map('leaflet-simple');
-map.setView(new L.LatLng(51.505, -0.09), 1).addLayer(
-    new L.TileLayer('http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png', {
-        maxZoom: 5,
-        scheme: 'tms'
-    }));
-wax.leaf.interaction(map);
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
+  grids: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.grid.json'],
+  formatter: function(options, data) { return data.NAME }
+};
+var map = new L.Map('leaflet-simple')
+  .addLayer(new wax.leaf.connector(tilejson))
+  .setView(new L.LatLng(51.505, -0.09), 1);
+wax.leaf.interaction(map, tilejson);
+</pre>
+</div>
+
+# Google Maps
+
+The Google Maps API V3 is supported by Wax.
+
+- Include the Google Maps API V3 according to the [API documentation](http://code.google.com/apis/maps/documentation/javascript/tutorial.html#Loading_the_Maps_API).
+- `wax/dist/wax.g.js` contains the Wax controls and integration code for
+  Google Maps.
+- `wax/theme/controls.css` contains default styles for controls. You can always
+  swap in your own later on.
+
+<div class='section'>
+<pre>
+&lt;html&gt;
+&lt;head&gt;
+  &lt;script src='http://maps.google.com/maps/api/js?sensor=false' type='text/javascript'&gt;&lt;/script&gt;
+  &lt;script src='wax/dist/wax.g.js' type='text/javascript'&gt;&lt;/script&gt;
+  &lt;link href='wax/theme/controls.css' rel='stylesheet' type='text/css' /&gt;
+  ...
+</pre>
+</div>
+
+Wax has a custom Google map type that can display tilesets described by
+the TileJSON format at `wax.g.connector`.
+
+<div class='section'>
+<div id='google-map' class='map'></div>
+<a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
+<pre class='sh_javascript run'>
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
+  grids: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.grid.json'],
+  formatter: function(options, data) { return data.NAME }
+};
+
+var m = new google.maps.Map(
+  document.getElementById('google-map'), {
+    center: new google.maps.LatLng(0, 0),
+    disableDefaultUI: true,
+    zoom: 1,
+    mapTypeId: google.maps.MapTypeId.ROADMAP });
+m.mapTypes.set('mb', new wax.g.connector(tilejson));
+m.setMapTypeId('mb');
+wax.g.interaction(m, tilejson);
 </pre>
 </div>
 
@@ -493,54 +546,6 @@ m.addLayer(new OpenLayers.Layer.TMS('geography-class',
 }));
 m.addControl(new wax.ol.Interaction());
 m.zoomTo(1);
-</pre>
-</div>
-
-# Google Maps
-
-The Google Maps API V3 is supported by Wax.
-
-- Include the Google Maps API V3 according to the [API documentation](http://code.google.com/apis/maps/documentation/javascript/tutorial.html#Loading_the_Maps_API).
-- `wax/dist/wax.g.js` contains the Wax controls and integration code for
-  Google Maps.
-- `wax/theme/controls.css` contains default styles for controls. You can always
-  swap in your own later on.
-
-<div class='section'>
-<pre>
-&lt;html&gt;
-&lt;head&gt;
-  &lt;script src='http://maps.google.com/maps/api/js?sensor=false' type='text/javascript'&gt;&lt;/script&gt;
-  &lt;script src='wax/dist/wax.g.js' type='text/javascript'&gt;&lt;/script&gt;
-  &lt;link href='wax/theme/controls.css' rel='stylesheet' type='text/css' /&gt;
-  ...
-</pre>
-</div>
-
-The tilesets that TileStream serves and TileMill creates are supported by a
-custom `MapType` provided by Wax at `wax.g.MapType`.
-
-<div class='section'>
-<div id='google-map' class='map'></div>
-<a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
-<pre class='sh_javascript run'>
-var tilejson = {
-  tilejson: '1.0.0',
-  scheme: 'tms',
-  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
-  grids: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.grid.json'],
-  formatter: function(options, data) { return data.NAME }
-};
-
-var m = new google.maps.Map(
-  document.getElementById('google-map'), {
-    center: new google.maps.LatLng(0, 0),
-    disableDefaultUI: true,
-    zoom: 1,
-    mapTypeId: google.maps.MapTypeId.ROADMAP });
-m.mapTypes.set('mb', new wax.g.connector(tilejson));
-m.setMapTypeId('mb');
-wax.g.interaction(m, tilejson);
 </pre>
 </div>
 
