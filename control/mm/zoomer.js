@@ -23,7 +23,6 @@ wax.mm.zoomer = function(map) {
         mm.cancelEvent(e);
         map.zoomIn();
     }, false);
-    map.parent.appendChild(zoomin);
 
     var zoomout = document.createElement('a');
     zoomout.innerHTML = '-';
@@ -39,7 +38,6 @@ wax.mm.zoomer = function(map) {
         mm.cancelEvent(e);
         map.zoomOut();
     }, false);
-    map.parent.appendChild(zoomout);
 
     var zoomer = {
         add: function(map) {
@@ -53,6 +51,11 @@ wax.mm.zoomer = function(map) {
                     zoomout.className = 'zoomer zoomout';
                 }
             });
+            return this;
+        },
+        appendTo: function(elem) {
+            wax.util.$(elem).appendChild(zoomin);
+            wax.util.$(elem).appendChild(zoomout);
             return this;
         }
     };

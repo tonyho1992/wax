@@ -38,8 +38,11 @@ wax.mm.fullscreen = function(map) {
         a.className = 'wax-fullscreen';
         a.href = '#fullscreen';
         a.innerHTML = 'fullscreen';
-        map.parent.appendChild(a);
         com.modestmaps.addEvent(a, 'click', click);
+        return this;
+    };
+    fullscreen.appendTo = function(elem) {
+        wax.util.$(elem).appendChild(a);
         return this;
     };
 

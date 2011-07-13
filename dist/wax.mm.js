@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-316-g73779a7 */
+/* wax - 2.1.6 - 1.0.4-318-gb379dd2 */
 
 
 /*!
@@ -970,8 +970,11 @@ wax.mm.fullscreen = function(map) {
         a.className = 'wax-fullscreen';
         a.href = '#fullscreen';
         a.innerHTML = 'fullscreen';
-        map.parent.appendChild(a);
         com.modestmaps.addEvent(a, 'click', click);
+        return this;
+    };
+    fullscreen.appendTo = function(elem) {
+        wax.util.$(elem).appendChild(a);
         return this;
     };
 
@@ -1789,7 +1792,6 @@ wax.mm.zoomer = function(map) {
         mm.cancelEvent(e);
         map.zoomIn();
     }, false);
-    map.parent.appendChild(zoomin);
 
     var zoomout = document.createElement('a');
     zoomout.innerHTML = '-';
@@ -1805,7 +1807,6 @@ wax.mm.zoomer = function(map) {
         mm.cancelEvent(e);
         map.zoomOut();
     }, false);
-    map.parent.appendChild(zoomout);
 
     var zoomer = {
         add: function(map) {
@@ -1819,6 +1820,11 @@ wax.mm.zoomer = function(map) {
                     zoomout.className = 'zoomer zoomout';
                 }
             });
+            return this;
+        },
+        appendTo: function(elem) {
+            wax.util.$(elem).appendChild(zoomin);
+            wax.util.$(elem).appendChild(zoomout);
             return this;
         }
     };

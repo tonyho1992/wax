@@ -227,7 +227,7 @@ var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-fullscreen',
   new wax.mm.connector(tilejson),
   new mm.Point(240,120));
-wax.mm.fullscreen(m, tilejson);
+wax.mm.fullscreen(m, tilejson).appendTo(m.parent);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
@@ -251,7 +251,7 @@ var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-zoomer',
   new wax.mm.connector(tilejson),
   new mm.Point(240,120));
-wax.mm.zoomer(m, tilejson);
+wax.mm.zoomer(m, tilejson).appendTo(m.parent);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>

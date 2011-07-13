@@ -9,8 +9,9 @@
   `function (map, tilejson, options) {}` where relevant TileJSON keys in
   `tilejson` are used if present and `options` contains settings specific to
   the control.
-* Attribution and legend controls no longer append themselves to the map div.
-  Use the `.appendTo` method to add the DOM element to the map.
+* Fullscreen, zoomer, attribution and legend controls no longer automatically
+  append themselves to the map div. Use the `.appendTo` method to add the DOM
+  element to the map or to another element on the page.
 * `w.melt(func)` now has the same return value as `func`.
 
 _2.x.x_
