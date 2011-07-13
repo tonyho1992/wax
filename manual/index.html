@@ -234,7 +234,9 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 
 ### Zoomer
 
-A simple zoom control offering zoom in &amp; out buttons.
+A simple zoom control offering zoom in &amp; out buttons. It creates links and
+appends them to the map, adding classes like `zoomin`, `zoomout`, and
+`zoomdisabled` to help you style them.
 
 <div class='section'>
 <div id='modestmaps-zoomer' class='map dark'></div>
@@ -278,7 +280,9 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 
 ### Boxselector
 
-A control that lets you highlight a region of the map with the shift-key and a draggable box.
+A control that lets you highlight a region of the map with the
+shift-key and a draggable box, and calls a callback when you release the mouse.
+It's useful for tools that need the selection of certain areas of the world.
 
 <div class='section'>
 <div id='modestmaps-boxselector' class='map dark'></div>
@@ -307,6 +311,11 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 
 ### Pointselector
 
+A control that enables users to add points to a map by clicking the map, and
+then clicking those points to remove them. Like the boxselector control, it
+calls a callback with the current map data, and also exposes an API,
+`addLocation(com.modestmaps.Location)`, if you wish to add points on pageload.
+
 <div class='section'>
 <div id='modestmaps-pointselector' class='map dark'></div>
 <a class='attribution' href='http://mapbox.com/tileset/blue-marble-topo-bathy-jul'>Blue Marble Topography & Bathymetry (July)</a>
@@ -332,7 +341,8 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 
 ### Legend
 
-Display legend information on the map.
+Display legend information on the map. This internally creates the legend,
+and then you can add it to a map by chaining `.appendTo(map.parent)`.
 
 <div class='section'>
 <div id='modestmaps-legend' class='map'></div>
@@ -357,6 +367,11 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 
 Save the map position to the URL so that links hit the map in the same state as
 the initial user.
+
+By default, this control uses [pushState](https://developer.mozilla.org/en/DOM/Manipulating_the_browser_history),
+a feature found in modern webbrowsers, to give you the history of the map without
+changing the page URL. You can use traditional hashes (`#/0/0/etc`) by
+specifying `manager: wax.mm.locationHash` in its options object.
 
 <div class='section'>
 <div id='modestmaps-hash' class='map'></div>
@@ -404,9 +419,9 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 ## Layering
 
 Modest Maps natively supports a single map layer at a time, unlike OpenLayers, 
-which has a flexible baselayer/overlay system. Currently we're working on 
-compositing layers server-side rather than supporting multiple layers in the 
-browser, because this could give a much higher level of performance.
+which has a flexible baselayer/overlay system. [TileStream Hosting](http://mapbox.com/#/tilestream)
+supports compositing of layers server-side, which is far more performant than
+layering client-side.
 
 # Leaflet
 
@@ -502,7 +517,8 @@ wax.g.interaction(m, tilejson);
 # OpenLayers
 
 The Wax toolkit also supports [OpenLayers](http://openlayers.org), though it is
-**not recommended for new projects**, because it has become extremely bulky and difficult to use correctly.
+**not recommended for new projects**, because it has become extremely
+bulky and difficult to use correctly.
 
 - `wax/ext/OpenLayers.js` contains the core OpenLayers library. **Do not use
   the hosted version** unless absolutely necessary - the openlayers.org server
@@ -713,3 +729,4 @@ m.setCenterZoom(
 </div>
 </body>
 </html>
+
