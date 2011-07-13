@@ -9,8 +9,29 @@
   `function (map, options) {}` where relevant TileJSON keys in `options` are
   used if present.
 * Attribution and legend controls no longer append themselves to the map div.
-  Use the `#appendTo` method to add the DOM element to the map.
+  Use the `.appendTo` method to add the DOM element to the map.
 * `w.melt(func)` now has the same return value as `func`.
+
+_2.x.x_
+
+```javascript
+var provider = new wax.mm.provider({
+    baseUrl: 'http://a.tiles.mapbox.com/mapbox/',
+    layerName: 'natural-earth-2'});
+var map = ...;
+wax.mm.legend(map);
+```
+
+_3.x.x_
+
+```javascript
+var connector = new wax.mm.connector({
+    tiles: 'http://a.tiles.mapbox.com/mapbox/1.0.0/natural-earth-2/{z}/{x}/{y}.png',
+    scheme: 'tms'
+    });
+var map = ...;
+wax.mm.legend(map, { legend: 'Content' }).appendTo(map.parent);
+```
 
 ### 2.1.6
 
