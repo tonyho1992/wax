@@ -3,7 +3,7 @@
 
 <p>A simple fullscreen control for Modest Maps</p>             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Add zoom links, which can be styled as buttons, to a <code>modestmaps.Map</code>
 control. This function can be used chaining-style with other
-chaining-style controls.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">wax</span><span class="p">.</span><span class="nx">mm</span><span class="p">.</span><span class="nx">fullscreen</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">map</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span> <span class="p">{</span>
+chaining-style controls.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">wax</span><span class="p">.</span><span class="nx">mm</span><span class="p">.</span><span class="nx">fullscreen</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">map</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">state</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="nx">fullscreen</span> <span class="o">=</span> <span class="p">{},</span>
         <span class="nx">a</span><span class="p">,</span>
@@ -30,8 +30,11 @@ restore to that size on exit from fullscreen.</p>             </td>             
         <span class="nx">a</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;wax-fullscreen&#39;</span><span class="p">;</span>
         <span class="nx">a</span><span class="p">.</span><span class="nx">href</span> <span class="o">=</span> <span class="s1">&#39;#fullscreen&#39;</span><span class="p">;</span>
         <span class="nx">a</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">&#39;fullscreen&#39;</span><span class="p">;</span>
-        <span class="nx">map</span><span class="p">.</span><span class="nx">parent</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
         <span class="nx">com</span><span class="p">.</span><span class="nx">modestmaps</span><span class="p">.</span><span class="nx">addEvent</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="s1">&#39;click&#39;</span><span class="p">,</span> <span class="nx">click</span><span class="p">);</span>
+        <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+    <span class="p">};</span>
+    <span class="nx">fullscreen</span><span class="p">.</span><span class="nx">appendTo</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">elem</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">wax</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">$</span><span class="p">(</span><span class="nx">elem</span><span class="p">).</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">a</span><span class="p">);</span>
         <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
     <span class="p">};</span>
 

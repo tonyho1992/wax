@@ -9,7 +9,7 @@ objects when the map is edited</li>
 </ul>
 
 <p>It also exposes a public API function: <code>addLocation</code>, which adds a point
-to the map as if added by the user.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">wax</span><span class="p">.</span><span class="nx">mm</span><span class="p">.</span><span class="nx">pointselector</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">map</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span> <span class="p">{</span>
+to the map as if added by the user.</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">wax</span><span class="p">.</span><span class="nx">mm</span><span class="p">.</span><span class="nx">pointselector</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">map</span><span class="p">,</span> <span class="nx">tilejson</span><span class="p">,</span> <span class="nx">opts</span><span class="p">)</span> <span class="p">{</span>
     <span class="kd">var</span> <span class="nx">mouseDownPoint</span> <span class="o">=</span> <span class="kc">null</span><span class="p">,</span>
         <span class="nx">mouseUpPoint</span> <span class="o">=</span> <span class="kc">null</span><span class="p">,</span>
         <span class="nx">tolerance</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>

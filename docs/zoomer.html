@@ -20,7 +20,6 @@ chaining-style controls.</p>             </td>             <td class="code">    
         <span class="nx">mm</span><span class="p">.</span><span class="nx">cancelEvent</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
         <span class="nx">map</span><span class="p">.</span><span class="nx">zoomIn</span><span class="p">();</span>
     <span class="p">},</span> <span class="kc">false</span><span class="p">);</span>
-    <span class="nx">map</span><span class="p">.</span><span class="nx">parent</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">zoomin</span><span class="p">);</span>
 
     <span class="kd">var</span> <span class="nx">zoomout</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">);</span>
     <span class="nx">zoomout</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span><span class="p">;</span>
@@ -36,7 +35,6 @@ chaining-style controls.</p>             </td>             <td class="code">    
         <span class="nx">mm</span><span class="p">.</span><span class="nx">cancelEvent</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
         <span class="nx">map</span><span class="p">.</span><span class="nx">zoomOut</span><span class="p">();</span>
     <span class="p">},</span> <span class="kc">false</span><span class="p">);</span>
-    <span class="nx">map</span><span class="p">.</span><span class="nx">parent</span><span class="p">.</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">zoomout</span><span class="p">);</span>
 
     <span class="kd">var</span> <span class="nx">zoomer</span> <span class="o">=</span> <span class="p">{</span>
         <span class="nx">add</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">map</span><span class="p">)</span> <span class="p">{</span>
@@ -50,6 +48,11 @@ chaining-style controls.</p>             </td>             <td class="code">    
                     <span class="nx">zoomout</span><span class="p">.</span><span class="nx">className</span> <span class="o">=</span> <span class="s1">&#39;zoomer zoomout&#39;</span><span class="p">;</span>
                 <span class="p">}</span>
             <span class="p">});</span>
+            <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
+        <span class="p">},</span>
+        <span class="nx">appendTo</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">elem</span><span class="p">)</span> <span class="p">{</span>
+            <span class="nx">wax</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">$</span><span class="p">(</span><span class="nx">elem</span><span class="p">).</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">zoomin</span><span class="p">);</span>
+            <span class="nx">wax</span><span class="p">.</span><span class="nx">util</span><span class="p">.</span><span class="nx">$</span><span class="p">(</span><span class="nx">elem</span><span class="p">).</span><span class="nx">appendChild</span><span class="p">(</span><span class="nx">zoomout</span><span class="p">);</span>
             <span class="k">return</span> <span class="k">this</span><span class="p">;</span>
         <span class="p">}</span>
     <span class="p">};</span>
