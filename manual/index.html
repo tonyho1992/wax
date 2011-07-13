@@ -1,8 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html >
+<html>
 <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+  <meta charset='utf-8'/>
   <title>Wax Manual</title>
   <script src='ender.js' type='text/javascript'></script>
   <script src='../ext/modestmaps.min.js' type='text/javascript'></script>
@@ -190,16 +189,17 @@ var tilejson = {
   scheme: 'tms',
   tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
   grids: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.grid.json'],
-  formatter: function(options, data) { return data.NAME },
-  bodyDraw: function(body) { body.bgColor = '#000000' }
+  formatter: function(options, data) { return data.NAME }
 };
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-mobile',
   new wax.mm.connector(tilejson),
   new mm.Point(240,120),
   [new mm.MouseHandler(), new mm.TouchHandler()]);
-wax.mm.mobile(m, tilejson);
 wax.mm.interaction(m, tilejson);
+wax.mm.mobile(m, tilejson, {
+  bodyDraw: function(body) { body.bgColor = '#000000' }
+});
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 </div>
@@ -291,19 +291,20 @@ It's useful for tools that need the selection of certain areas of the world.
 var tilejson = {
   tilejson: '1.0.0',
   scheme: 'tms',
-  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/{z}/{x}/{y}.png'],
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/{z}/{x}/{y}.png']
+};
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-boxselector',
+  new wax.mm.connector(tilejson),
+  new mm.Point(240,120));
+wax.mm.boxselector(m, tilejson, {
   callback: function(coords) {
     $('#boxselector-text').text(
       coords.map(function(c) {
         return c.lat + ',' + c.lon;
       }).join(' - '));
   }
-};
-var mm = com.modestmaps;
-var m = new mm.Map('modestmaps-boxselector',
-  new wax.mm.connector(tilejson),
-  new mm.Point(240,120));
-wax.mm.boxselector(m, tilejson);
+});
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 <div class='widget'>Selection: <span id='boxselector-text'></span></div>
@@ -323,17 +324,18 @@ calls a callback with the current map data, and also exposes an API,
 var tilejson = {
   tilejson: '1.0.0',
   scheme: 'tms',
-  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/{z}/{x}/{y}.png'],
-  callback: function(coords) {
-    $('#pointselector-text').text(
-      coords.join(' - '))
-  }
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/{z}/{x}/{y}.png']
 };
 var mm = com.modestmaps;
 var m = new mm.Map('modestmaps-pointselector',
   new wax.mm.connector(tilejson),
   new mm.Point(240,120))
-wax.mm.pointselector(m, tilejson);
+wax.mm.pointselector(m, tilejson, {
+  callback: function(coords) {
+    $('#pointselector-text').text(
+      coords.join(' - '))
+  }
+});
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
 <div class='widget'>Points: <span id='pointselector-text'></span></div>
@@ -381,15 +383,16 @@ var mm = com.modestmaps;
 var tilejson = {
   tilejson: '1.0.0',
   scheme: 'tms',
-  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/natural-earth-2/{z}/{x}/{y}.png'],
-  defaultCenter: new mm.Location(39, -98),
-  defaultZoom: 4,
-  manager: wax.mm.pushState
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/natural-earth-2/{z}/{x}/{y}.png']
 };
 var m = new mm.Map('modestmaps-hash',
   new wax.mm.connector(tilejson),
   new mm.Point(240,120));
-wax.mm.hash(m, tilejson);
+wax.mm.hash(m, tilejson, {
+  defaultCenter: new mm.Location(39, -98),
+  defaultZoom: 4,
+  manager: wax.mm.pushState
+});
 </pre>
 </div>
 

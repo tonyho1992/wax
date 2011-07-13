@@ -9,7 +9,8 @@ wax.g = wax.g || {};
 //   If not given, the `wax.tooltip` library will be expected.
 // * `clickAction` (optional): **full** or **location**: default is
 //   **full**.
-wax.g.interaction = function(map, options) {
+wax.g.interaction = function(map, tilejson, options) {
+    tilejson = tilejson || {};
     options = options || {};
     // Our GridManager (from `gridutil.js`). This will keep the
     // cache of grid information and provide friendly utility methods
@@ -18,7 +19,7 @@ wax.g.interaction = function(map, options) {
         modifyingEvents: ['dragstart', 'dragend', 'drag', 'zoom_changed',
             'resize', 'center_changed', 'bounds_changed'],
 
-        waxGM: new wax.GridManager(options),
+        waxGM: new wax.GridManager(tilejson),
 
         // This requires wax.Tooltip or similar
         callbacks: options.callbacks || new wax.tooltip(),

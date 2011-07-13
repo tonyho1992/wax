@@ -4,7 +4,7 @@ wax.mm = wax.mm || {};
 // Mobile
 // ------
 // For making maps on normal websites nicely mobile-ized
-wax.mm.mobile = function(map, opts) {
+wax.mm.mobile = function(map, tilejson, opts) {
     opts = opts || {};
     // Inspired by Leaflet
     var mm = com.modestmaps,

@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-307-g8863944 */
+/* wax - 2.1.6 - 1.0.4-316-g73779a7 */
 
 
 /*!
@@ -788,8 +788,8 @@ wax.g = wax.g || {};
 // Attribution
 // -----------
 // Attribution wrapper for Google Maps.
-wax.g.attribution = function(map, options) {
-    options = options || {};
+wax.g.attribution = function(map, tilejson) {
+    tilejson = tilejson || {};
     var a, // internal attribution control
         attribution = {};
 
@@ -804,7 +804,7 @@ wax.g.attribution = function(map, options) {
 
     attribution.init = function() {
         a = wax.attribution();
-        a.set(options.attribution);
+        a.set(tilejson.attribution);
         a.element().className = 'wax-attribution wax-g';
         return this;
     };
@@ -822,7 +822,8 @@ wax.g = wax.g || {};
 //   If not given, the `wax.tooltip` library will be expected.
 // * `clickAction` (optional): **full** or **location**: default is
 //   **full**.
-wax.g.interaction = function(map, options) {
+wax.g.interaction = function(map, tilejson, options) {
+    tilejson = tilejson || {};
     options = options || {};
     // Our GridManager (from `gridutil.js`). This will keep the
     // cache of grid information and provide friendly utility methods
@@ -831,7 +832,7 @@ wax.g.interaction = function(map, options) {
         modifyingEvents: ['dragstart', 'dragend', 'drag', 'zoom_changed',
             'resize', 'center_changed', 'bounds_changed'],
 
-        waxGM: new wax.GridManager(options),
+        waxGM: new wax.GridManager(tilejson),
 
         // This requires wax.Tooltip or similar
         callbacks: options.callbacks || new wax.tooltip(),
@@ -970,14 +971,14 @@ wax.g = wax.g || {};
 // Legend Control
 // --------------
 // Adds legends to a google Map object.
-wax.g.legend = function(map, options) {
-    options = options || {};
+wax.g.legend = function(map, tilejson) {
+    tilejson = tilejson || {};
     var l, // parent legend
         legend = {};
 
     legend.add = function() {
         l = wax.legend()
-            .content(options.legend || '');
+            .content(tilejson.legend || '');
         return this;
     };
 

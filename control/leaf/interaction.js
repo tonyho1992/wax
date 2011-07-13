@@ -10,7 +10,8 @@ wax.leaf = wax.leaf || {};
 //   If not given, the `wax.tooltip` library will be expected.
 // * `clickAction` (optional): **full** or **location**: default is
 //   **full**.
-wax.leaf.interaction = function(map, options) {
+wax.leaf.interaction = function(map, tilejson, options) {
+    tilejson = tilejson || {};
     options = options || {};
     // Our GridManager (from `gridutil.js`). This will keep the
     // cache of grid information and provide friendly utility methods
@@ -18,7 +19,7 @@ wax.leaf.interaction = function(map, options) {
     var interaction = {
         modifyingEvents: ['move'],
 
-        waxGM: new wax.GridManager(options),
+        waxGM: new wax.GridManager(tilejson),
 
         // This requires wax.Tooltip or similar
         callbacks: options.callbacks || new wax.tooltip(),

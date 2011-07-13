@@ -20,10 +20,10 @@ wax.ol.Interaction =
 
     gm: new wax.GridManager(),
 
-    initialize: function(options) {
+    initialize: function(tilejson, options) {
         this.options = options || {};
         this.clickAction = this.options.clickAction || 'full';
-        this.gm = new wax.GridManager(this.options);
+        this.gm = new wax.GridManager(tilejson);
 
         OpenLayers.Control.prototype.initialize.apply(this, [this.options || {}]);
 

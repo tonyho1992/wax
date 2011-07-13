@@ -1,4 +1,4 @@
-/* wax - 2.1.6 - 1.0.4-307-g8863944 */
+/* wax - 2.1.6 - 1.0.4-316-g73779a7 */
 
 
 /*!
@@ -788,8 +788,8 @@ wax.mm = wax.mm || {};
 // Attribution
 // -----------
 // Attribution wrapper for Modest Maps.
-wax.mm.attribution = function(map, options) {
-    options = options || {};
+wax.mm.attribution = function(map, tilejson) {
+    tilejson = tilejson || {};
     var a, // internal attribution control
         attribution = {};
 
@@ -804,7 +804,7 @@ wax.mm.attribution = function(map, options) {
 
     attribution.init = function() {
         a = wax.attribution();
-        a.set(options.attribution);
+        a.set(tilejson.attribution);
         a.element().className = 'wax-attribution wax-mm';
         return this;
     };
@@ -816,7 +816,7 @@ wax.mm = wax.mm || {};
 
 // Box Selector
 // ------------
-wax.mm.boxselector = function(map, opts) {
+wax.mm.boxselector = function(map, tilejson, opts) {
     var mouseDownPoint = null,
         MM = com.modestmaps,
         callback = ((typeof opts === 'function') ?
@@ -940,7 +940,7 @@ wax.mm = wax.mm || {};
 // Add zoom links, which can be styled as buttons, to a `modestmaps.Map`
 // control. This function can be used chaining-style with other
 // chaining-style controls.
-wax.mm.fullscreen = function(map, opts) {
+wax.mm.fullscreen = function(map) {
     var state = 1,
         fullscreen = {},
         a,
@@ -1023,7 +1023,7 @@ wax.mm.pushState = {
 
 // Hash
 // ----
-wax.mm.hash = function(map, options) {
+wax.mm.hash = function(map, tilejson, options) {
     options = options || {};
 
     var s0,
@@ -1133,10 +1133,12 @@ wax.mm = wax.mm || {};
 //
 //
 //     `clickHandler: function(url) { ... go to url ... }`
-wax.mm.interaction = function(map, options) {
+wax.mm.interaction = function(map, tilejson, options) {
+    options = options || {};
+    tilejson = tilejson || {};
+
     var MM = com.modestmaps,
-        waxGM = wax.GridManager(options),
-        options = options || {},
+        waxGM = wax.GridManager(tilejson),
         callbacks = options.callbacks || new wax.tooltip(),
         clickAction = options.clickAction || ['full'],
         clickHandler = options.clickHandler || function(url) {
@@ -1291,7 +1293,7 @@ wax.mm.interaction = function(map, options) {
             _clickTimeout = window.setTimeout((function(pos) {
                 return function(e) {
                     click(e, pos);
-                }
+                };
             })(pos));
         }
         return onUp;
@@ -1345,14 +1347,14 @@ wax.mm = wax.mm || {};
 // --------------
 // The Modest Maps version of this control is a very, very
 // light wrapper around the `/lib` code for legends.
-wax.mm.legend = function(map, options) {
-    options = options || {};
+wax.mm.legend = function(map, tilejson) {
+    tilejson = tilejson || {};
     var l, // parent legend
         legend = {};
 
     legend.add = function() {
         l = wax.legend()
-            .content(options.legend || '');
+            .content(tilejson.legend || '');
         return this;
     };
 
@@ -1373,7 +1375,7 @@ wax.mm = wax.mm || {};
 // Mobile
 // ------
 // For making maps on normal websites nicely mobile-ized
-wax.mm.mobile = function(map, opts) {
+wax.mm.mobile = function(map, tilejson, opts) {
     opts = opts || {};
     // Inspired by Leaflet
     var mm = com.modestmaps,
@@ -1539,7 +1541,7 @@ wax.mm = wax.mm || {};
 //
 // It also exposes a public API function: `addLocation`, which adds a point
 // to the map as if added by the user.
-wax.mm.pointselector = function(map, opts) {
+wax.mm.pointselector = function(map, tilejson, opts) {
     var mouseDownPoint = null,
         mouseUpPoint = null,
         tolerance = 5,
@@ -1667,7 +1669,7 @@ wax.mm = wax.mm || {};
 // ZoomBox
 // -------
 // An OL-style ZoomBox control, from the Modest Maps example.
-wax.mm.zoombox = function(map, opts) {
+wax.mm.zoombox = function(map) {
     // TODO: respond to resize
     var zoombox = {},
         mm = com.modestmaps,

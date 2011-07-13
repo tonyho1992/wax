@@ -4,8 +4,8 @@ wax.mm = wax.mm || {};
 // Attribution
 // -----------
 // Attribution wrapper for Modest Maps.
-wax.mm.attribution = function(map, options) {
-    options = options || {};
+wax.mm.attribution = function(map, tilejson) {
+    tilejson = tilejson || {};
     var a, // internal attribution control
         attribution = {};
 
@@ -20,7 +20,7 @@ wax.mm.attribution = function(map, options) {
 
     attribution.init = function() {
         a = wax.attribution();
-        a.set(options.attribution);
+        a.set(tilejson.attribution);
         a.element().className = 'wax-attribution wax-mm';
         return this;
     };

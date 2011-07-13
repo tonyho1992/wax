@@ -5,14 +5,14 @@ wax.mm = wax.mm || {};
 // --------------
 // The Modest Maps version of this control is a very, very
 // light wrapper around the `/lib` code for legends.
-wax.mm.legend = function(map, options) {
-    options = options || {};
+wax.mm.legend = function(map, tilejson) {
+    tilejson = tilejson || {};
     var l, // parent legend
         legend = {};
 
     legend.add = function() {
         l = wax.legend()
-            .content(options.legend || '');
+            .content(tilejson.legend || '');
         return this;
     };
 

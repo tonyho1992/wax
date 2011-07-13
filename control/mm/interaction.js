@@ -17,10 +17,12 @@ wax.mm = wax.mm || {};
 //
 //
 //     `clickHandler: function(url) { ... go to url ... }`
-wax.mm.interaction = function(map, options) {
+wax.mm.interaction = function(map, tilejson, options) {
+    options = options || {};
+    tilejson = tilejson || {};
+
     var MM = com.modestmaps,
-        waxGM = wax.GridManager(options),
-        options = options || {},
+        waxGM = wax.GridManager(tilejson),
         callbacks = options.callbacks || new wax.tooltip(),
         clickAction = options.clickAction || ['full'],
         clickHandler = options.clickHandler || function(url) {
@@ -175,7 +177,7 @@ wax.mm.interaction = function(map, options) {
             _clickTimeout = window.setTimeout((function(pos) {
                 return function(e) {
                     click(e, pos);
-                }
+                };
             })(pos));
         }
         return onUp;

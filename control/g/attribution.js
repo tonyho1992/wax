@@ -4,8 +4,8 @@ wax.g = wax.g || {};
 // Attribution
 // -----------
 // Attribution wrapper for Google Maps.
-wax.g.attribution = function(map, options) {
-    options = options || {};
+wax.g.attribution = function(map, tilejson) {
+    tilejson = tilejson || {};
     var a, // internal attribution control
         attribution = {};
 
@@ -20,7 +20,7 @@ wax.g.attribution = function(map, options) {
 
     attribution.init = function() {
         a = wax.attribution();
-        a.set(options.attribution);
+        a.set(tilejson.attribution);
         a.element().className = 'wax-attribution wax-g';
         return this;
     };

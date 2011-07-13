@@ -44,7 +44,7 @@ wax.mm.pushState = {
 
 // Hash
 // ----
-wax.mm.hash = function(map, options) {
+wax.mm.hash = function(map, tilejson, options) {
     options = options || {};
 
     var s0,

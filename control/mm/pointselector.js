@@ -11,7 +11,7 @@ wax.mm = wax.mm || {};
 //
 // It also exposes a public API function: `addLocation`, which adds a point
 // to the map as if added by the user.
-wax.mm.pointselector = function(map, opts) {
+wax.mm.pointselector = function(map, tilejson, opts) {
     var mouseDownPoint = null,
         mouseUpPoint = null,
         tolerance = 5,

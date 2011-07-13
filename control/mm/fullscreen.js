@@ -8,7 +8,7 @@ wax.mm = wax.mm || {};
 // Add zoom links, which can be styled as buttons, to a `modestmaps.Map`
 // control. This function can be used chaining-style with other
 // chaining-style controls.
-wax.mm.fullscreen = function(map, opts) {
+wax.mm.fullscreen = function(map) {
     var state = 1,
         fullscreen = {},
         a,

@@ -3,7 +3,7 @@ wax.mm = wax.mm || {};
 
 // Box Selector
 // ------------
-wax.mm.boxselector = function(map, opts) {
+wax.mm.boxselector = function(map, tilejson, opts) {
     var mouseDownPoint = null,
         MM = com.modestmaps,
         callback = ((typeof opts === 'function') ?
