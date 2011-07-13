@@ -6,8 +6,9 @@
   `wax.leaf.connector` and `wax.g.connector`. The old `wax.g.maptype` and
   `wax.mm.provider` have been removed.
 * All `g`, `leaf` and `mm` controls now use the signature
-  `function (map, options) {}` where relevant TileJSON keys in `options` are
-  used if present.
+  `function (map, tilejson, options) {}` where relevant TileJSON keys in
+  `tilejson` are used if present and `options` contains settings specific to
+  the control.
 * Attribution and legend controls no longer append themselves to the map div.
   Use the `.appendTo` method to add the DOM element to the map.
 * `w.melt(func)` now has the same return value as `func`.
