@@ -11,7 +11,7 @@ wax.GridManager = function(options) {
     var resolution = options.resolution || 4,
         grid_tiles = {},
         manager = {},
-        xyzFinder = new RegExp(/(\d+)\/(\d+)\/(\d+)\.[\w\._]+$/g),
+        xyzFinder = new RegExp(/(\d+)\/(\d+)\/(\d+)\.[\w\._]+/g),
         formatter;
 
     var formatterUrl = function(url) {

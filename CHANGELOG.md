@@ -1,5 +1,15 @@
 ## Changelog
 
+### 3.0.2
+
+* Fixes `xyzFinder` in `wax.GridManager` to handle URLs with query strings.
+
+### 3.0.1
+
+* Expose `#full` and `#original` methods on `wax.mm.fullscreen` allowing API
+  access to fullscreen toggling actions.
+* Fixes to boxselector and zoombox controls.
+
 ### 3.0.0
 
 * TileJSON support in new map connectors: `wax.mm.connector`,

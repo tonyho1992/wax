@@ -139,7 +139,7 @@ wax.mm.interaction = function(map, tilejson, options) {
         } else if (e.type === 'touchstart' && e.touches.length === 1) {
 
             // turn this into touch-mode. Fallback to teaser and full.
-            this.clickAction = ['full', 'teaser'];
+            clickAction = ['full', 'teaser'];
 
             // Don't make the user click close if they hit another tooltip
             if (callbacks._currentTooltip) {
@@ -170,7 +170,7 @@ wax.mm.interaction = function(map, tilejson, options) {
         _downLock = false;
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
-            click(_d);
+            click(e, _d);
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
             Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
             // Contain the event data in a closure.
