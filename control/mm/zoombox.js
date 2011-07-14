@@ -85,16 +85,17 @@ wax.mm.zoombox = function(map) {
         // Use a flag to determine whether the zoombox is currently being
         // drawn. Necessary only for IE because `mousedown` is triggered
         // twice.
-        box = document.createElement('div');
+        box = box || document.createElement('div');
         box.id = map.parent.id + '-zoombox-box';
         box.className = 'zoombox-box';
         map.parent.appendChild(box);
         mm.addEvent(map.parent, 'mousedown', mouseDown);
+        return this;
     };
 
     zoombox.remove = function() {
         map.parent.removeChild(box);
-        map.removeCallback('mousedown', mouseDown);
+        mm.removeEvent(map.parent, 'mousedown', mouseDown);
     };
 
     return zoombox.add(map);

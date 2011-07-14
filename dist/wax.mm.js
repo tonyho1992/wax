@@ -1,4 +1,4 @@
-/* wax - 3.0.0 - 1.0.4-320-g97e618c */
+/* wax - 3.0.1 - 1.0.4-321-g053540e */
 
 
 /*!
@@ -913,7 +913,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     }
 
     boxselector.add = function(map) {
-        boxDiv = document.createElement('div');
+        boxDiv = boxDiv || document.createElement('div');
         boxDiv.id = map.parent.id + '-boxselector-box';
         boxDiv.className = 'boxselector-box';
         map.parent.appendChild(boxDiv);
@@ -925,7 +925,8 @@ wax.mm.boxselector = function(map, tilejson, opts) {
 
     boxselector.remove = function() {
         map.parent.removeChild(boxDiv);
-        map.removeCallback('mousedown', drawbox);
+        MM.removeEvent(map.parent, 'mousedown', mouseDown);
+        map.removeCallback('drawn', drawbox);
     };
 
     return boxselector.add(map);
@@ -949,16 +950,9 @@ wax.mm.fullscreen = function(map) {
     function click(e) {
         if (e) com.modestmaps.cancelEvent(e);
         if (state = !state) {
-            map.parent.className = map.parent.className.replace('wax-fullscreen-map', '');
-            map.setSize(
-                smallSize[0],
-                smallSize[1]);
+            fullscreen.original();
         } else {
-            smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
-            map.parent.className += ' wax-fullscreen-map';
-            map.setSize(
-                map.parent.offsetWidth,
-                map.parent.offsetHeight);
+            fullscreen.full();
         }
     }
 
@@ -972,6 +966,19 @@ wax.mm.fullscreen = function(map) {
         a.innerHTML = 'fullscreen';
         com.modestmaps.addEvent(a, 'click', click);
         return this;
+    };
+    fullscreen.full = function() {
+        smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
+        map.parent.className += ' wax-fullscreen-map';
+        map.setSize(
+            map.parent.offsetWidth,
+            map.parent.offsetHeight);
+    };
+    fullscreen.original = function() {
+        map.parent.className = map.parent.className.replace('wax-fullscreen-map', '');
+        map.setSize(
+            smallSize[0],
+            smallSize[1]);
     };
     fullscreen.appendTo = function(elem) {
         wax.util.$(elem).appendChild(a);
@@ -1753,16 +1760,17 @@ wax.mm.zoombox = function(map) {
         // Use a flag to determine whether the zoombox is currently being
         // drawn. Necessary only for IE because `mousedown` is triggered
         // twice.
-        box = document.createElement('div');
+        box = box || document.createElement('div');
         box.id = map.parent.id + '-zoombox-box';
         box.className = 'zoombox-box';
         map.parent.appendChild(box);
         mm.addEvent(map.parent, 'mousedown', mouseDown);
+        return this;
     };
 
     zoombox.remove = function() {
         map.parent.removeChild(box);
-        map.removeCallback('mousedown', mouseDown);
+        mm.removeEvent(map.parent, 'mousedown', mouseDown);
     };
 
     return zoombox.add(map);

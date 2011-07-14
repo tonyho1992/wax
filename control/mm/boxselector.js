@@ -100,7 +100,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     }
 
     boxselector.add = function(map) {
-        boxDiv = document.createElement('div');
+        boxDiv = boxDiv || document.createElement('div');
         boxDiv.id = map.parent.id + '-boxselector-box';
         boxDiv.className = 'boxselector-box';
         map.parent.appendChild(boxDiv);
@@ -112,7 +112,8 @@ wax.mm.boxselector = function(map, tilejson, opts) {
 
     boxselector.remove = function() {
         map.parent.removeChild(boxDiv);
-        map.removeCallback('mousedown', drawbox);
+        MM.removeEvent(map.parent, 'mousedown', mouseDown);
+        map.removeCallback('drawn', drawbox);
     };
 
     return boxselector.add(map);

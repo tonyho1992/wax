@@ -17,16 +17,9 @@ wax.mm.fullscreen = function(map) {
     function click(e) {
         if (e) com.modestmaps.cancelEvent(e);
         if (state = !state) {
-            map.parent.className = map.parent.className.replace('wax-fullscreen-map', '');
-            map.setSize(
-                smallSize[0],
-                smallSize[1]);
+            fullscreen.original();
         } else {
-            smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
-            map.parent.className += ' wax-fullscreen-map';
-            map.setSize(
-                map.parent.offsetWidth,
-                map.parent.offsetHeight);
+            fullscreen.full();
         }
     }
 
@@ -40,6 +33,19 @@ wax.mm.fullscreen = function(map) {
         a.innerHTML = 'fullscreen';
         com.modestmaps.addEvent(a, 'click', click);
         return this;
+    };
+    fullscreen.full = function() {
+        smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
+        map.parent.className += ' wax-fullscreen-map';
+        map.setSize(
+            map.parent.offsetWidth,
+            map.parent.offsetHeight);
+    };
+    fullscreen.original = function() {
+        map.parent.className = map.parent.className.replace('wax-fullscreen-map', '');
+        map.setSize(
+            smallSize[0],
+            smallSize[1]);
     };
     fullscreen.appendTo = function(elem) {
         wax.util.$(elem).appendChild(a);
