@@ -139,7 +139,7 @@ wax.mm.interaction = function(map, tilejson, options) {
         } else if (e.type === 'touchstart' && e.touches.length === 1) {
 
             // turn this into touch-mode. Fallback to teaser and full.
-            this.clickAction = ['full', 'teaser'];
+            clickAction = ['full', 'teaser'];
 
             // Don't make the user click close if they hit another tooltip
             if (callbacks._currentTooltip) {
