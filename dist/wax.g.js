@@ -1,4 +1,4 @@
-/* wax - 3.0.1 - 1.0.4-321-g053540e */
+/* wax - 3.0.2 - 1.0.4-322-g6189bf0 */
 
 
 /*!
@@ -336,7 +336,7 @@ wax.GridManager = function(options) {
     var resolution = options.resolution || 4,
         grid_tiles = {},
         manager = {},
-        xyzFinder = new RegExp(/(\d+)\/(\d+)\/(\d+)\.[\w\._]+$/g),
+        xyzFinder = new RegExp(/(\d+)\/(\d+)\/(\d+)\.[\w\._]+/g),
         formatter;
 
     var formatterUrl = function(url) {

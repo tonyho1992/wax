@@ -1,5 +1,9 @@
 ## Changelog
 
+### 3.0.2
+
+* Fixes `xyzFinder` in `wax.GridManager` to handle URLs with query strings.
+
 ### 3.0.1
 
 * Expose `#full` and `#original` methods on `wax.mm.fullscreen` allowing API
