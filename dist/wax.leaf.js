@@ -1,4 +1,4 @@
-/* wax - 3.0.0 - 1.0.4-320-g97e618c */
+/* wax - 3.0.0 - 1.0.4-321-g053540e */
 
 
 /*!
@@ -670,6 +670,10 @@ wax.util = {
                 } else if (match = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/)) {
                     top += parseInt(match[2], 10);
                     left += parseInt(match[1], 10);
+                } else if (match = style.match(/matrix3d\(([\-\d,\s]+)\)/)) {
+                    var pts = match[1].split(',');
+                    top += parseInt(pts[13], 10);
+                    left += parseInt(pts[12], 10);
                 }
             }
         };

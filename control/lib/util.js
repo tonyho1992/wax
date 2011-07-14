@@ -31,6 +31,10 @@ wax.util = {
                 } else if (match = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/)) {
                     top += parseInt(match[2], 10);
                     left += parseInt(match[1], 10);
+                } else if (match = style.match(/matrix3d\(([\-\d,\s]+)\)/)) {
+                    var pts = match[1].split(',');
+                    top += parseInt(pts[13], 10);
+                    left += parseInt(pts[12], 10);
                 }
             }
         };
