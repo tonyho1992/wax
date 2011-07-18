@@ -1,4 +1,4 @@
-/* wax - 3.0.3 - 1.0.4-328-g04364b9 */
+/* wax - 3.0.3 - 1.0.4-329-g0783035 */
 
 
 /*!
@@ -1347,6 +1347,21 @@ wax.mm.interaction = function(map, tilejson, options) {
         MM.addEvent(map.parent, 'mousedown', onDown);
         if (touchable) {
             MM.addEvent(map.parent, 'touchstart', onDown);
+        }
+        return this;
+    };
+
+    // Remove this control from the map.
+    interaction.remove = function() {
+        var l = ['zoomed', 'panned', 'centered',
+            'extentset', 'resized', 'drawn'];
+        for (var i = 0; i < l.length; i++) {
+            map.removeCallback(l[i], clearTileGrid);
+        }
+        MM.removeEvent(map.parent, 'mousemove', onMove);
+        MM.removeEvent(map.parent, 'mousedown', onDown);
+        if (touchable) {
+            MM.removeEvent(map.parent, 'touchstart', onDown);
         }
         return this;
     };
