@@ -1,4 +1,4 @@
-/* wax - 3.0.3 - 1.0.4-329-g0783035 */
+/* wax - 3.0.3 - 1.0.4-330-ga507519 */
 
 
 /*!
@@ -1385,6 +1385,10 @@ wax.mm.legend = function(map, tilejson) {
         l = wax.legend()
             .content(tilejson.legend || '');
         return this;
+    };
+
+    legend.content = function(x) {
+        if (x) l.content(x.legend || '');
     };
 
     legend.element = function() {

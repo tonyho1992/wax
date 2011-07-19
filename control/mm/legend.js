@@ -16,6 +16,10 @@ wax.mm.legend = function(map, tilejson) {
         return this;
     };
 
+    legend.content = function(x) {
+        if (x) l.content(x.legend || '');
+    };
+
     legend.element = function() {
         return l.element();
     };
