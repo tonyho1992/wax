@@ -176,9 +176,10 @@ wax.mm.interaction = function(map, tilejson, options) {
             // Contain the event data in a closure.
             _clickTimeout = window.setTimeout((function(pos) {
                 return function(e) {
+                    _clickTimeout = null;
                     click(e, pos);
                 };
-            })(pos));
+            })(pos), 300);
         }
         return onUp;
     }

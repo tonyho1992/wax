@@ -11,7 +11,6 @@ wax.GridManager = function(options) {
     var resolution = options.resolution || 4,
         grid_tiles = {},
         manager = {},
-        xyzFinder = new RegExp(/(\d+)\/(\d+)\/(\d+)\.[\w\._]+/g),
         formatter;
 
     var formatterUrl = function(url) {
@@ -41,7 +40,7 @@ wax.GridManager = function(options) {
         if (typeof template === 'string') template = [template];
         return function templatedGridFinder(url) {
             if (!url) return;
-            var xyz = xyzFinder.exec(url);
+            var xyz = /(\d+)\/(\d+)\/(\d+)\.[\w\._]+/g.exec(url);
             if (!xyz) return;
             return template[parseInt(xyz[2], 10) % template.length]
                 .replace('{z}', xyz[1])
