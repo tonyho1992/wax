@@ -1,4 +1,4 @@
-/* wax - 3.0.3 - 1.0.4-331-gabf0606 */
+/* wax - 3.0.3 - 1.0.4-333-g7147554 */
 
 
 /*!
@@ -637,6 +637,7 @@ wax.tooltip.prototype.unselect = function(context) {
 wax.tooltip.prototype.out = wax.tooltip.prototype.unselect;
 wax.tooltip.prototype.over = wax.tooltip.prototype.select;
 wax.tooltip.prototype.click = wax.tooltip.prototype.click;
+var wax = wax || {};
 wax.util = wax.util || {};
 
 // Utils are extracted from other libraries or
@@ -745,7 +746,7 @@ wax.util = {
     isArray: Array.isArray || function(obj) {
         return Object.prototype.toString.call(obj) === '[object Array]';
     },
-    // From underscore: reimplement the ECMA5 `Object.keys()` methodb
+    // From underscore: reimplement the ECMA5 `Object.keys()` method
     keys: Object.keys || function(obj) {
         var hasOwnProperty = Object.prototype.hasOwnProperty;
         if (obj !== Object(obj)) throw new TypeError('Invalid object');
@@ -934,6 +935,61 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     };
 
     return boxselector.add(map);
+};
+wax = wax || {};
+wax.mm = wax.mm || {};
+
+// Bandwith Detection
+// ------------------
+wax.mm.bwdetect = function(map, options) {
+    options = options || {};
+    options.png = options.png || '.png128';
+    options.jpg = options.jpg || '.jpg70';
+
+    var detector = {},
+        mm = com.modestmaps,
+        // test image: 30.29KB
+        testImage = 'http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/0/0/0.png?preventcache=' + (+new Date()),
+        // High-bandwidth assumed
+        // 1: high bandwidth (.png, .jpg)
+        // 0: low bandwidth (.png128, .jpg70)
+        bw = 1;
+        // Alternative versions
+
+    function setProvider(x) {
+        // More or less detect the Wax version
+        if (x.options.scheme && bw === 0) {
+            for (var i = 0; i < x.options.tiles.length; i++) {
+                x.options.tiles[i] = x.options.tiles[i]
+                    .replace(/\.png$/, options.png)
+                    .replace(/\.jpg$/, options.jpg);
+            }
+        }
+        mm.Map.prototype.setProvider.call(map, x);
+    }
+
+    function testReturn() {
+        var duration = (+new Date()) - start;
+        if (duration > 200) {
+            bw = 0;
+            map.setProvider(map.provider);
+        }
+    }
+
+    function bwTest() {
+        var im = new Image();
+        im.src = testImage;
+        start = +new Date();
+        mm.addEvent(im, 'load', testReturn);
+    }
+
+    detector.add = function(map) {
+        bwTest();
+        map.setProvider = setProvider;
+        return this;
+    };
+
+    return detector.add(map);
 };
 wax = wax || {};
 wax.mm = wax.mm || {};

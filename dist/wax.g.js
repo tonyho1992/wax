@@ -1,4 +1,4 @@
-/* wax - 3.0.3 - 1.0.4-331-gabf0606 */
+/* wax - 3.0.3 - 1.0.4-333-g7147554 */
 
 
 /*!
@@ -637,6 +637,7 @@ wax.tooltip.prototype.unselect = function(context) {
 wax.tooltip.prototype.out = wax.tooltip.prototype.unselect;
 wax.tooltip.prototype.over = wax.tooltip.prototype.select;
 wax.tooltip.prototype.click = wax.tooltip.prototype.click;
+var wax = wax || {};
 wax.util = wax.util || {};
 
 // Utils are extracted from other libraries or
@@ -745,7 +746,7 @@ wax.util = {
     isArray: Array.isArray || function(obj) {
         return Object.prototype.toString.call(obj) === '[object Array]';
     },
-    // From underscore: reimplement the ECMA5 `Object.keys()` methodb
+    // From underscore: reimplement the ECMA5 `Object.keys()` method
     keys: Object.keys || function(obj) {
         var hasOwnProperty = Object.prototype.hasOwnProperty;
         if (obj !== Object(obj)) throw new TypeError('Invalid object');

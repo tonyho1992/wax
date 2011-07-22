@@ -1,3 +1,4 @@
+var wax = wax || {};
 wax.util = wax.util || {};
 
 // Utils are extracted from other libraries or
@@ -106,7 +107,7 @@ wax.util = {
     isArray: Array.isArray || function(obj) {
         return Object.prototype.toString.call(obj) === '[object Array]';
     },
-    // From underscore: reimplement the ECMA5 `Object.keys()` methodb
+    // From underscore: reimplement the ECMA5 `Object.keys()` method
     keys: Object.keys || function(obj) {
         var hasOwnProperty = Object.prototype.hasOwnProperty;
         if (obj !== Object(obj)) throw new TypeError('Invalid object');
