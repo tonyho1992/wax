@@ -1,4 +1,4 @@
-/* wax - 3.0.3 - 1.0.4-333-g7147554 */
+/* wax - 3.0.3 - 1.0.4-336-gc2642c2 */
 
 
 /*!
@@ -943,8 +943,6 @@ wax.mm = wax.mm || {};
 // ------------------
 wax.mm.bwdetect = function(map, options) {
     options = options || {};
-    options.png = options.png || '.png128';
-    options.jpg = options.jpg || '.jpg70';
 
     var detector = {},
         mm = com.modestmaps,
@@ -953,27 +951,28 @@ wax.mm.bwdetect = function(map, options) {
         // High-bandwidth assumed
         // 1: high bandwidth (.png, .jpg)
         // 0: low bandwidth (.png128, .jpg70)
-        bw = 1;
+        bw = 1,
         // Alternative versions
+        lowpng = options.png || '.png128',
+        lowjpg = options.jpg || '.jpg70',
+        auto = options.auto === undefined ? true : options.auto;
 
     function setProvider(x) {
         // More or less detect the Wax version
-        if (x.options.scheme && bw === 0) {
-            for (var i = 0; i < x.options.tiles.length; i++) {
-                x.options.tiles[i] = x.options.tiles[i]
-                    .replace(/\.png$/, options.png)
-                    .replace(/\.jpg$/, options.jpg);
-            }
+        if (!(x.options && x.options.scheme)) mm.Map.prototype.setProvider.call(map, x);
+        var swap = [['.png', '.jpg'], [lowpng, lowjpg]];
+        if (bw === 1) swap.reverse();
+        for (var i = 0; i < x.options.tiles.length; i++) {
+            x.options.tiles[i] = x.options.tiles[i]
+                .replace(swap[0][0], swap[1][0])
+                .replace(swap[0][1], swap[1][1]);
         }
         mm.Map.prototype.setProvider.call(map, x);
     }
 
     function testReturn() {
         var duration = (+new Date()) - start;
-        if (duration > 200) {
-            bw = 0;
-            map.setProvider(map.provider);
-        }
+        if (duration > 200) detector.bw(0);
     }
 
     function bwTest() {
@@ -983,9 +982,14 @@ wax.mm.bwdetect = function(map, options) {
         mm.addEvent(im, 'load', testReturn);
     }
 
+    detector.bw = function(x) {
+        if (!arguments.length) return bw;
+        if (bw !== (bw = x)) setProvider(map.provider);
+    };
+
     detector.add = function(map) {
-        bwTest();
         map.setProvider = setProvider;
+        if (options.auto) bwTest();
         return this;
     };
 

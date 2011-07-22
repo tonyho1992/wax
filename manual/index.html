@@ -176,6 +176,9 @@ m.setCenterZoom(new mm.Location(39, -98), 1);
 </pre>
 </div>
 
+
+
+
 ### Mobile
 
 TODO
@@ -417,6 +420,53 @@ var m = new mm.Map('modestmaps-attribution',
 wax.mm.attribution(m, tilejson).appendTo(m.parent);
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </pre>
+</div>
+
+
+
+
+
+
+### Bandwidth Detection
+
+This control adapts maps to low-bandwidth conditions. By default, it requests
+a test tile to determine speed, but accepts options that allow you to subsitute
+your own detection method. This method only works on **composited tiles** - that is,
+combinations of tilesets with the characteristic `,` between their tileset
+names.
+
+Accepts an options object with keys:
+
+* `auto`: default true, if false the control will not test bandwidth
+* `jpg`: the low-quality version of JPEG files. Default `.jpg70`.
+* `png`: the low-quality version of PNG files. Default `.png128`.
+
+<div class='section'>
+<div id='modestmaps-bw' class='map dark'></div>
+<pre class='sh_javascript run'>
+var tilejson = {
+  tilejson: '1.0.0',
+  scheme: 'tms',
+  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-jul,world-bank-borders-ar/{z}/{x}/{y}.png']
+};
+var mm = com.modestmaps;
+var m = new mm.Map('modestmaps-bw',
+  new wax.mm.connector(tilejson),
+  new mm.Point(240,120),
+  [new mm.MouseHandler(), new mm.TouchHandler()]);
+var bw = wax.mm.bwdetect(m, {
+  png: '.png32'
+});
+document.getElementById('trigger-low').onclick = function() {
+  bw.bw(0); return false;
+};
+document.getElementById('trigger-high').onclick = function() {
+  bw.bw(1); return false;
+};
+m.setCenterZoom(new mm.Location(39, -98), 2);
+</pre>
+<a id='trigger-low'>low quality</a>
+<a id='trigger-high'>high quality</a>
 </div>
 
 ## Layering
@@ -699,35 +749,6 @@ are written in a chainable fashion, like Modest Maps and Polymaps.
 stops spinning. Although `wax.Record` returns the last object it was playing
 around with (most often the map object), this is more a convenience than a core 
 API guarantee.
-
-<!-- @TODO
-## Currying
-
-<div class='section'>
-<div id='modestmaps-reverse' class='map'></div>
-<a class='attribution' href='http://mapbox.com/tileset/pakistan-grey'>Pakistan Grey</a>
-<pre class='sh_javascript run'>
-var mm = com.modestmaps;
-var m = new mm.Map('modestmaps-reverse',
-    new wax.mm.provider({
-      baseUrl: 'http://a.tile.mapbox.com/',
-      layerName: 'pakistan-grey',
-      zoomRange: [0, 9],
-      filetype: '.jpg'}), new mm.Point(240,120));
-w(m).melt(wax.mm.pointselector, {
-  callback: function(coords) {
-    $('#modestmaps-pointselector .attribution').text(
-      coords.map(function(c) {
-        return c.lat + ',' + c.lon;
-      }).join(' - '));
-    }
-  });
-m.setCenterZoom(
-  new com.modestmaps.Location(30.5, 69.78),
-  4);
-</pre>
-</div>
--->
 
 </div>
 </body>
