@@ -1,4 +1,4 @@
-wax = wax || {};
+var wax = wax || {};
 wax.mm = wax.mm || {};
 
 // A layer connector for Modest Maps conformant to TileJSON
