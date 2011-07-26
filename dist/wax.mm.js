@@ -1,4 +1,4 @@
-/* wax - 3.0.3 - 1.0.4-336-gc2642c2 */
+/* wax - 3.0.3 - 1.0.4-340-gd75272a */
 
 
 /*!
@@ -1424,6 +1424,9 @@ wax.mm.interaction = function(map, tilejson, options) {
         if (touchable) {
             MM.removeEvent(map.parent, 'touchstart', onDown);
         }
+        if (callbacks._currentTooltip) {
+            callbacks.hideTooltip(callbacks._currentTooltip);
+        }
         return this;
     };
 
@@ -1922,7 +1925,7 @@ wax.mm.zoomer = function(map) {
     };
     return zoomer.add(map);
 };
-wax = wax || {};
+var wax = wax || {};
 wax.mm = wax.mm || {};
 
 // A layer connector for Modest Maps conformant to TileJSON

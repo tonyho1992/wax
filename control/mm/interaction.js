@@ -234,6 +234,9 @@ wax.mm.interaction = function(map, tilejson, options) {
         if (touchable) {
             MM.removeEvent(map.parent, 'touchstart', onDown);
         }
+        if (callbacks._currentTooltip) {
+            callbacks.hideTooltip(callbacks._currentTooltip);
+        }
         return this;
     };
 
