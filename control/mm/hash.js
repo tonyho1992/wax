@@ -7,7 +7,7 @@ wax.mm = wax.mm || {};
 wax.mm.locationHash = {
   stateChange: function(callback) {
     com.modestmaps.addEvent(window, 'hashchange', function() {
-      callback(location.hash);
+      callback(location.hash.substring(1));
     }, false);
   },
   getState: function() {

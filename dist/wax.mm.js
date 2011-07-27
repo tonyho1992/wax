@@ -1,4 +1,4 @@
-/* wax - 3.0.3 - 1.0.4-343-ga9e45ff */
+/* wax - 3.0.3 - 1.0.4-344-gf45ccac */
 
 
 /*!
@@ -1061,7 +1061,7 @@ wax.mm = wax.mm || {};
 wax.mm.locationHash = {
   stateChange: function(callback) {
     com.modestmaps.addEvent(window, 'hashchange', function() {
-      callback(location.hash);
+      callback(location.hash.substring(1));
     }, false);
   },
   getState: function() {
