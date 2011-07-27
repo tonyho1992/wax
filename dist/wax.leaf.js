@@ -1,4 +1,4 @@
-/* wax - 3.0.3 - 1.0.4-336-gc2642c2 */
+/* wax - 3.0.3 - 1.0.4-340-gd75272a */
 
 
 /*!
@@ -521,7 +521,7 @@ wax.request = {
         }
     }
 };
-wax = wax || {};
+if (!wax) var wax = {};
 
 // A wrapper for reqwest jsonp to easily load TileJSON from a URL.
 wax.tilejson = function(url, callback) {

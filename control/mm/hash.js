@@ -112,7 +112,7 @@ wax.mm.hash = function(map, tilejson, options) {
         if (state === s0) return;
         if (parser(s0 = state)) {
             // replace bogus hash
-            hash.move();
+            move();
         }
     }
 

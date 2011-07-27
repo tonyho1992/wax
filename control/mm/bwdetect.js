@@ -7,6 +7,7 @@ wax.mm.bwdetect = function(map, options) {
     options = options || {};
 
     var detector = {},
+        threshold = options.threshold || 400,
         mm = com.modestmaps,
         // test image: 30.29KB
         testImage = 'http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/0/0/0.png?preventcache=' + (+new Date()),
@@ -23,7 +24,7 @@ wax.mm.bwdetect = function(map, options) {
         // More or less detect the Wax version
         if (!(x.options && x.options.scheme)) mm.Map.prototype.setProvider.call(map, x);
         var swap = [['.png', '.jpg'], [lowpng, lowjpg]];
-        if (bw === 1) swap.reverse();
+        if (bw) swap.reverse();
         for (var i = 0; i < x.options.tiles.length; i++) {
             x.options.tiles[i] = x.options.tiles[i]
                 .replace(swap[0][0], swap[1][0])
@@ -34,7 +35,7 @@ wax.mm.bwdetect = function(map, options) {
 
     function testReturn() {
         var duration = (+new Date()) - start;
-        if (duration > 200) detector.bw(0);
+        if (duration > threshold) detector.bw(0);
     }
 
     function bwTest() {
@@ -46,7 +47,7 @@ wax.mm.bwdetect = function(map, options) {
 
     detector.bw = function(x) {
         if (!arguments.length) return bw;
-        if (bw !== (bw = x)) setProvider(map.provider);
+        if (bw != (bw = x)) setProvider(map.provider);
     };
 
     detector.add = function(map) {
