@@ -1,4 +1,4 @@
-/* wax - 3.0.3 - 1.0.4-340-gd75272a */
+/* wax - 3.0.3 - 1.0.4-341-g4539424 */
 
 
 /*!
@@ -1424,6 +1424,9 @@ wax.mm.interaction = function(map, tilejson, options) {
         MM.removeEvent(map.parent, 'mousedown', onDown);
         if (touchable) {
             MM.removeEvent(map.parent, 'touchstart', onDown);
+        }
+        if (callbacks._currentTooltip) {
+            callbacks.hideTooltip(callbacks._currentTooltip);
         }
         return this;
     };
