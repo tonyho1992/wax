@@ -123,7 +123,7 @@ wax.mm.hash = function(map, tilejson, options) {
 
     hash.add = function(map) {
         if (options.manager.getState()) {
-            hash.stateChange(options.manager.getState());
+            stateChange(options.manager.getState());
         } else {
             initialize();
             move();

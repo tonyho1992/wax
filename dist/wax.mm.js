@@ -1,4 +1,4 @@
-/* wax - 3.0.3 - 1.0.4-341-g4539424 */
+/* wax - 3.0.3 - 1.0.4-343-ga9e45ff */
 
 
 /*!
@@ -1177,7 +1177,7 @@ wax.mm.hash = function(map, tilejson, options) {
 
     hash.add = function(map) {
         if (options.manager.getState()) {
-            hash.stateChange(options.manager.getState());
+            stateChange(options.manager.getState());
         } else {
             initialize();
             move();
