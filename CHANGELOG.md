@@ -1,5 +1,16 @@
 ## Changelog
 
+### 3.0.4
+
+* Added `bwdetect` control for Modest Maps.
+* Add tests using `jasmine` library.
+* Bugfixes.
+
+### 3.0.3
+
+* Add support for bleeding-edge MM.
+* Bugfixes.
+
 ### 3.0.2
 
 * Fixes `xyzFinder` in `wax.GridManager` to handle URLs with query strings.
