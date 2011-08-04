@@ -23,7 +23,7 @@ wax.mm.interaction = function(map, tilejson, options) {
 
     var MM = com.modestmaps,
         waxGM = wax.GridManager(tilejson),
-        callbacks = options.callbacks || new wax.tooltip(),
+        callbacks = options.callbacks || new wax.tooltip(options),
         clickAction = options.clickAction || ['full'],
         clickHandler = options.clickHandler || function(url) {
             window.location = url;

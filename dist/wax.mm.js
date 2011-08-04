@@ -1,4 +1,4 @@
-/* wax - 3.0.4 - 1.0.4-347-g1979c47 */
+/* wax - 3.0.4 - 1.0.4-350-g2a38e24 */
 
 
 /*!
@@ -990,7 +990,7 @@ wax.mm.bwdetect = function(map, options) {
 
     detector.add = function(map) {
         map.setProvider = setProvider;
-        if (options.auto) bwTest();
+        if (auto) bwTest();
         return this;
     };
 
@@ -1214,7 +1214,7 @@ wax.mm.interaction = function(map, tilejson, options) {
 
     var MM = com.modestmaps,
         waxGM = wax.GridManager(tilejson),
-        callbacks = options.callbacks || new wax.tooltip(),
+        callbacks = options.callbacks || new wax.tooltip(options),
         clickAction = options.clickAction || ['full'],
         clickHandler = options.clickHandler || function(url) {
             window.location = url;
