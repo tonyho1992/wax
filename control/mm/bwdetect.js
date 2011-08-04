@@ -52,7 +52,7 @@ wax.mm.bwdetect = function(map, options) {
 
     detector.add = function(map) {
         map.setProvider = setProvider;
-        if (options.auto) bwTest();
+        if (auto) bwTest();
         return this;
     };
 
