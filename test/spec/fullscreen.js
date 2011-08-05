@@ -15,13 +15,13 @@ describe('fullscreen', function() {
 
     it('makes the map fullscreen', function() {
         $('.wax-fullscreen', map.parent).click();
-        expect($(map.parent).hasClass('wax-fullscreen-map')).toEqual(true);;
+        expect($(map.parent).hasClass('wax-fullscreen-map')).toEqual(true);
     });
 
     it('can toggle fullscreen', function() {
         $('.wax-fullscreen', map.parent).click();
-        expect($(map.parent).hasClass('wax-fullscreen-map')).toEqual(true);;
+        expect($(map.parent).hasClass('wax-fullscreen-map')).toEqual(true);
         $('.wax-fullscreen', map.parent).click();
-        expect($(map.parent).hasClass('wax-fullscreen-map')).toEqual(false);;
+        expect($(map.parent).hasClass('wax-fullscreen-map')).toEqual(false);
     });
 });

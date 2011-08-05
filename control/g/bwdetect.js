@@ -21,7 +21,7 @@ wax.g.bwdetect = function(map, options) {
 
     // Create a low-bandwidth map type.
     if (!map.mapTypes['mb-low']) {
-        var mb = map.mapTypes['mb'];
+        var mb = map.mapTypes.mb;
         var tilejson = {
             tiles: [],
             scheme: mb.options.scheme,
@@ -36,7 +36,6 @@ wax.g.bwdetect = function(map, options) {
                 .replace('.png', lowpng)
                 .replace('.jpg', lowjpg));
         }
-        console.warn(tilejson);
         m.mapTypes.set('mb-low', new wax.g.connector(tilejson));
     }
 

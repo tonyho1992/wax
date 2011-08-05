@@ -29,7 +29,7 @@ describe('hash', function() {
 
     it('should react to changed zoom and location', function() {
         runs(function() {
-          window.location.hash = '#5.00/38.00/-99.00'
+          window.location.hash = '#5.00/38.00/-99.00';
         });
         waits(600);
         runs(function() {
