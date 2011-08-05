@@ -39,16 +39,15 @@ wax.g.bwdetect = function(map, options) {
         m.mapTypes.set('mb-low', new wax.g.connector(tilejson));
     }
 
-    function testReturn() {
-        var duration = (+new Date()) - start;
-        if (duration > threshold) detector.bw(0);
-    }
-
     function bwTest() {
         var im = new Image();
         im.src = testImage;
-        start = +new Date();
-        im.onload = testReturn;
+        var timeout = setTimeout(function() {
+            detector.bw(0);
+        }, threshold);
+        im.onload = function() {
+            clearTimeout(timeout);
+        };
     }
 
     detector.bw = function(x) {

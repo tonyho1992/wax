@@ -33,16 +33,15 @@ wax.mm.bwdetect = function(map, options) {
         mm.Map.prototype.setProvider.call(map, x);
     }
 
-    function testReturn() {
-        var duration = (+new Date()) - start;
-        if (duration > threshold) detector.bw(0);
-    }
-
     function bwTest() {
         var im = new Image();
         im.src = testImage;
-        start = +new Date();
-        mm.addEvent(im, 'load', testReturn);
+        var timeout = setTimeout(function() {
+            detector.bw(0);
+        }, threshold);
+        mm.addEvent(im, 'load', function() {
+            clearTimeout(timeout);
+        });
     }
 
     detector.bw = function(x) {
