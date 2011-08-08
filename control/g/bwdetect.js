@@ -40,18 +40,36 @@ wax.g.bwdetect = function(map, options) {
     }
 
     function bwTest() {
+        wax.bw = -1;
         var im = new Image();
         im.src = testImage;
+        var first = true;
         var timeout = setTimeout(function() {
-            detector.bw(0);
+            if (first) {
+                detector.bw(0);
+                first = false;
+            }
         }, threshold);
         im.onload = function() {
-            clearTimeout(timeout);
+            if (first) {
+                clearTimeout(timeout);
+                detector.bw(1);
+                first = false;
+            }
         };
     }
 
     detector.bw = function(x) {
         if (!arguments.length) return bw;
+        if (wax.bwlisteners && wax.bwlisteners.length) (function () {
+            wax.bw = x;
+            listeners = wax.bwlisteners;
+            wax.bwlisteners = [];
+            for (i = 0; i < listeners; i++) {
+                listeners[i](x);
+            }
+        })();
+
         if (bw != (bw = x)) map.setMapTypeId(bw ? 'mb' : 'mb-low');
     };
 
@@ -60,5 +78,14 @@ wax.g.bwdetect = function(map, options) {
         return this;
     };
 
-    return detector.add(map);
+    if (wax.bw == -1) {
+      wax.bwlisteners = wax.bwlisteners || [];
+      wax.bwlisteners.push(detector.bw);
+    }
+    else if (wax.bw != undefined) {
+        detector.bw(wax.bw);
+    }
+    else {
+        return detector.add(map);
+    }
 };
