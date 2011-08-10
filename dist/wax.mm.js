@@ -1,4 +1,4 @@
-/* wax - 3.0.4 - 1.0.4-350-g2a38e24 */
+/* wax - 3.0.4 - 1.0.4-357-g7b86dca */
 
 
 /*!
@@ -231,6 +231,70 @@ wax.attribution = function() {
 
     return a.init();
 };
+wax = wax || {};
+
+// Attribution
+// -----------
+wax.bwdetect = function(options, callback) {
+    var detector = {},
+        threshold = options.threshold || 400,
+        // test image: 30.29KB
+        testImage = 'http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/0/0/0.png?preventcache=' + (+new Date()),
+        // High-bandwidth assumed
+        // 1: high bandwidth (.png, .jpg)
+        // 0: low bandwidth (.png128, .jpg70)
+        bw = 1,
+        // Alternative versions
+        auto = options.auto === undefined ? true : options.auto;
+
+    function bwTest() {
+        wax.bw = -1;
+        var im = new Image();
+        im.src = testImage;
+        var first = true;
+        var timeout = setTimeout(function() {
+            if (first) {
+                detector.bw(0);
+                first = false;
+            }
+        }, threshold);
+        im.onload = function() {
+            if (first) {
+                clearTimeout(timeout);
+                detector.bw(1);
+                first = false;
+            }
+        };
+    }
+
+    detector.bw = function(x) {
+        if (!arguments.length) return bw;
+        if (wax.bwlisteners && wax.bwlisteners.length) (function () {
+            wax.bw = x;
+            listeners = wax.bwlisteners;
+            wax.bwlisteners = [];
+            for (i = 0; i < listeners; i++) {
+                listeners[i](x);
+            }
+        })();
+
+        if (bw != (bw = x)) callback(x);
+    };
+
+    detector.add = function() {
+        if (auto) bwTest();
+        return this;
+    };
+
+    if (wax.bw == -1) {
+      wax.bwlisteners = wax.bwlisteners || [];
+      wax.bwlisteners.push(detector.bw);
+    } else if (wax.bw !== undefined) {
+        detector.bw(wax.bw);
+    } else {
+        detector.add();
+    }
+};
 // Formatter
 // ---------
 wax.formatter = function(x) {
@@ -286,40 +350,38 @@ wax.GridInstance = function(grid_tile, formatter, options) {
         return key;
     }
 
+    // Lower-level than tileFeature - has nothing to do
+    // with the DOM. Takes a px offset from 0, 0 of a grid.
+    instance.gridFeature = function(x, y) {
+        if (!(grid_tile && grid_tile.grid)) return;
+        if ((y < 0) || (x < 0)) return;
+        if ((Math.floor(y) > tileSize) ||
+            (Math.floor(x) > tileSize)) return;
+        // Find the key in the grid. The above calls should ensure that
+        // the grid's array is large enough to make this work.
+        var key = resolveCode(grid_tile.grid[
+           Math.floor((y) / resolution)
+        ].charCodeAt(
+           Math.floor((x) / resolution)
+        ));
+
+        if (grid_tile.keys[key] && grid_tile.data[grid_tile.keys[key]]) {
+            return grid_tile.data[grid_tile.keys[key]];
+        }
+    };
+
     // Get a feature:
     //
     // * `x` and `y`: the screen coordinates of an event
     // * `tile_element`: a DOM element of a tile, from which we can get an offset.
     // * `options` options to give to the formatter: minimally having a `format`
     //   member, being `full`, `teaser`, or something else.
-    instance.getFeature = function(x, y, tile_element, options) {
-        if (!(grid_tile && grid_tile.grid)) return;
-
+    instance.tileFeature = function(x, y, tile_element, options) {
         // IE problem here - though recoverable, for whatever reason
-        var offset = wax.util.offset(tile_element),
-            tileX = offset.left,
-            tileY = offset.top,
-            res = (offset.width / tileSize) * resolution;
+        var offset = wax.util.offset(tile_element);
+            feature = this.gridFeature(x - offset.left, y - offset.top);
 
-        // This tile's resolution. larger tiles will have lower, aka coarser, resolutions
-        if ((y - tileY < 0) || (x - tileX < 0)) return;
-        if ((Math.floor(y - tileY) > tileSize) ||
-            (Math.floor(x - tileX) > tileSize)) return;
-        // Find the key in the grid. The above calls should ensure that
-        // the grid's array is large enough to make this work.
-        var key = grid_tile.grid[
-           Math.floor((y - tileY) / res)
-        ].charCodeAt(
-           Math.floor((x - tileX) / res)
-        );
-
-        key = resolveCode(key);
-
-        // If this layers formatter hasn't been loaded yet,
-        // download and load it now.
-        if (grid_tile.keys[key] && grid_tile.data[grid_tile.keys[key]]) {
-            return formatter.format(options, grid_tile.data[grid_tile.keys[key]]);
-        }
+        if (feature) return formatter.format(options, feature);
     };
 
     return instance;
@@ -939,24 +1001,14 @@ wax.mm.boxselector = function(map, tilejson, opts) {
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-// Bandwith Detection
+// Bandwidth Detection
 // ------------------
 wax.mm.bwdetect = function(map, options) {
     options = options || {};
-
-    var detector = {},
-        threshold = options.threshold || 400,
-        mm = com.modestmaps,
-        // test image: 30.29KB
-        testImage = 'http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/0/0/0.png?preventcache=' + (+new Date()),
-        // High-bandwidth assumed
-        // 1: high bandwidth (.png, .jpg)
-        // 0: low bandwidth (.png128, .jpg70)
-        bw = 1,
-        // Alternative versions
-        lowpng = options.png || '.png128',
+    var lowpng = options.png || '.png128',
         lowjpg = options.jpg || '.jpg70',
-        auto = options.auto === undefined ? true : options.auto;
+        mm = com.modestmaps,
+        bw = 1;
 
     function setProvider(x) {
         // More or less detect the Wax version
@@ -971,30 +1023,14 @@ wax.mm.bwdetect = function(map, options) {
         mm.Map.prototype.setProvider.call(map, x);
     }
 
-    function testReturn() {
-        var duration = (+new Date()) - start;
-        if (duration > threshold) detector.bw(0);
-    }
+    map.setProvider = setProvider;
 
-    function bwTest() {
-        var im = new Image();
-        im.src = testImage;
-        start = +new Date();
-        mm.addEvent(im, 'load', testReturn);
-    }
+    wax.bwdetect(options, function(x) {
+      bw = x;
+      setProvider(map.provider);
+    });
 
-    detector.bw = function(x) {
-        if (!arguments.length) return bw;
-        if (bw != (bw = x)) setProvider(map.provider);
-    };
-
-    detector.add = function(map) {
-        map.setProvider = setProvider;
-        if (auto) bwTest();
-        return this;
-    };
-
-    return detector.add(map);
+    return this;
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
@@ -1289,9 +1325,9 @@ wax.mm.interaction = function(map, tilejson, options) {
             tile = getTile(pos),
             feature;
 
-        tile && waxGM.getGrid(tile.src, function(err, g) {
+        if (tile) waxGM.getGrid(tile.src, function(err, g) {
             if (err || !g) return;
-            if (feature = g.getFeature(pos.x, pos.y, tile, {
+            if (feature = g.tileFeature(pos.x, pos.y, tile, {
                 format: 'teaser'
             })) {
                 if (feature && _af !== feature) {
@@ -1380,9 +1416,9 @@ wax.mm.interaction = function(map, tilejson, options) {
         var tile = getTile(pos),
             feature;
 
-        tile && waxGM.getGrid(tile.src, function(err, g) {
+        if (tile) waxGM.getGrid(tile.src, function(err, g) {
             for (var i = 0; g && i < clickAction.length; i++) {
-                if (feature = g.getFeature(pos.x, pos.y, tile, {
+                if (feature = g.tileFeature(pos.x, pos.y, tile, {
                     format: clickAction[i]
                 })) {
                     switch (clickAction[i]) {

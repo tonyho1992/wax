@@ -126,7 +126,7 @@ wax.ol.Interaction =
             if (!tiles[t].url) continue;
             this.gm.getGrid(tiles[t].url, function(err, g) {
                 if (!g) return;
-                var feature = g.getFeature(pos.x, pos.y, tiles[t].frame, {
+                var feature = g.tileFeature(pos.x, pos.y, tiles[t].frame, {
                     format: that.clickAction
                 });
                 if (feature) {
@@ -163,7 +163,7 @@ wax.ol.Interaction =
             // is currently being requested.
             this.gm.getGrid(tiles[t].url, function(err, g) {
                 if (g && tiles[t]) {
-                    var feature = g.getFeature(pos.x, pos.y, tiles[t].frame, options);
+                    var feature = g.tileFeature(pos.x, pos.y, tiles[t].frame, options);
 
                     if (feature) {
                         if (!tiles[t]) return;
