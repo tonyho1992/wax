@@ -1,4 +1,4 @@
-/* wax - 3.0.4 - 1.0.4-357-g7b86dca */
+/* wax - 3.0.4 - 1.0.4-358-g187b761 */
 
 
 /*!
@@ -1251,7 +1251,7 @@ wax.mm.interaction = function(map, tilejson, options) {
     var MM = com.modestmaps,
         waxGM = wax.GridManager(tilejson),
         callbacks = options.callbacks || new wax.tooltip(options),
-        clickAction = options.clickAction || ['full'],
+        clickAction = options.clickAction || ['full', 'location'],
         clickHandler = options.clickHandler || function(url) {
             window.location = url;
         },
