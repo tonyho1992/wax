@@ -104,7 +104,7 @@ wax.leaf.interaction = function(map, tilejson, options) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
                         if (err) return;
                         if (g) {
-                            var feature = g.getFeature(pos.x, pos.y, tile, {
+                            var feature = g.tileFeature(pos.x, pos.y, tile, {
                                 format: 'teaser'
                             });
                             // This and other Modest Maps controls only support a single layer.
@@ -166,7 +166,7 @@ wax.leaf.interaction = function(map, tilejson, options) {
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
                         if (g) {
-                            var feature = g.getFeature(evt.pageX, evt.pageY, tile, {
+                            var feature = g.tileFeature(evt.pageX, evt.pageY, tile, {
                                 format: this.clickAction
                             });
                             if (feature) {

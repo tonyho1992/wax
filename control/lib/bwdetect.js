@@ -56,11 +56,9 @@ wax.bwdetect = function(options, callback) {
     if (wax.bw == -1) {
       wax.bwlisteners = wax.bwlisteners || [];
       wax.bwlisteners.push(detector.bw);
-    }
-    else if (wax.bw != undefined) {
+    } else if (wax.bw !== undefined) {
         detector.bw(wax.bw);
-    }
-    else {
+    } else {
         detector.add();
     }
 };

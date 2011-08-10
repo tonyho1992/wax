@@ -29,6 +29,6 @@ wax.g.bwdetect = function(map, options) {
     }
 
     wax.bwdetect(options, function(bw) {
-      map.setMapTypeId(bw ? 'mb' : 'mb-low')
+      map.setMapTypeId(bw ? 'mb' : 'mb-low');
     });
 };

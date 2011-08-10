@@ -96,7 +96,7 @@ wax.g.interaction = function(map, tilejson, options) {
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
                         if (err || !g) return;
-                        var feature = g.getFeature(
+                        var feature = g.tileFeature(
                             evt.pixel.x + wax.util.offset(map.getDiv()).left,
                             evt.pixel.y + wax.util.offset(map.getDiv()).top,
                             tile,
@@ -124,7 +124,7 @@ wax.g.interaction = function(map, tilejson, options) {
                 if (tile) {
                     this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
                         if (err || !g) return;
-                        var feature = g.getFeature(
+                        var feature = g.tileFeature(
                             evt.pixel.x + wax.util.offset(map.getDiv()).left,
                             evt.pixel.y + wax.util.offset(map.getDiv()).top,
                             tile,

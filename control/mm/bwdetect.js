@@ -10,7 +10,6 @@ wax.mm.bwdetect = function(map, options) {
         mm = com.modestmaps,
         bw = 1;
 
-
     function setProvider(x) {
         // More or less detect the Wax version
         if (!(x.options && x.options.scheme)) mm.Map.prototype.setProvider.call(map, x);
@@ -23,11 +22,13 @@ wax.mm.bwdetect = function(map, options) {
         }
         mm.Map.prototype.setProvider.call(map, x);
     }
+
     map.setProvider = setProvider;
 
     wax.bwdetect(options, function(x) {
       bw = x;
       setProvider(map.provider);
     });
+
     return this;
 };

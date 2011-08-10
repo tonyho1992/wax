@@ -98,9 +98,9 @@ wax.mm.interaction = function(map, tilejson, options) {
             tile = getTile(pos),
             feature;
 
-        tile && waxGM.getGrid(tile.src, function(err, g) {
+        if (tile) waxGM.getGrid(tile.src, function(err, g) {
             if (err || !g) return;
-            if (feature = g.getFeature(pos.x, pos.y, tile, {
+            if (feature = g.tileFeature(pos.x, pos.y, tile, {
                 format: 'teaser'
             })) {
                 if (feature && _af !== feature) {
@@ -189,9 +189,9 @@ wax.mm.interaction = function(map, tilejson, options) {
         var tile = getTile(pos),
             feature;
 
-        tile && waxGM.getGrid(tile.src, function(err, g) {
+        if (tile) waxGM.getGrid(tile.src, function(err, g) {
             for (var i = 0; g && i < clickAction.length; i++) {
-                if (feature = g.getFeature(pos.x, pos.y, tile, {
+                if (feature = g.tileFeature(pos.x, pos.y, tile, {
                     format: clickAction[i]
                 })) {
                     switch (clickAction[i]) {
