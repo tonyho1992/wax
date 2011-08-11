@@ -1,4 +1,4 @@
-/* wax - 3.0.4 - 1.0.4-358-g187b761 */
+/* wax - 3.0.5 - 1.0.4-361-g59892a1 */
 
 
 /*!
@@ -253,13 +253,13 @@ wax.bwdetect = function(options, callback) {
         im.src = testImage;
         var first = true;
         var timeout = setTimeout(function() {
-            if (first) {
+            if (first && wax.bw == -1) {
                 detector.bw(0);
                 first = false;
             }
         }, threshold);
         im.onload = function() {
-            if (first) {
+            if (first && wax.bw == -1) {
                 clearTimeout(timeout);
                 detector.bw(1);
                 first = false;
@@ -269,14 +269,15 @@ wax.bwdetect = function(options, callback) {
 
     detector.bw = function(x) {
         if (!arguments.length) return bw;
+        var oldBw = bw;
         if (wax.bwlisteners && wax.bwlisteners.length) (function () {
-            wax.bw = x;
             listeners = wax.bwlisteners;
             wax.bwlisteners = [];
             for (i = 0; i < listeners; i++) {
                 listeners[i](x);
             }
         })();
+        wax.bw = x;
 
         if (bw != (bw = x)) callback(x);
     };
@@ -294,6 +295,7 @@ wax.bwdetect = function(options, callback) {
     } else {
         detector.add();
     }
+    return detector;
 };
 // Formatter
 // ---------
