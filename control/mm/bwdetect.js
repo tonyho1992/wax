@@ -25,10 +25,8 @@ wax.mm.bwdetect = function(map, options) {
 
     map.setProvider = setProvider;
 
-    wax.bwdetect(options, function(x) {
+    return wax.bwdetect(options, function(x) {
       bw = x;
       setProvider(map.provider);
     });
-
-    return this;
 };

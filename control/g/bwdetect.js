@@ -28,7 +28,7 @@ wax.g.bwdetect = function(map, options) {
         m.mapTypes.set('mb-low', new wax.g.connector(tilejson));
     }
 
-    wax.bwdetect(options, function(bw) {
+    return wax.bwdetect(options, function(bw) {
       map.setMapTypeId(bw ? 'mb' : 'mb-low');
     });
 };
