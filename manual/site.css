@@ -74,7 +74,12 @@ div.section {
   }
 
 div.section * { margin:0px; }
-div.section .map ~ pre { min-height:220px; }
+/* div.section .map ~ pre { min-height:220px; } */
+div.section .map ~ pre.sh_html { min-height:0; }
+
+pre.snippet {
+  margin:20px 0;
+  }
 
 div.map {
   position:absolute !important;
