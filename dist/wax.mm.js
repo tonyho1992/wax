@@ -1,4 +1,4 @@
-/* wax - 3.0.5 - 1.0.4-361-g59892a1 */
+/* wax - 3.0.5 - 1.0.4-363-g4511a81 */
 
 
 /*!
@@ -729,13 +729,17 @@ wax.util = {
                 el.style['-webkit-transform'] ||
                 el.style.MozTransform;
             if (style) {
-                if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
+                // TODO: this is straighforward, not fast.
+                var match = style.match(/translate\((.+)px, (.+)px\)/),
+                    match3d = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/),
+                    matchmatrix = style.match(/matrix3d\(([\-\d,\s]+)\)/);
+                if (match) {
                     top += parseInt(match[2], 10);
                     left += parseInt(match[1], 10);
-                } else if (match = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/)) {
+                } else if (match3d) {
                     top += parseInt(match[2], 10);
                     left += parseInt(match[1], 10);
-                } else if (match = style.match(/matrix3d\(([\-\d,\s]+)\)/)) {
+                } else if (matchMatrix) {
                     var pts = match[1].split(',');
                     top += parseInt(pts[13], 10);
                     left += parseInt(pts[12], 10);
@@ -823,7 +827,7 @@ wax.util = {
     eventoffset: function(e) {
         var posx = 0;
         var posy = 0;
-        if (!e) var e = window.event;
+        if (!e) e = window.event;
         if (e.pageX || e.pageY) {
             // Good browsers
             return {
@@ -1050,7 +1054,8 @@ wax.mm.fullscreen = function(map) {
 
     function click(e) {
         if (e) com.modestmaps.cancelEvent(e);
-        if (state = !state) {
+        state = !state;
+        if (state) {
             fullscreen.original();
         } else {
             fullscreen.full();
@@ -1128,7 +1133,9 @@ wax.mm.pushState = {
     // is a history object.
     pushState: function(state) {
         if (!(window.history && window.history.pushState)) return;
-        window.history.pushState({ map_location: state }, document.title, window.location.href);
+        window.history.pushState({
+            map_location: state
+        }, document.title);
     }
 };
 
@@ -1327,9 +1334,10 @@ wax.mm.interaction = function(map, tilejson, options) {
 
         if (tile) waxGM.getGrid(tile.src, function(err, g) {
             if (err || !g) return;
-            if (feature = g.tileFeature(pos.x, pos.y, tile, {
+            feature = g.tileFeature(pos.x, pos.y, tile, {
                 format: 'teaser'
-            })) {
+            });
+            if (feature) {
                 if (feature && _af !== feature) {
                     _af = feature;
                     callbacks.out(map.parent);
@@ -1418,9 +1426,10 @@ wax.mm.interaction = function(map, tilejson, options) {
 
         if (tile) waxGM.getGrid(tile.src, function(err, g) {
             for (var i = 0; g && i < clickAction.length; i++) {
-                if (feature = g.tileFeature(pos.x, pos.y, tile, {
+                feature = g.tileFeature(pos.x, pos.y, tile, {
                     format: clickAction[i]
-                })) {
+                });
+                if (feature) {
                     switch (clickAction[i]) {
                         case 'full':
                         // clickAction can be teaser in touch interaction

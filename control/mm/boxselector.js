@@ -3,6 +3,10 @@ wax.mm = wax.mm || {};
 
 // Box Selector
 // ------------
+//
+// This control lets people click and draw a box on a map
+// to select a geographical area, and calls a callback function with the
+// bounding box selected as an argument.
 wax.mm.boxselector = function(map, tilejson, opts) {
     var mouseDownPoint = null,
         MM = com.modestmaps,
@@ -47,6 +51,9 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     function mouseMove(e) {
         var point = getMousePoint(e);
         boxDiv.style.display = 'block';
+        // Depending on whether the user drags to the top-right
+        // or bottom-left, the box will be anchored by CSS positioning it
+        // along the left and top of the original or dragged point.
         if (point.x < mouseDownPoint.x) {
             boxDiv.style.left = point.x + 'px';
         } else {

@@ -5,17 +5,17 @@ wax.mm = wax.mm || {};
 // This **will interfere** with anchors, so a HTML5 pushState
 // implementation will be preferred.
 wax.mm.locationHash = {
-  stateChange: function(callback) {
-    com.modestmaps.addEvent(window, 'hashchange', function() {
-      callback(location.hash.substring(1));
-    }, false);
-  },
-  getState: function() {
-    return location.hash.substring(1);
-  },
-  pushState: function(state) {
-    location.hash = '#' + state;
-  }
+    stateChange: function(callback) {
+        com.modestmaps.addEvent(window, 'hashchange', function() {
+            callback(location.hash.substring(1));
+        }, false);
+    },
+    getState: function() {
+        return location.hash.substring(1);
+    },
+    pushState: function(state) {
+        location.hash = '#' + state;
+    }
 };
 
 // a HTML5 pushstate-based hash changer.
@@ -38,7 +38,9 @@ wax.mm.pushState = {
     // is a history object.
     pushState: function(state) {
         if (!(window.history && window.history.pushState)) return;
-        window.history.pushState({ map_location: state }, document.title, window.location.href);
+        window.history.pushState({
+            map_location: state
+        }, document.title);
     }
 };
 

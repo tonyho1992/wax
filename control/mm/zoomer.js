@@ -9,6 +9,8 @@ wax.mm = wax.mm || {};
 wax.mm.zoomer = function(map) {
     var mm = com.modestmaps;
 
+    // Create elements as soon as an instance of this control is made, though
+    // they won't be appended to anything until `appendTo(element)` is called.
     var zoomin = document.createElement('a');
     zoomin.innerHTML = '+';
     zoomin.href = '#';
@@ -42,6 +44,8 @@ wax.mm.zoomer = function(map) {
     var zoomer = {
         add: function(map) {
             map.addCallback('drawn', function(map, e) {
+                // This does you a favor by adding `zoomdisabled` when you can't
+                // zoom in or out any more.
                 if (map.coordinate.zoom === map.provider.outerLimits()[0].zoom) {
                     zoomout.className = 'zoomer zoomout zoomdisabled';
                 } else if (map.coordinate.zoom === map.provider.outerLimits()[1].zoom) {
