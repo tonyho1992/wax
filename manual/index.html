@@ -4,22 +4,34 @@
   <meta charset='utf-8'/>
   <title>Wax Manual</title>
   <script src='ender.js' type='text/javascript'></script>
-  <script src='../ext/modestmaps.min.js' type='text/javascript'></script>
-  <script src='../ext/OpenLayers.js' type='text/javascript'></script>
-  <script src='../ext/leaflet.js' type='text/javascript'></script>
-  <script src='http://maps.google.com/maps/api/js?sensor=false' type='text/javascript' ></script>
-  <script src='../dist/wax.mm.js' type='text/javascript'></script>
-  <script src='../dist/wax.ol.js' type='text/javascript'></script>
-  <script src='../dist/wax.leaf.js' type='text/javascript'></script>
-  <script src='../dist/wax.g.js' type='text/javascript'></script>
   <script src='lib/showdown.js' type='text/javascript'></script>
+
+  <script src='site.js' type='text/javascript'></script>
+
+  <!-- shjs -->
   <script src='lib/shjs.js' type='text/javascript'></script>
   <script src='lib/sh_javascript.min.js' type='text/javascript'></script>
   <script src='lib/sh_html.min.js' type='text/javascript'></script>
-  <script src='site.js' type='text/javascript'></script>
   <link href='lib/shjs.css' rel='stylesheet' type='text/css' />
+
+  <!-- google -->
+  <script src='http://maps.google.com/maps/api/js?sensor=false' type='text/javascript' ></script>
+  <script src='../dist/wax.g.js' type='text/javascript'></script>
+
+  <!-- openlayers -->
+  <script src='../ext/OpenLayers.js' type='text/javascript'></script>
+  <script src='../dist/wax.ol.js' type='text/javascript'></script>
+
+  <!-- modest maps -->
+  <script src='../ext/modestmaps.min.js' type='text/javascript'></script>
+  <script src='../dist/wax.mm.js' type='text/javascript'></script>
+
+  <!-- leaflet -->
+  <script src='../ext/leaflet.js' type='text/javascript'></script>
+  <script src='../dist/wax.leaf.js' type='text/javascript'></script>
   <link href='../ext/leaflet.css' rel='stylesheet' type='text/css' />
   <!--[if lte IE 8]><link rel="stylesheet" href="../ext/leaflet.ie.css" /><![endif]-->
+
   <link href='../theme/controls.css' rel='stylesheet' type='text/css' />
   <link href='site.css' rel='stylesheet' type='text/css' />
 </head>
@@ -28,12 +40,34 @@
 <div class='navigation'><ul></ul></div>
 
 <pre class='md'>
-# Wax 3.x
 
-Wax is a collection of extras and tools that make it easier to publish
-custom maps on any website. It's an extension of
-[different mapping APIs](#comparison-of-mapping-libraries) including Modest Maps, OpenLayers and
-the Google Maps API client.
+# Wax
+
+_your toolkit for putting interactive custom maps on the web_
+
+<div class='section'>
+<div id='intro-map'></div>
+<pre class='sh_javascript run'>
+var url = 'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class';
+wax.tilejson(url, function(tilejson) {
+  var mm = com.modestmaps;
+  var m = new mm.Map('intro-map', new wax.mm.connector(tilejson), new mm.Point(700,400));
+  m.setCenterZoom(new mm.Location(tilejson.center[1], tilejson.center[0]), tilejson.center[2] - 3);
+  wax.mm.zoomer(m).appendTo(m.parent);
+  wax.mm.interaction(m).appendTo(m.parent);
+});
+</pre>
+</div>
+
+
+## What is Wax?
+
+Wax helps out with putting maps on the internet, by working in concert with
+Javascript APIs: Modest Maps, OpenLayers, Leaflet and Google Maps. You've probably
+heard of one or two of these: we like Modest Maps and Leaflet as alternaties to
+Google Maps, because they're open-source and totally customizable. But, regardless
+of what you pick, Wax will help you out by offering little tweaks - hoverability,
+zoom controls, fullscreen, and more.
 
 ## Get Wax
 
@@ -49,15 +83,23 @@ See the instructions below for each mapping API ([Modest Maps](#modest-maps),
 [Leaflet](#leaflet), [Google Maps](#google-maps), [OpenLayers](#openlayers))
 to include Wax in your project.
 
-## The Fundamentals
+## A Quick Intro
 
-Assuming that you've been designing maps with [TileMill](http://tilemill.com/) or
-another design tool, and  have gotten them up on a server for your usage,
-what's next? It's actually  quite simple to get to the next step: your basic
-ingredients are
+Suppose you're making cool map designs with [TileMill](http://tilemill.com/)
+or you want to pre-built maps from [MapBox](http://mapbox.com), and you want to
+get famous by putting them somewhere online - your blog, a big CMS, or anywhere else.
 
-* A map server, like [TileStream](http://github.com/mapbox/tilestream)
+Don't be afraid! It's not too hard to do, and once you've learned how to do it,
+you'll have the power to make super-custom maps with minimal effort.
+
+So your ingredients will be:
+
+* A map server, like [TileStream](http://github.com/mapbox/tilestream),
+  [TileStream Pro](http://mapbox.com/#/tilestream), or just using the public
+  TileStream at [MapBox](http://mapbox.com). All of the examples you'll see
+  are with MapBox, so you can copy & paste at will and it'll all work.
 * A Javascript API, like [Modest Maps](http://github.com/stamen/modestmaps-js)
+* Wax
 * Your website
 
 The mapping server serves up **tiles** of rendered data - tiles being 256 pixel
@@ -547,13 +589,6 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 <a id='trigger-high'>high quality</a>
 </div>
 
-## Layering
-
-Modest Maps natively supports a single map layer at a time, unlike OpenLayers, 
-which has a flexible baselayer/overlay system. [TileStream Hosting](http://mapbox.com/#/tilestream)
-supports compositing of layers server-side, which is far more performant than
-layering client-side.
-
 # Leaflet
 
 [Leaflet](http://leaflet.cloudmade.com/index.html) is a new mapping library written by
@@ -707,27 +742,6 @@ m.addControl(new wax.ol.Interaction({
 m.zoomTo(1);
 </pre>
 </div>
-
-# Comparison of Mapping Libraries
-
-Wax supports [Modest Maps] [1], [OpenLayers] [2], and [Google Maps] [3] APIs
-with custom map controls - the ability to interact with tooltips and links,
-a legend to illustrate map data, and other various utilities.
-
-Modest Maps is the recommended library for use with Wax. Being more compact 
-than OpenLayers, faster on older browsers than Polymaps, and more flexible 
-than the Google Maps makes it a good choice for custom mapping applications.
-The library was originally developed by Tom Carden and Mike Migurski of
-[Stamen](http://stamen.com/) as a port of [ActionScript and Python code](http://modestmaps.com/).
-
-The main reason that [Polymaps](http://polymaps.org/) is not recommended for
-mainstream usage is its lack of support for Internet Explorer. Modest Maps,
-OpenLayers, and Google Maps all have solid support for Internet Explorer 7
-and higher.
-
-[1]: https://github.com/stamen/modestmaps-js
-[2]: http://www.openlayers.org/
-[3]: http://code.google.com/apis/maps/documentation/javascript/
 
 # Protips
 
