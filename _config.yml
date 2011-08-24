@@ -1,0 +1,11 @@
+destination: ./_site
+auto:        true
+source:      .
+lsi:         false
+server_port: 4000
+pygments:    true
+markdown:    rdiscount
+permalink:   /:title.html
+url:         http://mapbox.github.com/wax
+rdiscount:
+  extensions: [smart]

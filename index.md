@@ -1,17 +1,6 @@
-<!DOCTYPE html >
-<html>
-<head>
-  <meta charset='utf-8'/>
-  <title>Wax Manual</title>
-  <script src='ender.js' type='text/javascript'></script>
-  <link href='../theme/controls.css' rel='stylesheet' type='text/css' />
-  <link href='site.css' rel='stylesheet' type='text/css' />
-</head>
-<body>
-<div class='page'>
-<div class='navigation'><ul></ul></div>
-
-<pre class='md'>
+---
+layout: default
+---
 
 # Wax
 
@@ -19,31 +8,35 @@ _your toolkit for putting interactive custom maps on the web_
 
 <div class='section'>
 <div id='intro-map'></div>
-<pre class='sh_javascript run'>
+{% highlight js %}
+var mm = com.modestmaps;
 var url = 'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class';
+
 wax.tilejson(url, function(tilejson) {
-  var mm = com.modestmaps;
-  var m = new mm.Map('intro-map', new wax.mm.connector(tilejson), new mm.Point(700,400));
-  m.setCenterZoom(new mm.Location(tilejson.center[1], tilejson.center[0]), tilejson.center[2] - 3);
+  var m = new mm.Map('intro-map',
+    new wax.mm.connector(tilejson),
+    new mm.Point(700,400));
+
+  m.setCenterZoom(new mm.Location(tilejson.center[1],
+    tilejson.center[0]),
+    tilejson.center[2] - 3);
+
   wax.mm.zoomer(m).appendTo(m.parent);
   wax.mm.interaction(m).appendTo(m.parent);
 });
-</pre>
+{% endhighlight %}
 </div>
 
 
 ## What is Wax?
 
 Wax helps out with putting maps on the internet, by working in concert with
-Javascript APIs: Modest Maps, OpenLayers, Leaflet and Google Maps. You've probably
-heard of one or two of these: we like Modest Maps and Leaflet as alternatives to
-Google Maps, because they're open-source and totally customizable.
+Javascript APIs. By providing lots of little things, like zoom buttons
+and connectors to [TileStream](http://mapbox.com/#/tilestream), Wax lets you
+use super-fast and lightweight APIs.
 
-But, regardless of what you pick, Wax will help you out by offering little
-tweaks - hoverability, zoom controls, fullscreen, and more.
-
-And this manual should help you out with understanding web mapping in general,
-from the very start.
+And it happens to have some very thorough documentation that's pretty useful
+for learning about web mapping in general.
 
 ## Get Wax
 
@@ -100,14 +93,14 @@ make your map work. We'll also include a CSS file to start rolling with style:
   swap in your own later on.
 
 <div class='section'>
-<pre class='sh_html'>
-&lt;html&gt;
-  &lt;head&gt;
-    &lt;script src='wax/ext/modestmaps.min.js' type='text/javascript'&gt;&lt;/script&gt;
-    &lt;script src='wax/dist/wax.mm.js' type='text/javascript'&gt;&lt;/script&gt;
-    &lt;link href='wax/theme/controls.css' rel='stylesheet' type='text/css' /&gt;
+{% highlight html %}
+<html>
+  <head>
+    <script src='wax/ext/modestmaps.min.js' type='text/javascript'></script>
+    <script src='wax/dist/wax.mm.js' type='text/javascript'></script>
+    <link href='wax/theme/controls.css' rel='stylesheet' type='text/css' />
   ...
-</pre>
+{% endhighlight %}
 </div>
 
 Here's your first map! If you've downloaded Wax and add the code above into the
@@ -120,11 +113,9 @@ Modest Maps is making the tiles move when you click and drag.
 <div id='modestmaps-setup' class='map'></div>
 <a class='attribution' href='http://mapbox.com/tileset/world-light'>World Light</a>
 
-<pre class='sh_html'>
-&lt;div id="modestmaps-setup"&gt;&lt;/div&gt;
-&lt;script&gt;
-</pre>
-<pre class='sh_javascript run'>
+{% highlight html %}
+<div id="modestmaps-setup"></div>
+<script>
 var tilejson = {
   tilejson: '1.0.0',
   scheme: 'tms',
@@ -142,9 +133,8 @@ var m = new mm.Map('modestmaps-setup',
 
 // Center it on the United States, at zoom level 2.
 m.setCenterZoom(new mm.Location(39, -98), 2);
-</pre>
-<pre class='sh_html'>
-&lt;/script&gt;
+</script>
+{% endhighlight %}
 </pre>
 </div>
 
@@ -180,13 +170,13 @@ The URL of the tile above is `http://a.tile.mapbox.com/1.0.0/world-light/2/2/2.p
 By inference we can write the TileJSON needed to use the World Light tileset:
 
 <div class='section'>
-<pre class='sh_javascript'>
+{% highlight js %}
 {
   "version": "1.0.0",
   "scheme": "tms",
   "tiles" ["http://a.tile.mapbox.com/1.0.0/world-light/{z}/{x}/{y}.png"]
 }
-</pre>
+{% endhighlight %}
 </div>
 
 - The `version` key declares that we are implementing version `1.0.0` of the
@@ -202,7 +192,7 @@ By inference we can write the TileJSON needed to use the World Light tileset:
 Some servers, like [TileStream](http://github.com/mapbox/tilestream) provide TileJSON
 definitions for all of the tilesets they serve. This way, it's easy to configure maps, since
 all you need to know is the URL of the TileJSON file, and that'll provide you with values
-for urls, a centerpoint, zoom ranges, and more. Wax contains a helper functiont that just
+for urls, a centerpoint, zoom ranges, and more. Wax contains a helper function that just
 pulls a TileJSON description from a server using [JSONP](http://en.wikipedia.org/wiki/JSONP)
 and gives it to you as an argument to a callback function that you can use to configure
 your map.
@@ -216,7 +206,7 @@ has a TileJSON definition at `http://a.tiles.mapbox.com/mapbox/1.0.0/dc-nightvis
 <div id='tilejson-url' class='map'></div>
 <a class='attribution' href='http://mapbox.com/tileset/world-light'>World Light</a>
 
-<pre class='sh_javascript run'>
+{% highlight js %}
 var url = 'http://tiles.mapbox.com/mapbox/api/Tileset/dc-nightvision';
 wax.tilejson(url, function(tilejson) {
   var mm = com.modestmaps;
@@ -228,7 +218,4 @@ wax.tilejson(url, function(tilejson) {
     tilejson.center[0]), // lat
     tilejson.center[2]); // zoom
 });
-</pre>
-</div>
-</body>
-</html>
+{% endhighlight %}

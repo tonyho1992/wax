@@ -25,9 +25,6 @@ a { color:#b64c4c; }
 
 .navigation a {
   color:#999;
-  transition:color .5s;
-  -moz-transition:color .5s;
-  -webkit-transition:color .5s;
   }
 
 .navigation:hover a { color:#000; }
@@ -145,14 +142,10 @@ div.section .widget {
   border-radius:5px 0px 0px 5px;
   -moz-border-radius:5px 0px 0px 5px;
   -webkit-border-radius:5px 0px 0px 5px;
-  -moz-transition:background-color .5s;
-  -webkit-transition:background-color .5s;
   }
 
 .md a.api {
   top:25px;
-  -moz-transition:background-color .5s;
-  -webkit-transition:background-color .5s;
   }
 
 
@@ -175,10 +168,10 @@ h2, h3 { font-size:20px; }
 
 pre {
   margin:0px;
-  font: normal 12px/20px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
+  font: normal 15px/20px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
   }
 
-code {
+p code {
   font-size:12px;
   font-family:'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
   background:#fbe7cc;
