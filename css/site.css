@@ -166,8 +166,11 @@ h1, h2, h3, h4, h5, h6, p {
 
 h2, h3 { font-size:20px; }
 
+pre.highlight {
+  margin:10px 0;
+  }
+
 pre {
-  margin:0px;
   font: normal 15px/20px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
   }
 
