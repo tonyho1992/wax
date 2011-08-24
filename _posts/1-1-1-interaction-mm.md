@@ -18,8 +18,6 @@ with wax. Any other library that implements the same interface
 ## Examples
 
 {% highlight js %}
-var mm = com.modestmaps;
-
 wax.tilejson(
   'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
   function(tilejson) {

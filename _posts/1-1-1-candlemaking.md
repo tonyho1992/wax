@@ -84,3 +84,27 @@ of `com.modestmaps` to `mm`, but **not outside of that function**, lest
 `mm` stands for `com.modestmaps` for everything else - every other script
 on your page. Never ever declare a variable without `var` inside of this
 function, because it'll 'leak' to the global space.
+
+## Packaging
+
+Packaging of client-side Javascript libraries is not a solved problem. But
+there are a few things that we should do, for sure.
+
+### Distributions
+
+Deliver distributions, that have all relevant code for a certain feature.
+For instance, Wax has a distribution for each mapping API that it supports,
+with names like
+
+* `wax.mm.js`
+* `wax.mm.min.js`
+
+The `min` version is baked using uglify-js (see above).
+
+### package.json
+
+Provide a `package.json` file [like CommonJS](http://www.commonjs.org/)
+or at least like [npm wants](https://github.com/isaacs/npm/blob/master/doc/json.md).
+This lets advanced users developing apps with [nodejs](http://nodejs.org) pull in
+your project nicely and with versions. If you really want to level up,
+publish the package to npm.

@@ -15,7 +15,6 @@ specifying `manager: wax.mm.locationHash` in its options object.
 ## Example
 
 {% highlight js %}
-var mm = com.modestmaps;
 var tilejson = {
   tilejson: '1.0.0',
   scheme: 'tms',

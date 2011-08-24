@@ -10,8 +10,6 @@ calls a callback with the current map data, and also exposes an API,
 `addLocation(com.modestmaps.Location)`, if you wish to add points on pageload.
 
 {% highlight js %}
-var mm = com.modestmaps;
-
 wax.tilejson(
   'http://tiles.mapbox.com/mapbox/api/Tileset/blue-marble-topo-bathy-jul',
   function(tilejson) {

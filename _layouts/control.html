@@ -9,17 +9,18 @@
 </head>
 <body>
 <div class='navigation'>
+  <h1>Wax</h1>
+  <h2>Documentation</h2>
   <ul>
-    <li>Documentation
-      {% for post in site.tags.Documentation %}
-        <li>/ <a href="{{ post.url }}">{{ post.title }}</a></li>
-      {% endfor %}
-    </li>
-    <li>Modest Maps
-      {% for post in site.tags.ModestMaps %}
-        <li>/ <a href="{{ post.url }}">{{ post.title }}</a></li>
-      {% endfor %}
-    </li>
+    {% for post in site.tags.Documentation %}
+      <li>/ <a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+  </ul>
+  <h2>Modest Maps</h2>
+  <ul>
+    {% for post in site.tags.ModestMaps %}
+      <li>/ <a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
   </ul>
 </div>
 <div class='page'>

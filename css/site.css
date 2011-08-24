@@ -39,13 +39,17 @@ a { color:#b64c4c; }
 .navigation ul li a { text-decoration:none; }
 .navigation ul li a:hover { text-decoration:underline; }
 
-.navigation ul li.H1 { margin-top:10px; }
-.navigation ul li.H2 { padding-left:10px; }
-.navigation ul li.H3 {
-  padding-left:20px;
-  font-style:italic;
+.navigation h2 {
+  font:bold 13px/20px Georgia,serif;
+  margin:10px 0 0 0;
+  padding:0;
   }
-
+.navigation h1 {
+  font-size:70px;
+  line-height:80px;
+  margin:30px 0 30px 0;
+  border-bottom:1px dotted #222;
+}
 /**
  * Page wrapper
  */
