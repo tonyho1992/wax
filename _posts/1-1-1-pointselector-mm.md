@@ -1,5 +1,5 @@
 ---
-title: Pointselector
+title: Point Selector
 tags: ModestMaps
 layout: control
 ---

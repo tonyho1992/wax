@@ -1,6 +1,6 @@
 ---
 title: Bandwidth Detection
-tags: ModestMaps
+tags: ModestMaps touch
 layout: control
 ---
 

@@ -1,6 +1,6 @@
 ---
 title: Hash
-tags: ModestMaps
+tags: ModestMaps touch
 layout: control
 ---
 
