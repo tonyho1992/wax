@@ -27,7 +27,7 @@ wax.tilejson(url, function(tilejson) {
     tilejson.center[2] - 3);
 
   wax.mm.zoomer(m).appendTo(m.parent);
-  wax.mm.interaction(m).appendTo(m.parent);
+  wax.mm.interaction(m);
 });
 </script>
 {% endhighlight %}

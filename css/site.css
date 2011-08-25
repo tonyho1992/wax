@@ -21,10 +21,15 @@ a { color:#b64c4c; }
   left:50%;
   margin-left:280px;
   font:13px/20px Georgia,serif;
+  color:#777;
   }
 
 .navigation a {
   color:#999;
+  }
+
+.navigation:hover {
+  color:#000;
   }
 
 .navigation:hover a { color:#000; }
@@ -249,4 +254,18 @@ dt {
 dd {
   margin:0;
   padding:5px 0 0 20px;
+}
+
+span.hattip {
+  text-align:right;
+  display:block;
+  position:relative;
+  top:-30px;
+  margin:0 0 10px 10px;
+  font-size:11px;
+}
+
+span.hattip:before {
+  content: '↑';
+  margin-right:5px;
 }

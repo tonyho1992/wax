@@ -1,5 +1,5 @@
 ---
-title: Candlemaking
+title: How to Make Wax
 tags: Documentation
 layout: control
 ---
