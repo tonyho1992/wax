@@ -87,7 +87,6 @@ make your map work. We'll also include a CSS file to start rolling with style:
 - `wax/theme/controls.css` contains default styles for controls. You can always
   swap in your own later on.
 
-<div class='section'>
 {% highlight html %}
 <html>
   <head>
@@ -96,7 +95,6 @@ make your map work. We'll also include a CSS file to start rolling with style:
     <link href='wax/theme/controls.css' rel='stylesheet' type='text/css' />
   ...
 {% endhighlight %}
-</div>
 
 Here's your first map! If you've downloaded Wax and add the code above into the
 <code>&lt;head&gt;</code> of your page, then you can put the following code into the
@@ -104,7 +102,6 @@ Here's your first map! If you've downloaded Wax and add the code above into the
 drag around the little map below -
 Modest Maps is making the tiles move when you click and drag.
 
-<div class='section'>
 {% highlight html %}
 <div id="modestmaps-setup"></div>
 <script>
@@ -128,15 +125,14 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 </script>
 {% endhighlight %}
 </pre>
-</div>
 
 Let's look at how that was done: the only thing on the page besides that
 <code>&lt;script&gt;</code> tag and its code is a <code>&lt;div&gt;</code>
 tag with the id `modestmaps-setup`. And, down below, you see the code
 
-<pre class='sh_javascript snippet'>
+{% highlight js %}
 var m = new mm.Map('modestmaps-setup'...
-</pre>
+{% endhighlight %}
 
 So, you're telling Modest Maps (`mm`) to create a new map contained by
 this div element. It then does the work of putting a lot of images on the page
@@ -161,7 +157,6 @@ so that a tile at any coordinate can be requested.
 The URL of the tile above is `http://a.tile.mapbox.com/1.0.0/world-light/2/2/2.png`.
 By inference we can write the TileJSON needed to use the World Light tileset:
 
-<div class='section'>
 {% highlight js %}
 {
   "version": "1.0.0",
@@ -169,7 +164,6 @@ By inference we can write the TileJSON needed to use the World Light tileset:
   "tiles" ["http://a.tile.mapbox.com/1.0.0/world-light/{z}/{x}/{y}.png"]
 }
 {% endhighlight %}
-</div>
 
 - The `version` key declares that we are implementing version `1.0.0` of the
   TileJSON spec. Since there's only one version of TileJSON so far, it'll be `1.0.0` for you, too.
@@ -194,7 +188,6 @@ the TileJSON for dc-nightvision - using the TileStream API. These are also avail
 in `layer.json` files. As an example, `http://a.tiles.mapbox.com/mapbox/1.0.0/dc-nightvision/0/0/0.png`
 has a TileJSON definition at `http://a.tiles.mapbox.com/mapbox/1.0.0/dc-nightvision/layer.json`
 
-<div class='section'>
 {% highlight js %}
 var url = 'http://tiles.mapbox.com/mapbox/api/Tileset/dc-nightvision';
 wax.tilejson(url, function(tilejson) {
@@ -208,4 +201,3 @@ wax.tilejson(url, function(tilejson) {
     tilejson.center[2]); // zoom
 });
 {% endhighlight %}
-</div>
