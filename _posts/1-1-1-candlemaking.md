@@ -8,8 +8,8 @@ layout: control
 and other stuff that people already expect, and it has a lot of code that
 hooks up with [TileStream](http://mapbox.com/tilestreawm).
 
-But that's not everything - there are crazier, potentially interesting things
-that Wax doesn't do, and that you might want to do. Thus, this is a document
+But that's not everything - _there are crazier, potentially interesting things
+that Wax doesn't do_, and that you might want to do. Thus, this is a document
 about writing stuff like Wax. It's really not that hard to do, this is just about
 trying to guarantee that it goes well.
 

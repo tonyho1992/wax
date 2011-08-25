@@ -9,22 +9,24 @@ and then you can add it to a map by chaining `.appendTo(map.parent)`.
 
 ## Example
 
+<div class='live'>
 {% highlight html %}
 <div id='map-div'></div>
-<script>
+<script type='text/javascript'>
 var mm = com.modestmaps;
+
 wax.tilejson(
   'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
   function(tilejson) {
     var m = new mm.Map('map-div',
-      new wax.mm.connector(tilejson),
-      new mm.Point(240,120));
+      new wax.mm.connector(tilejson));
     wax.mm.attribution(m, tilejson).appendTo(m.parent);
     m.setCenterZoom(new mm.Location(39, -98), 2);
   }
 );
 </script>
 {% endhighlight %}
+</div>
 
 ## API
 

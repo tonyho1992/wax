@@ -80,8 +80,6 @@ div.section {
   }
 
 div.section * { margin:0px; }
-/* div.section .map ~ pre { min-height:220px; } */
-div.section .map ~ pre.sh_html { min-height:0; }
 
 pre.snippet {
   margin:20px 0;
@@ -175,8 +173,11 @@ h1, h2, h3, h4, h5, h6, p {
 
 h2, h3 { font-size:20px; }
 
-pre.highlight {
+div.highlight pre {
   margin:10px 0;
+  padding:10px;
+  background:#fcfcfc;
+  border:1px solid #dadada;
   }
 
 pre {
@@ -226,24 +227,26 @@ a.wax-fullscreen {
   z-index:99999;
   }
 
-  /** Teaching section **/
-.ui-2 {
-  padding:20px;
+#map-div {
+  width:700px;
+  height:300px;
 }
-#grids-display {
-  background-color:#D8E7DA;
-  border:1px dotted #A7B6A9;
-  border-spacing:0;
-  border-collapse:collapse;
+
+dl div.highlight pre {
+  border:0;
+  margin:0;
+  padding:0;
+  background: #fff8f0;
 }
-#grids-display pre {
-  font: normal 8px/8px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
-  width:8px;
+
+dt {
+  font: normal 15px/20px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
+  border-bottom:1px solid #fbe7cc;
+  padding:5px 10px;
+  background: #fff8f0;
 }
-#keys-display span, #data-display ul li {
-  font: normal 10px/10px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
-  padding:2px;
-  margin:2px;
-  overflow:scroll;
-  background-color:#D5E1E2;
+
+dd {
+  margin:0;
+  padding:5px 0 0 20px;
 }

@@ -12,21 +12,22 @@ names.
 
 ## Example
 
+<div class='live'>
 {% highlight html %}
-<div id='map-div' class='map dark'></div>
-<a id='trigger-low'>low quality</a>
-<a id='trigger-high'>high quality</a>
+<div id='map-div'></div>
+<a href='#' id='trigger-low'>low quality</a>
+<a href='#' id='trigger-high'>high quality</a>
 <script>
+var mm = com.modestmaps;
 var tilejson = {
   tilejson: '1.0.0',
   scheme: 'tms',
   tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-jul' +
     ',world-bank-borders-ar/{z}/{x}/{y}.png']
 };
-var mm = com.modestmaps;
+
 var m = new mm.Map('map-div',
-  new wax.mm.connector(tilejson),
-  new mm.Point(240,120),
+  new wax.mm.connector(tilejson), null,
   [new mm.MouseHandler(), new mm.TouchHandler()]);
 var bw = wax.mm.bwdetect(m, {
   png: '.png32'
@@ -40,6 +41,7 @@ document.getElementById('trigger-high').onclick = function() {
 m.setCenterZoom(new mm.Location(39, -98), 2);
 </script>
 {% endhighlight %}
+</div>
 
 ## API
 

@@ -11,15 +11,16 @@ calls a callback with the current map data, and also exposes an API,
 
 ## Example
 
+<div class='live'>
 {% highlight html %}
 <div id='map-div'></div>
 <script>
+var mm = com.modestmaps;
 wax.tilejson(
   'http://tiles.mapbox.com/mapbox/api/Tileset/blue-marble-topo-bathy-jul',
   function(tilejson) {
-    var m = new mm.Map('modestmaps-pointselector',
-      new wax.mm.connector(tilejson),
-      new mm.Point(240,120))
+    var m = new mm.Map('map-div',
+      new wax.mm.connector(tilejson))
 
     wax.mm.pointselector(m, tilejson, {
       callback: function(coords) {
@@ -32,6 +33,7 @@ wax.tilejson(
 );
 </script>
 {% endhighlight %}
+</div>
 
 ## API
 

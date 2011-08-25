@@ -14,9 +14,11 @@ specifying `manager: wax.mm.locationHash` in its options object.
 
 ## Example
 
+<div class='live'>
 {% highlight html %}
 <div id='map-div'></div>
 <script>
+var mm = com.modestmaps;
 var tilejson = {
   tilejson: '1.0.0',
   scheme: 'tms',
@@ -24,8 +26,7 @@ var tilejson = {
 };
 
 var m = new mm.Map('map-div',
-  new wax.mm.connector(tilejson),
-  new mm.Point(240,120));
+  new wax.mm.connector(tilejson));
 
 wax.mm.hash(m, tilejson, {
   defaultCenter: new mm.Location(39, -98),
@@ -34,6 +35,7 @@ wax.mm.hash(m, tilejson, {
 });
 </script>
 {% endhighlight %}
+</div>
 
 ## API
 

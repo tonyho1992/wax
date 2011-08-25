@@ -10,9 +10,10 @@ documents, from the very start, the basics of web maps.
 If you're just starting out, follow along and by the end, you'll be a
 web-mapping pro.
 
-<div class='section'>
+<div class='live'>
+{% highlight html %}
 <div id='intro-map'></div>
-{% highlight js %}
+<script>
 var mm = com.modestmaps;
 var url = 'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class';
 
@@ -28,6 +29,7 @@ wax.tilejson(url, function(tilejson) {
   wax.mm.zoomer(m).appendTo(m.parent);
   wax.mm.interaction(m).appendTo(m.parent);
 });
+</script>
 {% endhighlight %}
 </div>
 

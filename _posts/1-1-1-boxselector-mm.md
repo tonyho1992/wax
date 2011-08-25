@@ -11,18 +11,19 @@ offline use.
 
 ## Example
 
+<div class='live'>
 {% highlight html %}
 <div id='map-div'></div>
 <script>
+var mm = com.modestmaps;
 var tilejson = {
   tilejson: '1.0.0',
   scheme: 'tms',
   tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/{z}/{x}/{y}.png']
 };
-var mm = com.modestmaps;
+
 var m = new mm.Map('map-div',
-  new wax.mm.connector(tilejson),
-  new mm.Point(240,120));
+  new wax.mm.connector(tilejson));
 wax.mm.boxselector(m, tilejson, {
   callback: function(coords) {
     $('#boxselector-text').text(
@@ -35,9 +36,8 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
 </script>
 <div class='widget'>Selection: <span id='boxselector-text'></span></div>
 </div>
-
-
 {% endhighlight %}
+</div>
 
 ## API
 

@@ -17,15 +17,16 @@ with wax. Any other library that implements the same interface
 
 ## Example
 
+<div class='live'>
 {% highlight html %}
 <div id='map-div'></div>
 <script>
+var mm = com.modestmaps;
 wax.tilejson(
   'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
   function(tilejson) {
     var m = new mm.Map('map-div',
-      new wax.mm.connector(tilejson),
-      new mm.Point(240,120));
+      new wax.mm.connector(tilejson));
 
     wax.mm.interaction(m, tilejson);
     m.setCenterZoom(new mm.Location(39, -98), 1);
@@ -33,6 +34,7 @@ wax.tilejson(
 );
 </script>
 {% endhighlight %}
+</div>
 
 ## API
 
