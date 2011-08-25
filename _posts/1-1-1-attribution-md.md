@@ -1,10 +1,10 @@
 ---
-title: Legend
+title: Attribution
 tags: ModestMaps
 layout: control
 ---
 
-Display legend information on the map. This internally creates the legend,
+Display attribution information on the map. This internally creates the attribution,
 and then you can add it to a map by chaining `.appendTo(map.parent)`.
 
 {% highlight js %}
@@ -15,7 +15,7 @@ wax.tilejson(
     var m = new mm.Map('modestmaps-legend',
       new wax.mm.connector(tilejson),
       new mm.Point(240,120));
-    wax.mm.legend(m, tilejson).appendTo(m.parent);
+    wax.mm.attribution(m, tilejson).appendTo(m.parent);
     m.setCenterZoom(new mm.Location(39, -98), 2);
   }
 );
@@ -24,11 +24,11 @@ wax.tilejson(
 ## API
 
 <dl>
-  <dt>{% highlight js %}legend = wax.mm.legend(map, tilejson){% endhighlight %}</dt>
+  <dt>{% highlight js %}attribution = wax.mm.attribution(map, tilejson){% endhighlight %}</dt>
   <dd>Create a new legend object. This control requires the TileJSON object
-  to be valid and contain a valid legend attribute.</dd>
-  <dt>{% highlight js %}legend.appendTo(element){% endhighlight %}</dt>
-  <dd>Add the legend element - a div of the form
-  {% highlight html %}<div class='wax-legends'><div class='wax-legend'>legend content</div></div>{% endhighlight %}
+  to be valid and contain a valid attribution attribute.</dd>
+  <dt>{% highlight js %}attribution.appendTo(element){% endhighlight %}</dt>
+  <dd>Add the attribution element - a div of the form
+  {% highlight html %}<div class='wax-attribution'>legend content</div>{% endhighlight %}
   </dd>
 </dl>

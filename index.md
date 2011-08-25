@@ -1,10 +1,14 @@
 ---
 layout: default
+title: Wax
 ---
 
-# Wax
+Wax is your gateway into putting maps on the web. It makes it easier to
+use APIs like [Modest Maps](http://github.com/stamen/modestmaps-js), and
+documents, from the very start, the basics of web maps.
 
-_your toolkit for putting interactive custom maps on the web_
+If you're just starting out, follow along and by the end, you'll be a
+web-mapping pro.
 
 <div class='section'>
 <div id='intro-map'></div>
@@ -26,17 +30,6 @@ wax.tilejson(url, function(tilejson) {
 });
 {% endhighlight %}
 </div>
-
-
-## What is Wax?
-
-Wax helps out with putting maps on the internet, by working in concert with
-Javascript APIs. By providing lots of little things, like zoom buttons
-and connectors to [TileStream](http://mapbox.com/#/tilestream), Wax lets you
-use super-fast and lightweight APIs.
-
-And it happens to have some very thorough documentation that's pretty useful
-for learning about web mapping in general.
 
 ## Get Wax
 
@@ -110,9 +103,6 @@ drag around the little map below -
 Modest Maps is making the tiles move when you click and drag.
 
 <div class='section'>
-<div id='modestmaps-setup' class='map'></div>
-<a class='attribution' href='http://mapbox.com/tileset/world-light'>World Light</a>
-
 {% highlight html %}
 <div id="modestmaps-setup"></div>
 <script>
@@ -203,9 +193,6 @@ in `layer.json` files. As an example, `http://a.tiles.mapbox.com/mapbox/1.0.0/dc
 has a TileJSON definition at `http://a.tiles.mapbox.com/mapbox/1.0.0/dc-nightvision/layer.json`
 
 <div class='section'>
-<div id='tilejson-url' class='map'></div>
-<a class='attribution' href='http://mapbox.com/tileset/world-light'>World Light</a>
-
 {% highlight js %}
 var url = 'http://tiles.mapbox.com/mapbox/api/Tileset/dc-nightvision';
 wax.tilejson(url, function(tilejson) {
@@ -219,3 +206,4 @@ wax.tilejson(url, function(tilejson) {
     tilejson.center[2]); // zoom
 });
 {% endhighlight %}
+</div>

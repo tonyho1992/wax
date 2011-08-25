@@ -27,3 +27,26 @@ wax.tilejson(
   }
 );
 {% endhighlight %}
+
+## API
+
+<dl>
+  <dt>{% highlight js %}var pointselector = wax.mm.pointselector(map, tilejson, options){% endhighlight %}</dt>
+  <dd>Create a new pointselector object. The tilejson argument is ignored. Options
+  is an object with options:
+  <dl>
+    <dt>callback</dt>
+    <dd>A function that will be called with a single argument
+    <code>coords</coords>, containing a list of coordinates of
+    points that you've selected.
+    </dd>
+  </dl>
+  <dt>{% highlight js %}pointselector.addLocation(com.modestmaps.Location){% endhighlight %}</dt>
+  <dd>Add a new location (latitude/longitude), redraw the map, and call callback
+  with the new locations list. Useful for pre-populating point-selecting maps
+  on page load</dd>
+  <dt>{% highlight js %}pointselector.deletePoint(location){% endhighlight %}</dt>
+  <dd>Delete a location from the internal locations list. This is mainly an internal
+  API and requires that the location passed is not just a com.modestmaps.Location,
+  but the actual location object in the internal location object.</dd>
+</dl>
