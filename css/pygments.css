@@ -24,7 +24,7 @@
 .highlight .kr { color: #208090;  } /* Keyword.Reserved */
 .highlight .kt { color: #6060f0;  } /* Keyword.Type */
 .highlight .m { color: #6000E0;  } /* Literal.Number */
-.highlight .s { background-color: #e0e0ff } /* Literal.String */
+.highlight .s { background-color: #F0F0FF } /* Literal.String */
 .highlight .na { color: #000070 } /* Name.Attribute */
 .highlight .nb { color: #007020 } /* Name.Builtin */
 .highlight .nc { color: #e090e0;  } /* Name.Class */

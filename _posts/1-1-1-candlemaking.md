@@ -105,3 +105,19 @@ or at least like [npm wants](https://github.com/isaacs/npm/blob/master/doc/json.
 This lets advanced users developing apps with [nodejs](http://nodejs.org) pull in
 your project nicely and with versions. If you really want to level up,
 publish the package to npm.
+
+## Documentation
+
+**Documentation can and should be as high a priority as coding.** Author
+documentation for-real. Here's the Wax style:
+
+* branch for `gh-pages` and wipe out your source tree.
+* use [jekyll](http://jekyllrb.com) to manage your documentation
+* tag documentation pages with compatibilities
+* when documentating Javascript with examples, include the necessary
+  HTML bootstrap in the example code.
+* documentation pages should have the form:
+  * title
+  * abstract
+  * example
+  * api
