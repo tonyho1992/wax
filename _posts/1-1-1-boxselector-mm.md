@@ -9,7 +9,10 @@ key and dragging on a map. It's useful for stuff like selecting areas to
 render in [TileMill](http://mapbox.com/tilemill) or areas to download for
 offline use.
 
+## Example
+
 {% highlight html %}
+<div id='map-div'></div>
 <script>
 var tilejson = {
   tilejson: '1.0.0',
@@ -17,7 +20,7 @@ var tilejson = {
   tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/{z}/{x}/{y}.png']
 };
 var mm = com.modestmaps;
-var m = new mm.Map('modestmaps-boxselector',
+var m = new mm.Map('map-div',
   new wax.mm.connector(tilejson),
   new mm.Point(240,120));
 wax.mm.boxselector(m, tilejson, {

@@ -32,21 +32,18 @@ minimum of shipping code.
 There are plenty of tools out there to catch errors more quickly. Use them.
 Use these tools, at least.
 
-### [uglify-js](https://github.com/mishoo/UglifyJS)
+* [uglify-js](https://github.com/mishoo/UglifyJS) Takes input files, creates
+  a super-compacted output file, and in the process
+  it finds lots of syntax errors early.
 
-Takes input files, creates a super-compacted output file, and in the process
-it finds lots of syntax errors early.
+* [jshint](https://github.com/jshint/node-jshint): Takes input files,
+  yells at you for writing dangerous, incorrect, or unstable
+  code.
 
-### [jshint](https://github.com/jshint/node-jshint)
-
-Takes input files, yells at you for writing dangerous, incorrect, or unstable
-code.
-
-### [jasmine](http://pivotal.github.com/jasmine/)
-
-You write tests that make sure your code does things in reaction to user
-interaction, and you can run them in a lot of browsers to make sure they work,
-always.
+* [jasmine](http://pivotal.github.com/jasmine/): You write tests that make
+  sure your code does things in reaction to user
+  interaction, and you can run them in a lot of browsers to make sure they work,
+  always.
 
 ## Keeping to Yourself
 

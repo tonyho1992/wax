@@ -14,14 +14,16 @@ specifying `manager: wax.mm.locationHash` in its options object.
 
 ## Example
 
-{% highlight js %}
+{% highlight html %}
+<div id='map-div'></div>
+<script>
 var tilejson = {
   tilejson: '1.0.0',
   scheme: 'tms',
   tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/natural-earth-2/{z}/{x}/{y}.png']
 };
 
-var m = new mm.Map('modestmaps-hash',
+var m = new mm.Map('map-div',
   new wax.mm.connector(tilejson),
   new mm.Point(240,120));
 
@@ -30,6 +32,7 @@ wax.mm.hash(m, tilejson, {
   defaultZoom: 4,
   manager: wax.mm.pushState
 });
+</script>
 {% endhighlight %}
 
 ## API

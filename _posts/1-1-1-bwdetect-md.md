@@ -10,9 +10,10 @@ your own detection method. This method only works on **composited tiles** - that
 combinations of tilesets with the characteristic `,` between their tileset
 names.
 
+## Example
 
 {% highlight html %}
-<div id='modestmaps-bw' class='map dark'></div>
+<div id='map-div' class='map dark'></div>
 <a id='trigger-low'>low quality</a>
 <a id='trigger-high'>high quality</a>
 <script>
@@ -23,7 +24,7 @@ var tilejson = {
     ',world-bank-borders-ar/{z}/{x}/{y}.png']
 };
 var mm = com.modestmaps;
-var m = new mm.Map('modestmaps-bw',
+var m = new mm.Map('map-div',
   new wax.mm.connector(tilejson),
   new mm.Point(240,120),
   [new mm.MouseHandler(), new mm.TouchHandler()]);

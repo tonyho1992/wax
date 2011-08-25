@@ -15,13 +15,15 @@ default value of `new wax.tooltip()` - the default tooltip library that comes
 with wax. Any other library that implements the same interface
 (see `tooltips.js`) can be passed into the callbacks parameter.
 
-## Examples
+## Example
 
-{% highlight js %}
+{% highlight html %}
+<div id='map-div'></div>
+<script>
 wax.tilejson(
   'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
   function(tilejson) {
-    var m = new mm.Map('modestmaps-interaction',
+    var m = new mm.Map('map-div',
       new wax.mm.connector(tilejson),
       new mm.Point(240,120));
 
@@ -29,6 +31,7 @@ wax.tilejson(
     m.setCenterZoom(new mm.Location(39, -98), 1);
   }
 );
+</script>
 {% endhighlight %}
 
 ## API

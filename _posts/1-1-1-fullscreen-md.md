@@ -12,7 +12,11 @@ a bit ugly right now. Until Wax's theming improves, keep in mind that its
 styling, which is contained in `theme/controls.css`, is completely optional
 and you can replace it with your own.
 
-{% highlight js %}
+## Example
+
+{% highlight html %}
+<div id='map-div'></div>
+<script>
 var mm = com.modestmaps;
 var tilejson = {
   tilejson: '1.0.0',
@@ -20,12 +24,13 @@ var tilejson = {
   tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/world-light/{z}/{x}/{y}.png']
 };
 
-var m = new mm.Map('modestmaps-fullscreen',
+var m = new mm.Map('map-div',
   new wax.mm.connector(tilejson),
   new mm.Point(240,120));
 
 wax.mm.fullscreen(m, tilejson).appendTo(m.parent);
 m.setCenterZoom(new mm.Location(39, -98), 2);
+</script>
 {% endhighlight %}
 
 ## API
