@@ -1,6 +1,6 @@
 /*--------------------- Layout and Typography ----------------------------*/
 body {
-  font-family: 'Georgia', 'Book Antiqua', Palatino, FreeSerif, serif;
+  font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
   font-size: 15px;
   line-height: 22px;
   color: #252519;
@@ -16,11 +16,10 @@ p {
   margin: 0 0 15px 0;
 }
 h1, h2, h3, h4, h5, h6 {
-  margin: 0px 0 10px 0;
-  font-weight:normal;
+  margin: 0px 0 15px 0;
 }
   h1 {
-    margin-top: 20px;
+    margin-top: 40px;
   }
 #container {
   position: relative;
@@ -28,7 +27,7 @@ h1, h2, h3, h4, h5, h6 {
 #background {
   position: fixed;
   top: 0; left: 525px; right: 0; bottom: 0;
-  background: url(../manual/noise.png);
+  background: #f5f5ff;
   border-left: 1px solid #e5e5ee;
   z-index: -1;
 }
@@ -76,7 +75,7 @@ table td {
     max-width: 450px;
     min-width: 450px;
     min-height: 5px;
-    padding: 0px 25px 1px 20px;
+    padding: 10px 25px 1px 50px;
     overflow-x: hidden;
     vertical-align: top;
     text-align: left;
@@ -108,7 +107,7 @@ table td {
           opacity: 1;
         }
   td.code, th.code {
-    padding: 4px 15px 16px 25px;
+    padding: 14px 15px 16px 25px;
     width: 100%;
     vertical-align: top;
     background: #f5f5ff;

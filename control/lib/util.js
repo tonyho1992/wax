@@ -26,13 +26,17 @@ wax.util = {
                 el.style['-webkit-transform'] ||
                 el.style.MozTransform;
             if (style) {
-                if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
+                // TODO: this is straighforward, not fast.
+                var match = style.match(/translate\((.+)px, (.+)px\)/),
+                    match3d = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/),
+                    matchmatrix = style.match(/matrix3d\(([\-\d,\s]+)\)/);
+                if (match) {
                     top += parseInt(match[2], 10);
                     left += parseInt(match[1], 10);
-                } else if (match = style.match(/translate3d\((.+)px, (.+)px, (.+)px\)/)) {
+                } else if (match3d) {
                     top += parseInt(match[2], 10);
                     left += parseInt(match[1], 10);
-                } else if (match = style.match(/matrix3d\(([\-\d,\s]+)\)/)) {
+                } else if (matchMatrix) {
                     var pts = match[1].split(',');
                     top += parseInt(pts[13], 10);
                     left += parseInt(pts[12], 10);
@@ -120,7 +124,7 @@ wax.util = {
     eventoffset: function(e) {
         var posx = 0;
         var posy = 0;
-        if (!e) var e = window.event;
+        if (!e) e = window.event;
         if (e.pageX || e.pageY) {
             // Good browsers
             return {

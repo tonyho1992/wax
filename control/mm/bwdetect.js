@@ -10,6 +10,8 @@ wax.mm.bwdetect = function(map, options) {
         mm = com.modestmaps,
         bw = 1;
 
+    // This control overrides the Modest Maps `setProvider` function with its
+    // own function that changes the tile URLs to low-quality URLs.
     function setProvider(x) {
         // More or less detect the Wax version
         if (!(x.options && x.options.scheme)) mm.Map.prototype.setProvider.call(map, x);
