@@ -55,5 +55,9 @@ wax.GridInstance = function(grid_tile, formatter, options) {
         if (feature) return formatter.format(options, feature);
     };
 
+    instance.data = function() {
+        return grid_tile.data;
+    }
+
     return instance;
 };
