@@ -132,7 +132,7 @@ wax.mm.interaction = function(map, tilejson, options) {
         _downLock = true;
         _d = wax.util.eventoffset(e);
         if (e.type === 'mousedown') {
-            MM.addEvent(map.parent, 'mouseup', onUp);
+            MM.addEvent(document.body, 'mouseup', onUp);
 
         // Only track single-touches. Double-touches will not affect this
         // control
