@@ -9,14 +9,16 @@ wax.mm = wax.mm || {};
 // control. This function can be used chaining-style with other
 // chaining-style controls.
 wax.mm.fullscreen = function(map) {
-    var state = 1,
+    // true: fullscreen
+    // false: minimized
+    var state = false,
         fullscreen = {},
         a,
         smallSize;
 
     function click(e) {
         if (e) com.modestmaps.cancelEvent(e);
-        if (state = !state) {
+        if (state) {
             fullscreen.original();
         } else {
             fullscreen.full();
@@ -35,6 +37,7 @@ wax.mm.fullscreen = function(map) {
         return this;
     };
     fullscreen.full = function() {
+        if (state) { return; } else { state = true; }
         smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
         map.parent.className += ' wax-fullscreen-map';
         map.setSize(
@@ -42,6 +45,7 @@ wax.mm.fullscreen = function(map) {
             map.parent.offsetHeight);
     };
     fullscreen.original = function() {
+        if (!state) { return; } else { state = false; }
         map.parent.className = map.parent.className.replace('wax-fullscreen-map', '');
         map.setSize(
             smallSize[0],
