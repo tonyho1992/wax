@@ -42,6 +42,6 @@ wax.tilejson('http://a.tiles.mapbox.com/mapbox/1.0.0/world-light/layer.json',
   to an element given by 'element'.</dd>
   <dt>{% highlight js %}fullscreen.full(){% endhighlight %}</dt>
   <dd>Turn fullscreen mode on</dd>
-  <dt>{% highlight js %}fullscreen.origin(){% endhighlight %}</dt>
+  <dt>{% highlight js %}fullscreen.original(){% endhighlight %}</dt>
   <dd>Turn off fullscreen mode and return to the original size of the map</dd>
 </dl>
