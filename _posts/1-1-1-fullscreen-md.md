@@ -19,17 +19,13 @@ and you can replace it with your own.
 <div id='map-div'></div>
 <script>
 var mm = com.modestmaps;
-var tilejson = {
-  tilejson: '1.0.0',
-  scheme: 'tms',
-  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/world-light/{z}/{x}/{y}.png']
-};
+wax.tilejson('http://a.tiles.mapbox.com/mapbox/1.0.0/world-light/layer.json',
+  function(tilejson) {
+    var m = new mm.Map('map-div', new wax.mm.connector(tilejson));
 
-var m = new mm.Map('map-div',
-  new wax.mm.connector(tilejson));
-
-wax.mm.fullscreen(m, tilejson).appendTo(m.parent);
-m.setCenterZoom(new mm.Location(39, -98), 2);
+    wax.mm.fullscreen(m, tilejson).appendTo(m.parent);
+    m.setCenterZoom(new mm.Location(39, -98), 2);
+});
 </script>
 {% endhighlight %}
 </div>
@@ -44,4 +40,8 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
   <dd>Add the fullscreen control - a single element of the form
   {% highlight html %}<a class='wax-fullscreen'>fullscreen</a>{% endhighlight %}
   to an element given by 'element'.</dd>
+  <dt>{% highlight js %}fullscreen.full(){% endhighlight %}</dt>
+  <dd>Turn fullscreen mode on</dd>
+  <dt>{% highlight js %}fullscreen.origin(){% endhighlight %}</dt>
+  <dd>Turn off fullscreen mode and return to the original size of the map</dd>
 </dl>
