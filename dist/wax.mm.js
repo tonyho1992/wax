@@ -1,13 +1,270 @@
-/* wax - 3.0.5 - 1.0.4-361-g59892a1 */
+/* wax - 3.0.5 - 1.0.4-367-g12e3b2e */
 
 
-/*!
-  * Reqwest! A x-browser general purpose XHR connection manager
-  * copyright Dustin Diaz 2011
-  * https://github.com/ded/reqwest
-  * license MIT
-  */
-!function(window){function serial(a){var b=a.name;if(a.disabled||!b)return"";b=enc(b);switch(a.tagName.toLowerCase()){case"input":switch(a.type){case"reset":case"button":case"image":case"file":return"";case"checkbox":case"radio":return a.checked?b+"="+(a.value?enc(a.value):!0)+"&":"";default:return b+"="+(a.value?enc(a.value):"")+"&"}break;case"textarea":return b+"="+enc(a.value)+"&";case"select":return b+"="+enc(a.options[a.selectedIndex].value)+"&"}return""}function enc(a){return encodeURIComponent(a)}function reqwest(a,b){return new Reqwest(a,b)}function init(o,fn){function error(a){o.error&&o.error(a),complete(a)}function success(resp){o.timeout&&clearTimeout(self.timeout)&&(self.timeout=null);var r=resp.responseText,JSON;switch(type){case"json":resp=JSON?JSON.parse(r):eval("("+r+")");break;case"js":resp=eval(r);break;case"html":resp=r}fn(resp),o.success&&o.success(resp),complete(resp)}function complete(a){o.complete&&o.complete(a)}this.url=typeof o=="string"?o:o.url,this.timeout=null;var type=o.type||setType(this.url),self=this;fn=fn||function(){},o.timeout&&(this.timeout=setTimeout(function(){self.abort(),error()},o.timeout)),this.request=getRequest(o,success,error)}function setType(a){if(/\.json$/.test(a))return"json";if(/\.jsonp$/.test(a))return"jsonp";if(/\.js$/.test(a))return"js";if(/\.html?$/.test(a))return"html";if(/\.xml$/.test(a))return"xml";return"js"}function Reqwest(a,b){this.o=a,this.fn=b,init.apply(this,arguments)}function getRequest(a,b,c){if(a.type!="jsonp"){var f=xhr();f.open(a.method||"GET",typeof a=="string"?a:a.url,!0),setHeaders(f,a),f.onreadystatechange=readyState(f,b,c),a.before&&a.before(f),f.send(a.data||null);return f}var d=doc.createElement("script");window[getCallbackName(a)]=generalCallback,d.type="text/javascript",d.src=a.url,d.async=!0;var e=function(){a.success&&a.success(lastValue),lastValue=undefined,head.removeChild(d)};d.onload=e,d.onreadystatechange=function(){/^loaded|complete$/.test(d.readyState)&&e()},head.appendChild(d)}function generalCallback(a){lastValue=a}function getCallbackName(a){var b=a.jsonpCallback||"callback";if(a.url.slice(-(b.length+2))==b+"=?"){var c="reqwest_"+uniqid++;a.url=a.url.substr(0,a.url.length-1)+c;return c}var d=new RegExp(b+"=([\\w]+)");return a.url.match(d)[1]}function setHeaders(a,b){var c=b.headers||{};c.Accept=c.Accept||"text/javascript, text/html, application/xml, text/xml, */*",b.crossOrigin||(c["X-Requested-With"]=c["X-Requested-With"]||"XMLHttpRequest");if(b.data){c["Content-type"]=c["Content-type"]||"application/x-www-form-urlencoded";for(var d in c)c.hasOwnProperty(d)&&a.setRequestHeader(d,c[d],!1)}}function readyState(a,b,c){return function(){a&&a.readyState==4&&(twoHundo.test(a.status)?b(a):c(a))}}var twoHundo=/^20\d$/,doc=document,byTag="getElementsByTagName",head=doc[byTag]("head")[0],xhr="XMLHttpRequest"in window?function(){return new XMLHttpRequest}:function(){return new ActiveXObject("Microsoft.XMLHTTP")},uniqid=0,lastValue;Reqwest.prototype={abort:function(){this.request.abort()},retry:function(){init.call(this,this.o,this.fn)}},reqwest.serialize=function(a){var b=a[byTag]("input"),c=a[byTag]("select"),d=a[byTag]("textarea");return(v(b).chain().toArray().map(serial).value().join("")+v(c).chain().toArray().map(serial).value().join("")+v(d).chain().toArray().map(serial).value().join("")).replace(/&$/,"")},reqwest.serializeArray=function(a){for(var b=this.serialize(a).split("&"),c=0,d=b.length,e=[],f;c<d;c++)b[c]&&(f=b[c].split("="))&&e.push({name:f[0],value:f[1]});return e};var old=window.reqwest;reqwest.noConflict=function(){window.reqwest=old;return this},window.reqwest=reqwest}(this)
+!function (context, win) {
+
+  var twoHundo = /^20\d$/
+    , doc = document
+    , byTag = 'getElementsByTagName'
+    , contentType = 'Content-Type'
+    , head = doc[byTag]('head')[0]
+    , uniqid = 0
+    , lastValue // data stored by the most recent JSONP callback
+    , xhr = ('XMLHttpRequest' in win) ?
+        function () {
+          return new XMLHttpRequest()
+        } :
+        function () {
+          return new ActiveXObject('Microsoft.XMLHTTP')
+        }
+
+  function readyState(o, success, error) {
+    return function () {
+      if (o && o.readyState == 4) {
+        if (twoHundo.test(o.status)) {
+          success(o)
+        } else {
+          error(o)
+        }
+      }
+    }
+  }
+
+  function setHeaders(http, o) {
+    var headers = o.headers || {}
+    headers.Accept = headers.Accept || 'text/javascript, text/html, application/xml, text/xml, */*'
+
+    // breaks cross-origin requests with legacy browsers
+    if (!o.crossOrigin) {
+      headers['X-Requested-With'] = headers['X-Requested-With'] || 'XMLHttpRequest'
+    }
+
+    if (o.data) {
+      headers[contentType] = headers[contentType] || 'application/x-www-form-urlencoded'
+    }
+    for (var h in headers) {
+      headers.hasOwnProperty(h) && http.setRequestHeader(h, headers[h], false)
+    }
+  }
+
+  function getCallbackName(o) {
+    var callbackVar = o.jsonpCallback || "callback"
+    if (o.url.slice(-(callbackVar.length + 2)) == (callbackVar + "=?")) {
+      // Generate a guaranteed unique callback name
+      var callbackName = "reqwest_" + uniqid++
+
+      // Replace the ? in the URL with the generated name
+      o.url = o.url.substr(0, o.url.length - 1) + callbackName
+      return callbackName
+    } else {
+      // Find the supplied callback name
+      var regex = new RegExp(callbackVar + "=([\\w]+)")
+      return o.url.match(regex)[1]
+    }
+  }
+
+  // Store the data returned by the most recent callback
+  function generalCallback(data) {
+    lastValue = data
+  }
+
+  function getRequest(o, fn, err) {
+    function onload() {
+      // Call the user callback with the last value stored
+      // and clean up values and scripts.
+      o.success && o.success(lastValue)
+      lastValue = undefined
+      // head.removeChild(this);
+    }
+    if (o.type == 'jsonp') {
+      var script = doc.createElement('script')
+
+      // Add the global callback
+      win[getCallbackName(o)] = generalCallback;
+
+      // Setup our script element
+      script.type = 'text/javascript'
+      script.src = o.url
+      script.async = true
+
+      if (script.onload !== undefined) {
+          script.onload = onload
+      } else {
+          // onload for IE
+          script.onreadystatechange = function () {
+            /^loaded|complete$/.test(script.readyState) && onload()
+          }
+      }
+
+      // Add the script to the DOM head
+      head.appendChild(script)
+    } else {
+      var http = xhr()
+      http.open(o.method || 'GET', typeof o == 'string' ? o : o.url, true)
+      setHeaders(http, o)
+      http.onreadystatechange = readyState(http, fn, err)
+      o.before && o.before(http)
+      http.send(o.data || null)
+      return http
+    }
+  }
+
+  function Reqwest(o, fn) {
+    this.o = o
+    this.fn = fn
+    init.apply(this, arguments)
+  }
+
+  function setType(url) {
+    if (/\.json$/.test(url)) {
+      return 'json'
+    }
+    if (/\.jsonp$/.test(url)) {
+      return 'jsonp'
+    }
+    if (/\.js$/.test(url)) {
+      return 'js'
+    }
+    if (/\.html?$/.test(url)) {
+      return 'html'
+    }
+    if (/\.xml$/.test(url)) {
+      return 'xml'
+    }
+    return 'js'
+  }
+
+  function init(o, fn) {
+    this.url = typeof o == 'string' ? o : o.url
+    this.timeout = null
+    var type = o.type || setType(this.url), self = this
+    fn = fn || function () {}
+
+    if (o.timeout) {
+      this.timeout = setTimeout(function () {
+        self.abort()
+        error()
+      }, o.timeout)
+    }
+
+    function complete(resp) {
+      o.complete && o.complete(resp)
+    }
+
+    function success(resp) {
+      o.timeout && clearTimeout(self.timeout) && (self.timeout = null)
+      var r = resp.responseText
+
+      if (r) {
+        switch (type) {
+        case 'json':
+          resp = win.JSON ? win.JSON.parse(r) : eval('(' + r + ')')
+          break;
+        case 'js':
+          resp = eval(r)
+          break;
+        case 'html':
+          resp = r
+          break;
+        }
+      }
+
+      fn(resp)
+      o.success && o.success(resp)
+      complete(resp)
+    }
+
+    function error(resp) {
+      o.error && o.error(resp)
+      complete(resp)
+    }
+
+    this.request = getRequest(o, success, error)
+  }
+
+  Reqwest.prototype = {
+    abort: function () {
+      this.request.abort()
+    }
+
+  , retry: function () {
+      init.call(this, this.o, this.fn)
+    }
+  }
+
+  function reqwest(o, fn) {
+    return new Reqwest(o, fn)
+  }
+
+  function enc(v) {
+    return encodeURIComponent(v)
+  }
+
+  function serial(el) {
+    var n = el.name
+    // don't serialize elements that are disabled or without a name
+    if (el.disabled || !n) {
+      return ''
+    }
+    n = enc(n)
+    switch (el.tagName.toLowerCase()) {
+    case 'input':
+      switch (el.type) {
+      // silly wabbit
+      case 'reset':
+      case 'button':
+      case 'image':
+      case 'file':
+        return ''
+      case 'checkbox':
+      case 'radio':
+        return el.checked ? n + '=' + (el.value ? enc(el.value) : true) + '&' : ''
+      default: // text hidden password submit
+        return n + '=' + (el.value ? enc(el.value) : '') + '&'
+      }
+      break;
+    case 'textarea':
+      return n + '=' + enc(el.value) + '&'
+    case 'select':
+      // @todo refactor beyond basic single selected value case
+      return n + '=' + enc(el.options[el.selectedIndex].value) + '&'
+    }
+    return ''
+  }
+
+  reqwest.serialize = function (form) {
+    var fields = [form[byTag]('input')
+      , form[byTag]('select')
+      , form[byTag]('textarea')]
+      , serialized = []
+
+    for (var i = 0, l = fields.length; i < l; ++i) {
+      for (var j = 0, l2 = fields[i].length; j < l2; ++j) {
+        serialized.push(serial(fields[i][j]))
+      }
+    }
+    return serialized.join('').replace(/&$/, '')
+  }
+
+  reqwest.serializeArray = function (f) {
+    for (var pairs = this.serialize(f).split('&'), i = 0, l = pairs.length, r = [], o; i < l; i++) {
+      pairs[i] && (o = pairs[i].split('=')) && r.push({name: o[0], value: o[1]})
+    }
+    return r
+  }
+
+  var old = context.reqwest
+  reqwest.noConflict = function () {
+    context.reqwest = old
+    return this
+  }
+
+  // defined as extern for Closure Compilation
+  if (typeof module !== 'undefined')
+  module.exports = reqwest
+  context['reqwest'] = reqwest
+
+}(this, window)
 // Instantiate objects based on a JSON "record". The record must be a statement
 // array in the following form:
 //
@@ -585,6 +842,33 @@ wax.request = {
         }
     }
 };
+
+// wax.serialrequest = {
+//     queue: [],
+//     lock: false,
+//     run: function() {
+//         if (this.queue.length === 0) return;
+//         if (this.lock) window.setTimeout(this.run, 100);
+//         var head = this.queue.shift();
+//         var that = this;
+//         var headcb = function(err, data) {
+//             head[1](err, data);
+//             lock = false;
+//             that.run();
+//         };
+//         wax._request(head[0], headcb);
+//     },
+//     get: function(url, callback) {
+//         this.queue.push([url, callback]);
+//         this.run();
+//     }
+// };
+// 
+// // DIE DIE DIE DIE DIE DIE
+// if (navigator.appName == 'Microsoft Internet Explorer') {
+//     wax._request = wax.request;
+//     wax.request = wax.serialrequest;
+// }
 if (!wax) var wax = {};
 
 // A wrapper for reqwest jsonp to easily load TileJSON from a URL.
@@ -723,11 +1007,11 @@ wax.util = {
             top += el.offsetTop;
             left += el.offsetLeft;
 
-            // Add additional CSS3 transform handling.
-            // These features are used by Google Maps API V3.
             var style = el.style.transform ||
                 el.style['-webkit-transform'] ||
+                el.style['-ms-transform'] ||
                 el.style.MozTransform;
+
             if (style) {
                 if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
                     top += parseInt(match[2], 10);
@@ -739,6 +1023,9 @@ wax.util = {
                     var pts = match[1].split(',');
                     top += parseInt(pts[13], 10);
                     left += parseInt(pts[12], 10);
+                } else if (match = style.match(/matrix\(.+, .+, .+, .+, (.+), (.+)\)/)) {
+                    top += parseInt(match[2], 10);
+                    left += parseInt(match[1], 10);
                 }
             }
         };
@@ -1043,14 +1330,16 @@ wax.mm = wax.mm || {};
 // control. This function can be used chaining-style with other
 // chaining-style controls.
 wax.mm.fullscreen = function(map) {
-    var state = 1,
+    // true: fullscreen
+    // false: minimized
+    var state = false,
         fullscreen = {},
         a,
         smallSize;
 
     function click(e) {
         if (e) com.modestmaps.cancelEvent(e);
-        if (state = !state) {
+        if (state) {
             fullscreen.original();
         } else {
             fullscreen.full();
@@ -1069,6 +1358,7 @@ wax.mm.fullscreen = function(map) {
         return this;
     };
     fullscreen.full = function() {
+        if (state) { return; } else { state = true; }
         smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
         map.parent.className += ' wax-fullscreen-map';
         map.setSize(
@@ -1076,6 +1366,7 @@ wax.mm.fullscreen = function(map) {
             map.parent.offsetHeight);
     };
     fullscreen.original = function() {
+        if (!state) { return; } else { state = false; }
         map.parent.className = map.parent.className.replace('wax-fullscreen-map', '');
         map.setSize(
             smallSize[0],
@@ -1359,7 +1650,7 @@ wax.mm.interaction = function(map, tilejson, options) {
         _downLock = true;
         _d = wax.util.eventoffset(e);
         if (e.type === 'mousedown') {
-            MM.addEvent(map.parent, 'mouseup', onUp);
+            MM.addEvent(document.body, 'mouseup', onUp);
 
         // Only track single-touches. Double-touches will not affect this
         // control

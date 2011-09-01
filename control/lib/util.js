@@ -20,11 +20,11 @@ wax.util = {
             top += el.offsetTop;
             left += el.offsetLeft;
 
-            // Add additional CSS3 transform handling.
-            // These features are used by Google Maps API V3.
             var style = el.style.transform ||
                 el.style['-webkit-transform'] ||
+                el.style['-ms-transform'] ||
                 el.style.MozTransform;
+
             if (style) {
                 if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
                     top += parseInt(match[2], 10);
@@ -36,6 +36,9 @@ wax.util = {
                     var pts = match[1].split(',');
                     top += parseInt(pts[13], 10);
                     left += parseInt(pts[12], 10);
+                } else if (match = style.match(/matrix\(.+, .+, .+, .+, (.+), (.+)\)/)) {
+                    top += parseInt(match[2], 10);
+                    left += parseInt(match[1], 10);
                 }
             }
         };
