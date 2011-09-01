@@ -1,4 +1,4 @@
-/* wax - 3.0.5 - 1.0.4-367-g12e3b2e */
+/* wax - 3.0.5 - 1.0.4-368-gd2aa277 */
 
 
 !function (context, win) {
@@ -74,7 +74,7 @@
       // and clean up values and scripts.
       o.success && o.success(lastValue)
       lastValue = undefined
-      // head.removeChild(this);
+      head.removeChild(script);
     }
     if (o.type == 'jsonp') {
       var script = doc.createElement('script')
@@ -842,33 +842,6 @@ wax.request = {
         }
     }
 };
-
-// wax.serialrequest = {
-//     queue: [],
-//     lock: false,
-//     run: function() {
-//         if (this.queue.length === 0) return;
-//         if (this.lock) window.setTimeout(this.run, 100);
-//         var head = this.queue.shift();
-//         var that = this;
-//         var headcb = function(err, data) {
-//             head[1](err, data);
-//             lock = false;
-//             that.run();
-//         };
-//         wax._request(head[0], headcb);
-//     },
-//     get: function(url, callback) {
-//         this.queue.push([url, callback]);
-//         this.run();
-//     }
-// };
-// 
-// // DIE DIE DIE DIE DIE DIE
-// if (navigator.appName == 'Microsoft Internet Explorer') {
-//     wax._request = wax.request;
-//     wax.request = wax.serialrequest;
-// }
 if (!wax) var wax = {};
 
 // A wrapper for reqwest jsonp to easily load TileJSON from a URL.
