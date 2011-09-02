@@ -1,4 +1,4 @@
-/* wax - 3.0.5 - 1.0.4-368-gd2aa277 */
+/* wax - 3.0.5 - 1.0.4-369-gff70627 */
 
 
 !function (context, win) {
@@ -981,9 +981,10 @@ wax.util = {
             left += el.offsetLeft;
 
             var style = el.style.transform ||
-                el.style['-webkit-transform'] ||
-                el.style['-ms-transform'] ||
-                el.style.MozTransform;
+                el.style.WebkitTransform ||
+                el.style.OTransform ||
+                el.style.MozTransform ||
+                el.style.msTransform;
 
             if (style) {
                 if (match = style.match(/translate\((.+)px, (.+)px\)/)) {

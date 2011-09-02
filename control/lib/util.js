@@ -21,9 +21,10 @@ wax.util = {
             left += el.offsetLeft;
 
             var style = el.style.transform ||
-                el.style['-webkit-transform'] ||
-                el.style['-ms-transform'] ||
-                el.style.MozTransform;
+                el.style.WebkitTransform ||
+                el.style.OTransform ||
+                el.style.MozTransform ||
+                el.style.msTransform;
 
             if (style) {
                 if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
