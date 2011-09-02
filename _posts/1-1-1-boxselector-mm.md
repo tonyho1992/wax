@@ -49,8 +49,15 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
   <dl>
     <dt>callback</dt>
     <dd>A function that will be called with a single argument
-    <code>coords</coords>, containing the extent of a selection, as represented
+    <code>coords</code>, containing the extent of a selection, as represented
     by an array with two elements of type com.modestmaps.Location.
     </dd>
   </dl>
+  <dt>{% highlight js %}var extent = boxselector.extent(){% endhighlight %}</dt>
+  <dd>Get the current extent of the boxselector control, in the same form
+  as would be passed to the callback.</dd>
+  <dt>{% highlight js %}boxselector.extent([com.modestmaps.Location, com.modestmaps.Location]){% endhighlight %}</dt>
+  <dd>Set the extent of the boxselector with a two-element array of
+  `com.modestmaps.Location`. The boxselector control will internally fix
+  their order to be top-left, bottom-right, if they are unordered.</dd>
 </dl>
