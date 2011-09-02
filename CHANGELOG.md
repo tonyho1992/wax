@@ -1,5 +1,16 @@
 ## Changelog
 
+### 3.0.6
+
+* Update [reqwest](https://github.com/ded/reqwest) to 0.2.7 for IE9 compatibility.
+* Parse `matrix()` CSS transforms for IE9 compatibility.
+* Fix to `wax.mm.interaction()` on dragging outside of the map.
+
+### 3.0.5
+
+* `bwdetect` refactored to be compatible with Google Maps.
+* Tests for `bwdetect`, `gridFeature`.
+
 ### 3.0.4
 
 * Added `bwdetect` control for Modest Maps.
