@@ -1,4 +1,4 @@
-/* wax - 3.0.6 - 1.0.4-372-g3e9b147 */
+/* wax - 3.0.6 - 1.0.4-374-g42f5e32 */
 
 
 /*!
@@ -950,19 +950,17 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     function mouseUp(e) {
         var point = getMousePoint(e),
             l1 = map.pointLocation(point),
-            l2 = map.pointLocation(mouseDownPoint),
-            // Format coordinates like mm.map.getExtent().
-            extent = [
-                new MM.Location(
-                    Math.max(l1.lat, l2.lat),
-                    Math.min(l1.lon, l2.lon)),
-                new MM.Location(
-                    Math.min(l1.lat, l2.lat),
-                    Math.max(l1.lon, l2.lon))
-            ];
+            l2 = map.pointLocation(mouseDownPoint);
 
-        box = [l1, l2];
-        callback(extent);
+        // Format coordinates like mm.map.getExtent().
+        boxselector.extent([
+            new MM.Location(
+                Math.max(l1.lat, l2.lat),
+                Math.min(l1.lon, l2.lon)),
+            new MM.Location(
+                Math.min(l1.lat, l2.lat),
+                Math.max(l1.lon, l2.lon))
+        ]);
 
         MM.removeEvent(map.parent, 'mousemove', mouseMove);
         MM.removeEvent(map.parent, 'mouseup', mouseUp);
@@ -972,8 +970,8 @@ wax.mm.boxselector = function(map, tilejson, opts) {
 
     function drawbox(map, e) {
         if (!boxDiv || !box) return;
-        var br = map.locationPoint(box[0]),
-            tl = map.locationPoint(box[1]);
+        var br = map.locationPoint(box[1]),
+            tl = map.locationPoint(box[0]);
 
         boxDiv.style.display = 'block';
         boxDiv.style.height = 'auto';
@@ -983,6 +981,21 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         boxDiv.style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
         boxDiv.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
     }
+
+    boxselector.extent = function(x) {
+        if (!x) return box;
+
+        box = [
+            new MM.Location(
+                Math.max(x[0].lat, x[1].lat),
+                Math.min(x[0].lon, x[1].lon)),
+            new MM.Location(
+                Math.min(x[0].lat, x[1].lat),
+                Math.max(x[0].lon, x[1].lon))
+        ];
+
+        callback(box);
+    };
 
     boxselector.add = function(map) {
         boxDiv = boxDiv || document.createElement('div');
