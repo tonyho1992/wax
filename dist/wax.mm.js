@@ -1,4 +1,4 @@
-/* wax - 3.0.6 - 1.0.4-374-g42f5e32 */
+/* wax - 3.0.6 - 1.0.4-375-ge2f0703 */
 
 
 /*!
@@ -1765,7 +1765,7 @@ wax.mm.pointselector = function(map, tilejson, opts) {
                     var l = locations[i];
                     return function(e) {
                         MM.removeEvent(map.parent, 'mouseup', mouseUp);
-                        pointselector.deletePoint(l, e);
+                        pointselector.deleteLocation(l, e);
                     };
                 })());
                 map.parent.appendChild(locations[i].pointDiv);
@@ -1803,12 +1803,21 @@ wax.mm.pointselector = function(map, tilejson, opts) {
 
     pointselector.add = function(map) {
         MM.addEvent(map.parent, 'mousedown', mouseDown);
-        map.addCallback('drawn', drawPoints());
+        map.addCallback('drawn', drawPoints);
         return this;
     };
 
-    pointselector.deletePoint = function(location, e) {
-        if (confirm('Delete this point?')) {
+    pointselector.remove = function(map) {
+        MM.removeEvent(map.parent, 'mousedown', mouseDown);
+        map.removeCallback('drawn', drawPoints);
+        for (var i = 0; i < locations.length; i++) {
+            pointselector.deleteLocation(locations[i]);
+        }
+        return this;
+    };
+
+    pointselector.deleteLocation = function(location, e) {
+        if (!e || confirm('Delete this point?')) {
             location.pointDiv.parentNode.removeChild(location.pointDiv);
             locations.splice(wax.util.indexOf(locations, location), 1);
             callback(cleanLocations(locations));
