@@ -1,4 +1,4 @@
-/* wax - 3.0.6 - 1.0.4-371-g4cb599d */
+/* wax - 3.0.6 - 1.0.4-372-g3e9b147 */
 
 
 /*!
@@ -1395,7 +1395,7 @@ wax.mm.interaction = function(map, tilejson, options) {
     function onUp(e) {
         var pos = wax.util.eventoffset(e);
 
-        MM.removeEvent(map.parent, 'mouseup', onUp);
+        MM.removeEvent(document.body, 'mouseup', onUp);
         if (map.parent.ontouchend) {
             MM.removeEvent(map.parent, 'touchend', onUp);
             MM.removeEvent(map.parent, 'touchmove', _touchCancel);
