@@ -14,6 +14,7 @@ calls a callback with the current map data, and also exposes an API,
 <div class='live'>
 {% highlight html %}
 <div id='map-div'></div>
+<div id='pointselector-text'></div>
 <script>
 var mm = com.modestmaps;
 wax.tilejson(
