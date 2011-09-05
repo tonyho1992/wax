@@ -1,4 +1,4 @@
-/* wax - 3.0.6 - 1.0.4-375-ge2f0703 */
+/* wax - 3.0.6 - 1.0.4-376-g30842d3 */
 
 
 /*!
@@ -614,7 +614,7 @@ wax.tooltip.prototype.isPopup = function(el) {
 // Get the active tooltip for a layer or create a new one if no tooltip exists.
 // Hide any tooltips on layers underneath this one.
 wax.tooltip.prototype.getTooltip = function(feature, context, index, evt) {
-    tooltip = document.createElement('div');
+    var tooltip = document.createElement('div');
     tooltip.className = 'wax-tooltip wax-tooltip-' + index;
     tooltip.innerHTML = feature;
     context.appendChild(tooltip);
