@@ -97,7 +97,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         boxDiv.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
     }
 
-    boxselector.extent = function(x) {
+    boxselector.extent = function(x, silent) {
         if (!x) return box;
 
         box = [
@@ -109,7 +109,9 @@ wax.mm.boxselector = function(map, tilejson, opts) {
                 Math.max(x[0].lon, x[1].lon))
         ];
 
-        callback(box);
+        drawbox(map);
+
+        if (!silent) callback(box);
     };
 
     boxselector.add = function(map) {
