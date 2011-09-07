@@ -117,6 +117,10 @@ wax.mm.pointselector = function(map, tilejson, opts) {
         callback(cleanLocations(locations));
     };
 
+    pointselector.locations = function(x) {
+        return locations;
+    };
+
     pointselector.add = function(map) {
         MM.addEvent(map.parent, 'mousedown', mouseDown);
         map.addCallback('drawn', drawPoints);
@@ -126,7 +130,7 @@ wax.mm.pointselector = function(map, tilejson, opts) {
     pointselector.remove = function(map) {
         MM.removeEvent(map.parent, 'mousedown', mouseDown);
         map.removeCallback('drawn', drawPoints);
-        for (var i = 0; i < locations.length; i++) {
+        for (var i = locations.length - 1; i > -1; i--) {
             pointselector.deleteLocation(locations[i]);
         }
         return this;

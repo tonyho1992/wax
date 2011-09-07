@@ -44,6 +44,11 @@ describe('pointselector', function() {
     });
 
     it('can be removed', function() {
+        for (var i = 0; i < 10; i++) {
+            var l = new com.modestmaps.Location(i, i);
+            pointselector.addLocation(l);
+        }
         pointselector.remove(map);
+        expect(pointselector.locations().length).toEqual(0);
     });
 });
