@@ -16,12 +16,12 @@ and then you can add it to a map by chaining `.appendTo(map.parent)`.
 var mm = com.modestmaps;
 
 wax.tilejson(
-  'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
+  'http://tiles.mapbox.com/mapbox/api/Tileset/haiti-terrain',
   function(tilejson) {
     var m = new mm.Map('map-div',
       new wax.mm.connector(tilejson));
     wax.mm.attribution(m, tilejson).appendTo(m.parent);
-    m.setCenterZoom(new mm.Location(39, -98), 2);
+    m.setCenterZoom(new mm.Location(tilejson.center[1], tilejson.center[0]), 10);
   }
 );
 </script>
