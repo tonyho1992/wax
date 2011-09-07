@@ -113,7 +113,7 @@ wax.leaf.interaction = function(map, tilejson, options) {
                                 if (feature && this.feature !== feature) {
                                     this.feature = feature;
                                     this.callbacks.out(map._container);
-                                    this.callbacks.over(feature, map._container, 0, evt);
+                                    this.callbacks.over(feature, map._container);
                                 } else if (!feature) {
                                     this.feature = null;
                                     this.callbacks.out(map._container);

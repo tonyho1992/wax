@@ -100,13 +100,14 @@ wax.mm.interaction = function(map, tilejson, options) {
 
         if (tile) waxGM.getGrid(tile.src, function(err, g) {
             if (err || !g) return;
-            if (feature = g.tileFeature(pos.x, pos.y, tile, {
+            feature = g.tileFeature(pos.x, pos.y, tile, {
                 format: 'teaser'
-            })) {
+            });
+            if (feature) {
                 if (feature && _af !== feature) {
                     _af = feature;
                     callbacks.out(map.parent);
-                    callbacks.over(feature, map.parent, 0, e);
+                    callbacks.over(feature, map.parent);
                 } else if (!feature) {
                     _af = null;
                     callbacks.out(map.parent);
@@ -191,9 +192,10 @@ wax.mm.interaction = function(map, tilejson, options) {
 
         if (tile) waxGM.getGrid(tile.src, function(err, g) {
             for (var i = 0; g && i < clickAction.length; i++) {
-                if (feature = g.tileFeature(pos.x, pos.y, tile, {
+                feature = g.tileFeature(pos.x, pos.y, tile, {
                     format: clickAction[i]
-                })) {
+                });
+                if (feature) {
                     switch (clickAction[i]) {
                         case 'full':
                         // clickAction can be teaser in touch interaction

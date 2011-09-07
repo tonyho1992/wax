@@ -170,7 +170,7 @@ wax.ol.Interaction =
                         if (feature && that.feature[t] !== feature) {
                             that.feature[t] = feature;
                             that.callbacks.out(tiles[t].layer.map.div);
-                            that.callbacks.over(feature, tiles[t].layer.map.div, t, evt);
+                            that.callbacks.over(feature, tiles[t].layer.map.div);
                         } else if (!feature) {
                             that.feature[t] = null;
                             that.callbacks.out(tiles[t].layer.map.div);
