@@ -56,8 +56,12 @@ m.setCenterZoom(new mm.Location(39, -98), 2);
   <dt>{% highlight js %}var extent = boxselector.extent(){% endhighlight %}</dt>
   <dd>Get the current extent of the boxselector control, in the same form
   as would be passed to the callback.</dd>
-  <dt>{% highlight js %}boxselector.extent([com.modestmaps.Location, com.modestmaps.Location]){% endhighlight %}</dt>
+  <dt>{% highlight js %}boxselector.extent([com.modestmaps.Location, com.modestmaps.Location], [silent]){% endhighlight %}</dt>
   <dd>Set the extent of the boxselector with a two-element array of
   `com.modestmaps.Location`. The boxselector control will internally fix
-  their order to be top-left, bottom-right, if they are unordered.</dd>
+  their order to be top-left, bottom-right, if they are unordered.<br />
+  Since Wax 3.0.7, this control also accepts a `silent` option - which if
+  true means that boxselector's callback will not be called upon this
+  setting of the extent.
+  </dd>
 </dl>

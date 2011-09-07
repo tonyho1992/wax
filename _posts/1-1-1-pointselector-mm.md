@@ -60,4 +60,6 @@ wax.tilejson(
   <strong>Changed in 3.0.7: was deletePoint() before.</strong></dd>
   <dt>{% highlight js %}pointseletor.remove(map){% endhighlight %}</dt>
   <dd>Unbind the pointselector from the map and remove all of its points and events.</dd>
+  <dt>{% highlight js %}pointselector.locations(){% endhighlight %}</dt>
+  <dd>An accessor method for the pointselector's array of locations.</dd>
 </dl>
