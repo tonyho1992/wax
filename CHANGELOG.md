@@ -1,5 +1,13 @@
 ## Changelog
 
+### 3.0.7
+
+* Fixes `pointselector.remove()`
+* Adds `pointselector.locations()`
+* Fixes Google Maps connector - thanks @tokumine
+* Fixes and adds silent option to `boxselector.extent()`
+* Fixes `wax.tooltip` var error in IE8
+
 ### 3.0.6
 
 * Update [reqwest](https://github.com/ded/reqwest) to 0.2.7 for IE9 compatibility.
