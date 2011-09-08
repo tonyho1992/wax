@@ -1,5 +1,9 @@
 ## Changelog
 
+### 3.0.8
+
+* Fixed `wax.mm.interaction()` click callback
+
 ### 3.0.7
 
 * Fixes `pointselector.remove()`

@@ -1,4 +1,4 @@
-/* wax - 3.0.7 - 1.0.4-386-g25b1575 */
+/* wax - 3.0.7 - 1.0.4-387-ga887ab6 */
 
 
 /*!
@@ -1419,26 +1419,26 @@ wax.mm.interaction = function(map, tilejson, options) {
 
     function onUp(e) {
         var pos = wax.util.eventoffset(e);
+        _downLock = false;
 
         MM.removeEvent(document.body, 'mouseup', onUp);
+
         if (map.parent.ontouchend) {
             MM.removeEvent(map.parent, 'touchend', onUp);
             MM.removeEvent(map.parent, 'touchmove', _touchCancel);
         }
 
-        _downLock = false;
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
             click(e, _d);
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
             Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
             // Contain the event data in a closure.
-            _clickTimeout = window.setTimeout((function(pos) {
-                return function(e) {
+            _clickTimeout = window.setTimeout(
+                function() {
                     _clickTimeout = null;
                     click(e, pos);
-                };
-            })(pos), 300);
+                }, 300);
         }
         return onUp;
     }
