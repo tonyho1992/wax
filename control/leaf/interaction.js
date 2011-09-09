@@ -172,7 +172,7 @@ wax.leaf.interaction = function(map, tilejson, options) {
                             if (feature) {
                                 switch (this.clickAction) {
                                     case 'full':
-                                        this.callbacks.click(feature, this.parent, 0, evt);
+                                        this.callbacks.click(feature, map._container);
                                         break;
                                     case 'location':
                                         window.location = feature;

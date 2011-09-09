@@ -1,4 +1,4 @@
-/* wax - 3.0.7 - 1.0.4-387-ga887ab6 */
+/* wax - 3.0.7 - 1.0.4-388-gbb165b0 */
 
 
 /*!
@@ -1037,7 +1037,7 @@ wax.leaf.interaction = function(map, tilejson, options) {
                             if (feature) {
                                 switch (this.clickAction) {
                                     case 'full':
-                                        this.callbacks.click(feature, this.parent, 0, evt);
+                                        this.callbacks.click(feature, map._container);
                                         break;
                                     case 'location':
                                         window.location = feature;
