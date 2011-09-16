@@ -16,9 +16,6 @@ wax.g.interaction = function(map, tilejson, options) {
     // cache of grid information and provide friendly utility methods
     // that return `GridTile` objects instead of raw data.
     var interaction = {
-        modifyingEvents: ['dragstart', 'dragend', 'drag', 'zoom_changed',
-            'resize', 'center_changed', 'bounds_changed'],
-
         waxGM: new wax.GridManager(tilejson),
 
         // This requires wax.Tooltip or similar
@@ -28,13 +25,12 @@ wax.g.interaction = function(map, tilejson, options) {
 
         // Attach listeners to the map
         add: function() {
-            for (var i = 0; i < this.modifyingEvents.length; i++) {
-                google.maps.event.addListener(
-                    map,
-                    this.modifyingEvents[i],
-                    wax.util.bind(this.clearTileGrid, this)
-                );
-            }
+            google.maps.event.addListener(map, 'tileloaded',
+                wax.util.bind(this.clearTileGrid, this));
+
+            google.maps.event.addListener(map, 'idle',
+                wax.util.bind(this.clearTileGrid, this));
+
             google.maps.event.addListener(map, 'mousemove', this.onMove());
             google.maps.event.addListener(map, 'click', this.click());
             return this;

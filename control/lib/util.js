@@ -113,10 +113,10 @@ wax.util = {
     },
     // From underscore: reimplement the ECMA5 `Object.keys()` method
     keys: Object.keys || function(obj) {
-        var hasOwnProperty = Object.prototype.hasOwnProperty;
+        var ho = Object.prototype.hasOwnProperty;
         if (obj !== Object(obj)) throw new TypeError('Invalid object');
         var keys = [];
-        for (var key in obj) if (hasOwnProperty.call(obj, key)) keys[keys.length] = key;
+        for (var key in obj) if (ho.call(obj, key)) keys[keys.length] = key;
         return keys;
     },
     // From quirksmode: normalize the offset of an event from the top-left
