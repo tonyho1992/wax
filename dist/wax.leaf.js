@@ -1,4 +1,4 @@
-/* wax - 3.0.7 - 1.0.4-392-g83aa4b8 */
+/* wax - 3.0.7 - 1.0.4-395-gbd996fc */
 
 
 /*!
@@ -573,7 +573,7 @@ wax.request = {
             var that = this;
             this.locks[url] = true;
             reqwest({
-                url: url + '?callback=grid',
+                url: wax.util.addUrlData(url, 'callback=grid'),
                 type: 'jsonp',
                 jsonpCallback: 'callback',
                 success: function(data) {
@@ -599,7 +599,7 @@ if (!wax) var wax = {};
 // A wrapper for reqwest jsonp to easily load TileJSON from a URL.
 wax.tilejson = function(url, callback) {
     reqwest({
-        url: url + '?callback=grid',
+        url: wax.util.addUrlData(url, 'callback=grid'),
         type: 'jsonp',
         jsonpCallback: 'callback',
         success: callback,
@@ -789,7 +789,7 @@ wax.util = {
             parseInt(htmlComputed.marginTop, 10) &&
             !isNaN(parseInt(htmlComputed.marginTop, 10))) {
             top += parseInt(htmlComputed.marginTop, 10);
-        left += parseInt(htmlComputed.marginLeft, 10);
+            left += parseInt(htmlComputed.marginLeft, 10);
         }
 
         return {
@@ -810,14 +810,14 @@ wax.util = {
     // Returns a version of a function that always has the second parameter,
     // `obj`, as `this`.
     bind: function(func, obj) {
-      var args = Array.prototype.slice.call(arguments, 2);
-      return function() {
-        return func.apply(obj, args.concat(Array.prototype.slice.call(arguments)));
-      };
+        var args = Array.prototype.slice.call(arguments, 2);
+        return function() {
+            return func.apply(obj, args.concat(Array.prototype.slice.call(arguments)));
+        };
     },
     // From underscore
     isString: function(obj) {
-      return !!(obj === '' || (obj && obj.charCodeAt && obj.substr));
+        return !!(obj === '' || (obj && obj.charCodeAt && obj.substr));
     },
     // IE doesn't have indexOf
     indexOf: function(array, item) {
@@ -860,9 +860,9 @@ wax.util = {
             var leftMargin = parseInt(htmlComputed.marginLeft, 10) || 0;
             return {
                 x: e.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
-                  (doc && doc.clientLeft || body && body.clientLeft || 0) + leftMargin,
+                    (doc && doc.clientLeft || body && body.clientLeft || 0) + leftMargin,
                 y: e.clientY + (doc && doc.scrollTop  || body && body.scrollTop  || 0) -
-                  (doc && doc.clientTop  || body && body.clientTop  || 0) + topMargin
+                    (doc && doc.clientTop  || body && body.clientTop  || 0) + topMargin
             };
         } else if (e.touches && e.touches.length === 1) {
             // Touch browsers
@@ -871,6 +871,38 @@ wax.util = {
                 y: e.touches[0].pageY
             };
         }
+    },
+    // parseUri 1.2.2
+    // Steven Levithan <stevenlevithan.com>
+    parseUri: function(str) {
+        var o = {
+            strictMode: false,
+            key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
+            q:   {
+                name:   "queryKey",
+                parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+            },
+            parser: {
+                strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+                loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+            }
+        },
+            m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
+            uri = {},
+            i   = 14;
+
+        while (i--) uri[o.key[i]] = m[i] || "";
+
+        uri[o.q.name] = {};
+        uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
+            if ($1) uri[o.q.name][$1] = $2;
+        });
+        return uri;
+    },
+    // appends callback onto urls regardless of existing query params
+    addUrlData: function(url, data) {
+        url += (this.parseUri(url).query) ? '&' : '?';
+        return url += data;
     }
 };
 wax = wax || {};
