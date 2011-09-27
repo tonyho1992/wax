@@ -9,9 +9,12 @@ wax.mm.mobile = function(map, tilejson, opts) {
     // Inspired by Leaflet
     var mm = com.modestmaps,
         ua = navigator.userAgent.toLowerCase(),
-        isWebkit = ua.indexOf("webkit") != -1,
-        isMobile = ua.indexOf("mobile") != -1,
+        isWebkit = ua.indexOf('webkit') != -1,
+        isMobile = ua.indexOf('mobile') != -1,
         mobileWebkit = isMobile && isWebkit;
+
+    // FIXME: testing
+    // mobileWebkit = true;
 
     var defaultOverlayDraw = function(div) {
         var canvas = document.createElement('canvas');
@@ -20,30 +23,58 @@ wax.mm.mobile = function(map, tilejson, opts) {
             w2 = width / 2,
             h2 = height / 2,
             // Make the size of the arrow nicely proportional to the map
-            size = Math.min(width, height) / 4;
+            size = Math.min(width, height) / 4,
+            ctx = canvas.getContext('2d');
 
-        var ctx = canvas.getContext('2d');
         canvas.setAttribute('width', width);
         canvas.setAttribute('height', height);
-        ctx.globalAlpha = 0.5;
+        ctx.globalAlpha = 0.7;
         // Draw a nice gradient to signal that the map is inaccessible
         var inactive = ctx.createLinearGradient(0, 0, 300, 225);
-        inactive.addColorStop(0, "black");
-        inactive.addColorStop(1, "rgb(200, 200, 200)");
+        inactive.addColorStop(0, 'black');
+        inactive.addColorStop(1, 'rgb(144, 144, 144)');
         ctx.fillStyle = inactive;
         ctx.fillRect(0, 0, width, height);
 
-        ctx.fillStyle = "rgb(255, 255, 255)";
+        ctx.fillStyle = 'rgb(255, 255, 255)';
+        ctx.strokeStyle = 'rgb(255, 255, 255)';
+        ctx.lineWidth = 5;
         ctx.beginPath();
-        ctx.moveTo(w2 - size * 0.6, h2 - size); // give the (x,y) coordinates
-        ctx.lineTo(w2 - size * 0.6, h2 + size);
-        ctx.lineTo(w2 + size * 0.6, h2);
+        ctx.moveTo(w2 - size * 0.8, h2 - size); // give the (x,y) coordinates
+        ctx.lineTo(w2 - size * 0.8, h2 + size);
+        ctx.lineTo(w2 + size * 0.8, h2);
         ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(
+            w2 - size * 0.3,
+            h2,
+            size * 1.3,
+            size * 1.3,
+            Math.PI * 2,
+            true);
+        ctx.closePath();
+        ctx.stroke();
 
         // Done! Now fill the shape, and draw the stroke.
         // Note: your shape will not be visible until you call any of the two methods.
         div.appendChild(canvas);
     };
+
+    // Adapted from code by Mislav Marohnić: http://gist.github.com/355625
+    function getDeviceScale() {
+        var deviceWidth, landscape = Math.abs(window.orientation) == 90;
+
+        if (landscape) {
+            // iPhone OS < 3.2 reports a screen height of 396px
+            deviceWidth = Math.max(480, screen.height);
+        } else {
+            deviceWidth = screen.width;
+        }
+
+        // return window.innerWidth / deviceWidth;
+        return deviceWidth / window.innerWidth;
+    }
 
     var defaultBackDraw = function(div) {
         div.style.position = 'absolute';
@@ -57,11 +88,11 @@ wax.mm.mobile = function(map, tilejson, opts) {
 
         var ctx = canvas.getContext('2d');
         ctx.globalAlpha = 1;
-        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
         ctx.fillRect(0, 0, div.offsetWidth, div.offsetHeight);
-        ctx.fillStyle = "rgb(0, 0, 0)";
-        ctx.font = "bold 20px sans-serif";
-        ctx.fillText("back", 20, 30);
+        ctx.fillStyle = 'rgb(0, 0, 0)';
+        ctx.font = 'bold 20px sans-serif';
+        ctx.fillText('back', 20, 30);
         div.appendChild(canvas);
     };
 
@@ -87,6 +118,7 @@ wax.mm.mobile = function(map, tilejson, opts) {
         oldBody,
         standIn,
         meta,
+        oldscale,
         overlayDraw = opts.overlayDraw || defaultOverlayDraw,
         backDraw = opts.backDraw || defaultBackDraw;
         bodyDraw = opts.bodyDraw || function() {};
@@ -119,21 +151,26 @@ wax.mm.mobile = function(map, tilejson, opts) {
 
                 mm.addEvent(overlayDiv, 'touchstart', this.toTouch);
                 mm.addEvent(backDiv, 'touchstart', this.toPage);
+
             }
             return this;
         },
-        // Enter "touch mode"
+        // Enter 'touch mode'
         toTouch: function() {
             // Enter a new body
             map.parent.parentNode.replaceChild(standIn, map.parent);
             newBody.insertBefore(map.parent, backDiv);
             document.body = newBody;
 
+            oldscale = getDeviceScale();
+            document.head.appendChild(meta);
+
             bodyDraw(newBody);
             backDraw(backDiv);
-            meta.setAttribute('content',
-                'initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0');
-            document.head.appendChild(meta);
+            meta.setAttribute(
+                'content',
+                'initial-scale=1.0,' +
+                'minimum-scale=0, maximum-scale=10');
             map._smallSize = [map.parent.clientWidth, map.parent.clientHeight];
             maximizeElement(map.parent);
             map.setSize(
@@ -148,6 +185,11 @@ wax.mm.mobile = function(map, tilejson, opts) {
             // scale of the page. Anything to not use the meta-element
             // would be a bit of a hack.
             document.body = oldBody;
+
+            meta.setAttribute(
+                'content',
+                'user-scalable=yes, width=device-width,' +
+                'initial-scale=' + oldscale);
             standIn.parentNode.replaceChild(map.parent, standIn);
             minimizeElement(map.parent);
             map.setSize(map._smallSize[0], map._smallSize[1]);
