@@ -107,7 +107,7 @@ wax.mm.interaction = function(map, tilejson, options) {
                 if (feature && _af !== feature) {
                     _af = feature;
                     callbacks.out(map.parent);
-                    callbacks.over(feature, map.parent);
+                    callbacks.over(feature, map.parent, e);
                 } else if (!feature) {
                     _af = null;
                     callbacks.out(map.parent);
@@ -200,7 +200,7 @@ wax.mm.interaction = function(map, tilejson, options) {
                         case 'full':
                         // clickAction can be teaser in touch interaction
                         case 'teaser':
-                            return callbacks.click(feature, map.parent, 0, e);
+                            return callbacks.click(feature, map.parent, e);
                         case 'location':
                             return clickHandler(feature);
                     }

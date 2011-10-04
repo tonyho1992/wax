@@ -36,15 +36,6 @@ wax.mm.mobile = function(map, tilejson, opts) {
         ctx.fillStyle = inactive;
         ctx.fillRect(0, 0, width, height);
 
-        ctx.fillStyle = 'rgb(255, 255, 255)';
-        ctx.strokeStyle = 'rgb(255, 255, 255)';
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(w2 - size * 0.8, h2 - size); // give the (x,y) coordinates
-        ctx.lineTo(w2 - size * 0.8, h2 + size);
-        ctx.lineTo(w2 + size * 0.8, h2);
-        ctx.fill();
-
         ctx.beginPath();
         ctx.arc(
             w2 - size * 0.3,
@@ -54,26 +45,27 @@ wax.mm.mobile = function(map, tilejson, opts) {
             Math.PI * 2,
             true);
         ctx.closePath();
-        ctx.stroke();
+        ctx.fillStyle = 'rgb(100, 100, 100)';
+        ctx.fill();
+
+        ctx.fillStyle = 'rgb(255, 255, 255)';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.moveTo(w2 - size * 0.8, h2 - size); // give the (x,y) coordinates
+        ctx.lineTo(w2 - size * 0.8, h2 + size);
+        ctx.lineTo(w2 + size * 0.8, h2);
+        ctx.fill();
 
         // Done! Now fill the shape, and draw the stroke.
         // Note: your shape will not be visible until you call any of the two methods.
         div.appendChild(canvas);
     };
 
-    // Adapted from code by Mislav Marohnić: http://gist.github.com/355625
     function getDeviceScale() {
-        var deviceWidth, landscape = Math.abs(window.orientation) == 90;
-
-        if (landscape) {
-            // iPhone OS < 3.2 reports a screen height of 396px
-            deviceWidth = Math.max(480, screen.height);
-        } else {
-            deviceWidth = screen.width;
-        }
-
-        // return window.innerWidth / deviceWidth;
-        return deviceWidth / window.innerWidth;
+        return ((Math.abs(window.orientation) == 90) ?
+            Math.max(480, screen.height) :
+            screen.width) /
+            window.innerWidth;
     }
 
     var defaultBackDraw = function(div) {
