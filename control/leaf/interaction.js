@@ -6,22 +6,25 @@ wax.leaf.interaction = function(map, tilejson, options) {
     options = options || {};
 
     var waxGM = wax.GridManager(tilejson),
-    callbacks = options.callbacks || new wax.tooltip(options),
-    clickAction = options.clickAction || ['full', 'location'],
-    clickHandler = options.clickHandler || function(url) {
-        window.location = url;
-    },
-    interaction = {},
-    _downLock = false,
-    _clickTimeout = false,
-    touchable = ('ontouchstart' in document.documentElement),
-    // Active feature
-    _af,
-    // Down event
-    _d,
-    // Touch tolerance
-    tol = 4,
-    tileGrid;
+        callbacks = options.callbacks || new wax.tooltip(options),
+        clickAction = options.clickAction || ['full', 'location'],
+        addListener = L.DomEvent.addListener,
+        removeListener = L.DomEvent.removeListener,
+        clickHandler = options.clickHandler || function(url) {
+            window.location = url;
+        },
+        interaction = {},
+        _downLock = false,
+        _clickTimeout = false,
+        _container = map._container,
+        touchable = ('ontouchstart' in document.documentElement),
+        // Active feature
+        _af,
+        // Down event
+        _d,
+        // Touch tolerance
+        tol = 4,
+        tileGrid;
 
     // Search through `.tiles` and determine the position,
     // from the top-left of the **document**, and cache that data
@@ -91,15 +94,15 @@ wax.leaf.interaction = function(map, tilejson, options) {
             if (feature) {
                 if (feature && _af !== feature) {
                     _af = feature;
-                    callbacks.out(map._container);
-                    callbacks.over(feature, map._container);
+                    callbacks.out(_container);
+                    callbacks.over(feature, _container);
                 } else if (!feature) {
                     _af = null;
-                    callbacks.out(map._container);
+                    callbacks.out(_container);
                 }
             } else {
                 _af = null;
-                callbacks.out(map._container);
+                callbacks.out(_container);
             }
         });
     }
@@ -118,7 +121,7 @@ wax.leaf.interaction = function(map, tilejson, options) {
         _downLock = true;
         _d = wax.util.eventoffset(e);
         if (e.type === 'mousedown') {
-            L.DomEvent.addListener(map._container, 'mouseup', onUp, this);
+            addListener(_container, 'mouseup', onUp, this);
 
             // Only track single-touches. Double-touches will not affect this
             // control
@@ -133,15 +136,14 @@ wax.leaf.interaction = function(map, tilejson, options) {
             }
 
             // Touch moves invalidate touches
-
-            L.DomEvent.addListener(map._container, 'touchend', onUp, this);
-            L.DomEvent.addListener(map._container, 'touchmove', touchCancel, this);
+            addListener(_container, 'touchend', onUp, this);
+            addListener(_container, 'touchmove', touchCancel, this);
         }
     }
 
     function touchCancel() {
-        L.DomEvent.removeListener(map._container, 'touchend', onUp);
-        L.DomEvent.removeListener(map._container, 'touchmove', onUp);
+        removeListener(_container, 'touchend', onUp);
+        removeListener(_container, 'touchmove', onUp);
         _downLock = false;
     }
 
@@ -149,18 +151,18 @@ wax.leaf.interaction = function(map, tilejson, options) {
         var pos = wax.util.eventoffset(e);
         _downLock = false;
 
-        L.DomEvent.removeListener(map._container, 'mouseup', onUp);
+        removeListener(_container, 'mouseup', onUp);
 
-        if (map._container.ontouchend) {
-            L.DomEvent.removeListener(map._container, 'touchend', onUp);
-            L.DomEvent.removeListener(map._container, 'touchmove', _touchCancel);
+        if (_container.ontouchend) {
+            removeListener(_container, 'touchend', onUp);
+            removeListener(_container, 'touchmove', _touchCancel);
         }
 
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
             click(e, _d);
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
-                   Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
+            Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
             // Contain the event data in a closure.
             _clickTimeout = window.setTimeout(
                 function() {
@@ -177,7 +179,7 @@ wax.leaf.interaction = function(map, tilejson, options) {
         feature;
 
         if (tile) waxGM.getGrid(tile.src, function(err, g) {
-            for (var i = 0; g && i < clickAction.length; i++) {
+            for (var i = 0; g && (i < clickAction.length); i++) {
                 feature = g.tileFeature(pos.x, pos.y, tile, {
                     format: clickAction[i]
                 });
@@ -186,7 +188,7 @@ wax.leaf.interaction = function(map, tilejson, options) {
                         case 'full':
                         case 'teaser':
                             // clickAction can be teaser in touch interaction
-                            return callbacks.click(feature, map._container, 0, e);
+                            return callbacks.click(feature, _container, 0, e);
                         case 'location':
                             return clickHandler(feature);
                     }
@@ -201,10 +203,10 @@ wax.leaf.interaction = function(map, tilejson, options) {
         for (var i = 0; i < l.length; i++) {
             map.on(l[i], clearTileGrid);
         }
-        L.DomEvent.addListener(map._container, 'mousemove', onMove);
-        L.DomEvent.addListener(map._container, 'mousedown', onDown);
+        addListener(_container, 'mousemove', onMove);
+        addListener(_container, 'mousedown', onDown);
         if (touchable) {
-            L.DomEvent.addListener(map._container, 'touchstart', onDown);
+            addListener(_container, 'touchstart', onDown);
         }
         return this;
     };
@@ -215,10 +217,10 @@ wax.leaf.interaction = function(map, tilejson, options) {
         for (var i = 0; i < l.length; i++) {
             map.off(l[i], clearTileGrid);
         }
-        L.DomEvent.removeListener(map._container, 'mousemove', onMove);
-        L.DomEvent.removeListener(map._container, 'mousedown', onDown);
+        removeListener(_container, 'mousemove', onMove);
+        removeListener(_container, 'mousedown', onDown);
         if (touchable) {
-            L.DomEvent.removeListener(map._container, 'touchstart', onDown);
+            removeListener(_container, 'touchstart', onDown);
         }
         if (callbacks._currentTooltip) {
             callbacks.hideTooltip(callbacks._currentTooltip);

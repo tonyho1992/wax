@@ -1,4 +1,4 @@
-/* wax - 3.0.9 - 1.0.4-414-gb30379d */
+/* wax - 3.0.9 - 1.0.4-415-ga057648 */
 
 
 /*!
@@ -194,6 +194,7 @@ wax.GridInstance = function(grid_tile, formatter, options) {
     // * `options` options to give to the formatter: minimally having a `format`
     //   member, being `full`, `teaser`, or something else.
     instance.tileFeature = function(x, y, tile_element, options) {
+        if (!grid_tile) return;
         // IE problem here - though recoverable, for whatever reason
         var offset = wax.util.offset(tile_element);
             feature = this.gridFeature(x - offset.left, y - offset.top);
@@ -1253,7 +1254,7 @@ wax.mm.interaction = function(map, tilejson, options) {
             feature;
 
         if (tile) waxGM.getGrid(tile.src, function(err, g) {
-            for (var i = 0; g && i < clickAction.length; i++) {
+            for (var i = 0; g && (i < clickAction.length); i++) {
                 feature = g.tileFeature(pos.x, pos.y, tile, {
                     format: clickAction[i]
                 });

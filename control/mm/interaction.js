@@ -194,7 +194,7 @@ wax.mm.interaction = function(map, tilejson, options) {
             feature;
 
         if (tile) waxGM.getGrid(tile.src, function(err, g) {
-            for (var i = 0; g && i < clickAction.length; i++) {
+            for (var i = 0; g && (i < clickAction.length); i++) {
                 feature = g.tileFeature(pos.x, pos.y, tile, {
                     format: clickAction[i]
                 });

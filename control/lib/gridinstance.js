@@ -61,6 +61,7 @@ wax.GridInstance = function(grid_tile, formatter, options) {
     // * `options` options to give to the formatter: minimally having a `format`
     //   member, being `full`, `teaser`, or something else.
     instance.tileFeature = function(x, y, tile_element, options) {
+        if (!grid_tile) return;
         // IE problem here - though recoverable, for whatever reason
         var offset = wax.util.offset(tile_element);
             feature = this.gridFeature(x - offset.left, y - offset.top);
