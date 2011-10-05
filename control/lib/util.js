@@ -151,6 +151,28 @@ wax.util = {
             };
         }
     },
+
+    // Ripped from underscore.js
+    // Internal function used to implement `_.throttle` and `_.debounce`.
+    limit: function(func, wait, debounce) {
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            var throttler = function() {
+                timeout = null;
+                func.apply(context, args);
+            };
+            if (debounce) clearTimeout(timeout);
+            if (debounce || !timeout) timeout = setTimeout(throttler, wait);
+        };
+    },
+
+    // Returns a function, that, when invoked, will only be triggered at most once
+    // during a given window of time.
+    throttle: function(func, wait) {
+        return this.limit(func, wait, false);
+    },
+
     // parseUri 1.2.2
     // Steven Levithan <stevenlevithan.com>
     parseUri: function(str) {
@@ -178,6 +200,7 @@ wax.util = {
         });
         return uri;
     },
+
     // appends callback onto urls regardless of existing query params
     addUrlData: function(url, data) {
         url += (this.parseUri(url).query) ? '&' : '?';

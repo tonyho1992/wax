@@ -1,4 +1,4 @@
-/* wax - 3.0.8 - 1.0.4-403-ge99ff67 */
+/* wax - 3.0.8 - 1.0.4-404-g260b488 */
 
 
 /*!
@@ -488,6 +488,72 @@ wax.GridManager = function(options) {
 
     return manager;
 };
+wax = wax || {};
+
+// Hash
+// ----
+wax.hash = function(options) {
+    options = options || {};
+
+    function getState() {
+            return location.hash.substring(1);
+    }
+
+    function pushState(state) {
+        location.hash = '#' + state;
+    }
+
+    var s0, // old hash
+        hash = {},
+        lat = 90 - 1e-8;  // allowable latitude range
+
+    function parseHash(s) {
+        var args = s.split('/');
+        for (var i = 0; i < args.length; i++) {
+            args[i] = Number(args[i]);
+            if (isNaN(args[i])) return true;
+        }
+        if (args.length < 3) {
+            // replace bogus hash
+            return true;
+        } else if (args.length == 3) {
+            options.setCenterZoom(args);
+        }
+    }
+
+    function move() {
+        var s1 = options.getCenterZoom();
+        if (s0 !== s1) {
+            s0 = s1;
+            // don't recenter the map!
+            pushState(s0);
+        }
+    }
+
+    function stateChange(state) {
+        // ignore spurious hashchange events
+        if (state === s0) return;
+        if (parseHash(s0 = state)) {
+            // replace bogus hash
+            move();
+        }
+    }
+
+    var _move = wax.util.throttle(move, 500);
+
+    hash.add = function() {
+        stateChange(getState());
+        options.bindChange(_move);
+        return this;
+    };
+
+    hash.remove = function() {
+        options.unbindChange(_move);
+        return this;
+    };
+
+    return hash.add();
+};
 // Wax Legend
 // ----------
 
@@ -872,6 +938,28 @@ wax.util = {
             };
         }
     },
+
+    // Ripped from underscore.js
+    // Internal function used to implement `_.throttle` and `_.debounce`.
+    limit: function(func, wait, debounce) {
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            var throttler = function() {
+                timeout = null;
+                func.apply(context, args);
+            };
+            if (debounce) clearTimeout(timeout);
+            if (debounce || !timeout) timeout = setTimeout(throttler, wait);
+        };
+    },
+
+    // Returns a function, that, when invoked, will only be triggered at most once
+    // during a given window of time.
+    throttle: function(func, wait) {
+        return this.limit(func, wait, false);
+    },
+
     // parseUri 1.2.2
     // Steven Levithan <stevenlevithan.com>
     parseUri: function(str) {
@@ -899,6 +987,7 @@ wax.util = {
         });
         return uri;
     },
+
     // appends callback onto urls regardless of existing query params
     addUrlData: function(url, data) {
         url += (this.parseUri(url).query) ? '&' : '?';
@@ -911,26 +1000,26 @@ wax.util = {
 wax.leaf.interaction = function(map, tilejson, options) {
     tilejson = tilejson || {};
     options = options || {};
-	
-	var waxGM = wax.GridManager(tilejson),
-		callbacks = options.callbacks || new wax.tooltip(options),
-		clickAction = options.clickAction || ['full', 'location'],
-		clickHandler = options.clickHandler || function(url) {
-			window.location = url;
-		},
-		interaction = {},
-		_downLock = false,
-		_clickTimeout = false,
-		touchable = ('ontouchstart' in document.documentElement),
-		// Active feature
-		_af,
-		// Down event
-		_d,
-		// Touch tolerance
-		tol = 4,
-		tileGrid;
-	
-	// Search through `.tiles` and determine the position,
+
+    var waxGM = wax.GridManager(tilejson),
+    callbacks = options.callbacks || new wax.tooltip(options),
+    clickAction = options.clickAction || ['full', 'location'],
+    clickHandler = options.clickHandler || function(url) {
+        window.location = url;
+    },
+    interaction = {},
+    _downLock = false,
+    _clickTimeout = false,
+    touchable = ('ontouchstart' in document.documentElement),
+    // Active feature
+    _af,
+    // Down event
+    _d,
+    // Touch tolerance
+    tol = 4,
+    tileGrid;
+
+    // Search through `.tiles` and determine the position,
     // from the top-left of the **document**, and cache that data
     // so that `mousemove` events don't always recalculate.
     function getTileGrid() {
@@ -939,23 +1028,22 @@ wax.leaf.interaction = function(map, tilejson, options) {
         //var zoomLayer = map.createOrGetLayer(Math.round(map.getZoom())); //?what is this doing?
         // Calculate a tile grid and cache it, by using the `.tiles`
         // element on this map.
-        return tileGrid || (tileGrid =
-            (function(layers) {
-				var o = [];
-				for (var layerId in layers) {
-					// This only supports tiled layers
-					if (layers[layerId]._tiles) {
-						for (var tile in layers[layerId]._tiles) {
-							var offset = wax.util.offset(layers[layerId]._tiles[tile]);
-							o.push([offset.top, offset.left, layers[layerId]._tiles[tile]]);
-						}
-					}
-				}
-				return o;
-			})(map._layers));
-    };
+        return tileGrid || (tileGrid = (function(layers) {
+            var o = [];
+            for (var layerId in layers) {
+                // This only supports tiled layers
+                if (layers[layerId]._tiles) {
+                    for (var tile in layers[layerId]._tiles) {
+                        var offset = wax.util.offset(layers[layerId]._tiles[tile]);
+                        o.push([offset.top, offset.left, layers[layerId]._tiles[tile]]);
+                    }
+                }
+            }
+            return o;
+        })(map._layers));
+    }
 
-	// When the map moves, the tile grid is no longer valid.
+    // When the map moves, the tile grid is no longer valid.
     function clearTileGrid(map, e) {
         tileGrid = null;
     }
@@ -963,14 +1051,14 @@ wax.leaf.interaction = function(map, tilejson, options) {
     function getTile(e) {
         for (var i = 0, grid = getTileGrid(); i < grid.length; i++) {
             if ((grid[i][0] < e.y) &&
-               ((grid[i][0] + 256) > e.y) &&
+                ((grid[i][0] + 256) > e.y) &&
                 (grid[i][1] < e.x) &&
-               ((grid[i][1] + 256) > e.x)) return grid[i][2];
+                ((grid[i][1] + 256) > e.x)) return grid[i][2];
         }
         return false;
     }
 
-	// Clear the double-click timeout to prevent double-clicks from
+    // Clear the double-click timeout to prevent double-clicks from
     // triggering popups.
     function killTimeout() {
         if (_clickTimeout) {
@@ -981,15 +1069,15 @@ wax.leaf.interaction = function(map, tilejson, options) {
             return false;
         }
     }
-	
-	function onMove(e) {
+
+    function onMove(e) {
         // If the user is actually dragging the map, exit early
         // to avoid performance hits.
         if (_downLock) return;
 
         var pos = wax.util.eventoffset(e),
-            tile = getTile(pos),
-            feature;
+        tile = getTile(pos),
+        feature;
 
         if (tile) waxGM.getGrid(tile.src, function(err, g) {
             if (err || !g) return;
@@ -1011,8 +1099,8 @@ wax.leaf.interaction = function(map, tilejson, options) {
             }
         });
     }
-	
-	// A handler for 'down' events - which means `mousedown` and `touchstart`
+
+    // A handler for 'down' events - which means `mousedown` and `touchstart`
     function onDown(e) {
         // Ignore double-clicks by ignoring clicks within 300ms of
         // each other.
@@ -1026,10 +1114,10 @@ wax.leaf.interaction = function(map, tilejson, options) {
         _downLock = true;
         _d = wax.util.eventoffset(e);
         if (e.type === 'mousedown') {
-			L.DomEvent.addListener(map._container, 'mouseup', onUp, this);
+            L.DomEvent.addListener(map._container, 'mouseup', onUp, this);
 
-        // Only track single-touches. Double-touches will not affect this
-        // control
+            // Only track single-touches. Double-touches will not affect this
+            // control
         } else if (e.type === 'touchstart' && e.touches.length === 1) {
 
             // turn this into touch-mode. Fallback to teaser and full.
@@ -1041,19 +1129,19 @@ wax.leaf.interaction = function(map, tilejson, options) {
             }
 
             // Touch moves invalidate touches
-			
+
             L.DomEvent.addListener(map._container, 'touchend', onUp, this);
             L.DomEvent.addListener(map._container, 'touchmove', touchCancel, this);
         }
     }
-	
-	function touchCancel() {
-		L.DomEvent.removeListener(map._container, 'touchend', onUp);
+
+    function touchCancel() {
+        L.DomEvent.removeListener(map._container, 'touchend', onUp);
         L.DomEvent.removeListener(map._container, 'touchmove', onUp);
         _downLock = false;
     }
-	
-	function onUp(e) {
+
+    function onUp(e) {
         var pos = wax.util.eventoffset(e);
         _downLock = false;
 
@@ -1068,21 +1156,21 @@ wax.leaf.interaction = function(map, tilejson, options) {
             // If this was a touch and it survived, there's no need to avoid a double-tap
             click(e, _d);
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
-            Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
+                   Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
             // Contain the event data in a closure.
             _clickTimeout = window.setTimeout(
                 function() {
-                    _clickTimeout = null;
-                    click(e, pos);
-                }, 300);
+                _clickTimeout = null;
+                click(e, pos);
+            }, 300);
         }
         return onUp;
     }
-	
-	// Handle a click event. Takes a second
+
+    // Handle a click event. Takes a second
     function click(e, pos) {
         var tile = getTile(pos),
-            feature;
+        feature;
 
         if (tile) waxGM.getGrid(tile.src, function(err, g) {
             for (var i = 0; g && i < clickAction.length; i++) {
@@ -1092,8 +1180,8 @@ wax.leaf.interaction = function(map, tilejson, options) {
                 if (feature) {
                     switch (clickAction[i]) {
                         case 'full':
-                        // clickAction can be teaser in touch interaction
                         case 'teaser':
+                            // clickAction can be teaser in touch interaction
                             return callbacks.click(feature, map._container, 0, e);
                         case 'location':
                             return clickHandler(feature);
@@ -1102,8 +1190,8 @@ wax.leaf.interaction = function(map, tilejson, options) {
             }
         });
     }
-	
-	// Attach listeners to the map
+
+    // Attach listeners to the map
     interaction.add = function() {
         var l = ['moveend', 'layerswitched'];
         for (var i = 0; i < l.length; i++) {
@@ -1136,7 +1224,8 @@ wax.leaf.interaction = function(map, tilejson, options) {
 
     // Ensure chainability
     return interaction.add(map);
-};wax = wax || {};
+};
+wax = wax || {};
 wax.leaf = wax.leaf || {};
 
 wax.leaf.connector = L.TileLayer.extend({

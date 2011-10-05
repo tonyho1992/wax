@@ -1,4 +1,4 @@
-/* wax - 3.0.8 - 1.0.4-403-ge99ff67 */
+/* wax - 3.0.8 - 1.0.4-404-g260b488 */
 
 
 /*!
@@ -488,6 +488,72 @@ wax.GridManager = function(options) {
 
     return manager;
 };
+wax = wax || {};
+
+// Hash
+// ----
+wax.hash = function(options) {
+    options = options || {};
+
+    function getState() {
+            return location.hash.substring(1);
+    }
+
+    function pushState(state) {
+        location.hash = '#' + state;
+    }
+
+    var s0, // old hash
+        hash = {},
+        lat = 90 - 1e-8;  // allowable latitude range
+
+    function parseHash(s) {
+        var args = s.split('/');
+        for (var i = 0; i < args.length; i++) {
+            args[i] = Number(args[i]);
+            if (isNaN(args[i])) return true;
+        }
+        if (args.length < 3) {
+            // replace bogus hash
+            return true;
+        } else if (args.length == 3) {
+            options.setCenterZoom(args);
+        }
+    }
+
+    function move() {
+        var s1 = options.getCenterZoom();
+        if (s0 !== s1) {
+            s0 = s1;
+            // don't recenter the map!
+            pushState(s0);
+        }
+    }
+
+    function stateChange(state) {
+        // ignore spurious hashchange events
+        if (state === s0) return;
+        if (parseHash(s0 = state)) {
+            // replace bogus hash
+            move();
+        }
+    }
+
+    var _move = wax.util.throttle(move, 500);
+
+    hash.add = function() {
+        stateChange(getState());
+        options.bindChange(_move);
+        return this;
+    };
+
+    hash.remove = function() {
+        options.unbindChange(_move);
+        return this;
+    };
+
+    return hash.add();
+};
 // Wax Legend
 // ----------
 
@@ -872,6 +938,28 @@ wax.util = {
             };
         }
     },
+
+    // Ripped from underscore.js
+    // Internal function used to implement `_.throttle` and `_.debounce`.
+    limit: function(func, wait, debounce) {
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            var throttler = function() {
+                timeout = null;
+                func.apply(context, args);
+            };
+            if (debounce) clearTimeout(timeout);
+            if (debounce || !timeout) timeout = setTimeout(throttler, wait);
+        };
+    },
+
+    // Returns a function, that, when invoked, will only be triggered at most once
+    // during a given window of time.
+    throttle: function(func, wait) {
+        return this.limit(func, wait, false);
+    },
+
     // parseUri 1.2.2
     // Steven Levithan <stevenlevithan.com>
     parseUri: function(str) {
@@ -899,6 +987,7 @@ wax.util = {
         });
         return uri;
     },
+
     // appends callback onto urls regardless of existing query params
     addUrlData: function(url, data) {
         url += (this.parseUri(url).query) ? '&' : '?';
@@ -966,6 +1055,34 @@ wax.g.bwdetect = function(map, options) {
 
     return wax.bwdetect(options, function(bw) {
       map.setMapTypeId(bw ? 'mb' : 'mb-low');
+    });
+};
+wax = wax || {};
+wax.g = wax.g || {};
+
+wax.g.hash = function(map) {
+    return wax.hash({
+        getCenterZoom: function() {
+            var center = map.getCenter(),
+                zoom = map.getZoom(),
+                precision = Math.max(
+                    0,
+                    Math.ceil(Math.log(zoom) / Math.LN2));
+            return [zoom.toFixed(2),
+                center.lat().toFixed(precision),
+                center.lng().toFixed(precision)
+            ].join('/');
+        },
+        setCenterZoom: function setCenterZoom(args) {
+            map.setCenter(new google.maps.LatLng(args[1], args[2]));
+            map.setZoom(args[0]);
+        },
+        bindChange: function(fn) {
+            google.maps.event.addListener(map, 'idle', fn);
+        },
+        unbindChange: function(fn) {
+            google.maps.event.removeListener(map, 'idle', fn);
+        }
     });
 };
 wax = wax || {};
