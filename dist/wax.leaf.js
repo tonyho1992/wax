@@ -1,4 +1,4 @@
-/* wax - 3.0.9 - 1.0.4-412-gdb6039f */
+/* wax - 3.0.9 - 1.0.4-414-gb30379d */
 
 
 /*!
@@ -177,10 +177,13 @@ wax.GridInstance = function(grid_tile, formatter, options) {
     instance.gridFeature = function(x, y) {
         // Find the key in the grid. The above calls should ensure that
         // the grid's array is large enough to make this work.
-        var key = this.getKey(x, y);
+        var key = this.getKey(x, y),
+            keys = grid_tile.keys;
 
-        if (grid_tile.keys[key] && grid_tile.data[grid_tile.keys[key]]) {
-            return grid_tile.data[grid_tile.keys[key]];
+        if (keys &&
+            keys[key] &&
+            grid_tile.data[keys[key]]) {
+            return grid_tile.data[keys[key]];
         }
     };
 
@@ -299,7 +302,7 @@ wax.hash = function(options) {
     options = options || {};
 
     function getState() {
-            return location.hash.substring(1);
+        return location.hash.substring(1);
     }
 
     function pushState(state) {
