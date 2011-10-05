@@ -5,6 +5,8 @@
 * Simplified hash control - `hashchange` and `pushState` APIs discontinued
 * Added `wax.g.hash()` control
 * Moved hash fundamentals to `control/lib/hash.js` and utilities to `utils.js`
+* Simplified URL construction
+* Added micro-optimizations to reduce code size
 
 ### 3.0.8
 
