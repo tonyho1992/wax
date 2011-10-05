@@ -1,4 +1,4 @@
-/* wax - 3.0.8 - 1.0.4-404-g260b488 */
+/* wax - 3.0.8 - 1.0.4-406-g7817f44 */
 
 
 /*!
@@ -639,7 +639,7 @@ wax.request = {
             var that = this;
             this.locks[url] = true;
             reqwest({
-                url: wax.util.addUrlData(url, 'callback=grid'),
+                url: url + (~url.indexOf('?') ? '&' : '?') + 'callback=grid',
                 type: 'jsonp',
                 jsonpCallback: 'callback',
                 success: function(data) {
@@ -665,7 +665,7 @@ if (!wax) var wax = {};
 // A wrapper for reqwest jsonp to easily load TileJSON from a URL.
 wax.tilejson = function(url, callback) {
     reqwest({
-        url: wax.util.addUrlData(url, 'callback=grid'),
+        url: url + (~url.indexOf('?') ? '&' : '?') + 'callback=grid',
         type: 'jsonp',
         jsonpCallback: 'callback',
         success: callback,
@@ -958,40 +958,6 @@ wax.util = {
     // during a given window of time.
     throttle: function(func, wait) {
         return this.limit(func, wait, false);
-    },
-
-    // parseUri 1.2.2
-    // Steven Levithan <stevenlevithan.com>
-    parseUri: function(str) {
-        var o = {
-            strictMode: false,
-            key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
-            q:   {
-                name:   "queryKey",
-                parser: /(?:^|&)([^&=]*)=?([^&]*)/g
-            },
-            parser: {
-                strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
-                loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
-            }
-        },
-            m   = o.parser[o.strictMode ? "strict" : "loose"].exec(str),
-            uri = {},
-            i   = 14;
-
-        while (i--) uri[o.key[i]] = m[i] || "";
-
-        uri[o.q.name] = {};
-        uri[o.key[12]].replace(o.q.parser, function ($0, $1, $2) {
-            if ($1) uri[o.q.name][$1] = $2;
-        });
-        return uri;
-    },
-
-    // appends callback onto urls regardless of existing query params
-    addUrlData: function(url, data) {
-        url += (this.parseUri(url).query) ? '&' : '?';
-        return url += data;
     }
 };
 //   If not given, the `wax.tooltip` library will be expected.
