@@ -12,11 +12,12 @@ wax.util = {
         // by Firefox.
         var width = el.offsetWidth || parseInt(el.style.width, 10),
             height = el.offsetHeight || parseInt(el.style.height, 10),
+            doc_body = document.body,
             top = 0,
             left = 0;
 
         var calculateOffset = function(el) {
-            if (el === document.body || el === document.documentElement) return;
+            if (el === doc_body || el === document.documentElement) return;
             top += el.offsetTop;
             left += el.offsetLeft;
 
@@ -53,18 +54,18 @@ wax.util = {
         }
 
         // Offsets from the body
-        top += document.body.offsetTop;
-        left += document.body.offsetLeft;
+        top += doc_body.offsetTop;
+        left += doc_body.offsetLeft;
         // Offsets from the HTML element
-        top += document.body.parentNode.offsetTop;
-        left += document.body.parentNode.offsetLeft;
+        top += doc_body.parentNode.offsetTop;
+        left += doc_body.parentNode.offsetLeft;
 
         // Firefox and other weirdos. Similar technique to jQuery's
         // `doesNotIncludeMarginInBodyOffset`.
         var htmlComputed = document.defaultView ?
-            window.getComputedStyle(document.body.parentNode, null) :
-            document.body.parentNode.currentStyle;
-        if (document.body.parentNode.offsetTop !==
+            window.getComputedStyle(doc_body.parentNode, null) :
+            doc_body.parentNode.currentStyle;
+        if (doc_body.parentNode.offsetTop !==
             parseInt(htmlComputed.marginTop, 10) &&
             !isNaN(parseInt(htmlComputed.marginTop, 10))) {
             top += parseInt(htmlComputed.marginTop, 10);
