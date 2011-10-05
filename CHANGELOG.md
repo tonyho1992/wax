@@ -8,6 +8,7 @@
 * Simplified URL construction
 * Added micro-optimizations to reduce code size
 * Removed `wax.Record`
+* Fixes interaction control in Leaflet
 
 ### 3.0.8
 

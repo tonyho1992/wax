@@ -1,4 +1,4 @@
-/* wax - 3.0.9 - 1.0.4-415-ga057648 */
+/* wax - 3.0.9 - 1.0.4-416-g06548fc */
 
 
 /*!
@@ -865,10 +865,11 @@ wax.ol.Interaction =
         layerfound: for (var j = 0; j < layers.length; j++) {
             for (var x = 0; x < layers[j].grid.length; x++) {
                 for (var y = 0; y < layers[j].grid[x].length; y++) {
+                    var divpos;
                     if (layers[j].grid[x][y].imgDiv) {
-                        var divpos = wax.util.offset(layers[j].grid[x][y].imgDiv);
+                        divpos = wax.util.offset(layers[j].grid[x][y].imgDiv);
                     } else {
-                        var divpos = wax.util.offset(layers[j].grid[x][y].frame);
+                        divpos = wax.util.offset(layers[j].grid[x][y].frame);
                     }
                     if (divpos &&
                         ((divpos.top < pos.y) &&
@@ -914,28 +915,29 @@ wax.ol.Interaction =
     getInfoForClick: function(evt) {
         // If there's no event, this handler should not continue.
         if (!evt) return;
-        var layers = this.viableLayers();
-        var pos = wax.util.eventoffset(evt);
-        var tiles = this.getTileStack(this.viableLayers(), pos);
-        var feature = null,
-        g = null;
+        var layers = this.viableLayers(),
+            pos = wax.util.eventoffset(evt),
+            tiles = this.getTileStack(this.viableLayers(), pos),
+            feature = null,
+            g = null;
+
         var that = this;
 
         for (var t = 0; t < tiles.length; t++) {
             if (!tiles[t].url) continue;
             this.gm.getGrid(tiles[t].url, function(err, g) {
                 if (!g) return;
-                var feature = g.tileFeature(pos.x, pos.y, tiles[t].frame, {
+                var feature = g.tileFeature(pos.x, pos.y, tiles[t].frame || tiles[t].imgDiv, {
                     format: that.clickAction
                 });
                 if (feature) {
                     switch (that.clickAction) {
                         case 'full':
                             that.callbacks.click(feature, tiles[t].layer.map.viewPortDiv, t);
-                        break;
+                            break;
                         case 'location':
                             window.location = feature;
-                        break;
+                            break;
                     }
                 }
             });
@@ -948,12 +950,13 @@ wax.ol.Interaction =
     getInfoForHover: function(evt) {
         // If there's no event, this handler should not proceed.
         if (!evt) return;
-        var options = { format: 'teaser' };
-        var layers = this.viableLayers();
-        var pos = wax.util.eventoffset(evt);
-        var tiles = this.getTileStack(this.viableLayers(), pos);
-        var feature = null,
-        g = null;
+        var options = { format: 'teaser' },
+            layers = this.viableLayers(),
+            pos = wax.util.eventoffset(evt),
+            tiles = this.getTileStack(this.viableLayers(), pos),
+            feature = null,
+            g = null;
+
         var that = this;
 
         for (var t = 0; t < tiles.length; t++) {
@@ -962,7 +965,7 @@ wax.ol.Interaction =
             // is currently being requested.
             this.gm.getGrid(tiles[t].url, function(err, g) {
                 if (g && tiles[t]) {
-                    var feature = g.tileFeature(pos.x, pos.y, tiles[t].frame, options);
+                    var feature = g.tileFeature(pos.x, pos.y, tiles[t].frame || tiles[t].imgDiv, options);
 
                     if (feature) {
                         if (!tiles[t]) return;
@@ -973,7 +976,6 @@ wax.ol.Interaction =
                         } else if (!feature) {
                             that.feature[t] = null;
                             that.callbacks.out(tiles[t].layer.map.div);
-                        } else {
                         }
                     } else {
                         // Request this feature
