@@ -1,4 +1,4 @@
-wax = wax || {};
+;wax = wax || {};
 
 // Attribution
 // -----------

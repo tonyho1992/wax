@@ -4,19 +4,19 @@ BANNER = ./node_modules/.bin/banner
 dist: dist_setup dist/wax.ol.min.js dist/wax.g.min.js dist/wax.mm.min.js dist/wax.leaf.min.js lint
 
 dist/wax.ol.min.js:
-	cat build/header.js ext/reqwest.min.js lib/*.js control/lib/*.js control/ol/*.js > dist/wax.ol.js
+	cat build/header.js ext/reqwest.min.js control/lib/*.js control/ol/*.js > dist/wax.ol.js
 	$(UGLIFYJS) dist/wax.ol.js > dist/wax.ol.min.js
 
 dist/wax.g.min.js:
-	cat build/header.js ext/reqwest.min.js lib/*.js control/lib/*.js control/g/*.js connectors/g/*.js > dist/wax.g.js
+	cat build/header.js ext/reqwest.min.js control/lib/*.js control/g/*.js connectors/g/*.js > dist/wax.g.js
 	$(UGLIFYJS) dist/wax.g.js > dist/wax.g.min.js
 
 dist/wax.mm.min.js:
-	cat build/header.js ext/reqwest.min.js lib/*.js control/lib/*.js control/mm/*.js connectors/mm/*.js > dist/wax.mm.js
+	cat build/header.js ext/reqwest.min.js control/lib/*.js control/mm/*.js connectors/mm/*.js > dist/wax.mm.js
 	$(UGLIFYJS) dist/wax.mm.js > dist/wax.mm.min.js
 
 dist/wax.leaf.min.js:
-	cat build/header.js ext/reqwest.min.js lib/*.js control/lib/*.js control/leaf/*.js connectors/leaf/*.js > dist/wax.leaf.js
+	cat build/header.js ext/reqwest.min.js control/lib/*.js control/leaf/*.js connectors/leaf/*.js > dist/wax.leaf.js
 	$(UGLIFYJS) dist/wax.leaf.js > dist/wax.leaf.min.js
 
 dist_setup:
