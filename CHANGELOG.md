@@ -7,6 +7,7 @@
 * Moved hash fundamentals to `control/lib/hash.js` and utilities to `utils.js`
 * Simplified URL construction
 * Added micro-optimizations to reduce code size
+* Removed `wax.Record`
 
 ### 3.0.8
 
