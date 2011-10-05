@@ -1,5 +1,11 @@
 ## Changelog
 
+### 3.0.9
+
+* Simplified hash control - `hashchange` and `pushState` APIs discontinued
+* Added `wax.g.hash()` control
+* Moved hash fundamentals to `control/lib/hash.js` and utilities to `utils.js`
+
 ### 3.0.8
 
 * Fixed `wax.mm.interaction()` click callback
