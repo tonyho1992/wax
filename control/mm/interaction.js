@@ -28,6 +28,9 @@ wax.mm.interaction = function(map, tilejson, options) {
         clickHandler = options.clickHandler || function(url) {
             window.location = url;
         },
+        eventoffset = wax.util.eventoffset,
+        addEvent = MM.addEvent,
+        removeEvent = MM.removeEvent,
         interaction = {},
         _downLock = false,
         _clickTimeout = false,
@@ -94,7 +97,7 @@ wax.mm.interaction = function(map, tilejson, options) {
         // to avoid performance hits.
         if (_downLock) return;
 
-        var pos = wax.util.eventoffset(e),
+        var pos = eventoffset(e),
             tile = getTile(pos),
             feature;
 
@@ -131,9 +134,9 @@ wax.mm.interaction = function(map, tilejson, options) {
         // Store this event so that we can compare it to the
         // up event
         _downLock = true;
-        _d = wax.util.eventoffset(e);
+        _d = eventoffset(e);
         if (e.type === 'mousedown') {
-            MM.addEvent(document.body, 'mouseup', onUp);
+            addEvent(document.body, 'mouseup', onUp);
 
         // Only track single-touches. Double-touches will not affect this
         // control
@@ -148,26 +151,26 @@ wax.mm.interaction = function(map, tilejson, options) {
             }
 
             // Touch moves invalidate touches
-            MM.addEvent(map.parent, 'touchend', onUp);
-            MM.addEvent(map.parent, 'touchmove', touchCancel);
+            addEvent(map.parent, 'touchend', onUp);
+            addEvent(map.parent, 'touchmove', touchCancel);
         }
     }
 
     function touchCancel() {
-        MM.removeEvent(map.parent, 'touchend', onUp);
-        MM.removeEvent(map.parent, 'touchmove', onUp);
+        removeEvent(map.parent, 'touchend', onUp);
+        removeEvent(map.parent, 'touchmove', onUp);
         _downLock = false;
     }
 
     function onUp(e) {
-        var pos = wax.util.eventoffset(e);
+        var pos = eventoffset(e);
         _downLock = false;
 
-        MM.removeEvent(document.body, 'mouseup', onUp);
+        removeEvent(document.body, 'mouseup', onUp);
 
         if (map.parent.ontouchend) {
-            MM.removeEvent(map.parent, 'touchend', onUp);
-            MM.removeEvent(map.parent, 'touchmove', _touchCancel);
+            removeEvent(map.parent, 'touchend', onUp);
+            removeEvent(map.parent, 'touchmove', _touchCancel);
         }
 
         if (e.type === 'touchend') {
@@ -216,10 +219,10 @@ wax.mm.interaction = function(map, tilejson, options) {
         for (var i = 0; i < l.length; i++) {
             map.addCallback(l[i], clearTileGrid);
         }
-        MM.addEvent(map.parent, 'mousemove', onMove);
-        MM.addEvent(map.parent, 'mousedown', onDown);
+        addEvent(map.parent, 'mousemove', onMove);
+        addEvent(map.parent, 'mousedown', onDown);
         if (touchable) {
-            MM.addEvent(map.parent, 'touchstart', onDown);
+            addEvent(map.parent, 'touchstart', onDown);
         }
         return this;
     };
@@ -231,10 +234,10 @@ wax.mm.interaction = function(map, tilejson, options) {
         for (var i = 0; i < l.length; i++) {
             map.removeCallback(l[i], clearTileGrid);
         }
-        MM.removeEvent(map.parent, 'mousemove', onMove);
-        MM.removeEvent(map.parent, 'mousedown', onDown);
+        removeEvent(map.parent, 'mousemove', onMove);
+        removeEvent(map.parent, 'mousedown', onDown);
         if (touchable) {
-            MM.removeEvent(map.parent, 'touchstart', onDown);
+            removeEvent(map.parent, 'touchstart', onDown);
         }
         if (callbacks._currentTooltip) {
             callbacks.hideTooltip(callbacks._currentTooltip);

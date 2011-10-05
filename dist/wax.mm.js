@@ -1,4 +1,4 @@
-/* wax - 3.0.8 - 1.0.4-407-g28e7439 */
+/* wax - 3.0.8 - 1.0.4-408-gecafba1 */
 
 
 /*!
@@ -1002,6 +1002,8 @@ wax.mm.boxselector = function(map, tilejson, opts) {
             opts :
             opts.callback),
         boxDiv,
+        addEvent = MM.addEvent,
+        removeEvent = MM.removeEvent,
         box,
         boxselector = {};
 
@@ -1028,8 +1030,8 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         boxDiv.style.left = mouseDownPoint.x + 'px';
         boxDiv.style.top = mouseDownPoint.y + 'px';
 
-        MM.addEvent(map.parent, 'mousemove', mouseMove);
-        MM.addEvent(map.parent, 'mouseup', mouseUp);
+        addEvent(map.parent, 'mousemove', mouseMove);
+        addEvent(map.parent, 'mouseup', mouseUp);
 
         map.parent.style.cursor = 'crosshair';
         return MM.cancelEvent(e);
@@ -1037,20 +1039,21 @@ wax.mm.boxselector = function(map, tilejson, opts) {
 
 
     function mouseMove(e) {
-        var point = getMousePoint(e);
-        boxDiv.style.display = 'block';
+        var point = getMousePoint(e),
+            style = boxDiv.style;
+        style.display = 'block';
         if (point.x < mouseDownPoint.x) {
-            boxDiv.style.left = point.x + 'px';
+            style.left = point.x + 'px';
         } else {
-            boxDiv.style.left = mouseDownPoint.x + 'px';
+            style.left = mouseDownPoint.x + 'px';
         }
         if (point.y < mouseDownPoint.y) {
-            boxDiv.style.top = point.y + 'px';
+            style.top = point.y + 'px';
         } else {
-            boxDiv.style.top = mouseDownPoint.y + 'px';
+            style.top = mouseDownPoint.y + 'px';
         }
-        boxDiv.style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
-        boxDiv.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
+        style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
+        style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
         return MM.cancelEvent(e);
     }
 
@@ -1069,8 +1072,8 @@ wax.mm.boxselector = function(map, tilejson, opts) {
                 Math.max(l1.lon, l2.lon))
         ]);
 
-        MM.removeEvent(map.parent, 'mousemove', mouseMove);
-        MM.removeEvent(map.parent, 'mouseup', mouseUp);
+        removeEvent(map.parent, 'mousemove', mouseMove);
+        removeEvent(map.parent, 'mouseup', mouseUp);
 
         map.parent.style.cursor = 'auto';
     }
@@ -1078,15 +1081,16 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     function drawbox(map, e) {
         if (!boxDiv || !box) return;
         var br = map.locationPoint(box[1]),
-            tl = map.locationPoint(box[0]);
+            tl = map.locationPoint(box[0]),
+            style = boxDiv.style;
 
-        boxDiv.style.display = 'block';
-        boxDiv.style.height = 'auto';
-        boxDiv.style.width = 'auto';
-        boxDiv.style.left = Math.max(0, tl.x) + 'px';
-        boxDiv.style.top = Math.max(0, tl.y) + 'px';
-        boxDiv.style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
-        boxDiv.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
+        style.display = 'block';
+        style.height = 'auto';
+        style.width = 'auto';
+        style.left = Math.max(0, tl.x) + 'px';
+        style.top = Math.max(0, tl.y) + 'px';
+        style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
+        style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
     }
 
     boxselector.extent = function(x, silent) {
@@ -1112,14 +1116,14 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         boxDiv.className = 'boxselector-box';
         map.parent.appendChild(boxDiv);
 
-        MM.addEvent(map.parent, 'mousedown', mouseDown);
+        addEvent(map.parent, 'mousedown', mouseDown);
         map.addCallback('drawn', drawbox);
         return this;
     };
 
     boxselector.remove = function() {
         map.parent.removeChild(boxDiv);
-        MM.removeEvent(map.parent, 'mousedown', mouseDown);
+        removeEvent(map.parent, 'mousedown', mouseDown);
         map.removeCallback('drawn', drawbox);
     };
 
@@ -1277,6 +1281,9 @@ wax.mm.interaction = function(map, tilejson, options) {
         clickHandler = options.clickHandler || function(url) {
             window.location = url;
         },
+        eventoffset = wax.util.eventoffset,
+        addEvent = MM.addEvent,
+        removeEvent = MM.removeEvent,
         interaction = {},
         _downLock = false,
         _clickTimeout = false,
@@ -1343,7 +1350,7 @@ wax.mm.interaction = function(map, tilejson, options) {
         // to avoid performance hits.
         if (_downLock) return;
 
-        var pos = wax.util.eventoffset(e),
+        var pos = eventoffset(e),
             tile = getTile(pos),
             feature;
 
@@ -1380,9 +1387,9 @@ wax.mm.interaction = function(map, tilejson, options) {
         // Store this event so that we can compare it to the
         // up event
         _downLock = true;
-        _d = wax.util.eventoffset(e);
+        _d = eventoffset(e);
         if (e.type === 'mousedown') {
-            MM.addEvent(document.body, 'mouseup', onUp);
+            addEvent(document.body, 'mouseup', onUp);
 
         // Only track single-touches. Double-touches will not affect this
         // control
@@ -1397,26 +1404,26 @@ wax.mm.interaction = function(map, tilejson, options) {
             }
 
             // Touch moves invalidate touches
-            MM.addEvent(map.parent, 'touchend', onUp);
-            MM.addEvent(map.parent, 'touchmove', touchCancel);
+            addEvent(map.parent, 'touchend', onUp);
+            addEvent(map.parent, 'touchmove', touchCancel);
         }
     }
 
     function touchCancel() {
-        MM.removeEvent(map.parent, 'touchend', onUp);
-        MM.removeEvent(map.parent, 'touchmove', onUp);
+        removeEvent(map.parent, 'touchend', onUp);
+        removeEvent(map.parent, 'touchmove', onUp);
         _downLock = false;
     }
 
     function onUp(e) {
-        var pos = wax.util.eventoffset(e);
+        var pos = eventoffset(e);
         _downLock = false;
 
-        MM.removeEvent(document.body, 'mouseup', onUp);
+        removeEvent(document.body, 'mouseup', onUp);
 
         if (map.parent.ontouchend) {
-            MM.removeEvent(map.parent, 'touchend', onUp);
-            MM.removeEvent(map.parent, 'touchmove', _touchCancel);
+            removeEvent(map.parent, 'touchend', onUp);
+            removeEvent(map.parent, 'touchmove', _touchCancel);
         }
 
         if (e.type === 'touchend') {
@@ -1465,10 +1472,10 @@ wax.mm.interaction = function(map, tilejson, options) {
         for (var i = 0; i < l.length; i++) {
             map.addCallback(l[i], clearTileGrid);
         }
-        MM.addEvent(map.parent, 'mousemove', onMove);
-        MM.addEvent(map.parent, 'mousedown', onDown);
+        addEvent(map.parent, 'mousemove', onMove);
+        addEvent(map.parent, 'mousedown', onDown);
         if (touchable) {
-            MM.addEvent(map.parent, 'touchstart', onDown);
+            addEvent(map.parent, 'touchstart', onDown);
         }
         return this;
     };
@@ -1480,10 +1487,10 @@ wax.mm.interaction = function(map, tilejson, options) {
         for (var i = 0; i < l.length; i++) {
             map.removeCallback(l[i], clearTileGrid);
         }
-        MM.removeEvent(map.parent, 'mousemove', onMove);
-        MM.removeEvent(map.parent, 'mousedown', onDown);
+        removeEvent(map.parent, 'mousemove', onMove);
+        removeEvent(map.parent, 'mousedown', onDown);
         if (touchable) {
-            MM.removeEvent(map.parent, 'touchstart', onDown);
+            removeEvent(map.parent, 'touchstart', onDown);
         }
         if (callbacks._currentTooltip) {
             callbacks.hideTooltip(callbacks._currentTooltip);

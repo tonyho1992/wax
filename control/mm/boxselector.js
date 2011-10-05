@@ -10,6 +10,8 @@ wax.mm.boxselector = function(map, tilejson, opts) {
             opts :
             opts.callback),
         boxDiv,
+        addEvent = MM.addEvent,
+        removeEvent = MM.removeEvent,
         box,
         boxselector = {};
 
@@ -36,8 +38,8 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         boxDiv.style.left = mouseDownPoint.x + 'px';
         boxDiv.style.top = mouseDownPoint.y + 'px';
 
-        MM.addEvent(map.parent, 'mousemove', mouseMove);
-        MM.addEvent(map.parent, 'mouseup', mouseUp);
+        addEvent(map.parent, 'mousemove', mouseMove);
+        addEvent(map.parent, 'mouseup', mouseUp);
 
         map.parent.style.cursor = 'crosshair';
         return MM.cancelEvent(e);
@@ -45,20 +47,21 @@ wax.mm.boxselector = function(map, tilejson, opts) {
 
 
     function mouseMove(e) {
-        var point = getMousePoint(e);
-        boxDiv.style.display = 'block';
+        var point = getMousePoint(e),
+            style = boxDiv.style;
+        style.display = 'block';
         if (point.x < mouseDownPoint.x) {
-            boxDiv.style.left = point.x + 'px';
+            style.left = point.x + 'px';
         } else {
-            boxDiv.style.left = mouseDownPoint.x + 'px';
+            style.left = mouseDownPoint.x + 'px';
         }
         if (point.y < mouseDownPoint.y) {
-            boxDiv.style.top = point.y + 'px';
+            style.top = point.y + 'px';
         } else {
-            boxDiv.style.top = mouseDownPoint.y + 'px';
+            style.top = mouseDownPoint.y + 'px';
         }
-        boxDiv.style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
-        boxDiv.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
+        style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
+        style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
         return MM.cancelEvent(e);
     }
 
@@ -77,8 +80,8 @@ wax.mm.boxselector = function(map, tilejson, opts) {
                 Math.max(l1.lon, l2.lon))
         ]);
 
-        MM.removeEvent(map.parent, 'mousemove', mouseMove);
-        MM.removeEvent(map.parent, 'mouseup', mouseUp);
+        removeEvent(map.parent, 'mousemove', mouseMove);
+        removeEvent(map.parent, 'mouseup', mouseUp);
 
         map.parent.style.cursor = 'auto';
     }
@@ -86,15 +89,16 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     function drawbox(map, e) {
         if (!boxDiv || !box) return;
         var br = map.locationPoint(box[1]),
-            tl = map.locationPoint(box[0]);
+            tl = map.locationPoint(box[0]),
+            style = boxDiv.style;
 
-        boxDiv.style.display = 'block';
-        boxDiv.style.height = 'auto';
-        boxDiv.style.width = 'auto';
-        boxDiv.style.left = Math.max(0, tl.x) + 'px';
-        boxDiv.style.top = Math.max(0, tl.y) + 'px';
-        boxDiv.style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
-        boxDiv.style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
+        style.display = 'block';
+        style.height = 'auto';
+        style.width = 'auto';
+        style.left = Math.max(0, tl.x) + 'px';
+        style.top = Math.max(0, tl.y) + 'px';
+        style.right = Math.max(0, map.dimensions.x - br.x) + 'px';
+        style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
     }
 
     boxselector.extent = function(x, silent) {
@@ -120,14 +124,14 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         boxDiv.className = 'boxselector-box';
         map.parent.appendChild(boxDiv);
 
-        MM.addEvent(map.parent, 'mousedown', mouseDown);
+        addEvent(map.parent, 'mousedown', mouseDown);
         map.addCallback('drawn', drawbox);
         return this;
     };
 
     boxselector.remove = function() {
         map.parent.removeChild(boxDiv);
-        MM.removeEvent(map.parent, 'mousedown', mouseDown);
+        removeEvent(map.parent, 'mousedown', mouseDown);
         map.removeCallback('drawn', drawbox);
     };
 
