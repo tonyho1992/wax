@@ -1,3 +1,6 @@
+wax = wax || {};
+wax.leaf = wax.leaf || {};
+
 //   If not given, the `wax.tooltip` library will be expected.
 // * `clickAction` (optional): **full** or **location**: default is
 //   **full**.

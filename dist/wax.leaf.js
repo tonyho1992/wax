@@ -1,4 +1,4 @@
-/* wax - 3.0.9 - 1.0.4-416-g06548fc */
+/* wax - 3.0.9 - 1.0.4-417-g254103b */
 
 
 /*!
@@ -768,6 +768,9 @@ wax.util = {
         return this.limit(func, wait, false);
     }
 };
+wax = wax || {};
+wax.leaf = wax.leaf || {};
+
 //   If not given, the `wax.tooltip` library will be expected.
 // * `clickAction` (optional): **full** or **location**: default is
 //   **full**.
