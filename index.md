@@ -43,9 +43,8 @@ If you just want to download the source code for Wax,
 If you want to develop Wax, or keep it up to date more easily, [check out the
 project from GitHub](https://github.com/mapbox/wax) with git.
 
-See the instructions below for each mapping API ([Modest Maps](#modest-maps),
-[Leaflet](#leaflet), [Google Maps](#google-maps), [OpenLayers](#openlayers))
-to include Wax in your project.
+See [Making Your First Map](#making-your-first-map) below for instructions on
+how to include Wax in your project.
 
 ## A Quick Intro
 
@@ -75,7 +74,7 @@ Of course, things will get a lot cooler than this: Wax lets you use your own
 tiles, add zoom buttons, interaction, and a lot more. But it all starts out
 with tiles.
 
-## Making Your First Map
+<h2 id='making-your-first-map'>Making Your First Map</h2>
 
 The first step is to download and include the necessary Javascript code to
 make your map work. We'll also include a CSS file to start rolling with style:
