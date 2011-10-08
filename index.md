@@ -41,7 +41,7 @@ it's a Javascript library you copy to your server, so you have control over it.
 If you just want to download the source code for Wax,
 [get a zip file from GitHub](https://github.com/mapbox/wax/downloads).
 If you want to develop Wax, or keep it up to date more easily, [check out the
-project from GitHub](https://github.com/mapbox/) with git.
+project from GitHub](https://github.com/mapbox/wax) with git.
 
 See the instructions below for each mapping API ([Modest Maps](#modest-maps),
 [Leaflet](#leaflet), [Google Maps](#google-maps), [OpenLayers](#openlayers))
