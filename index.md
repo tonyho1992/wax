@@ -58,10 +58,9 @@ you'll have the power to make super-custom maps with minimal effort.
 
 So your ingredients will be:
 
-* A map server, like [TileStream](http://github.com/mapbox/tilestream),
-  [TileStream Pro](http://mapbox.com/#/tilestream), or just using the public
-  TileStream at [MapBox](http://mapbox.com). All of the examples you'll see
-  are with MapBox, so you can copy & paste at will and it'll all work.
+* A map server, like [TileStream](http://github.com/mapbox/tilestream) or
+  [MapBox Hosting](http://tiles.mapbox.com). All of the examples you'll see
+  here use MapBox Hosting, so you can copy & paste at will and it'll all work.
 * A Javascript API, like [Modest Maps](http://github.com/stamen/modestmaps-js)
 * Wax
 * Your website
