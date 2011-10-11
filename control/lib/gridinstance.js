@@ -2,12 +2,14 @@
 // ------------
 // GridInstances are queryable, fully-formed
 // objects for acquiring features from events.
+//
+// This code ignores format of 1.1-1.2
 wax.GridInstance = function(grid_tile, formatter, options) {
     options = options || {};
     // resolution is the grid-elements-per-pixel ratio of gridded data.
     // The size of a tile element. For now we expect tiles to be squares.
     var instance = {},
-        resolution = options.resolution || 4;
+        resolution = options.resolution || 4,
         tileSize = options.tileSize || 256;
 
     // Resolve the UTF-8 encoding stored in grids to simple

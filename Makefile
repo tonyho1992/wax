@@ -6,6 +6,7 @@ dist: dist_setup dist/wax.ol.min.js dist/wax.g.min.js dist/wax.mm.min.js dist/wa
 dist/wax.ol.min.js:
 	cat build/header.js \
 		ext/reqwest.min.js \
+		ext/html-sanitizer-bundle.js \
 		ext/mustache.js \
 		control/lib/*.js \
 		control/ol/*.js > dist/wax.ol.js
@@ -14,6 +15,7 @@ dist/wax.ol.min.js:
 dist/wax.g.min.js:
 	cat build/header.js \
 		ext/reqwest.min.js \
+		ext/html-sanitizer-bundle.js \
 		ext/mustache.js \
 		control/lib/*.js \
 		control/g/*.js \
@@ -23,6 +25,7 @@ dist/wax.g.min.js:
 dist/wax.mm.min.js:
 	cat build/header.js \
 		ext/reqwest.min.js \
+		ext/html-sanitizer-bundle.js \
 		ext/mustache.js \
 		control/lib/*.js \
 		control/mm/*.js \
@@ -32,6 +35,7 @@ dist/wax.mm.min.js:
 dist/wax.leaf.min.js:
 	cat build/header.js \
 		ext/reqwest.min.js \
+		ext/html-sanitizer-bundle.js \
 		ext/mustache.js \
 		control/lib/*.js \
 		control/leaf/*.js \

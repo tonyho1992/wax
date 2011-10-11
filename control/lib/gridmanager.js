@@ -9,10 +9,12 @@ wax.GridManager = function(options) {
     options = options || {};
 
     var resolution = options.resolution || 4,
+        version = options.version || '1.1',
         grid_tiles = {},
         manager = {},
         formatter;
 
+    // DEPRECATE at 4.0.0
     var formatterUrl = function(url) {
         return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
     };
@@ -25,6 +27,7 @@ wax.GridManager = function(options) {
         if (typeof formatter !== 'undefined') {
             return callback(null, formatter);
         } else {
+            // DEPRECATE at 4.0.0
             wax.request.get(formatterUrl(url), function(err, data) {
                 if (data && data.formatter) {
                     formatter = wax.formatter(data.formatter);
@@ -36,6 +39,7 @@ wax.GridManager = function(options) {
         }
     }
 
+    // DEPRECATE at 4.0.0
     function templatedGridUrl(template) {
         if (typeof template === 'string') template = [template];
         return function templatedGridFinder(url) {
@@ -52,6 +56,12 @@ wax.GridManager = function(options) {
     manager.formatter = function(x) {
         if (!arguments.length) return formatter;
         formatter =  wax.formatter(x);
+        return manager;
+    };
+
+    manager.template = function(x) {
+        if (!arguments.length) return formatter;
+        formatter =  wax.template(x);
         return manager;
     };
 
@@ -84,7 +94,12 @@ wax.GridManager = function(options) {
         return manager;
     };
 
-    if (options.formatter) manager.formatter(options.formatter);
+    if (options.template) {
+        manager.template(options.template);
+    } else if (options.formatter) {
+        manager.formatter(options.formatter);
+    }
+
     if (options.grids) manager.gridUrl(options.grids);
 
     return manager;
