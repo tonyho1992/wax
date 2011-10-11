@@ -18,11 +18,21 @@ wax.formatter = function(x) {
         f = function() {};
     }
 
+    function urlX(url) {
+        if (/^https?:\/\//.test(url)) {
+            return url;
+        }
+    }
+
+    function idX(id) {
+        return id;
+    }
+
     // Wrap the given formatter function in order to
     // catch exceptions that it may throw.
     formatter.format = function(options, data) {
         try {
-            return f(options, data);
+            return html_sanitize(f(options, data), urlX, idX);
         } catch (e) {
             if (console) console.log(e);
         }
