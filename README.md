@@ -22,9 +22,11 @@ Wax uses docco for documention. Install docco and build docs by running:
 
 ## Includes
 
-Wax currently includes one external:
+Wax currently includes three externals:
 
 * [reqwest](https://github.com/ded/reqwest) (MIT)
+* [mustache.js](https://github.com/janl/mustache.js) (MIT)
+* [html-sanitizer from Google Caja](http://code.google.com/p/google-caja/source/browse/trunk/src/com/google/caja/plugin/html-sanitizer.js) (Apache)
 
 ## Authors
 
