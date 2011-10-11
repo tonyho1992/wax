@@ -1,5 +1,10 @@
 ## Changelog
 
+## 3.1.0
+
+* Adds new formatter api: TileJSON with a `version=1.2` key and `template`
+  data will now be templated with Mustache and sent through `html-sanitizer`
+
 ### 3.0.9
 
 * Simplified hash control - `hashchange` and `pushState` APIs discontinued
