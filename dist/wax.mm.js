@@ -1,4 +1,4 @@
-/* wax - 3.0.9 - 1.0.4-417-g254103b */
+/* wax - 3.1.0 - 1.0.4-421-g974867f */
 
 
 /*!
@@ -1086,7 +1086,7 @@ wax.mm.interaction = function(map, tilejson, options) {
         callbacks = options.callbacks || new wax.tooltip(options),
         clickAction = options.clickAction || ['full', 'location'],
         clickHandler = options.clickHandler || function(url) {
-            window.location = url;
+            window.top.location = url;
         },
         eventoffset = wax.util.eventoffset,
         addEvent = MM.addEvent,
