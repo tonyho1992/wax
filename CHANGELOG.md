@@ -2,8 +2,7 @@
 
 ### 3.1.0
 
-* Default clickHandler now uses window.top.location to bust out of frames by
-  default.
+* clickHandler now uses window.top.location to bust out of frames by default.
 
 ### 3.0.9
 
