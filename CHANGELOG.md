@@ -1,5 +1,9 @@
 ## Changelog
 
+### 4.0.0
+
+* Removed `wax.Record` once again.
+
 ### 3.1.0
 
 * clickHandler now uses window.top.location to bust out of frames by default.
