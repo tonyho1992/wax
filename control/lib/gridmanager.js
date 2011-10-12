@@ -61,7 +61,7 @@ wax.GridManager = function(options) {
 
     manager.template = function(x) {
         if (!arguments.length) return formatter;
-        formatter =  wax.template(x);
+        formatter = wax.template(x);
         return manager;
     };
 
