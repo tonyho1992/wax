@@ -1,4 +1,4 @@
-/* wax - 3.1.0 - 1.0.4-422-gc929616 */
+/* wax - 3.1.0 - 1.0.4-422-g0312066 */
 
 
 /*!
@@ -1133,7 +1133,7 @@ wax.ol.Interaction =
                             that.callbacks.click(feature, tiles[t].layer.map.viewPortDiv, t);
                             break;
                         case 'location':
-                            window.location = feature;
+                            window.top.location = feature;
                             break;
                     }
                 }

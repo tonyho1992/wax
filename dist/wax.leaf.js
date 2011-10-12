@@ -1,4 +1,4 @@
-/* wax - 3.1.0 - 1.0.4-422-gc929616 */
+/* wax - 3.1.0 - 1.0.4-422-g0312066 */
 
 
 /*!
@@ -981,7 +981,7 @@ wax.leaf.interaction = function(map, tilejson, options) {
         addListener = L.DomEvent.addListener,
         removeListener = L.DomEvent.removeListener,
         clickHandler = options.clickHandler || function(url) {
-            window.location = url;
+            window.top.location = url;
         },
         interaction = {},
         _downLock = false,

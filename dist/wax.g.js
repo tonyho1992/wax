@@ -1,4 +1,4 @@
-/* wax - 3.1.0 - 1.0.4-422-gc929616 */
+/* wax - 3.1.0 - 1.0.4-422-g0312066 */
 
 
 /*!
@@ -1203,7 +1203,7 @@ wax.g.interaction = function(map, tilejson, options) {
                                     this.callbacks.click(feature, map.getDiv(), 0, evt);
                                     break;
                                 case 'location':
-                                    window.location = feature;
+                                    window.top.location = feature;
                                     break;
                             }
                         }

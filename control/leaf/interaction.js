@@ -14,7 +14,7 @@ wax.leaf.interaction = function(map, tilejson, options) {
         addListener = L.DomEvent.addListener,
         removeListener = L.DomEvent.removeListener,
         clickHandler = options.clickHandler || function(url) {
-            window.location = url;
+            window.top.location = url;
         },
         interaction = {},
         _downLock = false,

@@ -137,7 +137,7 @@ wax.ol.Interaction =
                             that.callbacks.click(feature, tiles[t].layer.map.viewPortDiv, t);
                             break;
                         case 'location':
-                            window.location = feature;
+                            window.top.location = feature;
                             break;
                     }
                 }
