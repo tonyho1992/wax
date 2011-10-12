@@ -3,6 +3,7 @@
 ### 3.1.0
 
 * clickHandler now uses window.top.location to bust out of frames by default.
+* Restore `record` control for a final tag of for version 3.
 
 ### 3.0.9
 
