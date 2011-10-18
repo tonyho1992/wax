@@ -41,11 +41,10 @@ it's a Javascript library you copy to your server, so you have control over it.
 If you just want to download the source code for Wax,
 [get a zip file from GitHub](https://github.com/mapbox/wax/downloads).
 If you want to develop Wax, or keep it up to date more easily, [check out the
-project from GitHub](https://github.com/mapbox/) with git.
+project from GitHub](https://github.com/mapbox/wax) with git.
 
-See the instructions below for each mapping API ([Modest Maps](#modest-maps),
-[Leaflet](#leaflet), [Google Maps](#google-maps), [OpenLayers](#openlayers))
-to include Wax in your project.
+See [Making Your First Map](#making-your-first-map) below for instructions on
+how to include Wax in your project.
 
 ## A Quick Intro
 
@@ -58,10 +57,9 @@ you'll have the power to make super-custom maps with minimal effort.
 
 So your ingredients will be:
 
-* A map server, like [TileStream](http://github.com/mapbox/tilestream),
-  [TileStream Pro](http://mapbox.com/#/tilestream), or just using the public
-  TileStream at [MapBox](http://mapbox.com). All of the examples you'll see
-  are with MapBox, so you can copy & paste at will and it'll all work.
+* A map server, like [TileStream](http://github.com/mapbox/tilestream) or
+  [MapBox Hosting](http://tiles.mapbox.com). All of the examples you'll see
+  here use MapBox Hosting, so you can copy & paste at will and it'll all work.
 * A Javascript API, like [Modest Maps](http://github.com/stamen/modestmaps-js)
 * Wax
 * Your website
@@ -76,7 +74,7 @@ Of course, things will get a lot cooler than this: Wax lets you use your own
 tiles, add zoom buttons, interaction, and a lot more. But it all starts out
 with tiles.
 
-## Making Your First Map
+<h2 id='making-your-first-map'>Making Your First Map</h2>
 
 The first step is to download and include the necessary Javascript code to
 make your map work. We'll also include a CSS file to start rolling with style:
