@@ -28,25 +28,22 @@ the TileJSON format at `wax.g.connector`.
 <div class='live'>
 {% highlight html %}
 <div id='map-div'></div>
-<a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
+<a
+  class='attribution'
+  href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
 <script>
-var tilejson = {
-  tilejson: '1.0.0',
-  scheme: 'tms',
-  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
-  grids: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.grid.json'],
-  formatter: function(options, data) { return data.NAME }
-};
-
-var map = new google.maps.Map(
-  document.getElementById('map-div'), {
-    center: new google.maps.LatLng(0, 0),
-    disableDefaultUI: true,
-    zoom: 1,
-    mapTypeId: google.maps.MapTypeId.ROADMAP });
-map.mapTypes.set('mb', new wax.g.connector(tilejson));
-map.setMapTypeId('mb');
-wax.g.hash(map);
+wax.tilejson('http://api.tiles.mapbox.com/v2/mapbox.geography-class.jsonp',
+  function(tilejson) {
+  var map = new google.maps.Map(
+    document.getElementById('map-div'), {
+      center: new google.maps.LatLng(0, 0),
+      disableDefaultUI: true,
+      zoom: 1,
+      mapTypeId: google.maps.MapTypeId.ROADMAP });
+  map.mapTypes.set('mb', new wax.g.connector(tilejson));
+  map.setMapTypeId('mb');
+  wax.g.hash(map);
+});
 </script>
 {% endhighlight %}
 </div>

@@ -29,17 +29,13 @@ with wax. Any other library that implements the same interface
 {% highlight html %}
 <div id='map-div'></div>
 <script>
-var tilejson = {
-  tilejson: '1.0.0',
-  scheme: 'tms',
-  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.png'],
-  grids: ['http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/{z}/{x}/{y}.grid.json'],
-  formatter: function(options, data) { return data.NAME }
-};
-var map = new L.Map('map-div')
-  .addLayer(new wax.leaf.connector(tilejson))
-  .setView(new L.LatLng(51.505, -0.09), 1);
-wax.leaf.interaction(map, tilejson);
+wax.tilejson('http://api.tiles.mapbox.com/v2/mapbox.geography-class.jsonp',
+  function(tilejson) {
+  var map = new L.Map('map-div')
+    .addLayer(new wax.leaf.connector(tilejson))
+    .setView(new L.LatLng(51.505, -0.09), 1);
+  wax.leaf.interaction(map, tilejson);
+});
 </script>
 {% endhighlight %}
 </div>

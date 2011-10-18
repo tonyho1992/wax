@@ -1,5 +1,5 @@
 ---
-title: Wax Scope and Limitations
+title: Scope and Limitations
 tags: Documentation
 layout: control
 ---
