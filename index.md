@@ -49,7 +49,7 @@ how to include Wax in your project.
 ## A Quick Intro
 
 Suppose you're making cool map designs with [TileMill](http://tilemill.com/)
-or you want to pre-built maps from [MapBox](http://mapbox.com), and you want to
+or you want to use maps from [MapBox Hosting](http://tiles.mapbox.com), and you want to
 get famous by putting them somewhere online - your blog, a big CMS, or anywhere else.
 
 Don't be afraid! It's not too hard to do, and once you've learned how to do it,
