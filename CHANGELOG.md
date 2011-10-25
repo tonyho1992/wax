@@ -6,6 +6,9 @@
   TileJSON, and possibly albums
 * Removes interaction autoconfiguration - you should use the
   `wax.tilejson()` instead to provide these details up-front.
+* Removes OpenLayers embedder and switcher controls. Embedder was deprecated
+  by changes in embedding strategy and map-exchanging should be used
+  instead of layer switching.
 
 ## 3.1.0
 
