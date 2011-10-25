@@ -1,5 +1,8 @@
 // Formatter
 // ---------
+//
+// This code is no longer the recommended code path for Wax -
+// see `template.js`, a safe implementation of Mustache templates.
 wax.formatter = function(x) {
     var formatter = {},
         f;

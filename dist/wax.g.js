@@ -1,4 +1,4 @@
-/* wax - 4.0.0 - 1.0.4-426-gab116f6 */
+/* wax - 4.0.0 - 1.0.4-435-g0b85637 */
 
 
 /*!
@@ -1461,6 +1461,9 @@ wax.bwdetect = function(options, callback) {
 };
 // Formatter
 // ---------
+//
+// This code is no longer the recommended code path for Wax -
+// see `template.js`, a safe implementation of Mustache templates.
 wax.formatter = function(x) {
     var formatter = {},
         f;
@@ -1592,32 +1595,10 @@ wax.GridManager = function(options) {
         manager = {},
         formatter;
 
-    // DEPRECATE at 4.0.0
-    var formatterUrl = function(url) {
-        return url.replace(/\d+\/\d+\/\d+\.\w+/, 'layer.json');
-    };
-
     var gridUrl = function(url) {
         return url.replace(/(\.png|\.jpg|\.jpeg)(\d*)/, '.grid.json');
     };
 
-    function getFormatter(url, callback) {
-        if (typeof formatter !== 'undefined') {
-            return callback(null, formatter);
-        } else {
-            // DEPRECATE at 4.0.0
-            wax.request.get(formatterUrl(url), function(err, data) {
-                if (data && data.formatter) {
-                    formatter = wax.formatter(data.formatter);
-                } else {
-                    formatter = false;
-                }
-                return callback(err, formatter);
-            });
-        }
-    }
-
-    // DEPRECATE at 4.0.0
     function templatedGridUrl(template) {
         if (typeof template === 'string') template = [template];
         return function templatedGridFinder(url) {
@@ -1643,13 +1624,6 @@ wax.GridManager = function(options) {
         return manager;
     };
 
-    manager.formatterUrl = function(x) {
-        if (!arguments.length) return formatterUrl;
-        formatterUrl = typeof x === 'string' ?
-            function() { return x; } : x;
-        return manager;
-    };
-
     manager.gridUrl = function(x) {
         if (!arguments.length) return gridUrl;
         gridUrl = typeof x === 'function' ?
@@ -1657,30 +1631,33 @@ wax.GridManager = function(options) {
         return manager;
     };
 
-     manager.getGrid = function(url, callback) {
-        getFormatter(url, function(err, f) {
-            var gurl = gridUrl(url);
-            if (err || !f || !gurl) return callback(err, null);
+    manager.getGrid = function(url, callback) {
+        var gurl = gridUrl(url);
+        if (err || !formatter || !gurl) return callback(err, null);
 
-            wax.request.get(gurl, function(err, t) {
-                if (err) return callback(err, null);
-                callback(null, wax.GridInstance(t, f, {
-                    resolution: resolution || 4
-                }));
-            });
+        wax.request.get(gurl, function(err, t) {
+            if (err) return callback(err, null);
+            callback(null, wax.GridInstance(t, formatter, {
+                resolution: resolution || 4
+            }));
         });
         return manager;
     };
 
-    if (options.template) {
-        manager.template(options.template);
-    } else if (options.formatter) {
-        manager.formatter(options.formatter);
-    }
+    manager.add = function(options) {
+        if (options.template) {
+            manager.template(options.template);
+        } else if (options.formatter) {
+            manager.formatter(options.formatter);
+        }
 
-    if (options.grids) manager.gridUrl(options.grids);
+        if (options.grids) {
+            manager.gridUrl(options.grids);
+        }
+        return this;
+    };
 
-    return manager;
+    return manager.add(options);
 };
 wax = wax || {};
 
