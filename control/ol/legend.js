@@ -43,4 +43,3 @@ wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
         this.legend.render(urls);
     }
 });
-
