@@ -1,5 +1,10 @@
 ## Changelog
 
+## 4.0.0
+
+* Removes `wax.Record`, which has been deprecated in favor of templating,
+  TileJSON, and possibly albums
+
 ## 3.1.0
 
 * Adds new formatter api: TileJSON with a `version=1.2` key and `template`
