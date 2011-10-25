@@ -4,6 +4,8 @@
 
 * Removes `wax.Record`, which has been deprecated in favor of templating,
   TileJSON, and possibly albums
+* Removes interaction autoconfiguration - you should use the
+  `wax.tilejson()` instead to provide these details up-front.
 
 ## 3.1.0
 
