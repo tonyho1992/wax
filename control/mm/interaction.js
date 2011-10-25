@@ -26,7 +26,7 @@ wax.mm.interaction = function(map, tilejson, options) {
         callbacks = options.callbacks || new wax.tooltip(options),
         clickAction = options.clickAction || ['full', 'location'],
         clickHandler = options.clickHandler || function(url) {
-            window.location = url;
+            window.top.location = url;
         },
         eventoffset = wax.util.eventoffset,
         addEvent = MM.addEvent,
