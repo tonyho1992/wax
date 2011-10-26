@@ -453,7 +453,7 @@ var html = (function (html4) {
   };
   
   // Schemes on which to defer to uripolicy. Urls with other schemes are denied
-  var WHITELISTED_SCHEMES = /^(?:https?|mailto)$/i;
+  var WHITELISTED_SCHEMES = /^(?:https?|mailto|data)$/i;
 
   var decimalEscapeRe = /^#(\d+)$/;
   var hexEscapeRe = /^#x([0-9A-Fa-f]+)$/;
