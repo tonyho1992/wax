@@ -1,4 +1,4 @@
-/* wax - 4.0.0 - 1.0.4-440-gb8e21ff */
+/* wax - 4.0.0 - 1.0.4-442-g02dbad3 */
 
 
 /*!
@@ -462,7 +462,7 @@ var html = (function (html4) {
   };
   
   // Schemes on which to defer to uripolicy. Urls with other schemes are denied
-  var WHITELISTED_SCHEMES = /^(?:https?|mailto)$/i;
+  var WHITELISTED_SCHEMES = /^(?:https?|mailto|data)$/i;
 
   var decimalEscapeRe = /^#(\d+)$/;
   var hexEscapeRe = /^#x([0-9A-Fa-f]+)$/;
@@ -1837,7 +1837,12 @@ wax.template = function(x) {
     var template = {};
 
     function urlX(url) {
-        if (/^https?:\/\//.test(url)) {
+        // Data URIs are subject to a bug in Firefox
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=255107
+        // which let them be a vector. But WebKit does 'the right thing'
+        // or at least 'something' about this situation, so we'll tolerate
+        // them.
+        if (/^(https?\/\/:|data:image)/.test(url)) {
             return url;
         }
     }
@@ -1850,7 +1855,11 @@ wax.template = function(x) {
     // catch exceptions that it may throw.
     template.format = function(options, data) {
         var view = {};
-        view[options.format] = data;
+        if (options) {
+            view[options.format] = data;
+        } else {
+            view = data;
+        }
         return html_sanitize(Mustache.to_html(x, view), urlX, idX);
     };
 
