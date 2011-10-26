@@ -1,4 +1,4 @@
-/* wax - 4.0.0 - 1.0.4-437-g4843524 */
+/* wax - 4.0.0 - 1.0.4-440-gb8e21ff */
 
 
 /*!
@@ -1633,7 +1633,7 @@ wax.GridManager = function(options) {
 
     manager.getGrid = function(url, callback) {
         var gurl = gridUrl(url);
-        if (err || !formatter || !gurl) return callback(err, null);
+        if (!formatter || !gurl) return callback(null, null);
 
         wax.request.get(gurl, function(err, t) {
             if (err) return callback(err, null);

@@ -52,7 +52,7 @@ wax.GridManager = function(options) {
 
     manager.getGrid = function(url, callback) {
         var gurl = gridUrl(url);
-        if (err || !formatter || !gurl) return callback(err, null);
+        if (!formatter || !gurl) return callback(null, null);
 
         wax.request.get(gurl, function(err, t) {
             if (err) return callback(err, null);
