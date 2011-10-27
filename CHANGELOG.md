@@ -1,5 +1,9 @@
 ## Changelog
 
+## 4.1.0
+
+* Adds `wax.ol.connector`, an OpenLayers connector
+
 ## 4.0.0
 
 * Removes `wax.Record`, which has been deprecated in favor of templating,
