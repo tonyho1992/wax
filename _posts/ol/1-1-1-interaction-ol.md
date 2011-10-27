@@ -22,22 +22,14 @@ in the future.
 wax.tilejson('http://d.tiles.mapbox.com/v2/mapbox.blue-marble-topo-bathy-jan.jsonp', function(tilejson) {
     var map = new OpenLayers.Map({
         div: 'map-div',
-        maxExtent: new OpenLayers.Bounds(
-          -20037500,
-          -20037500,
-          20037500,
-          20037500
-        ),
-        maxZoom:18,
-        maxResolution: 156543.0339,
-        theme: 'http://js.mapbox.com/theme/dark.css',
-        projection: new OpenLayers.Projection('EPSG:900913'),
-        units: 'm',
+        controls: [
+            new OpenLayers.Control.Navigation(),
+        ],
         layers: [
             wax.ol.connector(tilejson)
         ]
     });
-    map.zoomToExtent(extent);
+    map.zoomTo(2);
 });
 </script>
 {% endhighlight %}
