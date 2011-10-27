@@ -24,7 +24,6 @@ wax.template = function(x) {
         if (options.format) {
             data['__' + options.format + '__'] = true;
         }
-        console.log(data);
         return html_sanitize(Mustache.to_html(x, data), urlX, idX);
     };
 

@@ -1,4 +1,4 @@
-/* wax - 4.0.0 - 1.0.4-445-g286218a */
+/* wax - 4.0.0 - 1.0.4-446-gc75aaf3 */
 
 
 /*!
@@ -971,6 +971,10 @@ if (typeof window !== 'undefined') {
   window['html'] = html;
   window['html_sanitize'] = html_sanitize;
 }
+// Loosen restrictions of Caja's
+// html-sanitizer to allow for styling
+html4.ATTRIBS['*::style'] = 0;
+html4.ELEMENTS['style'] = 0;
 /*
   mustache.js — Logic-less templates in JavaScript
 
@@ -1645,7 +1649,6 @@ wax.GridManager = function(options) {
     };
 
     manager.add = function(options) {
-        console.log(options);
         if (options.template) {
             manager.template(options.template);
         } else if (options.formatter) {
@@ -1858,7 +1861,6 @@ wax.template = function(x) {
         if (options.format) {
             data['__' + options.format + '__'] = true;
         }
-        console.log(data);
         return html_sanitize(Mustache.to_html(x, data), urlX, idX);
     };
 

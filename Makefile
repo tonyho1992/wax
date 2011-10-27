@@ -7,6 +7,7 @@ dist/wax.ol.min.js:
 	cat build/header.js \
 		ext/reqwest.min.js \
 		ext/html-sanitizer-bundle.js \
+		ext/html-sanitizer-loosen.js \
 		ext/mustache.js \
 		control/lib/*.js \
 		control/ol/*.js > dist/wax.ol.js
@@ -16,6 +17,7 @@ dist/wax.g.min.js:
 	cat build/header.js \
 		ext/reqwest.min.js \
 		ext/html-sanitizer-bundle.js \
+		ext/html-sanitizer-loosen.js \
 		ext/mustache.js \
 		control/lib/*.js \
 		control/g/*.js \
@@ -26,6 +28,7 @@ dist/wax.mm.min.js:
 	cat build/header.js \
 		ext/reqwest.min.js \
 		ext/html-sanitizer-bundle.js \
+		ext/html-sanitizer-loosen.js \
 		ext/mustache.js \
 		control/lib/*.js \
 		control/mm/*.js \
@@ -36,6 +39,7 @@ dist/wax.leaf.min.js:
 	cat build/header.js \
 		ext/reqwest.min.js \
 		ext/html-sanitizer-bundle.js \
+		ext/html-sanitizer-loosen.js \
 		ext/mustache.js \
 		control/lib/*.js \
 		control/leaf/*.js \
