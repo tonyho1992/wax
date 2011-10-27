@@ -1,18 +1,8 @@
 ---
-title: Interaction
+title: Connector
 tags: OpenLayers
 layout: control-ol
 ---
-
-The interaction control adds quite a bit of logic to the map, adding
-interactivity - mouse hovers and clicks - to layers that support it, like those
-made with [TileMill](http://tilemill.com/) and the interactive
-[UTFGrid section](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md)
-of the [MBTiles spec](https://github.com/mapbox/mbtiles-spec).
-
-While we provide an interaction control for OpenLayers for projects that must
-use OpenLayers, it is not recommended for new projects, and may be discontinued
-in the future.
 
 <div class='live'>
 {% highlight html %}
