@@ -11,7 +11,8 @@ wax.ol.connector = function(tilejson) {
     return new OpenLayers.Layer.XYZ(
         tilejson.name,
         tilejson.tiles, {
+            sphericalMercator: true,
             zoomOffset: tilejson.minzoom,
-            maxZoom: tilejson.maxzoom - tilejson.minzoom
+            numZoomLevels: tilejson.maxzoom - tilejson.minzoom
         });
 };
