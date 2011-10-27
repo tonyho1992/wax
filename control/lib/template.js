@@ -21,13 +21,11 @@ wax.template = function(x) {
     // Wrap the given formatter function in order to
     // catch exceptions that it may throw.
     template.format = function(options, data) {
-        var view = {};
-        if (options) {
-            view[options.format] = data;
-        } else {
-            view = data;
+        if (options.format) {
+            data['__' + options.format + '__'] = true;
         }
-        return html_sanitize(Mustache.to_html(x, view), urlX, idX);
+        console.log(data);
+        return html_sanitize(Mustache.to_html(x, data), urlX, idX);
     };
 
     return template;
