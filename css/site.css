@@ -22,6 +22,7 @@ a { color:#b64c4c; }
   margin-left:280px;
   font:13px/20px Georgia,serif;
   color:#777;
+  overflow:auto;
   }
 
 .navigation a {
@@ -52,7 +53,7 @@ a { color:#b64c4c; }
 .navigation h1 {
   font-size:70px;
   line-height:80px;
-  margin:30px 0 30px 0;
+  margin:0 0 10px 0;
   border-bottom:1px dotted #222;
 }
 
@@ -269,3 +270,27 @@ span.hattip:before {
   content: '↑';
   margin-right:5px;
 }
+
+/* Special sauce */
+::-webkit-scrollbar {
+  height:8px;
+  width:10px;
+  background:#fff;
+  border-radius:2px;
+  }
+
+::-webkit-scrollbar:hover {
+  background:#fff;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background:#444;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius:2px;
+  background:#aaa;
+  }
+
+::-webkit-scrollbar-thumb:vertical { height:25px; }
+::-webkit-scrollbar-thumb:horizontal { width:25px; }
