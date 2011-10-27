@@ -9,6 +9,7 @@ dist/wax.ol.min.js:
 		ext/html-sanitizer-bundle.js \
 		ext/html-sanitizer-loosen.js \
 		ext/mustache.js \
+		connectors/ol/*.js \
 		control/lib/*.js \
 		control/ol/*.js > dist/wax.ol.js
 	$(UGLIFYJS) dist/wax.ol.js > dist/wax.ol.min.js
