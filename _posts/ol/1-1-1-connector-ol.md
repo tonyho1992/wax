@@ -14,7 +14,7 @@ function(tilejson) {
     var map = new OpenLayers.Map({
         div: 'map-div',
         controls: [
-            new OpenLayers.Control.Navigation(),
+            new OpenLayers.Control.Navigation()
         ],
         layers: [
             wax.ol.connector(tilejson)
