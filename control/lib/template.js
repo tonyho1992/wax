@@ -18,13 +18,17 @@ wax.template = function(x) {
         return id;
     }
 
-    // Wrap the given formatter function in order to
-    // catch exceptions that it may throw.
+    // Clone the data object such that the '__[format]__' key is only
+    // set for this instance of templating.
     template.format = function(options, data) {
-        if (options.format) {
-            data['__' + options.format + '__'] = true;
+        var clone = {};
+        for (var key in data) {
+            clone[key] = data[key];
         }
-        return html_sanitize(Mustache.to_html(x, data), urlX, idX);
+        if (options.format) {
+            clone['__' + options.format + '__'] = true;
+        }
+        return html_sanitize(Mustache.to_html(x, clone), urlX, idX);
     };
 
     return template;
