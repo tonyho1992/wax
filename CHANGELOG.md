@@ -1,5 +1,9 @@
 ## Changelog
 
+## 4.1.1
+
+* Fix for URL regex in HTML sanitizer integration.
+
 ## 4.1.0
 
 * Adds `wax.ol.connector`, an OpenLayers connector
