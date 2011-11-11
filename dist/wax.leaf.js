@@ -1,4 +1,4 @@
-/* wax - 4.1.0 - 1.0.4-453-g7180022 */
+/* wax - 4.1.0 - 1.0.4-455-gdb8fffd */
 
 
 /*!
@@ -1487,7 +1487,7 @@ wax.formatter = function(x) {
     }
 
     function urlX(url) {
-        if (/^https?:\/\//.test(url)) {
+        if (/^(https?:\/\/|data:image)/.test(url)) {
             return url;
         }
     }
@@ -1846,7 +1846,7 @@ wax.template = function(x) {
         // which let them be a vector. But WebKit does 'the right thing'
         // or at least 'something' about this situation, so we'll tolerate
         // them.
-        if (/^(https?\/\/:|data:image)/.test(url)) {
+        if (/^(https?:\/\/|data:image)/.test(url)) {
             return url;
         }
     }

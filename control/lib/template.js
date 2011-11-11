@@ -9,7 +9,7 @@ wax.template = function(x) {
         // which let them be a vector. But WebKit does 'the right thing'
         // or at least 'something' about this situation, so we'll tolerate
         // them.
-        if (/^(https?\/\/:|data:image)/.test(url)) {
+        if (/^(https?:\/\/|data:image)/.test(url)) {
             return url;
         }
     }

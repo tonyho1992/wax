@@ -22,7 +22,7 @@ wax.formatter = function(x) {
     }
 
     function urlX(url) {
-        if (/^https?:\/\//.test(url)) {
+        if (/^(https?:\/\/|data:image)/.test(url)) {
             return url;
         }
     }
