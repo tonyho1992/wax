@@ -1,4 +1,4 @@
-/* wax - 4.1.1 - 1.0.4-456-g5ea5562 */
+/* wax - 4.1.1 - 1.0.4-458-g3a9283d */
 
 
 /*!
@@ -1379,9 +1379,24 @@ wax.attribution = function() {
     var container,
         a = {};
 
+    function urlX(url) {
+        // Data URIs are subject to a bug in Firefox
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=255107
+        // which let them be a vector. But WebKit does 'the right thing'
+        // or at least 'something' about this situation, so we'll tolerate
+        // them.
+        if (/^(https?:\/\/|data:image)/.test(url)) {
+            return url;
+        }
+    }
+
+    function idX(id) {
+        return id;
+    }
+
     a.set = function(content) {
         if (typeof content === 'undefined') return;
-        container.innerHTML = content;
+        container.innerHTML = html_sanitize(content, urlX, idX);
         return this;
     };
 
@@ -1740,6 +1755,21 @@ wax.legend = function() {
         legend = {},
         container;
 
+    function urlX(url) {
+        // Data URIs are subject to a bug in Firefox
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=255107
+        // which let them be a vector. But WebKit does 'the right thing'
+        // or at least 'something' about this situation, so we'll tolerate
+        // them.
+        if (/^(https?:\/\/|data:image)/.test(url)) {
+            return url;
+        }
+    }
+
+    function idX(id) {
+        return id;
+    }
+
     legend.element = function() {
         return container;
     };
@@ -1747,7 +1777,7 @@ wax.legend = function() {
     legend.content = function(content) {
         if (!arguments.length) return element.innerHTML;
         if (content) {
-            element.innerHTML = content;
+            element.innerHTML = html_sanitize(content, urlX, idX);
             element.style.display = 'block';
         } else {
             element.innerHTML = '';
@@ -1855,13 +1885,17 @@ wax.template = function(x) {
         return id;
     }
 
-    // Wrap the given formatter function in order to
-    // catch exceptions that it may throw.
+    // Clone the data object such that the '__[format]__' key is only
+    // set for this instance of templating.
     template.format = function(options, data) {
-        if (options.format) {
-            data['__' + options.format + '__'] = true;
+        var clone = {};
+        for (var key in data) {
+            clone[key] = data[key];
         }
-        return html_sanitize(Mustache.to_html(x, data), urlX, idX);
+        if (options.format) {
+            clone['__' + options.format + '__'] = true;
+        }
+        return html_sanitize(Mustache.to_html(x, clone), urlX, idX);
     };
 
     return template;
