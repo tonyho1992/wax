@@ -1,5 +1,10 @@
 ## Changelog
 
+## 4.1.2
+
+* Sanitize legend, attribution output.
+* Fix bug where template would return multiple formats.
+
 ## 4.1.1
 
 * Fix for URL regex in HTML sanitizer integration.
