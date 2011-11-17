@@ -46,7 +46,7 @@ wax.mm.fullscreen = function(map) {
     };
     fullscreen.original = function() {
         if (!state) { return; } else { state = false; }
-        map.parent.className = map.parent.className.replace('wax-fullscreen-map', '');
+        map.parent.className = map.parent.className.replace(' wax-fullscreen-map', '');
         map.setSize(
             smallSize[0],
             smallSize[1]);
