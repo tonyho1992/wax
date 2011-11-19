@@ -1,5 +1,10 @@
 ## Changelog
 
+## 4.1.3
+
+* Adds a class, `wax-fullscreen-view`, when the fullscreen control
+  is toggled.
+
 ## 4.1.2
 
 * Sanitize legend, attribution output.
