@@ -8,15 +8,22 @@ wax.mm.connector = function(options) {
         tiles: options.tiles,
         scheme: options.scheme || 'xyz',
         minzoom: options.minzoom || 0,
-        maxzoom: options.maxzoom || 22
+        maxzoom: options.maxzoom || 22,
+        bounds: options.bounds || [-180, -90, 180, 90]
     };
 };
 
 wax.mm.connector.prototype = {
     outerLimits: function() {
         return [
-            new com.modestmaps.Coordinate(0,0,0).zoomTo(this.options.minzoom),
-            new com.modestmaps.Coordinate(1,1,0).zoomTo(this.options.maxzoom)
+            this.locationCoordinate(
+                new com.modestmaps.Location(
+                    this.options.bounds[0],
+                    this.options.bounds[1])).zoomTo(this.options.minzoom),
+            this.locationCoordinate(
+                new com.modestmaps.Location(
+                    this.options.bounds[2],
+                    this.options.bounds[3])).zoomTo(this.options.maxzoom)
         ];
     },
     getTileUrl: function(c) {
