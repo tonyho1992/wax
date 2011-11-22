@@ -1,4 +1,4 @@
-/* wax - 4.1.3 - 1.0.4-463-gefcb925 */
+/* wax - 4.1.3 - 1.0.4-464-g4396529 */
 
 
 /*!
@@ -2394,7 +2394,7 @@ wax.ol.Interaction =
                         if (feature && that.feature[t] !== feature) {
                             that.feature[t] = feature;
                             that.callbacks.out(tiles[t].layer.map.div);
-                            that.callbacks.over(feature, tiles[t].layer.map.div);
+                            that.callbacks.over(feature, tiles[t].layer.map.div, evt);
                         } else if (!feature) {
                             that.feature[t] = null;
                             that.callbacks.out(tiles[t].layer.map.div);

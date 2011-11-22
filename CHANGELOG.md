@@ -1,5 +1,9 @@
 ## Changelog
 
+## 4.1.4 (dev)
+
+* Calls callbacks with `evt` argument from `wax.ol.interaction`
+
 ## 4.1.3
 
 * Adds a class, `wax-fullscreen-view`, when the fullscreen control
