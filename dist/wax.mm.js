@@ -1,4 +1,4 @@
-/* wax - 4.1.3 - 1.0.4-463-gefcb925 */
+/* wax - 4.1.3 - 1.0.4-464-g4396529 */
 
 
 /*!
@@ -2537,7 +2537,9 @@ wax.mm.interaction = function(map, tilejson, options) {
         _d,
         // Touch tolerance
         tol = 4,
-        tileGrid;
+        tileGrid,
+        clearingEvents = ['zoomed', 'panned', 'centered',
+            'extentset', 'resized', 'drawn'];
 
     // Search through `.tiles` and determine the position,
     // from the top-left of the **document**, and cache that data
@@ -2592,6 +2594,7 @@ wax.mm.interaction = function(map, tilejson, options) {
         // If the user is actually dragging the map, exit early
         // to avoid performance hits.
         if (_downLock) return;
+        if (e.target.className !== 'map-tile-loaded') return;
 
         var pos = eventoffset(e),
             tile = getTile(pos),
@@ -2620,6 +2623,7 @@ wax.mm.interaction = function(map, tilejson, options) {
 
     // A handler for 'down' events - which means `mousedown` and `touchstart`
     function onDown(e) {
+        if (e.target.className !== 'map-tile-loaded') return;
         // Ignore double-clicks by ignoring clicks within 300ms of
         // each other.
         if (killTimeout()) { return; }
@@ -2710,10 +2714,8 @@ wax.mm.interaction = function(map, tilejson, options) {
 
     // Attach listeners to the map
     interaction.add = function() {
-        var l = ['zoomed', 'panned', 'centered',
-            'extentset', 'resized', 'drawn'];
-        for (var i = 0; i < l.length; i++) {
-            map.addCallback(l[i], clearTileGrid);
+        for (var i = 0; i < clearingEvents.length; i++) {
+            map.addCallback(clearingEvents[i], clearTileGrid);
         }
         addEvent(map.parent, 'mousemove', onMove);
         addEvent(map.parent, 'mousedown', onDown);
@@ -2725,10 +2727,8 @@ wax.mm.interaction = function(map, tilejson, options) {
 
     // Remove this control from the map.
     interaction.remove = function() {
-        var l = ['zoomed', 'panned', 'centered',
-            'extentset', 'resized', 'drawn'];
-        for (var i = 0; i < l.length; i++) {
-            map.removeCallback(l[i], clearTileGrid);
+        for (var i = 0; i < clearingEvents.length; i++) {
+            map.removeCallback(clearingEvents[i], clearTileGrid);
         }
         removeEvent(map.parent, 'mousemove', onMove);
         removeEvent(map.parent, 'mousedown', onDown);
