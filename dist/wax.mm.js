@@ -1,4 +1,4 @@
-/* wax - 4.1.3 - 1.0.4-464-g4396529 */
+/* wax - 4.1.3 - 1.0.4-467-gda35797 */
 
 
 /*!
@@ -2659,13 +2659,12 @@ wax.mm.interaction = function(map, tilejson, options) {
     }
 
     function onUp(e) {
-        var event = {},
+        var evt = {},
             pos = eventoffset(e);
-        
         _downLock = false;
 
         for (var key in e) {
-          event[key] = e[key];
+          evt[key] = e[key];
         }
 
         removeEvent(document.body, 'mouseup', onUp);
@@ -2681,10 +2680,11 @@ wax.mm.interaction = function(map, tilejson, options) {
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
             Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
             // Contain the event data in a closure.
-            _clickTimeout = window.setTimeout(function() {
-                _clickTimeout = null;
-                click(event, pos);
-            }, 50);
+            _clickTimeout = window.setTimeout(
+                function() {
+                    _clickTimeout = null;
+                    click(evt, pos);
+                }, 300);
         }
         return onUp;
     }

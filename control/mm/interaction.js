@@ -163,8 +163,13 @@ wax.mm.interaction = function(map, tilejson, options) {
     }
 
     function onUp(e) {
-        var pos = eventoffset(e);
+        var evt = {},
+            pos = eventoffset(e);
         _downLock = false;
+
+        for (var key in e) {
+          evt[key] = e[key];
+        }
 
         removeEvent(document.body, 'mouseup', onUp);
 
@@ -182,7 +187,7 @@ wax.mm.interaction = function(map, tilejson, options) {
             _clickTimeout = window.setTimeout(
                 function() {
                     _clickTimeout = null;
-                    click(e, pos);
+                    click(evt, pos);
                 }, 300);
         }
         return onUp;
