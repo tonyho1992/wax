@@ -166,7 +166,7 @@ By inference we can write the TileJSON needed to use the World Light tileset:
 - The `version` key declares that we are implementing version `1.0.0` of the
   TileJSON spec. Since there's only one version of TileJSON so far, it'll be `1.0.0` for you, too.
 - The `scheme` key defines the order in which tiles are saved. Don't worry about this right now -
-  you'll want the `xyz` scheme in most cases, but may find servers use the `tms` scheme.
+  you'll want the `xyz` scheme in most cases, but may find servers that use the `tms` scheme.
 - The `tiles` key contains an array of URLs from which tiles can be requested. Pro users can put
   multiple tile URLs here so that they can request tiles from multiple domains simultaneously.
 
