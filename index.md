@@ -15,7 +15,7 @@ web-mapping pro.
 <div id='intro-map'></div>
 <script>
 var mm = com.modestmaps;
-var url = 'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class';
+var url = 'http://api.tiles.mapbox.com/v3/mapbox.geography-class.jsonp';
 
 wax.tilejson(url, function(tilejson) {
   var m = new mm.Map('intro-map',
@@ -39,7 +39,7 @@ To follow this quick tutorial, you'll need a copy of Wax: unlike Google Maps,
 it's a Javascript library you copy to your server, so you have control over it.
 
 If you just want to download the source code for Wax,
-[get a zip file from GitHub](https://github.com/mapbox/wax/downloads).
+[get a zip file from GitHub](https://github.com/mapbox/wax/tags).
 If you want to develop Wax, or keep it up to date more easily, [check out the
 project from GitHub](https://github.com/mapbox/wax) with git.
 
@@ -66,9 +66,9 @@ So your ingredients will be:
 
 The mapping server serves up **tiles** of rendered data - tiles being 256 pixel
 square images covering some of the world. Here's a tile of Europe from the
-[World Light tileset](http://mapbox.com/tileset/world-light).
+[World Light tileset](http://tiles.mapbox.com/mapbox/map/world-light).
 
-![Europe](http://a.tile.mapbox.com/1.0.0/world-light/2/2/2.png)
+![Europe](http://a.tiles.mapbox.com/v3/mapbox.world-light/2/2/1.png)
 
 Of course, things will get a lot cooler than this: Wax lets you use your own
 tiles, add zoom buttons, interaction, and a lot more. But it all starts out
@@ -105,8 +105,8 @@ Modest Maps is making the tiles move when you click and drag.
 <script>
 var tilejson = {
   tilejson: '1.0.0',
-  scheme: 'tms',
-  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/world-light/{z}/{x}/{y}.png']
+  scheme: 'xyz',
+  tiles: ['http://a.tiles.mapbox.com/v3/mapbox.world-light/{z}/{x}/{y}.png']
 };
 // Alias com.modestmaps to mm. This isn't necessary -
 // just nice for shorter code.
@@ -152,28 +152,28 @@ where `{z}` is the *zoom level*, `{x}` is the *x coordinate* and `{y}` is
 the *y coordinate*. TileJSON represents tileset URLs using these placeholders
 so that a tile at any coordinate can be requested.
 
-The URL of the tile above is `http://a.tile.mapbox.com/1.0.0/world-light/2/2/2.png`.
+The URL of the tile above is `http://a.tiles.mapbox.com/v3/mapbox.world-light/2/2/1.png`.
 By inference we can write the TileJSON needed to use the World Light tileset:
 
 {% highlight js %}
 {
   "version": "1.0.0",
-  "scheme": "tms",
-  "tiles" ["http://a.tile.mapbox.com/1.0.0/world-light/{z}/{x}/{y}.png"]
+  "scheme": "xyz",
+  "tiles" ["http://a.tiles.mapbox.com/v3/mapbox.world-light/{z}/{x}/{y}.png"]
 }
 {% endhighlight %}
 
 - The `version` key declares that we are implementing version `1.0.0` of the
   TileJSON spec. Since there's only one version of TileJSON so far, it'll be `1.0.0` for you, too.
-- The `scheme` key defines the order in which tiles are saved. Don't worry about this -
-  for all tilesets that have `1.0.0` in the URL, this'll be `tms`
-- The `tiles` key contains an array of URLs from which tiles can be requested. Pro users
+- The `scheme` key defines the order in which tiles are saved. Don't worry about this right now -
+  you'll want the `xyz` scheme in most cases, but may find servers use the `tms` scheme.
+- The `tiles` key contains an array of URLs from which tiles can be requested. Pro users can put
   multiple tile URLs here so that they can request tiles from multiple domains simultaneously.
 
 
 ## Autopilot for TileJSON
 
-Some servers, like [TileStream](http://github.com/mapbox/tilestream) provide TileJSON
+Some servers, like [MapBox Hosting](http://tiles.mapbox.com/) provide TileJSON
 definitions for all of the tilesets they serve. This way, it's easy to configure maps, since
 all you need to know is the URL of the TileJSON file, and that'll provide you with values
 for urls, a centerpoint, zoom ranges, and more. Wax contains a helper function that just
@@ -181,13 +181,11 @@ pulls a TileJSON description from a server using [JSONP](http://en.wikipedia.org
 and gives it to you as an argument to a callback function that you can use to configure
 your map.
 
-Here we're using the url `http://tiles.mapbox.com/mapbox/api/Tileset/dc-nightvision` for
-the TileJSON for dc-nightvision - using the TileStream API. These are also available off of tilesets
-in `layer.json` files. As an example, `http://a.tiles.mapbox.com/mapbox/1.0.0/dc-nightvision/0/0/0.png`
-has a TileJSON definition at `http://a.tiles.mapbox.com/mapbox/1.0.0/dc-nightvision/layer.json`
+Here we're using the url `http://api.tiles.mapbox.com/v3/mapbox.dc-nightvision.jsonp` for
+the TileJSON for dc-nightvision - using the [MapBox Hosting API](http://mapbox.com/hosting/api/).
 
 {% highlight js %}
-var url = 'http://tiles.mapbox.com/mapbox/api/Tileset/dc-nightvision';
+var url = 'http://api.tiles.mapbox.com/v3/mapbox.dc-nightvision.jsonp';
 wax.tilejson(url, function(tilejson) {
   var mm = com.modestmaps;
   var m = new mm.Map('tilejson-url',
