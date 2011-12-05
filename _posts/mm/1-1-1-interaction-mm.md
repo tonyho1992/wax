@@ -7,8 +7,7 @@ layout: control
 The interaction control adds quite a bit of logic to the map, adding
 interactivity - mouse hovers and clicks - to layers that support it, like those
 made with [TileMill](http://tilemill.com/) and the interactive
-[UTFGrid section](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md)
-of the [MBTiles spec](https://github.com/mapbox/mbtiles-spec).
+[UTFGrid spec](https://github.com/mapbox/utfgrid-spec).
 
 The interaction control takes a parameter, `callbacks`, that has the
 default value of `new wax.tooltip()` - the default tooltip library that comes
@@ -22,9 +21,8 @@ with wax. Any other library that implements the same interface
 <div id='map-div'></div>
 <script>
 var mm = com.modestmaps;
-wax.tilejson(
-  'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
-  function(tilejson) {
+var url = 'http://api.tiles.mapbox.com/v3/mapbox.geography-class.jsonp';
+wax.tilejson(url, function(tilejson) {
     var m = new mm.Map('map-div',
       new wax.mm.connector(tilejson));
 
