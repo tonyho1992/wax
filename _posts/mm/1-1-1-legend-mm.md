@@ -15,7 +15,7 @@ and then you can add it to a map by chaining `.appendTo(map.parent)`.
 <script>
 var mm = com.modestmaps;
 wax.tilejson(
-  'http://tiles.mapbox.com/mapbox/api/Tileset/geography-class',
+  'http://api.tiles.mapbox.com/v3/mapbox.geography-class.jsonp',
   function(tilejson) {
     var m = new mm.Map('map-div',
       new wax.mm.connector(tilejson));

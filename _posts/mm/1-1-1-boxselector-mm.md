@@ -16,23 +16,22 @@ offline use.
 <div id='map-div'></div>
 <script>
 var mm = com.modestmaps;
-var tilejson = {
-  tilejson: '1.0.0',
-  scheme: 'tms',
-  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-bathy-jul/{z}/{x}/{y}.png']
-};
 
-var m = new mm.Map('map-div',
-  new wax.mm.connector(tilejson));
-wax.mm.boxselector(m, tilejson, {
-  callback: function(coords) {
-    $('#boxselector-text').text(
-      coords.map(function(c) {
-        return c.lat + ',' + c.lon;
-      }).join(' - '));
-  }
+var url = 'http://api.tiles.mapbox.com/v3/mapbox.blue-marble-topo-bathy-jul.jsonp';
+
+wax.tilejson(url, function(tilejson) {
+    var m = new mm.Map('map-div',
+      new wax.mm.connector(tilejson));
+    wax.mm.boxselector(m, tilejson, {
+      callback: function(coords) {
+        $('#boxselector-text').text(
+          coords.map(function(c) {
+            return c.lat + ',' + c.lon;
+          }).join(' - '));
+      }
+    });
+    m.setCenterZoom(new mm.Location(39, -98), 2);
 });
-m.setCenterZoom(new mm.Location(39, -98), 2);
 </script>
 <div class='widget'>Selection: <span id='boxselector-text'></span></div>
 </div>

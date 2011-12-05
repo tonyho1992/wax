@@ -14,15 +14,14 @@ appends them to the map.
 <div id='map-div'></div>
 <script>
 var mm = com.modestmaps;
-var tilejson = {
-  tilejson: '1.0.0',
-  scheme: 'tms',
-  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/world-bright/{z}/{x}/{y}.png']
-};
-var m = new mm.Map('map-div',
-  new wax.mm.connector(tilejson));
-wax.mm.zoomer(m, tilejson).appendTo(m.parent);
-m.setCenterZoom(new mm.Location(39, -98), 2);
+
+wax.tilejson('http://api.tiles.mapbox.com/v3/mapbox.world-bright.jsonp',
+    function(tilejson) {
+    var m = new mm.Map('map-div',
+      new wax.mm.connector(tilejson));
+    wax.mm.zoomer(m, tilejson).appendTo(m.parent);
+    m.setCenterZoom(new mm.Location(39, -98), 2);
+});
 </script>
 {% endhighlight %}
 </div>

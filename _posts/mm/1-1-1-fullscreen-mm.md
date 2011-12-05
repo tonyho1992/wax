@@ -19,7 +19,8 @@ and you can replace it with your own.
 <div id='map-div'></div>
 <script>
 var mm = com.modestmaps;
-wax.tilejson('http://a.tiles.mapbox.com/mapbox/1.0.0/world-light/layer.json',
+wax.tilejson(
+'http://api.tiles.mapbox.com/v3/mapbox.natural-earth-2.jsonp',
   function(tilejson) {
     var m = new mm.Map('map-div', new wax.mm.connector(tilejson));
 

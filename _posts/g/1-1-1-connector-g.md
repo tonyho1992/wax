@@ -38,7 +38,7 @@ the TileJSON format at `wax.g.connector`.
 <div id='map-div'></div>
 <a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
 <script>
-wax.tilejson('http://a.tiles.mapbox.com/mapbox/1.0.0/geography-class/layer.json',
+wax.tilejson('http://api.tiles.mapbox.com/v3/mapbox.geography-class.jsonp',
   function(tilejson) {
   var m = new google.maps.Map(
     document.getElementById('map-div'), {

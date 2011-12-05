@@ -19,26 +19,23 @@ names.
 <a href='#' id='trigger-high'>high quality</a>
 <script>
 var mm = com.modestmaps;
-var tilejson = {
-  tilejson: '1.0.0',
-  scheme: 'tms',
-  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/blue-marble-topo-jul' +
-    ',world-bank-borders-ar/{z}/{x}/{y}.png']
-};
+var url = 'http://api.tiles.mapbox.com/v3/mapbox.blue-marble-topo-jul.jsonp';
 
-var m = new mm.Map('map-div',
-  new wax.mm.connector(tilejson), null,
-  [new mm.MouseHandler(), new mm.TouchHandler()]);
-var bw = wax.mm.bwdetect(m, {
-  png: '.png32'
+wax.tilejson(url, function(tilejson) {
+    var m = new mm.Map('map-div',
+      new wax.mm.connector(tilejson), null,
+      [new mm.MouseHandler(), new mm.TouchHandler()]);
+    var bw = wax.mm.bwdetect(m, {
+      png: '.png32'
+    });
+    document.getElementById('trigger-low').onclick = function() {
+      bw.bw(0); return false;
+    };
+    document.getElementById('trigger-high').onclick = function() {
+      bw.bw(1); return false;
+    };
+    m.setCenterZoom(new mm.Location(39, -98), 2);
 });
-document.getElementById('trigger-low').onclick = function() {
-  bw.bw(0); return false;
-};
-document.getElementById('trigger-high').onclick = function() {
-  bw.bw(1); return false;
-};
-m.setCenterZoom(new mm.Location(39, -98), 2);
 </script>
 {% endhighlight %}
 </div>

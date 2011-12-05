@@ -108,18 +108,22 @@ var tilejson = {
   scheme: 'xyz',
   tiles: ['http://a.tiles.mapbox.com/v3/mapbox.world-light/{z}/{x}/{y}.png']
 };
+
+var url = 'http://api.tiles.mapbox.com/v3/mapbox.world-light.jsonp';
 // Alias com.modestmaps to mm. This isn't necessary -
 // just nice for shorter code.
 var mm = com.modestmaps;
-// Set up a map in a div with the id 'modestmaps-setup'
-var m = new mm.Map('modestmaps-setup',
-  // Use Wax's connector to add a new custom layer
-  new wax.mm.connector(tilejson),
-  // And it'll be 240px by 120px
-  new mm.Point(240,120));
+wax.tilejson(url, function(tilejson) {
+    // Set up a map in a div with the id 'modestmaps-setup'
+    var m = new mm.Map('modestmaps-setup',
+      // Use Wax's connector to add a new custom layer
+      new wax.mm.connector(tilejson),
+      // And it'll be 240px by 120px
+      new mm.Point(240,120));
 
-// Center it on the United States, at zoom level 2.
-m.setCenterZoom(new mm.Location(39, -98), 2);
+    // Center it on the United States, at zoom level 2.
+    m.setCenterZoom(new mm.Location(39, -98), 2);
+});
 </script>
 {% endhighlight %}
 </pre>

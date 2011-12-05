@@ -14,18 +14,16 @@ the initial user.
 <div id='map-div'></div>
 <script>
 var mm = com.modestmaps;
-var tilejson = {
-  tilejson: '1.0.0',
-  scheme: 'tms',
-  tiles: ['http://a.tiles.mapbox.com/mapbox/1.0.0/natural-earth-2/{z}/{x}/{y}.png']
-};
+var url = 'http://api.tiles.mapbox.com/v3/mapbox.natural-earth-2.jsonp';
 
-var map = new mm.Map('map-div',
-  new wax.mm.connector(tilejson));
+wax.tilejson(url, function(tilejson) {
+    var map = new mm.Map('map-div',
+      new wax.mm.connector(tilejson));
 
-wax.mm.hash(map);
+    wax.mm.hash(map);
 
-map.setCenterZoom(new mm.Location(10, 20), 2);
+    map.setCenterZoom(new mm.Location(10, 20), 2);
+});
 </script>
 {% endhighlight %}
 </div>
