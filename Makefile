@@ -1,7 +1,9 @@
 UGLIFYJS = ./node_modules/.bin/uglifyjs
 BANNER = ./node_modules/.bin/banner
 
-dist: dist_setup dist/wax.ol.min.js dist/wax.g.min.js dist/wax.mm.min.js dist/wax.leaf.min.js lint
+dist: dist_setup dist/wax.ol.min.js \
+	dist/wax.g.min.js dist/wax.mm.min.js \
+	dist/wax.leaf.min.js dist/wax.p.min.js lint
 
 dist/wax.ol.min.js:
 	cat build/header.js \
@@ -46,6 +48,13 @@ dist/wax.leaf.min.js:
 		control/leaf/*.js \
 		connectors/leaf/*.js > dist/wax.leaf.js
 	$(UGLIFYJS) dist/wax.leaf.js > dist/wax.leaf.min.js
+
+dist/wax.p.min.js:
+	cat build/header.js \
+		ext/reqwest.min.js \
+		control/lib/*.js \
+		connectors/p/*.js > dist/wax.p.js
+	$(UGLIFYJS) dist/wax.p.js > dist/wax.p.min.js
 
 dist_setup:
 	rm -rf dist
