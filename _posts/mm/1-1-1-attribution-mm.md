@@ -16,7 +16,7 @@ and then you can add it to a map by chaining `.appendTo(map.parent)`.
 var mm = com.modestmaps;
 
 wax.tilejson(
-  'http://tiles.mapbox.com/mapbox/api/Tileset/haiti-terrain',
+  'http://api.tiles.mapbox.com/v3/mapbox.haiti-terrain.jsonp',
   function(tilejson) {
     var m = new mm.Map('map-div',
       new wax.mm.connector(tilejson));
