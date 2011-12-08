@@ -7,6 +7,7 @@
   elements that are not actually map tiles. This changes behavior
   significantly
 * Adds latlngtooltip - a hover-based tooltip.
+* Adds a Polymaps connector to the build.
 
 ## 4.1.3
 
