@@ -3,6 +3,10 @@
 ## 4.1.4 (dev)
 
 * Calls callbacks with `evt` argument from `wax.ol.interaction`
+* Strict interaction: doesn't tolerate actions that are on
+  elements that are not actually map tiles. This changes behavior
+  significantly
+* Adds latlngtooltip - a hover-based tooltip.
 
 ## 4.1.3
 
