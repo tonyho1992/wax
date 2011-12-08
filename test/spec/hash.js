@@ -7,11 +7,8 @@ describe('hash', function() {
 
         window.location.hash = '';
 
-        div.style.width = '400px';
-        div.style.height = '400px';
-
         map = new mm.Map(div, new mm.TemplatedMapProvider(
-            'http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', ['a.']));
+            'http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', ['a.']), new com.modestmaps.Point(10, 10));
 
         wax.mm.hash(map);
     });
@@ -33,7 +30,7 @@ describe('hash', function() {
         runs(function() {
           map.setCenterZoom(new mm.Location(25, 25), 2);
         });
-        waits(600);
+        waits(1000);
         runs(function() {
           expect(window.location.hash).toEqual('#2.00/25.0/25.0');
         });

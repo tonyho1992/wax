@@ -3,11 +3,9 @@ describe('zoomer', function() {
 
     beforeEach(function() {
         var div = document.createElement('div');
-        div.style.width = '400px';
-        div.style.height = '400px';
 
         map = new com.modestmaps.Map(div, new com.modestmaps.TemplatedMapProvider(
-            'http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', ['a.']));
+            'http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', ['a.']), new com.modestmaps.Point(600, 400));
         map.setCenterZoom(new com.modestmaps.Location(37.811530, -122.2666097), 10);
         wax.mm.zoomer(map).appendTo(map.parent);
     });
@@ -25,12 +23,22 @@ describe('zoomer', function() {
     });
 
     it('marks as unzoomable when zoom is zero', function() {
-        map.setZoom(0);
-        expect($('.zoomout', map.parent).hasClass('zoomdisabled')).toEqual(true);
+        runs(function() {
+            map.setZoom(0);
+        });
+        waits(100);
+        runs(function() {
+            expect($('.zoomout', map.parent).hasClass('zoomdisabled')).toEqual(true);
+        });
     });
 
     it('marks as unzoomable when zoom is eighteen', function() {
-        map.setZoom(18);
-        expect($('.zoomin', map.parent).hasClass('zoomdisabled')).toEqual(true);
+        runs(function() {
+            map.setZoom(18);
+        });
+        waits(100);
+        runs(function() {
+            expect($('.zoomin', map.parent).hasClass('zoomdisabled')).toEqual(true);
+        });
     });
 });
