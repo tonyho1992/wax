@@ -70,6 +70,16 @@ a.zoomer {
   -moz-transition:opacity .5s;
   }
 
+.wax-movetip {
+  position:absolute;
+  z-index:999999;
+  background:#333;
+  color:#fff;
+  padding:10px;
+  max-width:300px;
+}
+
+
 .wax-tooltip.hide { opacity:0; }
 
 .wax-tooltip .close {
