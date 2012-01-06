@@ -98,7 +98,8 @@ wax.mm.interaction = function(map, tilejson, options) {
         // If the user is actually dragging the map, exit early
         // to avoid performance hits.
         if (_downLock) return;
-        if (e.target.className !== 'map-tile-loaded') return;
+        var t = e.target || e.srcElement;
+        if (t.className !== 'map-tile-loaded') return;
 
         var pos = eventoffset(e),
             tile = getTile(pos),
