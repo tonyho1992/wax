@@ -1,4 +1,4 @@
-/* wax - 4.1.3 - 1.0.4-478-ga83517c */
+/* wax - 4.1.5 - 1.0.4-481-g4c2189b */
 
 
 /*!
@@ -778,6 +778,7 @@ wax.tooltip.prototype.click = function(feature, context) {
     // IE compatibility.
     if (close.addEventListener) {
         close.addEventListener('click', closeClick, false);
+        close.addEventListener('touchend', closeClick, false);
     } else if (close.attachEvent) {
         close.attachEvent('onclick', closeClick);
     }

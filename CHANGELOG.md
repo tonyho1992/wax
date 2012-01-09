@@ -1,6 +1,10 @@
 ## Changelog
 
-## 4.1.4 (dev)
+## 4.1.5
+
+* Fixes a bug in touch interaction controls discovered and fixed by @lxbarth
+
+## 4.1.4
 
 * Calls callbacks with `evt` argument from `wax.ol.interaction`
 * Strict interaction: doesn't tolerate actions that are on

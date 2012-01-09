@@ -1,4 +1,4 @@
-/* wax - 4.1.3 - 1.0.4-478-ga83517c */
+/* wax - 4.1.5 - 1.0.4-481-g4c2189b */
 
 
 /*!
@@ -2142,6 +2142,7 @@ wax.tooltip.prototype.click = function(feature, context) {
     // IE compatibility.
     if (close.addEventListener) {
         close.addEventListener('click', closeClick, false);
+        close.addEventListener('touchend', closeClick, false);
     } else if (close.attachEvent) {
         close.attachEvent('onclick', closeClick);
     }
@@ -2803,12 +2804,14 @@ wax.mm.interaction = function(map, tilejson, options) {
             // Touch moves invalidate touches
             addEvent(map.parent, 'touchend', onUp);
             addEvent(map.parent, 'touchmove', touchCancel);
+            addEvent(map.parent, 'touchcancel', touchCancel);
         }
     }
 
     function touchCancel() {
         removeEvent(map.parent, 'touchend', onUp);
         removeEvent(map.parent, 'touchmove', onUp);
+        removeEvent(map.parent, 'touchcancel', touchCancel);
         _downLock = false;
     }
 
@@ -2823,9 +2826,10 @@ wax.mm.interaction = function(map, tilejson, options) {
 
         removeEvent(document.body, 'mouseup', onUp);
 
-        if (map.parent.ontouchend) {
+        if (touchable) {
             removeEvent(map.parent, 'touchend', onUp);
-            removeEvent(map.parent, 'touchmove', _touchCancel);
+            removeEvent(map.parent, 'touchmove', touchCancel);
+            removeEvent(map.parent, 'touchcancel', touchCancel);
         }
 
         if (e.type === 'touchend') {
