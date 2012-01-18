@@ -1,4 +1,4 @@
-/* wax - 4.1.5 - 1.0.4-481-g4c2189b */
+/* wax - 5.0.0-alpha - 1.0.4-482-g8a293d4 */
 
 
 /*!
@@ -2697,7 +2697,7 @@ wax.mm.interaction = function(map, tilejson, options) {
     function getTileGrid() {
         // TODO: don't build for tiles outside of viewport
         // Touch interaction leads to intermediate
-        var zoomLayer = map.createOrGetLayer(Math.round(map.getZoom()));
+        var zoomLayer = map.getLayerAt(0).levels[Math.round(map.getZoom())];
         // Calculate a tile grid and cache it, by using the `.tiles`
         // element on this map.
         return tileGrid || (tileGrid =
@@ -2710,7 +2710,7 @@ wax.mm.interaction = function(map, tilejson, options) {
                     }
                 }
                 return o;
-            })(map.tiles));
+            })(map.getLayerAt(0).tiles));
     }
 
     // When the map moves, the tile grid is no longer valid.
@@ -3497,9 +3497,9 @@ wax.mm.zoomer = function(map) {
     var zoomer = {
         add: function(map) {
             map.addCallback('drawn', function(map, e) {
-                if (map.coordinate.zoom === map.provider.outerLimits()[0].zoom) {
+                if (map.coordinate.zoom === map.coordLimits[0].zoom) {
                     zoomout.className = 'zoomer zoomout zoomdisabled';
-                } else if (map.coordinate.zoom === map.provider.outerLimits()[1].zoom) {
+                } else if (map.coordinate.zoom === map.coordLimits[1].zoom) {
                     zoomin.className = 'zoomer zoomin zoomdisabled';
                 } else {
                     zoomin.className = 'zoomer zoomin';

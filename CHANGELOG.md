@@ -1,5 +1,9 @@
 ## Changelog
 
+## 5.0.0-alpha
+
+* Initial support for Modest Maps 1.0.0-alpha
+
 ## 4.1.5
 
 * Fixes a bug in touch interaction controls discovered and fixed by @lxbarth

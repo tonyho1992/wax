@@ -42,9 +42,9 @@ wax.mm.zoomer = function(map) {
     var zoomer = {
         add: function(map) {
             map.addCallback('drawn', function(map, e) {
-                if (map.coordinate.zoom === map.provider.outerLimits()[0].zoom) {
+                if (map.coordinate.zoom === map.coordLimits[0].zoom) {
                     zoomout.className = 'zoomer zoomout zoomdisabled';
-                } else if (map.coordinate.zoom === map.provider.outerLimits()[1].zoom) {
+                } else if (map.coordinate.zoom === map.coordLimits[1].zoom) {
                     zoomin.className = 'zoomer zoomin zoomdisabled';
                 } else {
                     zoomin.className = 'zoomer zoomin';

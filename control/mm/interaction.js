@@ -51,7 +51,7 @@ wax.mm.interaction = function(map, tilejson, options) {
     function getTileGrid() {
         // TODO: don't build for tiles outside of viewport
         // Touch interaction leads to intermediate
-        var zoomLayer = map.createOrGetLayer(Math.round(map.getZoom()));
+        var zoomLayer = map.getLayerAt(0).levels[Math.round(map.getZoom())];
         // Calculate a tile grid and cache it, by using the `.tiles`
         // element on this map.
         return tileGrid || (tileGrid =
@@ -64,7 +64,7 @@ wax.mm.interaction = function(map, tilejson, options) {
                     }
                 }
                 return o;
-            })(map.tiles));
+            })(map.getLayerAt(0).tiles));
     }
 
     // When the map moves, the tile grid is no longer valid.
