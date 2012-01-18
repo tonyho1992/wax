@@ -7,8 +7,7 @@ wax.mm = wax.mm || {};
 wax.mm.mobile = function(map, tilejson, opts) {
     opts = opts || {};
     // Inspired by Leaflet
-    var mm = com.modestmaps,
-        ua = navigator.userAgent.toLowerCase(),
+    var ua = navigator.userAgent.toLowerCase(),
         isWebkit = ua.indexOf('webkit') != -1,
         isMobile = ua.indexOf('mobile') != -1,
         mobileWebkit = isMobile && isWebkit;
@@ -141,8 +140,8 @@ wax.mm.mobile = function(map, tilejson, opts) {
                 newBody.className = 'wax-mobile-body';
                 newBody.appendChild(backDiv);
 
-                mm.addEvent(overlayDiv, 'touchstart', this.toTouch);
-                mm.addEvent(backDiv, 'touchstart', this.toPage);
+                MM.addEvent(overlayDiv, 'touchstart', this.toTouch);
+                MM.addEvent(backDiv, 'touchstart', this.toPage);
 
             }
             return this;

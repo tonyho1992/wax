@@ -16,7 +16,6 @@ wax.mm.pointselector = function(map, tilejson, opts) {
         mouseUpPoint = null,
         tolerance = 5,
         overlayDiv,
-        MM = com.modestmaps,
         pointselector = {},
         locations = [];
 

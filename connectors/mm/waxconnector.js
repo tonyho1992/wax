@@ -17,11 +17,11 @@ wax.mm.connector.prototype = {
     outerLimits: function() {
         return [
             this.locationCoordinate(
-                new com.modestmaps.Location(
+                new MM.Location(
                     this.options.bounds[0],
                     this.options.bounds[1])).zoomTo(this.options.minzoom),
             this.locationCoordinate(
-                new com.modestmaps.Location(
+                new MM.Location(
                     this.options.bounds[2],
                     this.options.bounds[3])).zoomTo(this.options.maxzoom)
         ];
@@ -43,6 +43,6 @@ wax.mm.connector.prototype = {
 
 // Wax shouldn't throw any exceptions if the external it relies on isn't
 // present, so check for modestmaps.
-if (com && com.modestmaps) {
-    com.modestmaps.extend(wax.mm.connector, com.modestmaps.MapProvider);
+if (MM) {
+    MM.extend(wax.mm.connector, MM.MapProvider);
 }

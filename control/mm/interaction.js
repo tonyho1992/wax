@@ -21,8 +21,7 @@ wax.mm.interaction = function(map, tilejson, options) {
     options = options || {};
     tilejson = tilejson || {};
 
-    var MM = com.modestmaps,
-        waxGM = wax.GridManager(tilejson),
+    var waxGM = wax.GridManager(tilejson),
         callbacks = options.callbacks || new wax.tooltip(options),
         clickAction = options.clickAction || ['full', 'location'],
         clickHandler = options.clickHandler || function(url) {

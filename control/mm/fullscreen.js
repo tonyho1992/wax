@@ -18,7 +18,7 @@ wax.mm.fullscreen = function(map) {
         smallSize;
 
     function click(e) {
-        if (e) com.modestmaps.cancelEvent(e);
+        if (e) MM.cancelEvent(e);
         if (state) {
             fullscreen.original();
         } else {
@@ -34,7 +34,7 @@ wax.mm.fullscreen = function(map) {
         a.className = 'wax-fullscreen';
         a.href = '#fullscreen';
         a.innerHTML = 'fullscreen';
-        com.modestmaps.addEvent(a, 'click', click);
+        MM.addEvent(a, 'click', click);
         return this;
     };
     fullscreen.full = function() {

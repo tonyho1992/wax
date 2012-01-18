@@ -17,7 +17,7 @@ wax.mm.hash = function(map) {
         },
         setCenterZoom: function setCenterZoom(args) {
             map.setCenterZoom(
-                new com.modestmaps.Location(args[1], args[2]),
+                new MM.Location(args[1], args[2]),
                 args[0]);
         },
         bindChange: function(fn) {

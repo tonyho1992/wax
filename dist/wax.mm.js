@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha - 1.0.4-482-g8a293d4 */
+/* wax - 5.0.0-alpha - 1.0.4-483-gbb8e970 */
 
 
 /*!
@@ -2387,7 +2387,6 @@ wax.mm = wax.mm || {};
 // ------------
 wax.mm.boxselector = function(map, tilejson, opts) {
     var mouseDownPoint = null,
-        MM = com.modestmaps,
         callback = ((typeof opts === 'function') ?
             opts :
             opts.callback),
@@ -2528,12 +2527,11 @@ wax.mm.bwdetect = function(map, options) {
     options = options || {};
     var lowpng = options.png || '.png128',
         lowjpg = options.jpg || '.jpg70',
-        mm = com.modestmaps,
         bw = 1;
 
     function setProvider(x) {
         // More or less detect the Wax version
-        if (!(x.options && x.options.scheme)) mm.Map.prototype.setProvider.call(map, x);
+        if (!(x.options && x.options.scheme)) MM.Map.prototype.setProvider.call(map, x);
         var swap = [['.png', '.jpg'], [lowpng, lowjpg]];
         if (bw) swap.reverse();
         for (var i = 0; i < x.options.tiles.length; i++) {
@@ -2541,7 +2539,7 @@ wax.mm.bwdetect = function(map, options) {
                 .replace(swap[0][0], swap[1][0])
                 .replace(swap[0][1], swap[1][1]);
         }
-        mm.Map.prototype.setProvider.call(map, x);
+        MM.Map.prototype.setProvider.call(map, x);
     }
 
     map.setProvider = setProvider;
@@ -2571,7 +2569,7 @@ wax.mm.fullscreen = function(map) {
         smallSize;
 
     function click(e) {
-        if (e) com.modestmaps.cancelEvent(e);
+        if (e) MM.cancelEvent(e);
         if (state) {
             fullscreen.original();
         } else {
@@ -2587,7 +2585,7 @@ wax.mm.fullscreen = function(map) {
         a.className = 'wax-fullscreen';
         a.href = '#fullscreen';
         a.innerHTML = 'fullscreen';
-        com.modestmaps.addEvent(a, 'click', click);
+        MM.addEvent(a, 'click', click);
         return this;
     };
     fullscreen.full = function() {
@@ -2633,7 +2631,7 @@ wax.mm.hash = function(map) {
         },
         setCenterZoom: function setCenterZoom(args) {
             map.setCenterZoom(
-                new com.modestmaps.Location(args[1], args[2]),
+                new MM.Location(args[1], args[2]),
                 args[0]);
         },
         bindChange: function(fn) {
@@ -2667,8 +2665,7 @@ wax.mm.interaction = function(map, tilejson, options) {
     options = options || {};
     tilejson = tilejson || {};
 
-    var MM = com.modestmaps,
-        waxGM = wax.GridManager(tilejson),
+    var waxGM = wax.GridManager(tilejson),
         callbacks = options.callbacks || new wax.tooltip(options),
         clickAction = options.clickAction || ['full', 'location'],
         clickHandler = options.clickHandler || function(url) {
@@ -2911,14 +2908,13 @@ wax.mm = wax.mm || {};
 // Show the current cursor position in
 // lat/long
 wax.mm.latlngtooltip = function(map) {
-    var mm = com.modestmaps,
-        tt, // tooltip
+    var tt, // tooltip
         _down = false,
         latlng = {};
 
     function getMousePoint(e) {
         // start with just the mouse (x, y)
-        var point = new mm.Point(e.clientX, e.clientY);
+        var point = new MM.Point(e.clientX, e.clientY);
         // correct for scrolled document
         point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
         point.y += document.body.scrollTop + document.documentElement.scrollTop;
@@ -2955,23 +2951,23 @@ wax.mm.latlngtooltip = function(map) {
         tt.innerHTML = fmt;
         pt.scale = pt.width = pt.height = 1;
         pt.x += 10;
-        mm.moveElement(tt, pt);
+        MM.moveElement(tt, pt);
         map.parent.appendChild(tt);
     }
 
     latlng.add = function() {
-        mm.addEvent(map.parent, 'mousemove', onMove);
-        mm.addEvent(map.parent, 'mousedown', onDown);
-        mm.addEvent(map.parent, 'mouseup', onUp);
+        MM.addEvent(map.parent, 'mousemove', onMove);
+        MM.addEvent(map.parent, 'mousedown', onDown);
+        MM.addEvent(map.parent, 'mouseup', onUp);
         tt = document.createElement('div');
         tt.className = 'wax-latlngtooltip';
         return this;
     };
 
     latlng.remove = function() {
-        mm.removeEvent(map.parent, 'mousemove', onMove);
-        mm.removeEvent(map.parent, 'mousedown', onDown);
-        mm.removeEvent(map.parent, 'mouseup', onUp);
+        MM.removeEvent(map.parent, 'mousemove', onMove);
+        MM.removeEvent(map.parent, 'mousedown', onDown);
+        MM.removeEvent(map.parent, 'mouseup', onUp);
         return this;
     };
 
@@ -3019,8 +3015,7 @@ wax.mm = wax.mm || {};
 wax.mm.mobile = function(map, tilejson, opts) {
     opts = opts || {};
     // Inspired by Leaflet
-    var mm = com.modestmaps,
-        ua = navigator.userAgent.toLowerCase(),
+    var ua = navigator.userAgent.toLowerCase(),
         isWebkit = ua.indexOf('webkit') != -1,
         isMobile = ua.indexOf('mobile') != -1,
         mobileWebkit = isMobile && isWebkit;
@@ -3153,8 +3148,8 @@ wax.mm.mobile = function(map, tilejson, opts) {
                 newBody.className = 'wax-mobile-body';
                 newBody.appendChild(backDiv);
 
-                mm.addEvent(overlayDiv, 'touchstart', this.toTouch);
-                mm.addEvent(backDiv, 'touchstart', this.toPage);
+                MM.addEvent(overlayDiv, 'touchstart', this.toTouch);
+                MM.addEvent(backDiv, 'touchstart', this.toPage);
 
             }
             return this;
@@ -3221,7 +3216,6 @@ wax.mm.pointselector = function(map, tilejson, opts) {
         mouseUpPoint = null,
         tolerance = 5,
         overlayDiv,
-        MM = com.modestmaps,
         pointselector = {},
         locations = [];
 
@@ -3360,14 +3354,13 @@ wax.mm = wax.mm || {};
 wax.mm.zoombox = function(map) {
     // TODO: respond to resize
     var zoombox = {},
-        mm = com.modestmaps,
         drawing = false,
         box,
         mouseDownPoint = null;
 
     function getMousePoint(e) {
         // start with just the mouse (x, y)
-        var point = new mm.Point(e.clientX, e.clientY);
+        var point = new MM.Point(e.clientX, e.clientY);
         // correct for scrolled document
         point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
         point.y += document.body.scrollTop + document.documentElement.scrollTop;
@@ -3392,8 +3385,8 @@ wax.mm.zoombox = function(map) {
         map.setExtent([l1, l2]);
 
         box.style.display = 'none';
-        mm.removeEvent(map.parent, 'mousemove', mouseMove);
-        mm.removeEvent(map.parent, 'mouseup', mouseUp);
+        MM.removeEvent(map.parent, 'mousemove', mouseMove);
+        MM.removeEvent(map.parent, 'mouseup', mouseUp);
 
         map.parent.style.cursor = 'auto';
     }
@@ -3407,11 +3400,11 @@ wax.mm.zoombox = function(map) {
         box.style.left = mouseDownPoint.x + 'px';
         box.style.top = mouseDownPoint.y + 'px';
 
-        mm.addEvent(map.parent, 'mousemove', mouseMove);
-        mm.addEvent(map.parent, 'mouseup', mouseUp);
+        MM.addEvent(map.parent, 'mousemove', mouseMove);
+        MM.addEvent(map.parent, 'mouseup', mouseUp);
 
         map.parent.style.cursor = 'crosshair';
-        return mm.cancelEvent(e);
+        return MM.cancelEvent(e);
     }
 
     function mouseMove(e) {
@@ -3431,7 +3424,7 @@ wax.mm.zoombox = function(map) {
             box.style.top = mouseDownPoint.y + 'px';
         }
         box.style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
-        return mm.cancelEvent(e);
+        return MM.cancelEvent(e);
     }
 
     zoombox.add = function(map) {
@@ -3442,13 +3435,13 @@ wax.mm.zoombox = function(map) {
         box.id = map.parent.id + '-zoombox-box';
         box.className = 'zoombox-box';
         map.parent.appendChild(box);
-        mm.addEvent(map.parent, 'mousedown', mouseDown);
+        MM.addEvent(map.parent, 'mousedown', mouseDown);
         return this;
     };
 
     zoombox.remove = function() {
         map.parent.removeChild(box);
-        mm.removeEvent(map.parent, 'mousedown', mouseDown);
+        MM.removeEvent(map.parent, 'mousedown', mouseDown);
     };
 
     return zoombox.add(map);
@@ -3535,11 +3528,11 @@ wax.mm.connector.prototype = {
     outerLimits: function() {
         return [
             this.locationCoordinate(
-                new com.modestmaps.Location(
+                new MM.Location(
                     this.options.bounds[0],
                     this.options.bounds[1])).zoomTo(this.options.minzoom),
             this.locationCoordinate(
-                new com.modestmaps.Location(
+                new MM.Location(
                     this.options.bounds[2],
                     this.options.bounds[3])).zoomTo(this.options.maxzoom)
         ];
@@ -3561,6 +3554,6 @@ wax.mm.connector.prototype = {
 
 // Wax shouldn't throw any exceptions if the external it relies on isn't
 // present, so check for modestmaps.
-if (com && com.modestmaps) {
-    com.modestmaps.extend(wax.mm.connector, com.modestmaps.MapProvider);
+if (MM) {
+    MM.extend(wax.mm.connector, MM.MapProvider);
 }
