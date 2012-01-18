@@ -26,7 +26,7 @@ wax.mm.connector.prototype = {
                     this.options.bounds[3])).zoomTo(this.options.maxzoom)
         ];
     },
-    getTileUrl: function(c) {
+    getTile: function(c) {
         if (!(coord = this.sourceCoordinate(c))) return null;
 
         coord.row = (this.options.scheme === 'tms') ?

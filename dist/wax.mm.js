@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha - 1.0.4-483-gbb8e970 */
+/* wax - 5.0.0-alpha - 1.0.4-484-g0920bfb */
 
 
 /*!
@@ -3537,7 +3537,8 @@ wax.mm.connector.prototype = {
                     this.options.bounds[3])).zoomTo(this.options.maxzoom)
         ];
     },
-    getTileUrl: function(c) {
+    releaseTile: function(elem) { },
+    getTile: function(c) {
         if (!(coord = this.sourceCoordinate(c))) return null;
 
         coord.row = (this.options.scheme === 'tms') ?
