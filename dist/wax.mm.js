@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha - 1.0.4-484-g0920bfb */
+/* wax - 5.0.0-alpha1 - 1.0.4-485-gf88b6e0 */
 
 
 /*!
@@ -3537,7 +3537,6 @@ wax.mm.connector.prototype = {
                     this.options.bounds[3])).zoomTo(this.options.maxzoom)
         ];
     },
-    releaseTile: function(elem) { },
     getTile: function(c) {
         if (!(coord = this.sourceCoordinate(c))) return null;
 
