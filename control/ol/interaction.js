@@ -31,8 +31,8 @@ wax.ol.Interaction =
     },
 
     setMap: function(map) {
-        addEv(map.viewPortDiv, 'mousemove', wax.util.bind(this.getInfoForHover, this));
-        addEv(map.viewPortDiv, 'mouseout', wax.util.bind(this.resetLayers, this));
+        addEv(map.viewPortDiv, 'mousemove', getInfoForHover);
+        addEv(map.viewPortDiv, 'mouseout', resetLayers);
         this.clickHandler = new OpenLayers.Handler.Click(
             this, {
                 click: this.getInfoForClick
@@ -148,13 +148,13 @@ wax.ol.Interaction =
     // React to a hover mouse event, by finding all tiles,
     // finding features, and calling `this.callbacks[]`
     // This is the `click` handler attached to the map.
-    getInfoForHover: function(evt) {
+    function getInfoForHover(evt) {
         // If there's no event, this handler should not proceed.
         if (!evt) return;
         var options = { format: 'teaser' },
-            layers = this.viableLayers(),
+            layers = viableLayers(),
             pos = wax.util.eventoffset(evt),
-            tiles = this.getTileStack(this.viableLayers(), pos),
+            tiles = getTileStack(this.viableLayers(), pos),
             feature = null,
             g = null;
 

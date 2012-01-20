@@ -1,5 +1,12 @@
 ## Changelog
 
+## 6.0.0
+
+* Event dispatcher for tooltips and other functionality
+* Rewritten tooltip functionality
+* Space optimizations to reduce overall size of library
+* Mature implementation of movetip.js
+
 ## 5.0.0-alpha*
 
 * Initial support for Modest Maps 1.0.0-alpha
