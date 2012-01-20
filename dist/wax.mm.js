@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha1 - 1.0.4-485-gf88b6e0 */
+/* wax - 5.0.0-alpha2 - 1.0.4-488-g8a0a6d6 */
 
 
 /*!
@@ -2562,7 +2562,7 @@ wax.mm = wax.mm || {};
 wax.mm.fullscreen = function(map) {
     // true: fullscreen
     // false: minimized
-    var state = false,
+    var fullscreened = false,
         fullscreen = {},
         a,
         body = document.body,
@@ -2570,11 +2570,18 @@ wax.mm.fullscreen = function(map) {
 
     function click(e) {
         if (e) MM.cancelEvent(e);
-        if (state) {
+        if (fullscreened) {
             fullscreen.original();
         } else {
             fullscreen.full();
         }
+    }
+
+    function ss(w, h) {
+        map.dimensions = new MM.Point(w, h);
+        map.parent.style.width = Math.round(map.dimensions.x) + 'px';
+        map.parent.style.height = Math.round(map.dimensions.y) + 'px';
+        map.dispatchCallback('resized', map.dimensions);
     }
 
     // Modest Maps demands an absolute height & width, and doesn't auto-correct
@@ -2589,21 +2596,17 @@ wax.mm.fullscreen = function(map) {
         return this;
     };
     fullscreen.full = function() {
-        if (state) { return; } else { state = true; }
+        if (fullscreened) { return; } else { fullscreened = true; }
         smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
         map.parent.className += ' wax-fullscreen-map';
         body.className += ' wax-fullscreen-view';
-        map.setSize(
-            map.parent.offsetWidth,
-            map.parent.offsetHeight);
+        ss(map.parent.offsetWidth, map.parent.offsetHeight);
     };
     fullscreen.original = function() {
-        if (!state) { return; } else { state = false; }
+        if (!fullscreened) { return; } else { fullscreened = false; }
         map.parent.className = map.parent.className.replace(' wax-fullscreen-map', '');
         body.className = body.className.replace(' wax-fullscreen-view', '');
-        map.setSize(
-            smallSize[0],
-            smallSize[1]);
+        ss(smallSize[0], smallSize[1]);
     };
     fullscreen.appendTo = function(elem) {
         wax.util.$(elem).appendChild(a);

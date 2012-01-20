@@ -1,6 +1,6 @@
 {
     "name": "wax",
-    "version": "5.0.0-alpha1",
+    "version": "5.0.0-alpha2",
     "description": "Tools for improving web maps.",
     "repository": {
         "type": "git",

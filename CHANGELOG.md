@@ -1,6 +1,6 @@
 ## Changelog
 
-## 5.0.0-alpha
+## 5.0.0-alpha*
 
 * Initial support for Modest Maps 1.0.0-alpha
 
