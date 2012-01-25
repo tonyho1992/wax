@@ -33,11 +33,18 @@ wax.mm.connector.prototype = {
             Math.pow(2, coord.zoom) - coord.row - 1 :
             coord.row;
 
-        return this.options.tiles[parseInt(Math.pow(2, coord.zoom) * coord.row + coord.column, 10) %
+        var u = this.options.tiles[parseInt(Math.pow(2, coord.zoom) * coord.row + coord.column, 10) %
             this.options.tiles.length]
             .replace('{z}', coord.zoom.toFixed(0))
             .replace('{x}', coord.column.toFixed(0))
             .replace('{y}', coord.row.toFixed(0));
+
+        if (wax._ && wax._.bw) {
+            u = u.replace('.png', wax._.bw_png)
+                .replace('.jpg', wax._.bw_jpg);
+        }
+
+        return u;
     }
 };
 

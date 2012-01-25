@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha2 - 1.0.4-488-g8a0a6d6 */
+/* wax - 5.0.0-alpha2 - 1.0.4-489-g7b6392f */
 
 
 /*!
@@ -2520,6 +2520,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
+wax._ = {};
 
 // Bandwidth Detection
 // ------------------
@@ -2527,26 +2528,18 @@ wax.mm.bwdetect = function(map, options) {
     options = options || {};
     var lowpng = options.png || '.png128',
         lowjpg = options.jpg || '.jpg70',
-        bw = 1;
+        bw = false;
 
-    function setProvider(x) {
-        // More or less detect the Wax version
-        if (!(x.options && x.options.scheme)) MM.Map.prototype.setProvider.call(map, x);
-        var swap = [['.png', '.jpg'], [lowpng, lowjpg]];
-        if (bw) swap.reverse();
-        for (var i = 0; i < x.options.tiles.length; i++) {
-            x.options.tiles[i] = x.options.tiles[i]
-                .replace(swap[0][0], swap[1][0])
-                .replace(swap[0][1], swap[1][1]);
-        }
-        MM.Map.prototype.setProvider.call(map, x);
-    }
-
-    map.setProvider = setProvider;
+    wax._.bw_png = lowpng;
+    wax._.bw_jpg = lowjpg;
 
     return wax.bwdetect(options, function(x) {
-      bw = x;
-      setProvider(map.provider);
+        wax._.bw = !x;
+        for (var i = 0; i < map.layers.length; i++) {
+            if (map.getLayerAt(i).provider instanceof wax.mm.connector) {
+                map.getLayerAt(i).setProvider(map.getLayerAt(i).provider);
+            }
+        }
     });
 };
 wax = wax || {};
@@ -3547,11 +3540,18 @@ wax.mm.connector.prototype = {
             Math.pow(2, coord.zoom) - coord.row - 1 :
             coord.row;
 
-        return this.options.tiles[parseInt(Math.pow(2, coord.zoom) * coord.row + coord.column, 10) %
+        var u = this.options.tiles[parseInt(Math.pow(2, coord.zoom) * coord.row + coord.column, 10) %
             this.options.tiles.length]
             .replace('{z}', coord.zoom.toFixed(0))
             .replace('{x}', coord.column.toFixed(0))
             .replace('{y}', coord.row.toFixed(0));
+
+        if (wax._ && wax._.bw) {
+            u = u.replace('.png', wax._.bw_png)
+                .replace('.jpg', wax._.bw_jpg);
+        }
+
+        return u;
     }
 };
 
