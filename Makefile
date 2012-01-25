@@ -7,10 +7,7 @@ dist: dist_setup dist/wax.ol.min.js \
 
 dist/wax.ol.min.js:
 	cat build/header.js \
-		ext/reqwest.min.js \
-		ext/html-sanitizer-bundle.js \
-		ext/html-sanitizer-loosen.js \
-		ext/mustache.js \
+		lib/*.js \
 		connectors/ol/*.js \
 		control/lib/*.js \
 		control/ol/*.js > dist/wax.ol.js
@@ -18,10 +15,7 @@ dist/wax.ol.min.js:
 
 dist/wax.g.min.js:
 	cat build/header.js \
-		ext/reqwest.min.js \
-		ext/html-sanitizer-bundle.js \
-		ext/html-sanitizer-loosen.js \
-		ext/mustache.js \
+		lib/*.js \
 		control/lib/*.js \
 		control/g/*.js \
 		connectors/g/*.js > dist/wax.g.js
@@ -29,10 +23,7 @@ dist/wax.g.min.js:
 
 dist/wax.mm.min.js:
 	cat build/header.js \
-		ext/reqwest.min.js \
-		ext/html-sanitizer-bundle.js \
-		ext/html-sanitizer-loosen.js \
-		ext/mustache.js \
+		lib/*.js \
 		control/lib/*.js \
 		control/mm/*.js \
 		connectors/mm/*.js > dist/wax.mm.js
@@ -40,10 +31,7 @@ dist/wax.mm.min.js:
 
 dist/wax.leaf.min.js:
 	cat build/header.js \
-		ext/reqwest.min.js \
-		ext/html-sanitizer-bundle.js \
-		ext/html-sanitizer-loosen.js \
-		ext/mustache.js \
+		lib/*.js \
 		control/lib/*.js \
 		control/leaf/*.js \
 		connectors/leaf/*.js > dist/wax.leaf.js
@@ -51,7 +39,7 @@ dist/wax.leaf.min.js:
 
 dist/wax.p.min.js:
 	cat build/header.js \
-		ext/reqwest.min.js \
+		lib/*.js \
 		control/lib/*.js \
 		connectors/p/*.js > dist/wax.p.js
 	$(UGLIFYJS) dist/wax.p.js > dist/wax.p.min.js

@@ -85,20 +85,6 @@ wax.u = {
             document.getElementById(x) :
             x;
     },
-
-    // From underscore, minus funcbind for now.
-    // Returns a version of a function that always has the second parameter,
-    // `obj`, as `this`.
-    bind: function(func, obj) {
-        var args = Array.prototype.slice.call(arguments, 2);
-        return function() {
-            return func.apply(obj, args.concat(Array.prototype.slice.call(arguments)));
-        };
-    },
-    // From underscore
-    isString: function(obj) {
-        return !!(obj === '' || (obj && obj.charCodeAt && obj.substr));
-    },
     // IE doesn't have indexOf
     indexOf: function(array, item) {
         var nativeIndexOf = Array.prototype.indexOf;
@@ -107,10 +93,6 @@ wax.u = {
         if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item);
         for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
         return -1;
-    },
-    // is this object an array?
-    isArray: Array.isArray || function(obj) {
-        return Object.prototype.toString.call(obj) === '[object Array]';
     },
     // From underscore: reimplement the ECMA5 `Object.keys()` method
     keys: Object.keys || function(obj) {
@@ -173,66 +155,4 @@ wax.u = {
     throttle: function(func, wait) {
         return this.limit(func, wait, false);
     }
-};
-
-// From d3
-wax.dispatch = function() {
-  var dispatch = new d3_dispatch(),
-      i = -1,
-      n = arguments.length;
-  while (++i < n) dispatch[arguments[i]] = d3_dispatch_event();
-  return dispatch;
-};
-
-function d3_dispatch() {}
-
-d3_dispatch.prototype.on = function(type, listener) {
-  var i = type.indexOf("."),
-      name = "";
-
-  // Extract optional namespace, e.g., "click.foo"
-  if (i > 0) {
-    name = type.substring(i + 1);
-    type = type.substring(0, i);
-  }
-
-  return arguments.length < 2
-      ? this[type].on(name)
-      : (this[type].on(name, listener), this);
-};
-
-function d3_dispatch_event() {
-  var listeners = [],
-      listenerByName = {};
-
-  function dispatch() {
-    var z = listeners, // defensive reference
-        i = -1,
-        n = z.length,
-        l;
-    while (++i < n) if (l = z[i].on) l.apply(this, arguments);
-  }
-
-  dispatch.on = function(name, listener) {
-    var l, i;
-
-    // return the current listener, if any
-    if (arguments.length < 2) return (l = listenerByName[name]) && l.on;
-
-    // remove the old listener, if any (with copy-on-write)
-    if (l = listenerByName[name]) {
-      l.on = null;
-      listeners = listeners.slice(0, i = listeners.indexOf(l)).concat(listeners.slice(i + 1));
-      delete listenerByName[name];
-    }
-
-    // add the new listener, if any
-    if (listener) {
-      listeners.push(listenerByName[name] = {on: listener});
-    }
-
-    return dispatch;
-  };
-
-  return dispatch;
 };

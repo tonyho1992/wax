@@ -22,14 +22,11 @@ wax.mm.interaction = function(map, tilejson, options) {
     tilejson = tilejson || {};
 
     var waxGM = wax.GridManager(tilejson),
-        callbacks = options.callbacks || new wax.tooltip(options),
         clickAction = options.clickAction || ['full', 'location'],
         clickHandler = options.clickHandler || function(url) {
             window.top.location = url;
         },
         eventoffset = wax.util.eventoffset,
-        addEvent = MM.addEvent,
-        removeEvent = MM.removeEvent,
         interaction = {},
         _downLock = false,
         _clickTimeout = false,
@@ -112,15 +109,18 @@ wax.mm.interaction = function(map, tilejson, options) {
             if (feature) {
                 if (feature && _af !== feature) {
                     _af = feature;
-                    callbacks.out(map.parent);
-                    callbacks.over(feature, map.parent, e);
+                    bean.fire(interaction, 'on', {
+                        parent: map.parent,
+                        feature: feature,
+                        e: e
+                    });
                 } else if (!feature) {
                     _af = null;
-                    callbacks.out(map.parent);
+                    bean.fire(interaction, 'off');
                 }
             } else {
                 _af = null;
-                callbacks.out(map.parent);
+                bean.fire(interaction, 'off');
             }
         });
     }
@@ -140,7 +140,7 @@ wax.mm.interaction = function(map, tilejson, options) {
         _downLock = true;
         _d = eventoffset(e);
         if (e.type === 'mousedown') {
-            addEvent(document.body, 'mouseup', onUp);
+            bean.add(document.body, 'mouseup', onUp);
 
         // Only track single-touches. Double-touches will not affect this
         // control
@@ -150,21 +150,19 @@ wax.mm.interaction = function(map, tilejson, options) {
             clickAction = ['full', 'teaser'];
 
             // Don't make the user click close if they hit another tooltip
-            if (callbacks._currentTooltip) {
-                callbacks.hideTooltip(callbacks._currentTooltip);
-            }
+            bean.fire(interaction, 'off');
 
             // Touch moves invalidate touches
-            addEvent(map.parent, 'touchend', onUp);
-            addEvent(map.parent, 'touchmove', touchCancel);
-            addEvent(map.parent, 'touchcancel', touchCancel);
+            bean.add(map.parent, 'touchend', onUp);
+            bean.add(map.parent, 'touchmove', touchCancel);
+            bean.add(map.parent, 'touchcancel', touchCancel);
         }
     }
 
     function touchCancel() {
-        removeEvent(map.parent, 'touchend', onUp);
-        removeEvent(map.parent, 'touchmove', onUp);
-        removeEvent(map.parent, 'touchcancel', touchCancel);
+        bean.remove(map.parent, 'touchend', onUp);
+        bean.remove(map.parent, 'touchmove', onUp);
+        bean.remove(map.parent, 'touchcancel', touchCancel);
         _downLock = false;
     }
 
@@ -177,12 +175,14 @@ wax.mm.interaction = function(map, tilejson, options) {
           evt[key] = e[key];
         }
 
-        removeEvent(document.body, 'mouseup', onUp);
+        bean.remove(document.body, 'mouseup', onUp);
 
         if (touchable) {
-            removeEvent(map.parent, 'touchend', onUp);
-            removeEvent(map.parent, 'touchmove', touchCancel);
-            removeEvent(map.parent, 'touchcancel', touchCancel);
+            bean.remove(map.parent, {
+                'touchend': onUp,
+                'touchmove': touchCancel,
+                'touchcancel': touchCancel
+            });
         }
 
         if (e.type === 'touchend') {
@@ -229,10 +229,10 @@ wax.mm.interaction = function(map, tilejson, options) {
         for (var i = 0; i < clearingEvents.length; i++) {
             map.addCallback(clearingEvents[i], clearTileGrid);
         }
-        addEvent(map.parent, 'mousemove', onMove);
-        addEvent(map.parent, 'mousedown', onDown);
+        bean.add(map.parent, 'mousemove', onMove);
+        bean.add(map.parent, 'mousedown', onDown);
         if (touchable) {
-            addEvent(map.parent, 'touchstart', onDown);
+            bean.add(map.parent, 'touchstart', onDown);
         }
         return this;
     };
@@ -242,14 +242,14 @@ wax.mm.interaction = function(map, tilejson, options) {
         for (var i = 0; i < clearingEvents.length; i++) {
             map.removeCallback(clearingEvents[i], clearTileGrid);
         }
-        removeEvent(map.parent, 'mousemove', onMove);
-        removeEvent(map.parent, 'mousedown', onDown);
+        bean.remove(map.parent, {
+            mousemove: onMove,
+            mousedown: onDown
+        });
         if (touchable) {
-            removeEvent(map.parent, 'touchstart', onDown);
+            bean.remove(map.parent, 'touchstart', onDown);
         }
-        if (callbacks._currentTooltip) {
-            callbacks.hideTooltip(callbacks._currentTooltip);
-        }
+        bean.fire(interaction, 'remove');
         return this;
     };
 

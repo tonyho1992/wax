@@ -1,4 +1,4 @@
-var wax = wax || {};
+;var wax = wax || {};
 wax.ol = wax.ol || {};
 
 wax.ol.connector = function(tilejson) {

@@ -1,5 +1,4 @@
-// Wax header
-var wax = wax || {};
+;var wax = wax || {};
 wax.ol = wax.ol || {};
 
 var addEv = function(element, name, observer) {
