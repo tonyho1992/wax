@@ -1,13 +1,508 @@
-/* wax - 5.0.0-alpha2 - 1.0.4-489-g7b6392f */
+/* wax - 5.0.0-alpha2 - 1.0.4-491-g410a9c0 */
 
 
-/*!
-  * Reqwest! A general purpose XHR connection manager
-  * copyright Dustin Diaz 2011
-  * https://github.com/ded/reqwest
-  * license MIT
-  */
-!function(context,win){function serial(a){var b=a.name;if(a.disabled||!b)return"";b=enc(b);switch(a.tagName.toLowerCase()){case"input":switch(a.type){case"reset":case"button":case"image":case"file":return"";case"checkbox":case"radio":return a.checked?b+"="+(a.value?enc(a.value):!0)+"&":"";default:return b+"="+(a.value?enc(a.value):"")+"&"}break;case"textarea":return b+"="+enc(a.value)+"&";case"select":return b+"="+enc(a.options[a.selectedIndex].value)+"&"}return""}function enc(a){return encodeURIComponent(a)}function reqwest(a,b){return new Reqwest(a,b)}function init(o,fn){function error(a){o.error&&o.error(a),complete(a)}function success(resp){o.timeout&&clearTimeout(self.timeout)&&(self.timeout=null);var r=resp.responseText;if(r)switch(type){case"json":resp=win.JSON?win.JSON.parse(r):eval("("+r+")");break;case"js":resp=eval(r);break;case"html":resp=r}fn(resp),o.success&&o.success(resp),complete(resp)}function complete(a){o.complete&&o.complete(a)}this.url=typeof o=="string"?o:o.url,this.timeout=null;var type=o.type||setType(this.url),self=this;fn=fn||function(){},o.timeout&&(this.timeout=setTimeout(function(){self.abort(),error()},o.timeout)),this.request=getRequest(o,success,error)}function setType(a){if(/\.json$/.test(a))return"json";if(/\.jsonp$/.test(a))return"jsonp";if(/\.js$/.test(a))return"js";if(/\.html?$/.test(a))return"html";if(/\.xml$/.test(a))return"xml";return"js"}function Reqwest(a,b){this.o=a,this.fn=b,init.apply(this,arguments)}function getRequest(a,b,c){if(a.type!="jsonp"){var f=xhr();f.open(a.method||"GET",typeof a=="string"?a:a.url,!0),setHeaders(f,a),f.onreadystatechange=handleReadyState(f,b,c),a.before&&a.before(f),f.send(a.data||null);return f}var d=doc.createElement("script"),e=0;win[getCallbackName(a)]=generalCallback,d.type="text/javascript",d.src=a.url,d.async=!0,d.onload=d.onreadystatechange=function(){if(d[readyState]&&d[readyState]!=="complete"&&d[readyState]!=="loaded"||e)return!1;d.onload=d.onreadystatechange=null,a.success&&a.success(lastValue),lastValue=undefined,head.removeChild(d),e=1},head.appendChild(d)}function generalCallback(a){lastValue=a}function getCallbackName(a){var b=a.jsonpCallback||"callback";if(a.url.slice(-(b.length+2))==b+"=?"){var c="reqwest_"+uniqid++;a.url=a.url.substr(0,a.url.length-1)+c;return c}var d=new RegExp(b+"=([\\w]+)");return a.url.match(d)[1]}function setHeaders(a,b){var c=b.headers||{};c.Accept=c.Accept||"text/javascript, text/html, application/xml, text/xml, */*",b.crossOrigin||(c["X-Requested-With"]=c["X-Requested-With"]||"XMLHttpRequest"),c[contentType]=c[contentType]||"application/x-www-form-urlencoded";for(var d in c)c.hasOwnProperty(d)&&a.setRequestHeader(d,c[d],!1)}function handleReadyState(a,b,c){return function(){a&&a[readyState]==4&&(twoHundo.test(a.status)?b(a):c(a))}}var twoHundo=/^20\d$/,doc=document,byTag="getElementsByTagName",readyState="readyState",contentType="Content-Type",head=doc[byTag]("head")[0],uniqid=0,lastValue,xhr="XMLHttpRequest"in win?function(){return new XMLHttpRequest}:function(){return new ActiveXObject("Microsoft.XMLHTTP")};Reqwest.prototype={abort:function(){this.request.abort()},retry:function(){init.call(this,this.o,this.fn)}},reqwest.serialize=function(a){var b=[a[byTag]("input"),a[byTag]("select"),a[byTag]("textarea")],c=[],d,e;for(d=0,l=b.length;d<l;++d)for(e=0,l2=b[d].length;e<l2;++e)c.push(serial(b[d][e]));return c.join("").replace(/&$/,"")},reqwest.serializeArray=function(a){for(var b=this.serialize(a).split("&"),c=0,d=b.length,e=[],f;c<d;c++)b[c]&&(f=b[c].split("="))&&e.push({name:f[0],value:f[1]});return e};var old=context.reqwest;reqwest.noConflict=function(){context.reqwest=old;return this},typeof module!="undefined"?module.exports=reqwest:context.reqwest=reqwest}(this,window)// Copyright Google Inc.
+!function (name, context, definition) {
+  if (typeof module !== 'undefined') module.exports = definition(name, context);
+  else if (typeof define === 'function' && typeof define.amd  === 'object') define(definition);
+  else context[name] = definition(name, context);
+}('bean', this, function (name, context) {
+  var win = window
+    , old = context[name]
+    , overOut = /over|out/
+    , namespaceRegex = /[^\.]*(?=\..*)\.|.*/
+    , nameRegex = /\..*/
+    , addEvent = 'addEventListener'
+    , attachEvent = 'attachEvent'
+    , removeEvent = 'removeEventListener'
+    , detachEvent = 'detachEvent'
+    , doc = document || {}
+    , root = doc.documentElement || {}
+    , W3C_MODEL = root[addEvent]
+    , eventSupport = W3C_MODEL ? addEvent : attachEvent
+    , slice = Array.prototype.slice
+    , mouseTypeRegex = /click|mouse(?!(.*wheel|scroll))|menu|drag|drop/i
+    , mouseWheelTypeRegex = /mouse.*(wheel|scroll)/i
+    , textTypeRegex = /^text/i
+    , touchTypeRegex = /^touch|^gesture/i
+    , ONE = { one: 1 } // singleton for quick matching making add() do one()
+
+    , nativeEvents = (function (hash, events, i) {
+        for (i = 0; i < events.length; i++)
+          hash[events[i]] = 1
+        return hash
+      })({}, (
+          'click dblclick mouseup mousedown contextmenu ' +                  // mouse buttons
+          'mousewheel mousemultiwheel DOMMouseScroll ' +                     // mouse wheel
+          'mouseover mouseout mousemove selectstart selectend ' +            // mouse movement
+          'keydown keypress keyup ' +                                        // keyboard
+          'orientationchange ' +                                             // mobile
+          'focus blur change reset select submit ' +                         // form elements
+          'load unload beforeunload resize move DOMContentLoaded readystatechange ' + // window
+          'error abort scroll ' +                                            // misc
+          (W3C_MODEL ? // element.fireEvent('onXYZ'... is not forgiving if we try to fire an event
+                       // that doesn't actually exist, so make sure we only do these on newer browsers
+            'show ' +                                                          // mouse buttons
+            'input invalid ' +                                                 // form elements
+            'touchstart touchmove touchend touchcancel ' +                     // touch
+            'gesturestart gesturechange gestureend ' +                         // gesture
+            'message readystatechange pageshow pagehide popstate ' +           // window
+            'hashchange offline online ' +                                     // window
+            'afterprint beforeprint ' +                                        // printing
+            'dragstart dragenter dragover dragleave drag drop dragend ' +      // dnd
+            'loadstart progress suspend emptied stalled loadmetadata ' +       // media
+            'loadeddata canplay canplaythrough playing waiting seeking ' +     // media
+            'seeked ended durationchange timeupdate play pause ratechange ' +  // media
+            'volumechange cuechange ' +                                        // media
+            'checking noupdate downloading cached updateready obsolete ' +     // appcache
+            '' : '')
+        ).split(' ')
+      )
+
+    , customEvents = (function () {
+        function isDescendant(parent, node) {
+          while ((node = node.parentNode) !== null) {
+            if (node === parent) return true
+          }
+          return false
+        }
+
+        function check(event) {
+          var related = event.relatedTarget
+          if (!related) return related === null
+          return (related !== this && related.prefix !== 'xul' && !/document/.test(this.toString()) && !isDescendant(this, related))
+        }
+
+        return {
+            mouseenter: { base: 'mouseover', condition: check }
+          , mouseleave: { base: 'mouseout', condition: check }
+          , mousewheel: { base: /Firefox/.test(navigator.userAgent) ? 'DOMMouseScroll' : 'mousewheel' }
+        }
+      })()
+
+    , fixEvent = (function () {
+        var commonProps = 'altKey attrChange attrName bubbles cancelable ctrlKey currentTarget detail eventPhase getModifierState isTrusted metaKey relatedNode relatedTarget shiftKey srcElement target timeStamp type view which'.split(' ')
+          , mouseProps = commonProps.concat('button buttons clientX clientY dataTransfer fromElement offsetX offsetY pageX pageY screenX screenY toElement'.split(' '))
+          , mouseWheelProps = mouseProps.concat('wheelDelta wheelDeltaX wheelDeltaY wheelDeltaZ axis'.split(' ')) // 'axis' is FF specific
+          , keyProps = commonProps.concat('char charCode key keyCode keyIdentifier keyLocation'.split(' '))
+          , textProps = commonProps.concat(['data'])
+          , touchProps = commonProps.concat('touches targetTouches changedTouches scale rotation'.split(' '))
+          , preventDefault = 'preventDefault'
+          , createPreventDefault = function (event) {
+              return function () {
+                if (event[preventDefault])
+                  event[preventDefault]()
+                else
+                  event.returnValue = false
+              }
+            }
+          , stopPropagation = 'stopPropagation'
+          , createStopPropagation = function (event) {
+              return function () {
+                if (event[stopPropagation])
+                  event[stopPropagation]()
+                else
+                  event.cancelBubble = true
+              }
+            }
+          , createStop = function (synEvent) {
+              return function () {
+                synEvent[preventDefault]()
+                synEvent[stopPropagation]()
+                synEvent.stopped = true
+              }
+            }
+          , copyProps = function (event, result, props) {
+              var i, p
+              for (i = props.length; i--;) {
+                p = props[i]
+                if (!(p in result) && p in event) result[p] = event[p]
+              }
+            }
+
+        return function (event, isNative) {
+          var result = { originalEvent: event, isNative: isNative }
+          if (!event)
+            return result
+
+          var props
+            , type = event.type
+            , target = event.target || event.srcElement
+
+          result[preventDefault] = createPreventDefault(event)
+          result[stopPropagation] = createStopPropagation(event)
+          result.stop = createStop(result)
+          result.target = target && target.nodeType === 3 ? target.parentNode : target
+
+          if (isNative) { // we only need basic augmentation on custom events, the rest is too expensive
+            if (type.indexOf('key') !== -1) {
+              props = keyProps
+              result.keyCode = event.which || event.keyCode
+            } else if (mouseTypeRegex.test(type)) {
+              props = mouseProps
+              result.rightClick = event.which === 3 || event.button === 2
+              result.pos = { x: 0, y: 0 }
+              if (event.pageX || event.pageY) {
+                result.clientX = event.pageX
+                result.clientY = event.pageY
+              } else if (event.clientX || event.clientY) {
+                result.clientX = event.clientX + doc.body.scrollLeft + root.scrollLeft
+                result.clientY = event.clientY + doc.body.scrollTop + root.scrollTop
+              }
+              if (overOut.test(type))
+                result.relatedTarget = event.relatedTarget || event[(type === 'mouseover' ? 'from' : 'to') + 'Element']
+            } else if (touchTypeRegex.test(type)) {
+              props = touchProps
+            } else if (mouseWheelTypeRegex.test(type)) {
+              props = mouseWheelProps
+            } else if (textTypeRegex.test(type)) {
+              props = textProps
+            }
+            copyProps(event, result, props || commonProps)
+          }
+          return result
+        }
+      })()
+
+      // if we're in old IE we can't do onpropertychange on doc or win so we use doc.documentElement for both
+    , targetElement = function (element, isNative) {
+        return !W3C_MODEL && !isNative && (element === doc || element === win) ? root : element
+      }
+
+      // we use one of these per listener, of any type
+    , RegEntry = (function () {
+        function entry(element, type, handler, original, namespaces) {
+          this.element = element
+          this.type = type
+          this.handler = handler
+          this.original = original
+          this.namespaces = namespaces
+          this.custom = customEvents[type]
+          this.isNative = nativeEvents[type] && element[eventSupport]
+          this.eventType = W3C_MODEL || this.isNative ? type : 'propertychange'
+          this.customType = !W3C_MODEL && !this.isNative && type
+          this.target = targetElement(element, this.isNative)
+          this.eventSupport = this.target[eventSupport]
+        }
+
+        entry.prototype = {
+            // given a list of namespaces, is our entry in any of them?
+            inNamespaces: function (checkNamespaces) {
+              var i, j
+              if (!checkNamespaces)
+                return true
+              if (!this.namespaces)
+                return false
+              for (i = checkNamespaces.length; i--;) {
+                for (j = this.namespaces.length; j--;) {
+                  if (checkNamespaces[i] === this.namespaces[j])
+                    return true
+                }
+              }
+              return false
+            }
+
+            // match by element, original fn (opt), handler fn (opt)
+          , matches: function (checkElement, checkOriginal, checkHandler) {
+              return this.element === checkElement &&
+                (!checkOriginal || this.original === checkOriginal) &&
+                (!checkHandler || this.handler === checkHandler)
+            }
+        }
+
+        return entry
+      })()
+
+    , registry = (function () {
+        // our map stores arrays by event type, just because it's better than storing
+        // everything in a single array. uses '$' as a prefix for the keys for safety
+        var map = {}
+
+          // generic functional search of our registry for matching listeners,
+          // `fn` returns false to break out of the loop
+          , forAll = function (element, type, original, handler, fn) {
+              if (!type || type === '*') {
+                // search the whole registry
+                for (var t in map) {
+                  if (t.charAt(0) === '$')
+                    forAll(element, t.substr(1), original, handler, fn)
+                }
+              } else {
+                var i = 0, l, list = map['$' + type], all = element === '*'
+                if (!list)
+                  return
+                for (l = list.length; i < l; i++) {
+                  if (all || list[i].matches(element, original, handler))
+                    if (!fn(list[i], list, i, type))
+                      return
+                }
+              }
+            }
+
+          , has = function (element, type, original) {
+              // we're not using forAll here simply because it's a bit slower and this
+              // needs to be fast
+              var i, list = map['$' + type]
+              if (list) {
+                for (i = list.length; i--;) {
+                  if (list[i].matches(element, original, null))
+                    return true
+                }
+              }
+              return false
+            }
+
+          , get = function (element, type, original) {
+              var entries = []
+              forAll(element, type, original, null, function (entry) { return entries.push(entry) })
+              return entries
+            }
+
+          , put = function (entry) {
+              (map['$' + entry.type] || (map['$' + entry.type] = [])).push(entry)
+              return entry
+            }
+
+          , del = function (entry) {
+              forAll(entry.element, entry.type, null, entry.handler, function (entry, list, i) {
+                list.splice(i, 1)
+                if (list.length === 0)
+                  delete map['$' + entry.type]
+                return false
+              })
+            }
+
+            // dump all entries, used for onunload
+          , entries = function () {
+              var t, entries = []
+              for (t in map) {
+                if (t.charAt(0) === '$')
+                  entries = entries.concat(map[t])
+              }
+              return entries
+            }
+
+        return { has: has, get: get, put: put, del: del, entries: entries }
+      })()
+
+      // add and remove listeners to DOM elements
+    , listener = W3C_MODEL ? function (element, type, fn, add) {
+        element[add ? addEvent : removeEvent](type, fn, false)
+      } : function (element, type, fn, add, custom) {
+        if (custom && add && element['_on' + custom] === null)
+          element['_on' + custom] = 0
+        element[add ? attachEvent : detachEvent]('on' + type, fn)
+      }
+
+    , nativeHandler = function (element, fn, args) {
+        return function (event) {
+          event = fixEvent(event || ((this.ownerDocument || this.document || this).parentWindow || win).event, true)
+          return fn.apply(element, [event].concat(args))
+        }
+      }
+
+    , customHandler = function (element, fn, type, condition, args, isNative) {
+        return function (event) {
+          if (condition ? condition.apply(this, arguments) : W3C_MODEL ? true : event && event.propertyName === '_on' + type || !event) {
+            if (event)
+              event = fixEvent(event || ((this.ownerDocument || this.document || this).parentWindow || win).event, isNative)
+            fn.apply(element, event && (!args || args.length === 0) ? arguments : slice.call(arguments, event ? 0 : 1).concat(args))
+          }
+        }
+      }
+
+    , once = function (rm, element, type, fn, originalFn) {
+        // wrap the handler in a handler that does a remove as well
+        return function () {
+          rm(element, type, originalFn)
+          fn.apply(this, arguments)
+        }
+      }
+
+    , removeListener = function (element, orgType, handler, namespaces) {
+        var i, l, entry
+          , type = (orgType && orgType.replace(nameRegex, ''))
+          , handlers = registry.get(element, type, handler)
+
+        for (i = 0, l = handlers.length; i < l; i++) {
+          if (handlers[i].inNamespaces(namespaces)) {
+            if ((entry = handlers[i]).eventSupport)
+              listener(entry.target, entry.eventType, entry.handler, false, entry.type)
+            // TODO: this is problematic, we have a registry.get() and registry.del() that
+            // both do registry searches so we waste cycles doing this. Needs to be rolled into
+            // a single registry.forAll(fn) that removes while finding, but the catch is that
+            // we'll be splicing the arrays that we're iterating over. Needs extra tests to
+            // make sure we don't screw it up. @rvagg
+            registry.del(entry)
+          }
+        }
+      }
+
+    , addListener = function (element, orgType, fn, originalFn, args) {
+        var entry
+          , type = orgType.replace(nameRegex, '')
+          , namespaces = orgType.replace(namespaceRegex, '').split('.')
+
+        if (registry.has(element, type, fn))
+          return element // no dupe
+        if (type === 'unload')
+          fn = once(removeListener, element, type, fn, originalFn) // self clean-up
+        if (customEvents[type]) {
+          if (customEvents[type].condition)
+            fn = customHandler(element, fn, type, customEvents[type].condition, true)
+          type = customEvents[type].base || type
+        }
+        entry = registry.put(new RegEntry(element, type, fn, originalFn, namespaces[0] && namespaces))
+        entry.handler = entry.isNative ?
+          nativeHandler(element, entry.handler, args) :
+          customHandler(element, entry.handler, type, false, args, false)
+        if (entry.eventSupport)
+          listener(entry.target, entry.eventType, entry.handler, true, entry.customType)
+      }
+
+    , del = function (selector, fn, $) {
+        return function (e) {
+          var target, i, array = typeof selector === 'string' ? $(selector, this) : selector
+          for (target = e.target; target && target !== this; target = target.parentNode) {
+            for (i = array.length; i--;) {
+              if (array[i] === target) {
+                return fn.apply(target, arguments)
+              }
+            }
+          }
+        }
+      }
+
+    , remove = function (element, typeSpec, fn) {
+        var k, m, type, namespaces, i
+          , rm = removeListener
+          , isString = typeSpec && typeof typeSpec === 'string'
+
+        if (isString && typeSpec.indexOf(' ') > 0) {
+          // remove(el, 't1 t2 t3', fn) or remove(el, 't1 t2 t3')
+          typeSpec = typeSpec.split(' ')
+          for (i = typeSpec.length; i--;)
+            remove(element, typeSpec[i], fn)
+          return element
+        }
+        type = isString && typeSpec.replace(nameRegex, '')
+        if (type && customEvents[type])
+          type = customEvents[type].type
+        if (!typeSpec || isString) {
+          // remove(el) or remove(el, t1.ns) or remove(el, .ns) or remove(el, .ns1.ns2.ns3)
+          if (namespaces = isString && typeSpec.replace(namespaceRegex, ''))
+            namespaces = namespaces.split('.')
+          rm(element, type, fn, namespaces)
+        } else if (typeof typeSpec === 'function') {
+          // remove(el, fn)
+          rm(element, null, typeSpec)
+        } else {
+          // remove(el, { t1: fn1, t2, fn2 })
+          for (k in typeSpec) {
+            if (typeSpec.hasOwnProperty(k))
+              remove(element, k, typeSpec[k])
+          }
+        }
+        return element
+      }
+
+    , add = function (element, events, fn, delfn, $) {
+        var type, types, i, args
+          , originalFn = fn
+          , isDel = fn && typeof fn === 'string'
+
+        if (events && !fn && typeof events === 'object') {
+          for (type in events) {
+            if (events.hasOwnProperty(type))
+              add.apply(this, [ element, type, events[type] ])
+          }
+        } else {
+          args = arguments.length > 3 ? slice.call(arguments, 3) : []
+          types = (isDel ? fn : events).split(' ')
+          isDel && (fn = del(events, (originalFn = delfn), $)) && (args = slice.call(args, 1))
+          // special case for one()
+          this === ONE && (fn = once(remove, element, events, fn, originalFn))
+          for (i = types.length; i--;) addListener(element, types[i], fn, originalFn, args)
+        }
+        return element
+      }
+
+    , one = function () {
+        return add.apply(ONE, arguments)
+      }
+
+    , fireListener = W3C_MODEL ? function (isNative, type, element) {
+        var evt = doc.createEvent(isNative ? 'HTMLEvents' : 'UIEvents')
+        evt[isNative ? 'initEvent' : 'initUIEvent'](type, true, true, win, 1)
+        element.dispatchEvent(evt)
+      } : function (isNative, type, element) {
+        element = targetElement(element, isNative)
+        // if not-native then we're using onpropertychange so we just increment a custom property
+        isNative ? element.fireEvent('on' + type, doc.createEventObject()) : element['_on' + type]++
+      }
+
+    , fire = function (element, type, args) {
+        var i, j, l, names, handlers
+          , types = type.split(' ')
+
+        for (i = types.length; i--;) {
+          type = types[i].replace(nameRegex, '')
+          if (names = types[i].replace(namespaceRegex, ''))
+            names = names.split('.')
+          if (!names && !args && element[eventSupport]) {
+            fireListener(nativeEvents[type], type, element)
+          } else {
+            // non-native event, either because of a namespace, arguments or a non DOM element
+            // iterate over all listeners and manually 'fire'
+            handlers = registry.get(element, type)
+            args = [false].concat(args)
+            for (j = 0, l = handlers.length; j < l; j++) {
+              if (handlers[j].inNamespaces(names))
+                handlers[j].handler.apply(element, args)
+            }
+          }
+        }
+        return element
+      }
+
+    , clone = function (element, from, type) {
+        var i = 0
+          , handlers = registry.get(from, type)
+          , l = handlers.length
+
+        for (;i < l; i++)
+          handlers[i].original && add(element, handlers[i].type, handlers[i].original)
+        return element
+      }
+
+    , bean = {
+          add: add
+        , one: one
+        , remove: remove
+        , clone: clone
+        , fire: fire
+        , noConflict: function () {
+            context[name] = old
+            return this
+          }
+      }
+
+  if (win[attachEvent]) {
+    // for IE, clean up on unload to avoid leaks
+    var cleanup = function () {
+      var i, entries = registry.entries()
+      for (i in entries) {
+        if (entries[i].type && entries[i].type !== 'unload')
+          remove(entries[i].element, entries[i].type)
+      }
+      win[detachEvent]('onunload', cleanup)
+      win.CollectGarbage && win.CollectGarbage()
+    }
+    win[attachEvent]('onunload', cleanup)
+  }
+
+  return bean
+})
+// Copyright Google Inc.
 // Licensed under the Apache Licence Version 2.0
 // Autogenerated at Tue Oct 11 13:36:46 EDT 2011
 // @provides html4
@@ -1371,7 +1866,13 @@ var Mustache = function() {
     }
   });
 }();
-;wax = wax || {};
+/*!
+  * Reqwest! A general purpose XHR connection manager
+  * copyright Dustin Diaz 2011
+  * https://github.com/ded/reqwest
+  * license MIT
+  */
+!function(context,win){function serial(a){var b=a.name;if(a.disabled||!b)return"";b=enc(b);switch(a.tagName.toLowerCase()){case"input":switch(a.type){case"reset":case"button":case"image":case"file":return"";case"checkbox":case"radio":return a.checked?b+"="+(a.value?enc(a.value):!0)+"&":"";default:return b+"="+(a.value?enc(a.value):"")+"&"}break;case"textarea":return b+"="+enc(a.value)+"&";case"select":return b+"="+enc(a.options[a.selectedIndex].value)+"&"}return""}function enc(a){return encodeURIComponent(a)}function reqwest(a,b){return new Reqwest(a,b)}function init(o,fn){function error(a){o.error&&o.error(a),complete(a)}function success(resp){o.timeout&&clearTimeout(self.timeout)&&(self.timeout=null);var r=resp.responseText;if(r)switch(type){case"json":resp=win.JSON?win.JSON.parse(r):eval("("+r+")");break;case"js":resp=eval(r);break;case"html":resp=r}fn(resp),o.success&&o.success(resp),complete(resp)}function complete(a){o.complete&&o.complete(a)}this.url=typeof o=="string"?o:o.url,this.timeout=null;var type=o.type||setType(this.url),self=this;fn=fn||function(){},o.timeout&&(this.timeout=setTimeout(function(){self.abort(),error()},o.timeout)),this.request=getRequest(o,success,error)}function setType(a){if(/\.json$/.test(a))return"json";if(/\.jsonp$/.test(a))return"jsonp";if(/\.js$/.test(a))return"js";if(/\.html?$/.test(a))return"html";if(/\.xml$/.test(a))return"xml";return"js"}function Reqwest(a,b){this.o=a,this.fn=b,init.apply(this,arguments)}function getRequest(a,b,c){if(a.type!="jsonp"){var f=xhr();f.open(a.method||"GET",typeof a=="string"?a:a.url,!0),setHeaders(f,a),f.onreadystatechange=handleReadyState(f,b,c),a.before&&a.before(f),f.send(a.data||null);return f}var d=doc.createElement("script"),e=0;win[getCallbackName(a)]=generalCallback,d.type="text/javascript",d.src=a.url,d.async=!0,d.onload=d.onreadystatechange=function(){if(d[readyState]&&d[readyState]!=="complete"&&d[readyState]!=="loaded"||e)return!1;d.onload=d.onreadystatechange=null,a.success&&a.success(lastValue),lastValue=undefined,head.removeChild(d),e=1},head.appendChild(d)}function generalCallback(a){lastValue=a}function getCallbackName(a){var b=a.jsonpCallback||"callback";if(a.url.slice(-(b.length+2))==b+"=?"){var c="reqwest_"+uniqid++;a.url=a.url.substr(0,a.url.length-1)+c;return c}var d=new RegExp(b+"=([\\w]+)");return a.url.match(d)[1]}function setHeaders(a,b){var c=b.headers||{};c.Accept=c.Accept||"text/javascript, text/html, application/xml, text/xml, */*",b.crossOrigin||(c["X-Requested-With"]=c["X-Requested-With"]||"XMLHttpRequest"),c[contentType]=c[contentType]||"application/x-www-form-urlencoded";for(var d in c)c.hasOwnProperty(d)&&a.setRequestHeader(d,c[d],!1)}function handleReadyState(a,b,c){return function(){a&&a[readyState]==4&&(twoHundo.test(a.status)?b(a):c(a))}}var twoHundo=/^20\d$/,doc=document,byTag="getElementsByTagName",readyState="readyState",contentType="Content-Type",head=doc[byTag]("head")[0],uniqid=0,lastValue,xhr="XMLHttpRequest"in win?function(){return new XMLHttpRequest}:function(){return new ActiveXObject("Microsoft.XMLHTTP")};Reqwest.prototype={abort:function(){this.request.abort()},retry:function(){init.call(this,this.o,this.fn)}},reqwest.serialize=function(a){var b=[a[byTag]("input"),a[byTag]("select"),a[byTag]("textarea")],c=[],d,e;for(d=0,l=b.length;d<l;++d)for(e=0,l2=b[d].length;e<l2;++e)c.push(serial(b[d][e]));return c.join("").replace(/&$/,"")},reqwest.serializeArray=function(a){for(var b=this.serialize(a).split("&"),c=0,d=b.length,e=[],f;c<d;c++)b[c]&&(f=b[c].split("="))&&e.push({name:f[0],value:f[1]});return e};var old=context.reqwest;reqwest.noConflict=function(){context.reqwest=old;return this},typeof module!="undefined"?module.exports=reqwest:context.reqwest=reqwest}(this,window);wax = wax || {};
 
 // Attribution
 // -----------
@@ -2048,8 +2549,8 @@ var wax = wax || {};
 wax.tooltip = {};
 
 wax.tooltip = function(o) {
-    _currentTooltip = undefined;
-    options = options || {};
+    var _currentTooltip;
+    o = o || {};
 
     // Helper function to determine whether a given element is a wax popup.
     function isPopup(el) {
@@ -2245,20 +2746,6 @@ wax.u = {
             document.getElementById(x) :
             x;
     },
-
-    // From underscore, minus funcbind for now.
-    // Returns a version of a function that always has the second parameter,
-    // `obj`, as `this`.
-    bind: function(func, obj) {
-        var args = Array.prototype.slice.call(arguments, 2);
-        return function() {
-            return func.apply(obj, args.concat(Array.prototype.slice.call(arguments)));
-        };
-    },
-    // From underscore
-    isString: function(obj) {
-        return !!(obj === '' || (obj && obj.charCodeAt && obj.substr));
-    },
     // IE doesn't have indexOf
     indexOf: function(array, item) {
         var nativeIndexOf = Array.prototype.indexOf;
@@ -2267,10 +2754,6 @@ wax.u = {
         if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item);
         for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
         return -1;
-    },
-    // is this object an array?
-    isArray: Array.isArray || function(obj) {
-        return Object.prototype.toString.call(obj) === '[object Array]';
     },
     // From underscore: reimplement the ECMA5 `Object.keys()` method
     keys: Object.keys || function(obj) {
@@ -2333,68 +2816,6 @@ wax.u = {
     throttle: function(func, wait) {
         return this.limit(func, wait, false);
     }
-};
-
-// From d3
-wax.dispatch = function() {
-  var dispatch = new d3_dispatch(),
-      i = -1,
-      n = arguments.length;
-  while (++i < n) dispatch[arguments[i]] = d3_dispatch_event();
-  return dispatch;
-};
-
-function d3_dispatch() {}
-
-d3_dispatch.prototype.on = function(type, listener) {
-  var i = type.indexOf("."),
-      name = "";
-
-  // Extract optional namespace, e.g., "click.foo"
-  if (i > 0) {
-    name = type.substring(i + 1);
-    type = type.substring(0, i);
-  }
-
-  return arguments.length < 2
-      ? this[type].on(name)
-      : (this[type].on(name, listener), this);
-};
-
-function d3_dispatch_event() {
-  var listeners = [],
-      listenerByName = {};
-
-  function dispatch() {
-    var z = listeners, // defensive reference
-        i = -1,
-        n = z.length,
-        l;
-    while (++i < n) if (l = z[i].on) l.apply(this, arguments);
-  }
-
-  dispatch.on = function(name, listener) {
-    var l, i;
-
-    // return the current listener, if any
-    if (arguments.length < 2) return (l = listenerByName[name]) && l.on;
-
-    // remove the old listener, if any (with copy-on-write)
-    if (l = listenerByName[name]) {
-      l.on = null;
-      listeners = listeners.slice(0, i = listeners.indexOf(l)).concat(listeners.slice(i + 1));
-      delete listenerByName[name];
-    }
-
-    // add the new listener, if any
-    if (listener) {
-      listeners.push(listenerByName[name] = {on: listener});
-    }
-
-    return dispatch;
-  };
-
-  return dispatch;
 };
 wax = wax || {};
 wax.g = wax.g || {};
@@ -2504,146 +2925,141 @@ wax.g.interaction = function(map, tilejson, options) {
     // Our GridManager (from `gridutil.js`). This will keep the
     // cache of grid information and provide friendly utility methods
     // that return `GridTile` objects instead of raw data.
-    var interaction = {
-        waxGM: new wax.GridManager(tilejson),
+    var waxGM = new wax.GridManager(tilejson),
+        callbacks = options.callbacks || new wax.tooltip(),
+        clickAction = options.clickAction || 'full';
 
-        // This requires wax.Tooltip or similar
-        callbacks: options.callbacks || new wax.tooltip(),
-        clickAction: options.clickAction || 'full',
-        eventHandlers:{},
+    // Attach listeners to the map
+    function add() {
+        eventHandlers.tileloaded = google.maps.event.addListener(map, 'tileloaded',
+            clearTileGrid);
 
-        // Attach listeners to the map
-        add: function() {
-            this.eventHandlers.tileloaded = google.maps.event.addListener(map, 'tileloaded',
-                wax.util.bind(this.clearTileGrid, this));
+        eventHandlers.idle = google.maps.event.addListener(map, 'idle',
+            clearTileGrid);
 
-            this.eventHandlers.idle = google.maps.event.addListener(map, 'idle',
-                wax.util.bind(this.clearTileGrid, this));
+        eventHandlers.mousemove = google.maps.event.addListener(map, 'mousemove',
+            this.onMove());
 
-            this.eventHandlers.mousemove = google.maps.event.addListener(map, 'mousemove',
-                this.onMove());
+        eventHandlers.click = google.maps.event.addListener(map, 'click',
+            this.click());
 
-            this.eventHandlers.click = google.maps.event.addListener(map, 'click',
-                this.click());
+        return this;
+    }
 
-            return this;
-        },
+    // Remove interaction events from the map.
+    function remove() {
+        google.maps.event.removeListener(eventHandlers.tileloaded);
+        google.maps.event.removeListener(eventHandlers.idle);
+        google.maps.event.removeListener(eventHandlers.mousemove);
+        google.maps.event.removeListener(eventHandlers.click);
+        return this;
+    }
 
-        // Remove interaction events from the map.
-        remove: function() {
-            google.maps.event.removeListener(this.eventHandlers.tileloaded);
-            google.maps.event.removeListener(this.eventHandlers.idle);
-            google.maps.event.removeListener(this.eventHandlers.mousemove);
-            google.maps.event.removeListener(this.eventHandlers.click);
-            return this;
-        },
-
-        // Search through `.tiles` and determine the position,
-        // from the top-left of the **document**, and cache that data
-        // so that `mousemove` events don't always recalculate.
-        getTileGrid: function() {
-            // Get all 'marked' tiles, added by the `wax.g.MapType` layer.
-            // Return an array of objects which have the **relative** offset of
-            // each tile, with a reference to the tile object in `tile`, since the API
-            // returns evt coordinates as relative to the map object.
-            if (!this._getTileGrid) {
-                this._getTileGrid = [];
-                var zoom = map.getZoom();
-                var mapOffset = wax.util.offset(map.getDiv());
-                var get = wax.util.bind(function(mapType) {
-                    if (!mapType.interactive) return;
-                    for (var key in mapType.cache) {
-                        if (key.split('/')[0] != zoom) continue;
-                        var tileOffset = wax.util.offset(mapType.cache[key]);
-                        this._getTileGrid.push([
-                            tileOffset.top - mapOffset.top,
-                            tileOffset.left - mapOffset.left,
-                            mapType.cache[key]
-                        ]);
-                    }
-                }, this);
-                // Iterate over base mapTypes and overlayMapTypes.
-                for (var i in map.mapTypes) get(map.mapTypes[i]);
-                map.overlayMapTypes.forEach(get);
-            }
-            return this._getTileGrid;
-        },
-
-        clearTileGrid: function(map, e) {
-            this._getTileGrid = null;
-        },
-
-        getTile: function(evt) {
-            var tile;
-            var grid = this.getTileGrid();
-            for (var i = 0; i < grid.length; i++) {
-                if ((grid[i][0] < evt.pixel.y) &&
-                    ((grid[i][0] + 256) > evt.pixel.y) &&
-                    (grid[i][1] < evt.pixel.x) &&
-                    ((grid[i][1] + 256) > evt.pixel.x)) {
-                    tile = grid[i][2];
-                    break;
+    // Search through `.tiles` and determine the position,
+    // from the top-left of the **document**, and cache that data
+    // so that `mousemove` events don't always recalculate.
+    function getTileGrid() {
+        // Get all 'marked' tiles, added by the `wax.g.MapType` layer.
+        // Return an array of objects which have the **relative** offset of
+        // each tile, with a reference to the tile object in `tile`, since the API
+        // returns evt coordinates as relative to the map object.
+        if (!this._getTileGrid) {
+            this._getTileGrid = [];
+            var zoom = map.getZoom();
+            var mapOffset = wax.util.offset(map.getDiv());
+            var get = function(mapType) {
+                if (!mapType.interactive) return;
+                for (var key in mapType.cache) {
+                    if (key.split('/')[0] != zoom) continue;
+                    var tileOffset = wax.util.offset(mapType.cache[key]);
+                    this._getTileGrid.push([
+                        tileOffset.top - mapOffset.top,
+                        tileOffset.left - mapOffset.left,
+                        mapType.cache[key]
+                    ]);
                 }
-            }
-            return tile || false;
-        },
-
-        onMove: function(evt) {
-            if (!this._onMove) this._onMove = wax.util.bind(function(evt) {
-                var tile = this.getTile(evt);
-                if (tile) {
-                    this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
-                        if (err || !g) return;
-                        var feature = g.tileFeature(
-                            evt.pixel.x + wax.util.offset(map.getDiv()).left,
-                            evt.pixel.y + wax.util.offset(map.getDiv()).top,
-                            tile,
-                            { format: 'teaser' }
-                        );
-                        // Support only a single layer.
-                        // Thus a layer index of **0** is given to the tooltip library
-                        if (feature && this.feature !== feature) {
-                            this.feature = feature;
-                            this.callbacks.out(map.getDiv());
-                            this.callbacks.over(feature, map.getDiv(), 0, evt);
-                        } else if (!feature) {
-                            this.feature = null;
-                            this.callbacks.out(map.getDiv());
-                        }
-                    }, this));
-                }
-            }, this);
-            return this._onMove;
-        },
-
-        click: function(evt) {
-            if (!this._onClick) this._onClick = wax.util.bind(function(evt) {
-                var tile = this.getTile(evt);
-                if (tile) {
-                    this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
-                        if (err || !g) return;
-                        var feature = g.tileFeature(
-                            evt.pixel.x + wax.util.offset(map.getDiv()).left,
-                            evt.pixel.y + wax.util.offset(map.getDiv()).top,
-                            tile,
-                            { format: this.clickAction }
-                        );
-                        if (feature) {
-                            switch (this.clickAction) {
-                                case 'full':
-                                    this.callbacks.click(feature, map.getDiv(), 0, evt);
-                                    break;
-                                case 'location':
-                                    window.location = feature;
-                                    break;
-                            }
-                        }
-                    }, this));
-                }
-            }, this);
-            return this._onClick;
+            };
+            // Iterate over base mapTypes and overlayMapTypes.
+            for (var i in map.mapTypes) get(map.mapTypes[i]);
+            map.overlayMapTypes.forEach(get);
         }
-    };
+        return _getTileGrid;
+    }
+
+    function clearTileGrid(map, e) {
+        _getTileGrid = null;
+    }
+
+    function getTile(evt) {
+        var tile;
+        var grid = getTileGrid();
+        for (var i = 0; i < grid.length; i++) {
+            if ((grid[i][0] < evt.pixel.y) &&
+                ((grid[i][0] + 256) > evt.pixel.y) &&
+                (grid[i][1] < evt.pixel.x) &&
+                ((grid[i][1] + 256) > evt.pixel.x)) {
+                tile = grid[i][2];
+                break;
+            }
+        }
+        return tile || false;
+    }
+
+    function onMove(evt) {
+        if (!this._onMove) this._onMove = wax.util.bind(function(evt) {
+            var tile = this.getTile(evt);
+            if (tile) {
+                this.waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
+                    if (err || !g) return;
+                    var feature = g.tileFeature(
+                        evt.pixel.x + wax.util.offset(map.getDiv()).left,
+                        evt.pixel.y + wax.util.offset(map.getDiv()).top,
+                        tile,
+                        { format: 'teaser' }
+                    );
+                    // Support only a single layer.
+                    // Thus a layer index of **0** is given to the tooltip library
+                    if (feature && this.feature !== feature) {
+                        this.feature = feature;
+                        this.callbacks.out(map.getDiv());
+                        this.callbacks.over(feature, map.getDiv(), 0, evt);
+                    } else if (!feature) {
+                        this.feature = null;
+                        this.callbacks.out(map.getDiv());
+                    }
+                }, this));
+            }
+        }, this);
+        return _onMove;
+    }
+
+    function click(evt) {
+        if (!_onClick) _onClick = wax.util.bind(function(evt) {
+            var tile = getTile(evt);
+            if (tile) {
+                waxGM.getGrid(tile.src, wax.util.bind(function(err, g) {
+                    if (err || !g) return;
+                    var feature = g.tileFeature(
+                        evt.pixel.x + wax.util.offset(map.getDiv()).left,
+                        evt.pixel.y + wax.util.offset(map.getDiv()).top,
+                        tile,
+                        { format: clickAction }
+                    );
+                    if (feature) {
+                        switch (clickAction) {
+                            case 'full':
+                                callbacks.click(feature, map.getDiv(), 0, evt);
+                                break;
+                            case 'location':
+                                window.location = feature;
+                                break;
+                        }
+                    }
+                }, this));
+            }
+        }, this);
+        return this._onClick;
+    }
 
     // Return the interaction control such that the caller may manipulate it
     // e.g. remove it.

@@ -7,19 +7,14 @@ wax.mm = wax.mm || {};
 // control. This function can be used chaining-style with other
 // chaining-style controls.
 wax.mm.zoomer = function(map) {
-    var mm = com.modestmaps;
-
     var zoomin = document.createElement('a');
     zoomin.innerHTML = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
-    mm.addEvent(zoomin, 'mousedown', function(e) {
+    bean.add(zoomin, 'mousedown dblclick', function(e) {
         mm.cancelEvent(e);
     });
-    mm.addEvent(zoomin, 'dblclick', function(e) {
-        mm.cancelEvent(e);
-    });
-    mm.addEvent(zoomin, 'click', function(e) {
+    bean.add(zoomin, 'click', function(e) {
         mm.cancelEvent(e);
         map.zoomIn();
     }, false);
@@ -28,10 +23,7 @@ wax.mm.zoomer = function(map) {
     zoomout.innerHTML = '-';
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
-    mm.addEvent(zoomout, 'mousedown', function(e) {
-        mm.cancelEvent(e);
-    });
-    mm.addEvent(zoomout, 'dblclick', function(e) {
+    bean.add(zoomout, 'mousedown dblclick', function(e) {
         mm.cancelEvent(e);
     });
     mm.addEvent(zoomout, 'click', function(e) {

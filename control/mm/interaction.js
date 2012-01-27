@@ -153,16 +153,20 @@ wax.mm.interaction = function(map, tilejson, options) {
             bean.fire(interaction, 'off');
 
             // Touch moves invalidate touches
-            bean.add(map.parent, 'touchend', onUp);
-            bean.add(map.parent, 'touchmove', touchCancel);
-            bean.add(map.parent, 'touchcancel', touchCancel);
+            bean.add(map.parent, {
+                'touchend': onUp,
+                'touchmove': touchCancel,
+                'touchcancel': touchCancel
+            });
         }
     }
 
     function touchCancel() {
-        bean.remove(map.parent, 'touchend', onUp);
-        bean.remove(map.parent, 'touchmove', onUp);
-        bean.remove(map.parent, 'touchcancel', touchCancel);
+        bean.remove(map.parent, {
+            'touchend': onUp,
+            'touchmove': onUp,
+            'touchcancel': touchCancel
+        });
         _downLock = false;
     }
 
@@ -235,6 +239,10 @@ wax.mm.interaction = function(map, tilejson, options) {
             bean.add(map.parent, 'touchstart', onDown);
         }
         return this;
+    };
+
+    interaction.trigger = function(pt) {
+        // TODO: trigger an interaction at a screen point.
     };
 
     // Remove this control from the map.

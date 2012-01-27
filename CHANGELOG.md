@@ -6,6 +6,8 @@
 * Rewritten tooltip functionality
 * Space optimizations to reduce overall size of library
 * Mature implementation of movetip.js
+* Now includes bean for events
+* Moved all external deps to lib/*
 
 ## 5.0.0-alpha*
 

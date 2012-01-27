@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha2 - 1.0.4-490-g99d329d */
+/* wax - 5.0.0-alpha2 - 1.0.4-491-g410a9c0 */
 
 
 !function (name, context, definition) {
@@ -2838,14 +2838,6 @@ wax.u = {
 ;var wax = wax || {};
 wax.ol = wax.ol || {};
 
-var addEv = function(element, name, observer) {
-    if (element.addEventListener) {
-        element.addEventListener(name, observer, false);
-    } else if (element.attachEvent) {
-        element.attachEvent('on' + name, observer);
-    }
-};
-
 // An interaction toolkit for tiles that implement the
 // [MBTiles UTFGrid spec](https://github.com/mapbox/mbtiles-spec)
 wax.ol.Interaction =
@@ -2867,8 +2859,10 @@ wax.ol.Interaction =
     },
 
     setMap: function(map) {
-        addEv(map.viewPortDiv, 'mousemove', getInfoForHover);
-        addEv(map.viewPortDiv, 'mouseout', resetLayers);
+        bean.add(map.viewPortDiv, {
+            mousemove: getInfoForHover,
+            mouseout: resetLayers
+        });
         this.clickHandler = new OpenLayers.Handler.Click(
             this, {
                 click: this.getInfoForClick
@@ -2984,7 +2978,7 @@ wax.ol.Interaction =
     // React to a hover mouse event, by finding all tiles,
     // finding features, and calling `this.callbacks[]`
     // This is the `click` handler attached to the map.
-    function getInfoForHover(evt) {
+    getInfoForHover: function(evt) {
         // If there's no event, this handler should not proceed.
         if (!evt) return;
         var options = { format: 'teaser' },
