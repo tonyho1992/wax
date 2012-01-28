@@ -11,8 +11,6 @@ wax.leaf.interaction = function(map, tilejson, options) {
     var waxGM = wax.GridManager(tilejson),
         callbacks = options.callbacks || new wax.tooltip(options),
         clickAction = options.clickAction || ['full', 'location'],
-        addListener = L.DomEvent.addListener,
-        removeListener = L.DomEvent.removeListener,
         clickHandler = options.clickHandler || function(url) {
             window.location = url;
         },
@@ -124,7 +122,7 @@ wax.leaf.interaction = function(map, tilejson, options) {
         _downLock = true;
         _d = wax.util.eventoffset(e);
         if (e.type === 'mousedown') {
-            addListener(_container, 'mouseup', onUp, this);
+            bean.add(_container, 'mouseup', onUp, this);
 
             // Only track single-touches. Double-touches will not affect this
             // control
@@ -139,14 +137,18 @@ wax.leaf.interaction = function(map, tilejson, options) {
             }
 
             // Touch moves invalidate touches
-            addListener(_container, 'touchend', onUp, this);
-            addListener(_container, 'touchmove', touchCancel, this);
+            bean.add(_container, {
+                touchend: onUp,
+                touchmove: touchCancel
+            });
         }
     }
 
     function touchCancel() {
-        removeListener(_container, 'touchend', onUp);
-        removeListener(_container, 'touchmove', onUp);
+        bean.remove(_container, {
+            touchend: onUp,
+            touchmove: onUp
+        });
         _downLock = false;
     }
 
@@ -157,8 +159,10 @@ wax.leaf.interaction = function(map, tilejson, options) {
         removeListener(_container, 'mouseup', onUp);
 
         if (_container.ontouchend) {
-            removeListener(_container, 'touchend', onUp);
-            removeListener(_container, 'touchmove', _touchCancel);
+            bean.remove(_container, {
+                touchend: onUp,
+                touchmove: _touchCancel
+            });
         }
 
         if (e.type === 'touchend') {
