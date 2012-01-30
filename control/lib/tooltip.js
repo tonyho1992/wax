@@ -31,6 +31,7 @@ wax.tooltip = function(o) {
 
         function remove() {
             if (parentNode) parentNode.removeChild(this);
+            _ct = null;
         }
 
         if (event) {
@@ -40,6 +41,7 @@ wax.tooltip = function(o) {
             _ct.className += ' ' + o.animationOut;
         } else {
             if (_ct.parentNode) _ct.parentNode.removeChild(_ct);
+            _ct = null;
         }
     }
 
@@ -48,27 +50,22 @@ wax.tooltip = function(o) {
     function click(feature) {
         // Hide any current tooltips.
         if (_currentTooltip) {
-            hideTooltip(_currentTooltip);
-            _currentTooltip = undefined;
+            hide();
         }
 
-        var tooltip = getTooltip(feature);
+        var tooltip = parent.appendChild(getTooltip(feature));
         tooltip.className += ' wax-popup';
         tooltip.innerHTML = feature;
 
-        var close = document.createElement('a');
+        var close = tooltip.appendChild(document.createElement('a'));
         close.href = '#close';
         close.className = 'close';
         close.innerHTML = 'Close';
-        tooltip.appendChild(close);
         popped = true;
-
-        parent.appendChild(tooltip);
 
         bean.add(close, 'click touchend', function closeClick(e) {
             e.stop();
-            hideTooltip(tooltip);
-            _ct = undefined;
+            hide();
             popped = false;
         });
 
@@ -90,11 +87,7 @@ wax.tooltip = function(o) {
     // highest layer underneath if found.
     function out(feature) {
         context.style.cursor = 'default';
-
-        if (!popped && _ct) {
-            hideTooltip(_ct);
-            _ct = undefined;
-        }
+        if (!popped && _ct) hide();
     }
 
     t.parent = function(x) {

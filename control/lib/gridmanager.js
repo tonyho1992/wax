@@ -54,7 +54,7 @@ wax.gm = function() {
 
         wax.request.get(gurl, function(err, t) {
             if (err) return callback(err, null);
-            callback(null, wax.GridInstance(t, formatter, {
+            callback(null, wax.gi(t, formatter, {
                 resolution: resolution || 4
             }));
         });
