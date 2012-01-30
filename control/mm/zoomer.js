@@ -12,10 +12,10 @@ wax.mm.zoomer = function(map) {
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
     bean.add(zoomin, 'mousedown dblclick', function(e) {
-        mm.cancelEvent(e);
+        e.stop();
     });
     bean.add(zoomin, 'click', function(e) {
-        mm.cancelEvent(e);
+        e.stop();
         map.zoomIn();
     }, false);
 
@@ -24,12 +24,12 @@ wax.mm.zoomer = function(map) {
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
     bean.add(zoomout, 'mousedown dblclick', function(e) {
-        mm.cancelEvent(e);
+        e.stop();
     });
-    mm.addEvent(zoomout, 'click', function(e) {
-        mm.cancelEvent(e);
+    bean.add(zoomout, 'click', function(e) {
+        e.stop();
         map.zoomOut();
-    }, false);
+    });
 
     var zoomer = {
         add: function(map) {
@@ -46,8 +46,8 @@ wax.mm.zoomer = function(map) {
             return this;
         },
         appendTo: function(elem) {
-            wax.util.$(elem).appendChild(zoomin);
-            wax.util.$(elem).appendChild(zoomout);
+            wax.u.$(elem).appendChild(zoomin);
+            wax.u.$(elem).appendChild(zoomout);
             return this;
         }
     };

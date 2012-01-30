@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha2 - 1.0.4-491-g410a9c0 */
+/* wax - 5.0.0-alpha2 - 1.0.4-493-ge08d816 */
 
 
 !function (name, context, definition) {
@@ -1895,9 +1895,9 @@ wax.attribution = function() {
         return id;
     }
 
-    a.set = function(content) {
-        if (typeof content === 'undefined') return;
-        container.innerHTML = html_sanitize(content, urlX, idX);
+    a.content = function(x) {
+        if (typeof x === 'undefined') return container.innerHTML;
+        container.innerHTML = html_sanitize(x, urlX, idX);
         return this;
     };
 
@@ -2106,11 +2106,9 @@ wax.GridInstance = function(grid_tile, formatter, options) {
 // It takes one options object, which current accepts a single option:
 // `resolution` determines the number of pixels per grid element in the grid.
 // The default is 4.
-wax.GridManager = function(options) {
-    options = options || {};
+wax.gm = function() {
 
-    var resolution = options.resolution || 4,
-        version = options.version || '1.1',
+    var resolution = 4,
         grid_tiles = {},
         manager = {},
         formatter;
@@ -2164,20 +2162,19 @@ wax.GridManager = function(options) {
         return manager;
     };
 
-    manager.add = function(options) {
-        if (options.template) {
-            manager.template(options.template);
-        } else if (options.formatter) {
-            manager.formatter(options.formatter);
+    manager.tilejson = function(x) {
+        if (x.template) {
+            manager.template(x.template);
+        } else if (x.formatter) {
+            manager.formatter(x.formatter);
         }
-
-        if (options.grids) {
-            manager.gridUrl(options.grids);
+        if (x.grids) {
+            manager.gridUrl(x.grids);
         }
-        return this;
+        return manager;
     };
 
-    return manager.add(options);
+    return manager;
 };
 wax = wax || {};
 
@@ -2244,6 +2241,232 @@ wax.hash = function(options) {
     };
 
     return hash.add();
+};
+wax = wax || {};
+
+wax.interaction = function() {
+    var gm = wax.gm(),
+        clickAction = ['full', 'location'],
+        eventoffset = wax.u.eventoffset,
+        interaction = {},
+        _downLock = false,
+        _clickTimeout = false,
+        // Active feature
+        _af,
+        // Down event
+        _d,
+        // Touch tolerance
+        tol = 4,
+        tileGrid;
+
+    var clickHandler = function(url) {
+        window.top.location = url;
+    };
+
+    var defaultEvents = {
+        mousemove: onMove,
+        touchstart: onDown,
+        mousedown: onDown
+    };
+
+    var touchEnds = {
+        touchend: onUp,
+        touchmove: onUp,
+        touchcancel: touchCancel
+    };
+
+    // Abstract getTile method. Depends on a tilegrid with
+    // grid[ [x, y, tile] ] structure.
+    function getTile(e) {
+        for (var i = 0, g = grid(); i < grid.length; i++) {
+            if ((g[i][0] < e.y) &&
+               ((g[i][0] + 256) > e.y) &&
+                (g[i][1] < e.x) &&
+               ((g[i][1] + 256) > e.x)) return g[i][2];
+        }
+        return false;
+    }
+
+    // Clear the double-click timeout to prevent double-clicks from
+    // triggering popups.
+    function killTimeout() {
+        if (_clickTimeout) {
+            window.clearTimeout(_clickTimeout);
+            _clickTimeout = null;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function onMove(e) {
+        // If the user is actually dragging the map, exit early
+        // to avoid performance hits.
+        if (_downLock) return;
+        if (e.target.className !== 'map-tile-loaded') return;
+
+        var pos = eventoffset(e),
+            tile = getTile(pos),
+            feature;
+
+        if (tile) gm.getGrid(tile.src, function(err, g) {
+            if (err || !g) return;
+            feature = g.tileFeature(pos.x, pos.y, tile, {
+                format: 'teaser'
+            });
+            if (feature) {
+                if (feature && _af !== feature) {
+                    _af = feature;
+                    bean.fire(interaction, 'on', {
+                        parent: map.parent,
+                        feature: feature,
+                        e: e
+                    });
+                } else if (!feature) {
+                    _af = null;
+                    bean.fire(interaction, 'off');
+                }
+            } else {
+                _af = null;
+                bean.fire(interaction, 'off');
+            }
+        });
+    }
+
+    // A handler for 'down' events - which means `mousedown` and `touchstart`
+    function onDown(e) {
+        if (e.target.className !== 'map-tile-loaded') return;
+        // Ignore double-clicks by ignoring clicks within 300ms of
+        // each other.
+        if (killTimeout()) { return; }
+
+        // Prevent interaction offset calculations happening while
+        // the user is dragging the map.
+        //
+        // Store this event so that we can compare it to the
+        // up event
+        _downLock = true;
+        _d = eventoffset(e);
+        if (e.type === 'mousedown') {
+            bean.add(document.body, 'mouseup', onUp);
+
+        // Only track single-touches. Double-touches will not affect this
+        // control
+        } else if (e.type === 'touchstart' && e.touches.length === 1) {
+
+            // turn this into touch-mode. Fallback to teaser and full.
+            clickAction = ['full', 'teaser'];
+
+            // Don't make the user click close if they hit another tooltip
+            bean.fire(interaction, 'off');
+
+            // Touch moves invalidate touches
+            bean.add(map.parent, touchEnds);
+        }
+    }
+
+    function touchCancel() {
+        bean.remove(map.parent, touchEnds);
+        _downLock = false;
+    }
+
+    function onUp(e) {
+        var evt = {},
+            pos = eventoffset(e);
+        _downLock = false;
+
+        // TODO: refine
+        for (var key in e) {
+          evt[key] = e[key];
+        }
+
+        bean.remove(document.body, 'mouseup', onUp);
+        bean.remove(map.parent, touchEnds);
+
+        if (e.type === 'touchend') {
+            // If this was a touch and it survived, there's no need to avoid a double-tap
+            click(e, _d);
+        } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
+            Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
+            // Contain the event data in a closure.
+            _clickTimeout = window.setTimeout(
+                function() {
+                    _clickTimeout = null;
+                    click(evt, pos);
+                }, 300);
+        }
+        return onUp;
+    }
+
+    // Handle a click event. Takes a second
+    function click(e, pos) {
+        var tile = getTile(pos),
+            feature;
+
+        if (tile) gm.getGrid(tile.src, function(err, g) {
+            for (var i = 0; g && (i < clickAction.length); i++) {
+                feature = g.tileFeature(pos.x, pos.y, tile, {
+                    format: clickAction[i]
+                });
+                if (feature) {
+                    switch (clickAction[i]) {
+                        case 'full':
+                        // clickAction can be teaser in touch interaction
+                        case 'teaser':
+                            return callbacks.click(feature, map.parent, e);
+                        case 'location':
+                            return clickHandler(feature);
+                    }
+                }
+            }
+        });
+    }
+
+    interaction.attach = function(x) {
+        if (!arguments.length) return attach;
+        attach = x;
+        return interaction;
+    };
+
+    // Attach listeners to the map
+    interaction.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        bean.add(map.parent, defaultEvents);
+        bean.add(map.parent, 'touchstart', onDown);
+        if (attach) attach();
+        return interaction;
+    };
+
+    interaction.trigger = function(pt) {
+        // TODO: trigger an interaction at a screen point.
+    };
+
+    interaction.grid = function(x) {
+        if (!arguments.length) return grid;
+        grid = x;
+        return interaction;
+    };
+
+    // Remove this control from the map.
+    interaction.remove = function() {
+        for (var i = 0; i < clearingEvents.length; i++) {
+            map.removeCallback(clearingEvents[i], clearTileGrid);
+        }
+        bean.remove(map.parent, defaultEvents);
+        bean.fire(interaction, 'remove');
+        return this;
+    };
+
+    interaction.tilejson = function(x) {
+        if (!arguments.length) return tilejson;
+        gm.tilejson(x);
+        return interaction;
+    };
+
+
+    // Ensure chainability
+    return interaction;
 };
 // Wax Legend
 // ----------
@@ -2833,13 +3056,13 @@ wax.mm.attribution = function(map, tilejson) {
     };
 
     attribution.appendTo = function(elem) {
-        wax.util.$(elem).appendChild(a.element());
+        wax.u.$(elem).appendChild(a.element());
         return this;
     };
 
     attribution.init = function() {
         a = wax.attribution();
-        a.set(tilejson.attribution);
+        a.content(tilejson.attribution);
         a.element().className = 'wax-attribution wax-mm';
         return this;
     };
@@ -2986,6 +3209,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
+wax._ = {};
 
 // Bandwidth Detection
 // ------------------
@@ -2993,26 +3217,18 @@ wax.mm.bwdetect = function(map, options) {
     options = options || {};
     var lowpng = options.png || '.png128',
         lowjpg = options.jpg || '.jpg70',
-        bw = 1;
+        bw = false;
 
-    function setProvider(x) {
-        // More or less detect the Wax version
-        if (!(x.options && x.options.scheme)) MM.Map.prototype.setProvider.call(map, x);
-        var swap = [['.png', '.jpg'], [lowpng, lowjpg]];
-        if (bw) swap.reverse();
-        for (var i = 0; i < x.options.tiles.length; i++) {
-            x.options.tiles[i] = x.options.tiles[i]
-                .replace(swap[0][0], swap[1][0])
-                .replace(swap[0][1], swap[1][1]);
-        }
-        MM.Map.prototype.setProvider.call(map, x);
-    }
-
-    map.setProvider = setProvider;
+    wax._.bw_png = lowpng;
+    wax._.bw_jpg = lowjpg;
 
     return wax.bwdetect(options, function(x) {
-      bw = x;
-      setProvider(map.provider);
+        wax._.bw = !x;
+        for (var i = 0; i < map.layers.length; i++) {
+            if (map.getLayerAt(i).provider instanceof wax.mm.connector) {
+                map.getLayerAt(i).setProvider(map.getLayerAt(i).provider);
+            }
+        }
     });
 };
 wax = wax || {};
@@ -3035,7 +3251,7 @@ wax.mm.fullscreen = function(map) {
         smallSize;
 
     function click(e) {
-        if (e) MM.cancelEvent(e);
+        if (e) e.stop();
         if (fullscreened) {
             fullscreen.original();
         } else {
@@ -3058,7 +3274,7 @@ wax.mm.fullscreen = function(map) {
         a.className = 'wax-fullscreen';
         a.href = '#fullscreen';
         a.innerHTML = 'fullscreen';
-        MM.addEvent(a, 'click', click);
+        bean.add(a, 'click', click);
         return this;
     };
     fullscreen.full = function() {
@@ -3075,7 +3291,7 @@ wax.mm.fullscreen = function(map) {
         ss(smallSize[0], smallSize[1]);
     };
     fullscreen.appendTo = function(elem) {
-        wax.util.$(elem).appendChild(a);
+        wax.u.$(elem).appendChild(a);
         return this;
     };
 
@@ -3114,268 +3330,47 @@ wax.mm.hash = function(map) {
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-// A chaining-style control that adds
-// interaction to a modestmaps.Map object.
-//
-// Takes an options object with the following keys:
-//
-// * `callbacks` (optional): an `out`, `over`, and `click` callback.
-//   If not given, the `wax.tooltip` library will be expected.
-// * `clickAction` (optional): **full** or **location**: default is
-//   **full**.
-// * `clickHandler` (optional): if not given, `clickAction: 'location'` will
-//   assign a location to your window with `window.location = 'location'`.
-//   To make location-getting work with other systems, like those based on
-//   pushState or Backbone, you can provide a custom function of the form
-//
-//
-//     `clickHandler: function(url) { ... go to url ... }`
-wax.mm.interaction = function(map, tilejson, options) {
-    options = options || {};
-    tilejson = tilejson || {};
+wax.mm.interaction = function() {
+    var dirty = false, _grid;
 
-    var waxGM = wax.GridManager(tilejson),
-        clickAction = options.clickAction || ['full', 'location'],
-        clickHandler = options.clickHandler || function(url) {
-            window.top.location = url;
-        },
-        eventoffset = wax.util.eventoffset,
-        interaction = {},
-        _downLock = false,
-        _clickTimeout = false,
-        touchable = ('ontouchstart' in document.documentElement),
-        // Active feature
-        _af,
-        // Down event
-        _d,
-        // Touch tolerance
-        tol = 4,
-        tileGrid,
-        clearingEvents = ['zoomed', 'panned', 'centered',
-            'extentset', 'resized', 'drawn'];
-
-    // Search through `.tiles` and determine the position,
-    // from the top-left of the **document**, and cache that data
-    // so that `mousemove` events don't always recalculate.
-    function getTileGrid() {
-        // TODO: don't build for tiles outside of viewport
-        // Touch interaction leads to intermediate
-        var zoomLayer = map.getLayerAt(0).levels[Math.round(map.getZoom())];
-        // Calculate a tile grid and cache it, by using the `.tiles`
-        // element on this map.
-        return tileGrid || (tileGrid =
-            (function(t) {
+    function grid() {
+        var zoomLayer = map.getLayerAt(0)
+            .levels[Math.round(map.getZoom())];
+        if (!dirty && _grid) {
+            return _grid;
+        } else {
+            _grid = (function(t) {
                 var o = [];
                 for (var key in t) {
                     if (t[key].parentNode === zoomLayer) {
-                        var offset = wax.util.offset(t[key]);
-                        o.push([offset.top, offset.left, t[key]]);
+                        var offset = wax.u.offset(t[key]);
+                        o.push([
+                            offset.top,
+                            offset.left,
+                            t[key]
+                        ]);
                     }
                 }
                 return o;
-            })(map.getLayerAt(0).tiles));
-    }
-
-    // When the map moves, the tile grid is no longer valid.
-    function clearTileGrid(map, e) {
-        tileGrid = null;
-    }
-
-    function getTile(e) {
-        for (var i = 0, grid = getTileGrid(); i < grid.length; i++) {
-            if ((grid[i][0] < e.y) &&
-               ((grid[i][0] + 256) > e.y) &&
-                (grid[i][1] < e.x) &&
-               ((grid[i][1] + 256) > e.x)) return grid[i][2];
-        }
-        return false;
-    }
-
-    // Clear the double-click timeout to prevent double-clicks from
-    // triggering popups.
-    function killTimeout() {
-        if (_clickTimeout) {
-            window.clearTimeout(_clickTimeout);
-            _clickTimeout = null;
-            return true;
-        } else {
-            return false;
+            })(map.getLayerAt(0).tiles);
+            return _grid;
         }
     }
 
-    function onMove(e) {
-        // If the user is actually dragging the map, exit early
-        // to avoid performance hits.
-        if (_downLock) return;
-        var t = e.target || e.srcElement;
-        if (t.className !== 'map-tile-loaded') return;
-
-        var pos = eventoffset(e),
-            tile = getTile(pos),
-            feature;
-
-        if (tile) waxGM.getGrid(tile.src, function(err, g) {
-            if (err || !g) return;
-            feature = g.tileFeature(pos.x, pos.y, tile, {
-                format: 'teaser'
-            });
-            if (feature) {
-                if (feature && _af !== feature) {
-                    _af = feature;
-                    bean.fire(interaction, 'on', {
-                        parent: map.parent,
-                        feature: feature,
-                        e: e
-                    });
-                } else if (!feature) {
-                    _af = null;
-                    bean.fire(interaction, 'off');
-                }
-            } else {
-                _af = null;
-                bean.fire(interaction, 'off');
-            }
-        });
-    }
-
-    // A handler for 'down' events - which means `mousedown` and `touchstart`
-    function onDown(e) {
-        if (e.target.className !== 'map-tile-loaded') return;
-        // Ignore double-clicks by ignoring clicks within 300ms of
-        // each other.
-        if (killTimeout()) { return; }
-
-        // Prevent interaction offset calculations happening while
-        // the user is dragging the map.
-        //
-        // Store this event so that we can compare it to the
-        // up event
-        _downLock = true;
-        _d = eventoffset(e);
-        if (e.type === 'mousedown') {
-            bean.add(document.body, 'mouseup', onUp);
-
-        // Only track single-touches. Double-touches will not affect this
-        // control
-        } else if (e.type === 'touchstart' && e.touches.length === 1) {
-
-            // turn this into touch-mode. Fallback to teaser and full.
-            clickAction = ['full', 'teaser'];
-
-            // Don't make the user click close if they hit another tooltip
-            bean.fire(interaction, 'off');
-
-            // Touch moves invalidate touches
-            bean.add(map.parent, {
-                'touchend': onUp,
-                'touchmove': touchCancel,
-                'touchcancel': touchCancel
-            });
-        }
-    }
-
-    function touchCancel() {
-        bean.remove(map.parent, {
-            'touchend': onUp,
-            'touchmove': onUp,
-            'touchcancel': touchCancel
-        });
-        _downLock = false;
-    }
-
-    function onUp(e) {
-        var evt = {},
-            pos = eventoffset(e);
-        _downLock = false;
-
-        for (var key in e) {
-          evt[key] = e[key];
-        }
-
-        bean.remove(document.body, 'mouseup', onUp);
-
-        if (touchable) {
-            bean.remove(map.parent, {
-                'touchend': onUp,
-                'touchmove': touchCancel,
-                'touchcancel': touchCancel
-            });
-        }
-
-        if (e.type === 'touchend') {
-            // If this was a touch and it survived, there's no need to avoid a double-tap
-            click(e, _d);
-        } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
-            Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
-            // Contain the event data in a closure.
-            _clickTimeout = window.setTimeout(
-                function() {
-                    _clickTimeout = null;
-                    click(evt, pos);
-                }, 300);
-        }
-        return onUp;
-    }
-
-    // Handle a click event. Takes a second
-    function click(e, pos) {
-        var tile = getTile(pos),
-            feature;
-
-        if (tile) waxGM.getGrid(tile.src, function(err, g) {
-            for (var i = 0; g && (i < clickAction.length); i++) {
-                feature = g.tileFeature(pos.x, pos.y, tile, {
-                    format: clickAction[i]
-                });
-                if (feature) {
-                    switch (clickAction[i]) {
-                        case 'full':
-                        // clickAction can be teaser in touch interaction
-                        case 'teaser':
-                            return callbacks.click(feature, map.parent, e);
-                        case 'location':
-                            return clickHandler(feature);
-                    }
-                }
-            }
-        });
-    }
-
-    // Attach listeners to the map
-    interaction.add = function() {
+    function attach(x) {
+        if (!arguments.length) return map;
+        map = x;
+        function setdirty() { dirty = true; }
+        var clearingEvents = ['zoomed', 'panned', 'centered',
+            'extentset', 'resized', 'drawn'];
         for (var i = 0; i < clearingEvents.length; i++) {
-            map.addCallback(clearingEvents[i], clearTileGrid);
+            map.addCallback(clearingEvents[i], setdirty);
         }
-        bean.add(map.parent, 'mousemove', onMove);
-        bean.add(map.parent, 'mousedown', onDown);
-        if (touchable) {
-            bean.add(map.parent, 'touchstart', onDown);
-        }
-        return this;
-    };
+    }
 
-    interaction.trigger = function(pt) {
-        // TODO: trigger an interaction at a screen point.
-    };
-
-    // Remove this control from the map.
-    interaction.remove = function() {
-        for (var i = 0; i < clearingEvents.length; i++) {
-            map.removeCallback(clearingEvents[i], clearTileGrid);
-        }
-        bean.remove(map.parent, {
-            mousemove: onMove,
-            mousedown: onDown
-        });
-        if (touchable) {
-            bean.remove(map.parent, 'touchstart', onDown);
-        }
-        bean.fire(interaction, 'remove');
-        return this;
-    };
-
-    // Ensure chainability
-    return interaction.add(map);
+    return wax.interaction()
+        .attach(attach)
+        .grid(grid);
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
@@ -3486,198 +3481,6 @@ wax.mm.legend = function(map, tilejson) {
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-// Mobile
-// ------
-// For making maps on normal websites nicely mobile-ized
-wax.mm.mobile = function(map, tilejson, opts) {
-    opts = opts || {};
-    // Inspired by Leaflet
-    var ua = navigator.userAgent.toLowerCase(),
-        isWebkit = ua.indexOf('webkit') != -1,
-        isMobile = ua.indexOf('mobile') != -1,
-        mobileWebkit = isMobile && isWebkit;
-
-    // FIXME: testing
-    // mobileWebkit = true;
-
-    var defaultOverlayDraw = function(div) {
-        var canvas = document.createElement('canvas');
-        var width = parseInt(div.style.width, 10),
-            height = parseInt(div.style.height, 10),
-            w2 = width / 2,
-            h2 = height / 2,
-            // Make the size of the arrow nicely proportional to the map
-            size = Math.min(width, height) / 4,
-            ctx = canvas.getContext('2d');
-
-        canvas.setAttribute('width', width);
-        canvas.setAttribute('height', height);
-        ctx.globalAlpha = 0.7;
-        // Draw a nice gradient to signal that the map is inaccessible
-        var inactive = ctx.createLinearGradient(0, 0, 300, 225);
-        inactive.addColorStop(0, 'black');
-        inactive.addColorStop(1, 'rgb(144, 144, 144)');
-        ctx.fillStyle = inactive;
-        ctx.fillRect(0, 0, width, height);
-
-        ctx.beginPath();
-        ctx.arc(
-            w2 - size * 0.3,
-            h2,
-            size * 1.3,
-            size * 1.3,
-            Math.PI * 2,
-            true);
-        ctx.closePath();
-        ctx.fillStyle = 'rgb(100, 100, 100)';
-        ctx.fill();
-
-        ctx.fillStyle = 'rgb(255, 255, 255)';
-        ctx.lineWidth = 5;
-        ctx.beginPath();
-        ctx.moveTo(w2 - size * 0.8, h2 - size); // give the (x,y) coordinates
-        ctx.lineTo(w2 - size * 0.8, h2 + size);
-        ctx.lineTo(w2 + size * 0.8, h2);
-        ctx.fill();
-
-        // Done! Now fill the shape, and draw the stroke.
-        // Note: your shape will not be visible until you call any of the two methods.
-        div.appendChild(canvas);
-    };
-
-    function getDeviceScale() {
-        return ((Math.abs(window.orientation) == 90) ?
-            Math.max(480, screen.height) :
-            screen.width) /
-            window.innerWidth;
-    }
-
-    var defaultBackDraw = function(div) {
-        div.style.position = 'absolute';
-        div.style.height = '50px';
-        div.style.left =
-            div.style.right = '0';
-
-        var canvas = document.createElement('canvas');
-        canvas.setAttribute('width', div.offsetWidth);
-        canvas.setAttribute('height', div.offsetHeight);
-
-        var ctx = canvas.getContext('2d');
-        ctx.globalAlpha = 1;
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-        ctx.fillRect(0, 0, div.offsetWidth, div.offsetHeight);
-        ctx.fillStyle = 'rgb(0, 0, 0)';
-        ctx.font = 'bold 20px sans-serif';
-        ctx.fillText('back', 20, 30);
-        div.appendChild(canvas);
-    };
-
-    var maximizeElement = function(elem) {
-        elem.style.position = 'absolute';
-        elem.style.width =
-            elem.style.height = 'auto';
-        elem.style.top = (window.pageYOffset) + 'px';
-        elem.style.left =
-            elem.style.right = '0px';
-    };
-
-    var minimizeElement = function(elem) {
-        elem.style.position = 'relative';
-        elem.style.width =
-            elem.style.height =
-            elem.style.top =
-            elem.style.left =
-            elem.style.right = 'auto';
-    };
-
-    var overlayDiv,
-        oldBody,
-        standIn,
-        meta,
-        oldscale,
-        overlayDraw = opts.overlayDraw || defaultOverlayDraw,
-        backDraw = opts.backDraw || defaultBackDraw;
-        bodyDraw = opts.bodyDraw || function() {};
-
-    var mobile = {
-        add: function(map) {
-            // Code in this block is only run on Mobile Safari;
-            // therefore HTML5 Canvas is fine.
-            if (mobileWebkit) {
-                meta = document.createElement('meta');
-                meta.id = 'wax-touch';
-                meta.setAttribute('name', 'viewport');
-                overlayDiv = document.createElement('div');
-                overlayDiv.id = map.parent.id + '-mobileoverlay';
-                overlayDiv.className = 'wax-mobileoverlay';
-                overlayDiv.style.position = 'absolute';
-                overlayDiv.style.width = map.dimensions.x + 'px';
-                overlayDiv.style.height = map.dimensions.y + 'px';
-                map.parent.appendChild(overlayDiv);
-                overlayDraw(overlayDiv);
-
-                standIn = document.createElement('div');
-                backDiv = document.createElement('div');
-                // Store the old body - we'll need it.
-                oldBody = document.body;
-
-                newBody = document.createElement('body');
-                newBody.className = 'wax-mobile-body';
-                newBody.appendChild(backDiv);
-
-                MM.addEvent(overlayDiv, 'touchstart', this.toTouch);
-                MM.addEvent(backDiv, 'touchstart', this.toPage);
-
-            }
-            return this;
-        },
-        // Enter 'touch mode'
-        toTouch: function() {
-            // Enter a new body
-            map.parent.parentNode.replaceChild(standIn, map.parent);
-            newBody.insertBefore(map.parent, backDiv);
-            document.body = newBody;
-
-            oldscale = getDeviceScale();
-            document.head.appendChild(meta);
-
-            bodyDraw(newBody);
-            backDraw(backDiv);
-            meta.setAttribute(
-                'content',
-                'initial-scale=1.0,' +
-                'minimum-scale=0, maximum-scale=10');
-            map._smallSize = [map.parent.clientWidth, map.parent.clientHeight];
-            maximizeElement(map.parent);
-            map.setSize(
-                map.parent.offsetWidth,
-                window.innerHeight);
-            backDiv.style.display = 'block';
-            overlayDiv.style.display = 'none';
-        },
-        // Return from touch mode
-        toPage: function() {
-            // Currently this code doesn't, and can't, reset the
-            // scale of the page. Anything to not use the meta-element
-            // would be a bit of a hack.
-            document.body = oldBody;
-
-            meta.setAttribute(
-                'content',
-                'user-scalable=yes, width=device-width,' +
-                'initial-scale=' + oldscale);
-            standIn.parentNode.replaceChild(map.parent, standIn);
-            minimizeElement(map.parent);
-            map.setSize(map._smallSize[0], map._smallSize[1]);
-            backDiv.style.display = 'none';
-            overlayDiv.style.display = 'block';
-        }
-    };
-    return mobile.add(map);
-};
-wax = wax || {};
-wax.mm = wax.mm || {};
-
 // Point Selector
 // --------------
 //
@@ -3752,7 +3555,7 @@ wax.mm.pointselector = function(map, tilejson, opts) {
                 // TODO: avoid circular reference
                 locations[i].pointDiv.location = locations[i];
                 // Create this closure once per point
-                MM.addEvent(locations[i].pointDiv, 'mouseup',
+                bean.add(locations[i].pointDiv, 'mouseup',
                     (function selectPointWrap(e) {
                     var l = locations[i];
                     return function(e) {
@@ -3769,7 +3572,7 @@ wax.mm.pointselector = function(map, tilejson, opts) {
 
     function mouseDown(e) {
         mouseDownPoint = makePoint(e);
-        MM.addEvent(map.parent, 'mouseup', mouseUp);
+        bean.add(map.parent, 'mouseup', mouseUp);
     }
 
     // Remove the awful circular reference from locations.
@@ -3798,13 +3601,13 @@ wax.mm.pointselector = function(map, tilejson, opts) {
     };
 
     pointselector.add = function(map) {
-        MM.addEvent(map.parent, 'mousedown', mouseDown);
+        bean.add(map.parent, 'mousedown', mouseDown);
         map.addCallback('drawn', drawPoints);
         return this;
     };
 
     pointselector.remove = function(map) {
-        MM.removeEvent(map.parent, 'mousedown', mouseDown);
+        bean.remove(map.parent, 'mousedown', mouseDown);
         map.removeCallback('drawn', drawPoints);
         for (var i = locations.length - 1; i > -1; i--) {
             pointselector.deleteLocation(locations[i]);
@@ -3815,7 +3618,7 @@ wax.mm.pointselector = function(map, tilejson, opts) {
     pointselector.deleteLocation = function(location, e) {
         if (!e || confirm('Delete this point?')) {
             location.pointDiv.parentNode.removeChild(location.pointDiv);
-            locations.splice(wax.util.indexOf(locations, location), 1);
+            locations.splice(wax.u.indexOf(locations, location), 1);
             callback(cleanLocations(locations));
         }
     };
@@ -3937,10 +3740,10 @@ wax.mm.zoomer = function(map) {
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
     bean.add(zoomin, 'mousedown dblclick', function(e) {
-        mm.cancelEvent(e);
+        e.stop();
     });
     bean.add(zoomin, 'click', function(e) {
-        mm.cancelEvent(e);
+        e.stop();
         map.zoomIn();
     }, false);
 
@@ -3949,12 +3752,12 @@ wax.mm.zoomer = function(map) {
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
     bean.add(zoomout, 'mousedown dblclick', function(e) {
-        mm.cancelEvent(e);
+        e.stop();
     });
-    mm.addEvent(zoomout, 'click', function(e) {
-        mm.cancelEvent(e);
+    bean.add(zoomout, 'click', function(e) {
+        e.stop();
         map.zoomOut();
-    }, false);
+    });
 
     var zoomer = {
         add: function(map) {
@@ -3971,8 +3774,8 @@ wax.mm.zoomer = function(map) {
             return this;
         },
         appendTo: function(elem) {
-            wax.util.$(elem).appendChild(zoomin);
-            wax.util.$(elem).appendChild(zoomout);
+            wax.u.$(elem).appendChild(zoomin);
+            wax.u.$(elem).appendChild(zoomout);
             return this;
         }
     };
