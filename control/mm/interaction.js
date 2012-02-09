@@ -128,7 +128,8 @@ wax.mm.interaction = function(map, tilejson, options) {
 
     // A handler for 'down' events - which means `mousedown` and `touchstart`
     function onDown(e) {
-        if (e.target.className !== 'map-tile-loaded') return;
+        var t = e.target || e.srcElement;
+        if (t.className !== 'map-tile-loaded') return;
         // Ignore double-clicks by ignoring clicks within 300ms of
         // each other.
         if (killTimeout()) { return; }
