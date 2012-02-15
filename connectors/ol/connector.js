@@ -8,11 +8,13 @@ wax.ol.connector = function(tilejson) {
             .replace('{x}', '${x}')
             .replace('{y}', '${y}');
     }
-    return new OpenLayers.Layer.XYZ(
+    var l = new OpenLayers.Layer.XYZ(
         tilejson.name,
         tilejson.tiles, {
             sphericalMercator: true,
             zoomOffset: tilejson.minzoom,
             numZoomLevels: tilejson.maxzoom - tilejson.minzoom
         });
+    l.CLASS_NAME = 'Wax.Layer';
+    return l;
 };
