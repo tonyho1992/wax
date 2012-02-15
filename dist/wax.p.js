@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha2 - 1.0.4-494-gd9c3217 */
+/* wax - 5.0.0-alpha2 - 1.0.4-498-g65848e7 */
 
 
 !function (name, context, definition) {
@@ -2030,7 +2030,7 @@ wax.formatter = function(x) {
 // objects for acquiring features from events.
 //
 // This code ignores format of 1.1-1.2
-wax.GridInstance = function(grid_tile, formatter, options) {
+wax.gi = function(grid_tile, formatter, options) {
     options = options || {};
     // resolution is the grid-elements-per-pixel ratio of gridded data.
     // The size of a tile element. For now we expect tiles to be squares.
@@ -2155,7 +2155,7 @@ wax.gm = function() {
 
         wax.request.get(gurl, function(err, t) {
             if (err) return callback(err, null);
-            callback(null, wax.GridInstance(t, formatter, {
+            callback(null, wax.gi(t, formatter, {
                 resolution: resolution || 4
             }));
         });
@@ -2507,19 +2507,17 @@ wax.legend = function() {
             element.innerHTML = '';
             element.style.display = 'none';
         }
-        return this;
+        return legend;
     };
 
     legend.add = function() {
         container = document.createElement('div');
         container.className = 'wax-legends';
 
-        element = document.createElement('div');
+        element = container.appendChild(document.createElement('div'));
         element.className = 'wax-legend';
         element.style.display = 'none';
-
-        container.appendChild(element);
-        return this;
+        return legend;
     };
 
     return legend.add();
@@ -2801,6 +2799,7 @@ wax.tooltip = function(o) {
 
         function remove() {
             if (parentNode) parentNode.removeChild(this);
+            _ct = null;
         }
 
         if (event) {
@@ -2810,6 +2809,7 @@ wax.tooltip = function(o) {
             _ct.className += ' ' + o.animationOut;
         } else {
             if (_ct.parentNode) _ct.parentNode.removeChild(_ct);
+            _ct = null;
         }
     }
 
@@ -2818,27 +2818,22 @@ wax.tooltip = function(o) {
     function click(feature) {
         // Hide any current tooltips.
         if (_currentTooltip) {
-            hideTooltip(_currentTooltip);
-            _currentTooltip = undefined;
+            hide();
         }
 
-        var tooltip = getTooltip(feature);
+        var tooltip = parent.appendChild(getTooltip(feature));
         tooltip.className += ' wax-popup';
         tooltip.innerHTML = feature;
 
-        var close = document.createElement('a');
+        var close = tooltip.appendChild(document.createElement('a'));
         close.href = '#close';
         close.className = 'close';
         close.innerHTML = 'Close';
-        tooltip.appendChild(close);
         popped = true;
-
-        parent.appendChild(tooltip);
 
         bean.add(close, 'click touchend', function closeClick(e) {
             e.stop();
-            hideTooltip(tooltip);
-            _ct = undefined;
+            hide();
             popped = false;
         });
 
@@ -2860,11 +2855,7 @@ wax.tooltip = function(o) {
     // highest layer underneath if found.
     function out(feature) {
         context.style.cursor = 'default';
-
-        if (!popped && _ct) {
-            hideTooltip(_ct);
-            _ct = undefined;
-        }
+        if (!popped && _ct) hide();
     }
 
     t.parent = function(x) {

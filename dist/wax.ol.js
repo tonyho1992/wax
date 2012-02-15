@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha2 - 1.0.4-494-gd9c3217 */
+/* wax - 5.0.0-alpha2 - 1.0.4-498-g65848e7 */
 
 
 !function (name, context, definition) {
@@ -1882,13 +1882,15 @@ wax.ol.connector = function(tilejson) {
             .replace('{x}', '${x}')
             .replace('{y}', '${y}');
     }
-    return new OpenLayers.Layer.XYZ(
+    var l = new OpenLayers.Layer.XYZ(
         tilejson.name,
         tilejson.tiles, {
             sphericalMercator: true,
             zoomOffset: tilejson.minzoom,
             numZoomLevels: tilejson.maxzoom - tilejson.minzoom
         });
+    l.CLASS_NAME = 'Wax.Layer';
+    return l;
 };
 ;wax = wax || {};
 
@@ -2048,7 +2050,7 @@ wax.formatter = function(x) {
 // objects for acquiring features from events.
 //
 // This code ignores format of 1.1-1.2
-wax.GridInstance = function(grid_tile, formatter, options) {
+wax.gi = function(grid_tile, formatter, options) {
     options = options || {};
     // resolution is the grid-elements-per-pixel ratio of gridded data.
     // The size of a tile element. For now we expect tiles to be squares.
@@ -2173,7 +2175,7 @@ wax.gm = function() {
 
         wax.request.get(gurl, function(err, t) {
             if (err) return callback(err, null);
-            callback(null, wax.GridInstance(t, formatter, {
+            callback(null, wax.gi(t, formatter, {
                 resolution: resolution || 4
             }));
         });
@@ -2525,19 +2527,17 @@ wax.legend = function() {
             element.innerHTML = '';
             element.style.display = 'none';
         }
-        return this;
+        return legend;
     };
 
     legend.add = function() {
         container = document.createElement('div');
         container.className = 'wax-legends';
 
-        element = document.createElement('div');
+        element = container.appendChild(document.createElement('div'));
         element.className = 'wax-legend';
         element.style.display = 'none';
-
-        container.appendChild(element);
-        return this;
+        return legend;
     };
 
     return legend.add();
@@ -2819,6 +2819,7 @@ wax.tooltip = function(o) {
 
         function remove() {
             if (parentNode) parentNode.removeChild(this);
+            _ct = null;
         }
 
         if (event) {
@@ -2828,6 +2829,7 @@ wax.tooltip = function(o) {
             _ct.className += ' ' + o.animationOut;
         } else {
             if (_ct.parentNode) _ct.parentNode.removeChild(_ct);
+            _ct = null;
         }
     }
 
@@ -2836,27 +2838,22 @@ wax.tooltip = function(o) {
     function click(feature) {
         // Hide any current tooltips.
         if (_currentTooltip) {
-            hideTooltip(_currentTooltip);
-            _currentTooltip = undefined;
+            hide();
         }
 
-        var tooltip = getTooltip(feature);
+        var tooltip = parent.appendChild(getTooltip(feature));
         tooltip.className += ' wax-popup';
         tooltip.innerHTML = feature;
 
-        var close = document.createElement('a');
+        var close = tooltip.appendChild(document.createElement('a'));
         close.href = '#close';
         close.className = 'close';
         close.innerHTML = 'Close';
-        tooltip.appendChild(close);
         popped = true;
-
-        parent.appendChild(tooltip);
 
         bean.add(close, 'click touchend', function closeClick(e) {
             e.stop();
-            hideTooltip(tooltip);
-            _ct = undefined;
+            hide();
             popped = false;
         });
 
@@ -2878,11 +2875,7 @@ wax.tooltip = function(o) {
     // highest layer underneath if found.
     function out(feature) {
         context.style.cursor = 'default';
-
-        if (!popped && _ct) {
-            hideTooltip(_ct);
-            _ct = undefined;
-        }
+        if (!popped && _ct) hide();
     }
 
     t.parent = function(x) {
@@ -3240,6 +3233,74 @@ wax.ol.Interaction =
     },
     CLASS_NAME: 'wax.ol.Interaction'
 });
+
+
+wax = wax || {};
+wax.ol = wax.ol || {};
+
+wax.ol.interaction = function() {
+    var dirty = false, _grid;
+
+    function setdirty() { dirty = true; }
+
+    function getlayers() {
+        var l = [];
+        for (var i in map.layers) {
+            // TODO: make better indication of whether
+            // this is an interactive layer
+            if ((map.layers[i].visibility === true) &&
+                (map.layers[i].CLASS_NAME === 'Wax.Layer')) {
+              l.push(map.layers[i]);
+            }
+        }
+        return l;
+    }
+
+    function grid() {
+        if (!dirty && _grid) {
+            return _grid;
+        } else {
+            _grid = [];
+            var layers = getlayers();
+            for (var j = 0; j < layers.length; j++) {
+                for (var x = 0; x < layers[j].grid.length; x++) {
+                    for (var y = 0; y < layers[j].grid[x].length; y++) {
+                        var divpos;
+                        if (layers[j].grid[x][y].imgDiv) {
+                            divpos = wax.util.offset(layers[j].grid[x][y].imgDiv);
+                        } else {
+                            divpos = wax.util.offset(layers[j].grid[x][y].frame);
+                        }
+                        if (divpos &&
+                            ((divpos.top < pos.y) &&
+                             ((divpos.top + 256) > pos.y) &&
+                             (divpos.left < pos.x) &&
+                             ((divpos.left + 256) > pos.x))) {
+                            tiles.push(layers[j].grid[x][y]);
+                        }
+                    }
+                }
+            }
+            return tiles;
+        }
+    }
+
+    function attach(x) {
+        if (!arguments.length) return map;
+        map = x;
+        map.events.on({
+            addlayer: setdirty,
+            changelayer: setdirty,
+            removelayer: setdirty,
+            changebaselayer: setdirty
+        });
+    }
+
+    return wax.interaction()
+        .attach(attach)
+        .grid(grid);
+};
+
 // Wax: Legend Control
 // -------------------
 
