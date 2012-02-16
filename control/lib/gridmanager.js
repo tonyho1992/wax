@@ -22,7 +22,8 @@ wax.GridManager = function(options) {
         if (typeof template === 'string') template = [template];
         return function templatedGridFinder(url) {
             if (!url) return;
-            var xyz = /(\d+)\/(\d+)\/(\d+)\.[\w\._]+/g.exec(url);
+            var rx = new RegExp('/(\\d+)\\/(\\d+)\\/(\\d+)\\.[\\w\\._]+');
+            var xyz = rx.exec(url);
             if (!xyz) return;
             return template[parseInt(xyz[2], 10) % template.length]
                 .replace('{z}', xyz[1])

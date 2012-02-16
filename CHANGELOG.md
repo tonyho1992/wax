@@ -1,5 +1,13 @@
 ## Changelog
 
+## 4.1.7
+
+* Fixing click handler regex in Firefox due to absurd implementation bug
+
+## 4.1.6
+
+* Fixing click handlers in IE
+
 ## 4.1.5
 
 * Fixes a bug in touch interaction controls discovered and fixed by @lxbarth
