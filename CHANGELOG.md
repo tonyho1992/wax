@@ -1,5 +1,10 @@
 ## Changelog
 
+## 4.1.8
+
+* Fix `wax.ol.Legend`
+* Stop propagation of mouse events on tooltips, letting people scroll and click easily.
+
 ## 4.1.7
 
 * Fixing click handler regex in Firefox due to absurd implementation bug

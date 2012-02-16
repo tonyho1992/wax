@@ -61,6 +61,7 @@ a.zoomer {
   position:absolute;
   background:#333;
   color:#fff;
+  -webkit-user-select:auto;
   padding:10px;
   left:10px;
   top:10px;

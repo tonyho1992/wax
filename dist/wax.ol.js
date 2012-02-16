@@ -1,4 +1,4 @@
-/* wax - 4.1.7 - 1.0.4-483-gbb64c65 */
+/* wax - 4.1.7 - 1.0.4-484-gb0586cd */
 
 
 /*!
@@ -2102,6 +2102,33 @@ wax.tooltip.prototype.getTooltip = function(feature, context) {
     tooltip.className = 'wax-tooltip wax-tooltip-0';
     tooltip.innerHTML = feature;
     context.appendChild(tooltip);
+
+    function addEv(obj, type, fn) {
+        if (obj.addEventListener) {
+            obj.addEventListener(type, fn, false);
+            if (type == 'mousewheel') {
+                obj.addEventListener('DOMMouseScroll', fn, false);
+            }
+        } else if (obj.attachEvent) {
+            obj['e'+type+fn] = fn;
+            obj[type+fn] = function(){ obj['e'+type+fn](window.event); };
+            obj.attachEvent('on'+type, obj[type+fn]);
+        }
+    }
+
+    function stop(e) {
+	    e.cancelBubble = true;
+		if (e.stopPropagation) e.stopPropagation();
+		return this;
+	}
+
+    var mouseEvents = ['mousewheel', 'mousemove',
+        'click', 'dblclick'];
+
+    for (var i = 0; i < mouseEvents.length; i++) {
+        addEv(tooltip, mouseEvents[i], stop);
+    }
+
     return tooltip;
 };
 
@@ -2584,7 +2611,7 @@ wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
     },
 
     activate: function() {
-        this.legend = new wax.Legend(this.map.viewPortDiv, this.options.container);
+        this.legend = new wax.legend(this.map.viewPortDiv, this.options.container);
         return OpenLayers.Control.prototype.activate.apply(this, arguments);
     },
 
