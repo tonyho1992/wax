@@ -6,7 +6,7 @@ layout: control
 
 **Wax makes typical maps a lot easier to make.** So, it provides zoom controls
 and other stuff that people already expect, and it has a lot of code that
-hooks up with [TileStream](http://mapbox.com/tilestreawm).
+hooks up with [TileStream](http://mapbox.com/tilestream).
 
 But that's not everything - _there are crazier, potentially interesting things
 that Wax doesn't do_, and that you might want to do. Thus, this is a document
