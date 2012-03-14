@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha2 - 1.0.4-498-g1105fb8 */
+/* wax - 5.0.0-alpha2 - 1.0.4-499-g1144af8 */
 
 
 /*!
@@ -2084,6 +2084,33 @@ wax.tooltip.prototype.getTooltip = function(feature, context) {
     tooltip.className = 'wax-tooltip wax-tooltip-0';
     tooltip.innerHTML = feature;
     context.appendChild(tooltip);
+
+    function addEv(obj, type, fn) {
+        if (obj.addEventListener) {
+            obj.addEventListener(type, fn, false);
+            if (type == 'mousewheel') {
+                obj.addEventListener('DOMMouseScroll', fn, false);
+            }
+        } else if (obj.attachEvent) {
+            obj['e'+type+fn] = fn;
+            obj[type+fn] = function(){ obj['e'+type+fn](window.event); };
+            obj.attachEvent('on'+type, obj[type+fn]);
+        }
+    }
+
+    function stop(e) {
+        e.cancelBubble = true;
+		if (e.stopPropagation) e.stopPropagation();
+		return this;
+	}
+
+    var mouseEvents = ['mousewheel', 'mousemove',
+        'click', 'dblclick'];
+
+    for (var i = 0; i < mouseEvents.length; i++) {
+        addEv(tooltip, mouseEvents[i], stop);
+    }
+
     return tooltip;
 };
 
