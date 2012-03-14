@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha2 - 1.0.4-496-g685c8e4 */
+/* wax - 5.0.0-alpha2 - 1.0.4-497-g77e78c7 */
 
 
 /*!
@@ -258,7 +258,8 @@ wax.GridManager = function(options) {
         if (typeof template === 'string') template = [template];
         return function templatedGridFinder(url) {
             if (!url) return;
-            var xyz = /(\d+)\/(\d+)\/(\d+)\.[\w\._]+/g.exec(url);
+            var rx = new RegExp('/(\\d+)\\/(\\d+)\\/(\\d+)\\.[\\w\\._]+');
+            var xyz = rx.exec(url);
             if (!xyz) return;
             return template[parseInt(xyz[2], 10) % template.length]
                 .replace('{z}', xyz[1])
