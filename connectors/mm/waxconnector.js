@@ -3,7 +3,7 @@ wax.mm = wax.mm || {};
 
 // A layer connector for Modest Maps conformant to TileJSON
 // https://github.com/mapbox/tilejson
-wax.mm.connector = function(options) {
+wax.mm._provider = function(options) {
     this.options = {
         tiles: options.tiles,
         scheme: options.scheme || 'xyz',
@@ -13,7 +13,7 @@ wax.mm.connector = function(options) {
     };
 };
 
-wax.mm.connector.prototype = {
+wax.mm._provider.prototype = {
     outerLimits: function() {
         return [
             this.locationCoordinate(
@@ -28,6 +28,7 @@ wax.mm.connector.prototype = {
     },
     getTile: function(c) {
         if (!(coord = this.sourceCoordinate(c))) return null;
+        if (coord.zoom < this.options.minzoom || coord.zoom > this.options.maxzoom) return null;
 
         coord.row = (this.options.scheme === 'tms') ?
             Math.pow(2, coord.zoom) - coord.row - 1 :
@@ -48,8 +49,11 @@ wax.mm.connector.prototype = {
     }
 };
 
-// Wax shouldn't throw any exceptions if the external it relies on isn't
-// present, so check for modestmaps.
 if (MM) {
-    MM.extend(wax.mm.connector, MM.MapProvider);
+    MM.extend(wax.mm._provider, MM.MapProvider);
 }
+
+wax.mm.connector = function(options) {
+    var x = new wax.mm._provider(options);
+    return new MM.Layer(x);
+};

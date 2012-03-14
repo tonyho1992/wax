@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha2 - 1.0.4-489-g7b6392f */
+/* wax - 5.0.0-alpha2 - 1.0.4-496-g685c8e4 */
 
 
 /*!
@@ -1539,7 +1539,7 @@ wax.GridInstance = function(grid_tile, formatter, options) {
 
     // Resolve the UTF-8 encoding stored in grids to simple
     // number values.
-    // See the [utfgrid section of the mbtiles spec](https://github.com/mapbox/mbtiles-spec/blob/master/1.1/utfgrid.md)
+    // See the [utfgrid spec](https://github.com/mapbox/utfgrid-spec)
     // for details.
     function resolveCode(key) {
         if (key >= 93) key--;
@@ -3510,7 +3510,7 @@ wax.mm = wax.mm || {};
 
 // A layer connector for Modest Maps conformant to TileJSON
 // https://github.com/mapbox/tilejson
-wax.mm.connector = function(options) {
+wax.mm._provider = function(options) {
     this.options = {
         tiles: options.tiles,
         scheme: options.scheme || 'xyz',
@@ -3520,7 +3520,7 @@ wax.mm.connector = function(options) {
     };
 };
 
-wax.mm.connector.prototype = {
+wax.mm._provider.prototype = {
     outerLimits: function() {
         return [
             this.locationCoordinate(
@@ -3535,6 +3535,7 @@ wax.mm.connector.prototype = {
     },
     getTile: function(c) {
         if (!(coord = this.sourceCoordinate(c))) return null;
+        if (coord.zoom < this.options.minzoom || coord.zoom > this.options.maxzoom) return null;
 
         coord.row = (this.options.scheme === 'tms') ?
             Math.pow(2, coord.zoom) - coord.row - 1 :
@@ -3555,8 +3556,11 @@ wax.mm.connector.prototype = {
     }
 };
 
-// Wax shouldn't throw any exceptions if the external it relies on isn't
-// present, so check for modestmaps.
 if (MM) {
-    MM.extend(wax.mm.connector, MM.MapProvider);
+    MM.extend(wax.mm._provider, MM.MapProvider);
 }
+
+wax.mm.connector = function(options) {
+    var x = new wax.mm._provider(options);
+    return new MM.Layer(x);
+};

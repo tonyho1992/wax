@@ -1,5 +1,10 @@
 ## Changelog
 
+## 5.0.1
+
+* Real support for Modest Maps 1.0.0-alpha2
+* No longer requires layers to be wrapped with `MM.Layer()` in MM 1.x
+
 ## 5.0.0-alpha*
 
 * Initial support for Modest Maps 1.0.0-alpha
