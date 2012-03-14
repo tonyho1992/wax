@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha2 - 1.0.4-497-g77e78c7 */
+/* wax - 5.0.0-alpha2 - 1.0.4-498-g1105fb8 */
 
 
 /*!
@@ -2768,7 +2768,8 @@ wax.mm.interaction = function(map, tilejson, options) {
 
     // A handler for 'down' events - which means `mousedown` and `touchstart`
     function onDown(e) {
-        if (e.target.className !== 'map-tile-loaded') return;
+        var t = e.target || e.srcElement;
+        if (t.className !== 'map-tile-loaded') return;
         // Ignore double-clicks by ignoring clicks within 300ms of
         // each other.
         if (killTimeout()) { return; }
