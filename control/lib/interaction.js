@@ -159,6 +159,8 @@ wax.interaction = function() {
         });
     }
 
+    // set an attach function that should be
+    // called when maps are set
     interaction.attach = function(x) {
         if (!arguments.length) return attach;
         attach = x;
@@ -175,12 +177,14 @@ wax.interaction = function() {
         return interaction;
     };
 
+    // set a grid getter for this control
     interaction.grid = function(x) {
         if (!arguments.length) return grid;
         grid = x;
         return interaction;
     };
 
+    // detach this and its events from the map cleanly
     interaction.remove = function() {
         for (var i = 0; i < clearingEvents.length; i++) {
             map.removeCallback(clearingEvents[i], clearTileGrid);
@@ -190,28 +194,35 @@ wax.interaction = function() {
         return interaction;
     };
 
+    // get or set a tilejson chunk of json
     interaction.tilejson = function(x) {
         if (!arguments.length) return tilejson;
         gm.tilejson(x);
         return interaction;
     };
 
+    // return the formatter, which has an exposed .format
+    // function
     interaction.formatter = function() {
         return gm.formatter();
     };
 
+    // ev can be 'on', 'off', fn is the handler
     interaction.on = function(ev, fn) {
         bean.add(interaction, ev, fn);
         return interaction;
     };
 
-    interaction.parent  = function(x) {
-        parent = x;
+    // ev can be 'on', 'off', fn is the handler
+    interaction.off = function(ev, fn) {
+        bean.remove(interaction, ev, fn);
         return interaction;
     };
 
-    interaction.off = function(ev, fn) {
-        bean.remove(interaction, ev, fn);
+    // parent should be a function that returns
+    // the parent element of the map
+    interaction.parent  = function(x) {
+        parent = x;
         return interaction;
     };
 
