@@ -1,9 +1,11 @@
 UGLIFYJS = ./node_modules/.bin/uglifyjs
 BANNER = ./node_modules/.bin/banner
 
-dist: dist_setup dist/wax.ol.min.js \
-	dist/wax.g.min.js dist/wax.mm.min.js \
-	dist/wax.leaf.min.js dist/wax.p.min.js lint
+# dist: dist_setup dist/wax.ol.min.js \
+# 	dist/wax.g.min.js dist/wax.mm.min.js \
+# 	dist/wax.leaf.min.js dist/wax.p.min.js lint
+
+mindist: dist_setup dist/wax.leaf.min.js lint
 
 dist/wax.ol.min.js:
 	cat build/header.js \

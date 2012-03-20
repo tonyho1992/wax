@@ -6,7 +6,7 @@ wax.leaf.interaction = function() {
 
     function setdirty() { dirty = true; }
 
-    function getTileGrid() {
+    function grid() {
         // TODO: don't build for tiles outside of viewport
         // Touch interaction leads to intermediate
         //var zoomLayer = map.createOrGetLayer(Math.round(map.getZoom())); //?what is this doing?
@@ -21,7 +21,7 @@ wax.leaf.interaction = function() {
                     // This only supports tiled layers
                     if (layers[layerId]._tiles) {
                         for (var tile in layers[layerId]._tiles) {
-                            var offset = wax.util.offset(layers[layerId]._tiles[tile]);
+                            var offset = wax.u.offset(layers[layerId]._tiles[tile]);
                             o.push([offset.top, offset.left, layers[layerId]._tiles[tile]]);
                         }
                     }
@@ -34,7 +34,7 @@ wax.leaf.interaction = function() {
     function attach(x) {
         if (!arguments.length) return map;
         map = x;
-        var l = ['moveend', 'layerswitched'];
+        var l = ['moveend'];
         for (var i = 0; i < l.length; i++) {
             map.on(l[i], setdirty);
         }
@@ -42,5 +42,8 @@ wax.leaf.interaction = function() {
 
     return wax.interaction()
         .attach(attach)
+        .parent(function() {
+          return map._container;
+        })
         .grid(grid);
 };

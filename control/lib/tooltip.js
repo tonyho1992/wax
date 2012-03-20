@@ -50,8 +50,7 @@ wax.tooltip = function() {
             content = o.formatter({ format: 'teaser' }, o.data);
             if (!content) return;
             parent.style.cursor = 'pointer';
-            _ct = getTooltip(content);
-            parent.appendChild(_ct);
+            _ct = parent.appendChild(getTooltip(content));
         } else {
             hide();
             content = o.formatter({ format: 'full' }, o.data);

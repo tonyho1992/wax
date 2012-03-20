@@ -2,7 +2,6 @@ wax = wax || {};
 
 wax.interaction = function() {
     var gm = wax.gm(),
-        eventoffset = wax.u.eventoffset,
         interaction = {},
         _downLock = false,
         _clickTimeout = false,
@@ -13,6 +12,7 @@ wax.interaction = function() {
         // Touch tolerance
         tol = 4,
         grid,
+        parent,
         tileGrid;
 
     var defaultEvents = {
@@ -57,7 +57,7 @@ wax.interaction = function() {
         // to avoid performance hits.
         if (_downLock) return;
 
-        var pos = eventoffset(e),
+        var pos = wax.u.eventoffset(e),
             tile = getTile(pos),
             feature;
 
@@ -68,7 +68,7 @@ wax.interaction = function() {
                 if (feature && _af !== feature) {
                     _af = feature;
                     bean.fire(interaction, 'on', {
-                        parent: map.parent,
+                        parent: parent(),
                         data: feature,
                         formatter: gm.formatter().format,
                         e: e
@@ -96,7 +96,7 @@ wax.interaction = function() {
         // Store this event so that we can compare it to the
         // up event
         _downLock = true;
-        _d = eventoffset(e);
+        _d = wax.u.eventoffset(e);
         if (e.type === 'mousedown') {
             bean.add(document.body, 'mouseup', onUp);
 
@@ -106,18 +106,18 @@ wax.interaction = function() {
             // Don't make the user click close if they hit another tooltip
             bean.fire(interaction, 'off');
             // Touch moves invalidate touches
-            bean.add(map.parent, touchEnds);
+            bean.add(parent(), touchEnds);
         }
     }
 
     function touchCancel() {
-        bean.remove(map.parent, touchEnds);
+        bean.remove(parent(), touchEnds);
         _downLock = false;
     }
 
     function onUp(e) {
         var evt = {},
-            pos = eventoffset(e);
+            pos = wax.u.eventoffset(e);
         _downLock = false;
 
         // TODO: refine
@@ -126,7 +126,7 @@ wax.interaction = function() {
         }
 
         bean.remove(document.body, 'mouseup', onUp);
-        bean.remove(map.parent, touchEnds);
+        bean.remove(parent(), touchEnds);
 
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
@@ -151,7 +151,7 @@ wax.interaction = function() {
             var feature = g.tileFeature(pos.x, pos.y, tile);
             if (!feature) return;
             bean.fire(interaction, 'on', {
-                parent: map.parent,
+                parent: parent(),
                 data: feature,
                 formatter: gm.formatter().format,
                 e: e
@@ -169,8 +169,8 @@ wax.interaction = function() {
     interaction.map = function(x) {
         if (!arguments.length) return map;
         map = x;
-        bean.add(map.parent, defaultEvents);
-        bean.add(map.parent, 'touchstart', onDown);
+        bean.add(parent(), defaultEvents);
+        bean.add(parent(), 'touchstart', onDown);
         if (attach) attach(map);
         return interaction;
     };
@@ -185,9 +185,9 @@ wax.interaction = function() {
         for (var i = 0; i < clearingEvents.length; i++) {
             map.removeCallback(clearingEvents[i], clearTileGrid);
         }
-        bean.remove(map.parent, defaultEvents);
+        bean.remove(parent(), defaultEvents);
         bean.fire(interaction, 'remove');
-        return this;
+        return interaction;
     };
 
     interaction.tilejson = function(x) {
@@ -202,6 +202,11 @@ wax.interaction = function() {
 
     interaction.on = function(ev, fn) {
         bean.add(interaction, ev, fn);
+        return interaction;
+    };
+
+    interaction.parent  = function(x) {
+        parent = x;
         return interaction;
     };
 
