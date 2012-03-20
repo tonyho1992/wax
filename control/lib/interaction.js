@@ -205,10 +205,12 @@ wax.interaction = function() {
 
     interaction.on = function(ev, fn) {
         bean.add(interaction, ev, fn);
+        return interaction;
     };
 
     interaction.off = function(ev, fn) {
         bean.remove(interaction, ev, fn);
+        return interaction;
     };
 
     return interaction;
