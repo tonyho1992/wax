@@ -2,10 +2,10 @@ var wax = wax || {};
 wax.tooltip = {};
 
 wax.tooltip = function() {
-    var _ct, // current tooltip
-        popped = false,
+    var popped = false,
         animate = false,
         t = {},
+        tooltips = [],
         parent;
 
     // Get the active tooltip for a layer or create a new one if no tooltip exists.
@@ -19,50 +19,52 @@ wax.tooltip = function() {
 
     // Hide a given tooltip.
     function hide() {
-        if (!_ct) return;
         var event;
 
         function remove() {
-            if (parentNode) parentNode.removeChild(this);
-            _ct = null;
+            if (this.parentNode) this.parentNode.removeChild(this);
         }
 
-        if (_ct.style['-webkit-transition'] !== undefined) {
+        if (document.body.style['-webkit-transition'] !== undefined) {
             event = 'webkitTransitionEnd';
-        } else if (_ct.style.MozTransition !== undefined) {
+        } else if (document.body.style.MozTransition !== undefined) {
             event = 'transitionend';
         }
 
-        if (animate && event) {
-            // This code assumes that transform-supporting browsers
-            // also support proper events. IE9 does both.
-            bean.add(_ct, event, remove);
-            _ct.className += ' ' + o.animationOut;
-        } else {
-            if (_ct.parentNode) _ct.parentNode.removeChild(_ct);
-            _ct = null;
+        var _ct;
+        while (_ct = tooltips.pop()) {
+            if (animate && event) {
+                // This code assumes that transform-supporting browsers
+                // also support proper events. IE9 does both.
+                  bean.add(_ct, event, remove);
+                  _ct.className += ' wax-fade';
+            } else {
+                if (_ct.parentNode) _ct.parentNode.removeChild(_ct);
+            }
         }
     }
 
     function on(o) {
         var content;
+        hide();
         if ((o.e.type === 'mousemove' || !o.e.type) && !popped) {
             content = o.formatter({ format: 'teaser' }, o.data);
             if (!content) return;
             parent.style.cursor = 'pointer';
-            _ct = parent.appendChild(getTooltip(content));
+            tooltips.push(parent.appendChild(getTooltip(content)));
         } else {
-            hide();
             content = o.formatter({ format: 'full' }, o.data);
             if (!content) return;
-            _ct = parent.appendChild(getTooltip(content));
-            _ct.className += ' wax-popup';
+            var tt = parent.appendChild(getTooltip(content));
+            tt.className += ' wax-popup';
 
-            var close = _ct.appendChild(document.createElement('a'));
+            var close = tt.appendChild(document.createElement('a'));
             close.href = '#close';
             close.className = 'close';
             close.innerHTML = 'Close';
             popped = true;
+
+            tooltips.push(tt);
 
             bean.add(close, 'click touchend', function closeClick(e) {
                 e.stop();
@@ -74,7 +76,7 @@ wax.tooltip = function() {
 
     function off() {
         parent.style.cursor = 'default';
-        if (!popped && _ct) hide();
+        if (!popped) hide();
     }
 
     t.parent = function(x) {
@@ -84,7 +86,7 @@ wax.tooltip = function() {
     };
 
     t.animate = function(x) {
-        if (!arguments.lenght) return animate;
+        if (!arguments.length) return animate;
         animate = x;
         return t;
     };
