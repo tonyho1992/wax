@@ -15,10 +15,6 @@ wax.interaction = function() {
         grid,
         tileGrid;
 
-    var clickHandler = function(url) {
-        window.top.location = url;
-    };
-
     var defaultEvents = {
         mousemove: onMove,
         touchstart: onDown,
@@ -74,6 +70,7 @@ wax.interaction = function() {
                     bean.fire(interaction, 'on', {
                         parent: map.parent,
                         data: feature,
+                        formatter: gm.formatter().format,
                         e: e
                     });
                 } else if (!feature) {
@@ -89,7 +86,6 @@ wax.interaction = function() {
 
     // A handler for 'down' events - which means `mousedown` and `touchstart`
     function onDown(e) {
-        if (e.target.className !== 'map-tile-loaded') return;
         // Ignore double-clicks by ignoring clicks within 300ms of
         // each other.
         if (killTimeout()) { return; }
@@ -157,6 +153,7 @@ wax.interaction = function() {
             bean.fire(interaction, 'on', {
                 parent: map.parent,
                 data: feature,
+                formatter: gm.formatter().format,
                 e: e
             });
         });
@@ -174,7 +171,7 @@ wax.interaction = function() {
         map = x;
         bean.add(map.parent, defaultEvents);
         bean.add(map.parent, 'touchstart', onDown);
-        if (attach) attach();
+        if (attach) attach(map);
         return interaction;
     };
 

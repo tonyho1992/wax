@@ -1,11 +1,10 @@
 var wax = wax || {};
 wax.tooltip = {};
 
-wax.tooltip = function(o) {
-    o = o || {};
-
+wax.tooltip = function() {
     var _ct, // current tooltip
         popped = false,
+        animate = false,
         t = {},
         parent;
 
@@ -23,18 +22,18 @@ wax.tooltip = function(o) {
         if (!_ct) return;
         var event;
 
-        if (_ct.style['-webkit-transition'] !== undefined && o.animationOut) {
-            event = 'webkitTransitionEnd';
-        } else if (_ct.style.MozTransition !== undefined && o.animationOut) {
-            event = 'transitionend';
-        }
-
         function remove() {
             if (parentNode) parentNode.removeChild(this);
             _ct = null;
         }
 
-        if (event) {
+        if (_ct.style['-webkit-transition'] !== undefined) {
+            event = 'webkitTransitionEnd';
+        } else if (_ct.style.MozTransition !== undefined) {
+            event = 'transitionend';
+        }
+
+        if (animate && event) {
             // This code assumes that transform-supporting browsers
             // also support proper events. IE9 does both.
             bean.add(_ct, event, remove);
@@ -45,48 +44,37 @@ wax.tooltip = function(o) {
         }
     }
 
-    // Expand a tooltip to be a "popup". Suspends all other tooltips from being
-    // shown until this popup is closed or another popup is opened.
-    function click(feature) {
-        // Hide any current tooltips.
-        if (_currentTooltip) {
-            hide();
-        }
-
-        var tooltip = parent.appendChild(getTooltip(feature));
-        tooltip.className += ' wax-popup';
-        tooltip.innerHTML = feature;
-
-        var close = tooltip.appendChild(document.createElement('a'));
-        close.href = '#close';
-        close.className = 'close';
-        close.innerHTML = 'Close';
-        popped = true;
-
-        bean.add(close, 'click touchend', function closeClick(e) {
-            e.stop();
-            hide();
-            popped = false;
-        });
-
-        _currentTooltip = tooltip;
-    }
-
-    // Show a tooltip.
-    function over(feature) {
-        if (!feature) return;
-        parent.style.cursor = 'pointer';
-
-        if (!popped) {
-            _ct = getTooltip(feature);
+    function on(o) {
+        var content;
+        if ((o.e.type === 'mousemove' || !o.e.type) && !popped) {
+            content = o.formatter({ format: 'teaser' }, o.data);
+            if (!content) return;
+            parent.style.cursor = 'pointer';
+            _ct = getTooltip(content);
             parent.appendChild(_ct);
+        } else {
+            hide();
+            content = o.formatter({ format: 'full' }, o.data);
+            if (!content) return;
+            _ct = parent.appendChild(getTooltip(content));
+            _ct.className += ' wax-popup';
+
+            var close = _ct.appendChild(document.createElement('a'));
+            close.href = '#close';
+            close.className = 'close';
+            close.innerHTML = 'Close';
+            popped = true;
+
+            bean.add(close, 'click touchend', function closeClick(e) {
+                e.stop();
+                hide();
+                popped = false;
+            });
         }
     }
 
-    // Hide all tooltips on this layer and show the first hidden tooltip on the
-    // highest layer underneath if found.
-    function out(feature) {
-        context.style.cursor = 'default';
+    function off() {
+        parent.style.cursor = 'default';
         if (!popped && _ct) hide();
     }
 
@@ -94,6 +82,19 @@ wax.tooltip = function(o) {
         if (!arguments.length) return parent;
         parent = x;
         return t;
+    };
+
+    t.animate = function(x) {
+        if (!arguments.lenght) return animate;
+        animate = x;
+        return t;
+    };
+
+    t.events = function() {
+        return {
+            on: on,
+            off: off
+        };
     };
 
     return t;

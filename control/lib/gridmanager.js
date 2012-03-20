@@ -68,9 +68,7 @@ wax.gm = function() {
         } else if (x.formatter) {
             manager.formatter(x.formatter);
         }
-        if (x.grids) {
-            manager.gridUrl(x.grids);
-        }
+        if (x.grids) manager.gridUrl(x.grids);
         return manager;
     };
 
