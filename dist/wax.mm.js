@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha2 - 1.0.4-498-g65848e7 */
+/* wax - 5.0.0-alpha2 - 1.0.4-499-g4c793e3 */
 
 
 !function (name, context, definition) {
@@ -2030,7 +2030,7 @@ wax.formatter = function(x) {
 // objects for acquiring features from events.
 //
 // This code ignores format of 1.1-1.2
-wax.gi = function(grid_tile, formatter, options) {
+wax.gi = function(grid_tile, options) {
     options = options || {};
     // resolution is the grid-elements-per-pixel ratio of gridded data.
     // The size of a tile element. For now we expect tiles to be squares.
@@ -2083,18 +2083,14 @@ wax.gi = function(grid_tile, formatter, options) {
     };
 
     // Get a feature:
-    //
     // * `x` and `y`: the screen coordinates of an event
     // * `tile_element`: a DOM element of a tile, from which we can get an offset.
-    // * `options` options to give to the formatter: minimally having a `format`
-    //   member, being `full`, `teaser`, or something else.
-    instance.tileFeature = function(x, y, tile_element, options) {
+    instance.tileFeature = function(x, y, tile_element) {
         if (!grid_tile) return;
         // IE problem here - though recoverable, for whatever reason
-        var offset = wax.util.offset(tile_element);
+        var offset = wax.u.offset(tile_element);
             feature = this.gridFeature(x - offset.left, y - offset.top);
-
-        if (feature) return formatter.format(options, feature);
+        return feature;
     };
 
     return instance;
@@ -2163,6 +2159,7 @@ wax.gm = function() {
     };
 
     manager.tilejson = function(x) {
+        // prefer templates over formatters
         if (x.template) {
             manager.template(x.template);
         } else if (x.formatter) {
@@ -2246,7 +2243,6 @@ wax = wax || {};
 
 wax.interaction = function() {
     var gm = wax.gm(),
-        clickAction = ['full', 'location'],
         eventoffset = wax.u.eventoffset,
         interaction = {},
         _downLock = false,
@@ -2257,6 +2253,7 @@ wax.interaction = function() {
         _d,
         // Touch tolerance
         tol = 4,
+        grid,
         tileGrid;
 
     var clickHandler = function(url) {
@@ -2278,7 +2275,8 @@ wax.interaction = function() {
     // Abstract getTile method. Depends on a tilegrid with
     // grid[ [x, y, tile] ] structure.
     function getTile(e) {
-        for (var i = 0, g = grid(); i < grid.length; i++) {
+        var g = grid();
+        for (var i = 0; i < g.length; i++) {
             if ((g[i][0] < e.y) &&
                ((g[i][0] + 256) > e.y) &&
                 (g[i][1] < e.x) &&
@@ -2303,7 +2301,6 @@ wax.interaction = function() {
         // If the user is actually dragging the map, exit early
         // to avoid performance hits.
         if (_downLock) return;
-        if (e.target.className !== 'map-tile-loaded') return;
 
         var pos = eventoffset(e),
             tile = getTile(pos),
@@ -2311,15 +2308,13 @@ wax.interaction = function() {
 
         if (tile) gm.getGrid(tile.src, function(err, g) {
             if (err || !g) return;
-            feature = g.tileFeature(pos.x, pos.y, tile, {
-                format: 'teaser'
-            });
+            feature = g.tileFeature(pos.x, pos.y, tile);
             if (feature) {
                 if (feature && _af !== feature) {
                     _af = feature;
                     bean.fire(interaction, 'on', {
                         parent: map.parent,
-                        feature: feature,
+                        data: feature,
                         e: e
                     });
                 } else if (!feature) {
@@ -2353,13 +2348,8 @@ wax.interaction = function() {
         // Only track single-touches. Double-touches will not affect this
         // control
         } else if (e.type === 'touchstart' && e.touches.length === 1) {
-
-            // turn this into touch-mode. Fallback to teaser and full.
-            clickAction = ['full', 'teaser'];
-
             // Don't make the user click close if they hit another tooltip
             bean.fire(interaction, 'off');
-
             // Touch moves invalidate touches
             bean.add(map.parent, touchEnds);
         }
@@ -2400,25 +2390,16 @@ wax.interaction = function() {
 
     // Handle a click event. Takes a second
     function click(e, pos) {
-        var tile = getTile(pos),
-            feature;
-
+        var tile = getTile(pos);
         if (tile) gm.getGrid(tile.src, function(err, g) {
-            for (var i = 0; g && (i < clickAction.length); i++) {
-                feature = g.tileFeature(pos.x, pos.y, tile, {
-                    format: clickAction[i]
-                });
-                if (feature) {
-                    switch (clickAction[i]) {
-                        case 'full':
-                        // clickAction can be teaser in touch interaction
-                        case 'teaser':
-                            return callbacks.click(feature, map.parent, e);
-                        case 'location':
-                            return clickHandler(feature);
-                    }
-                }
-            }
+            if (err || !g) return;
+            var feature = g.tileFeature(pos.x, pos.y, tile);
+            if (!feature) return;
+            bean.fire(interaction, 'on', {
+                parent: map.parent,
+                data: feature,
+                e: e
+            });
         });
     }
 
@@ -2438,17 +2419,12 @@ wax.interaction = function() {
         return interaction;
     };
 
-    interaction.trigger = function(pt) {
-        // TODO: trigger an interaction at a screen point.
-    };
-
     interaction.grid = function(x) {
         if (!arguments.length) return grid;
         grid = x;
         return interaction;
     };
 
-    // Remove this control from the map.
     interaction.remove = function() {
         for (var i = 0; i < clearingEvents.length; i++) {
             map.removeCallback(clearingEvents[i], clearTileGrid);
@@ -2464,8 +2440,18 @@ wax.interaction = function() {
         return interaction;
     };
 
+    interaction.formatter = function() {
+        return gm.formatter();
+    };
 
-    // Ensure chainability
+    interaction.on = function(ev, fn) {
+        bean.add(interaction, ev, fn);
+    };
+
+    interaction.off = function(ev, fn) {
+        bean.remove(interaction, ev, fn);
+    };
+
     return interaction;
 };
 // Wax Legend
@@ -3290,7 +3276,7 @@ wax.mm.interaction = function() {
     function grid() {
         var zoomLayer = map.getLayerAt(0)
             .levels[Math.round(map.getZoom())];
-        if (!dirty && _grid) {
+        if (!dirty && _grid !== undefined && _grid.length) {
             return _grid;
         } else {
             _grid = (function(t) {

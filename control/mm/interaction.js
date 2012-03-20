@@ -7,7 +7,7 @@ wax.mm.interaction = function() {
     function grid() {
         var zoomLayer = map.getLayerAt(0)
             .levels[Math.round(map.getZoom())];
-        if (!dirty && _grid) {
+        if (!dirty && _grid !== undefined && _grid.length) {
             return _grid;
         } else {
             _grid = (function(t) {

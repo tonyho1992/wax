@@ -2,7 +2,6 @@ wax = wax || {};
 
 wax.interaction = function() {
     var gm = wax.gm(),
-        clickAction = ['full', 'location'],
         eventoffset = wax.u.eventoffset,
         interaction = {},
         _downLock = false,
@@ -13,6 +12,7 @@ wax.interaction = function() {
         _d,
         // Touch tolerance
         tol = 4,
+        grid,
         tileGrid;
 
     var clickHandler = function(url) {
@@ -34,7 +34,8 @@ wax.interaction = function() {
     // Abstract getTile method. Depends on a tilegrid with
     // grid[ [x, y, tile] ] structure.
     function getTile(e) {
-        for (var i = 0, g = grid(); i < grid.length; i++) {
+        var g = grid();
+        for (var i = 0; i < g.length; i++) {
             if ((g[i][0] < e.y) &&
                ((g[i][0] + 256) > e.y) &&
                 (g[i][1] < e.x) &&
@@ -59,7 +60,6 @@ wax.interaction = function() {
         // If the user is actually dragging the map, exit early
         // to avoid performance hits.
         if (_downLock) return;
-        if (e.target.className !== 'map-tile-loaded') return;
 
         var pos = eventoffset(e),
             tile = getTile(pos),
@@ -67,15 +67,13 @@ wax.interaction = function() {
 
         if (tile) gm.getGrid(tile.src, function(err, g) {
             if (err || !g) return;
-            feature = g.tileFeature(pos.x, pos.y, tile, {
-                format: 'teaser'
-            });
+            feature = g.tileFeature(pos.x, pos.y, tile);
             if (feature) {
                 if (feature && _af !== feature) {
                     _af = feature;
                     bean.fire(interaction, 'on', {
                         parent: map.parent,
-                        feature: feature,
+                        data: feature,
                         e: e
                     });
                 } else if (!feature) {
@@ -109,13 +107,8 @@ wax.interaction = function() {
         // Only track single-touches. Double-touches will not affect this
         // control
         } else if (e.type === 'touchstart' && e.touches.length === 1) {
-
-            // turn this into touch-mode. Fallback to teaser and full.
-            clickAction = ['full', 'teaser'];
-
             // Don't make the user click close if they hit another tooltip
             bean.fire(interaction, 'off');
-
             // Touch moves invalidate touches
             bean.add(map.parent, touchEnds);
         }
@@ -156,25 +149,16 @@ wax.interaction = function() {
 
     // Handle a click event. Takes a second
     function click(e, pos) {
-        var tile = getTile(pos),
-            feature;
-
+        var tile = getTile(pos);
         if (tile) gm.getGrid(tile.src, function(err, g) {
-            for (var i = 0; g && (i < clickAction.length); i++) {
-                feature = g.tileFeature(pos.x, pos.y, tile, {
-                    format: clickAction[i]
-                });
-                if (feature) {
-                    switch (clickAction[i]) {
-                        case 'full':
-                        // clickAction can be teaser in touch interaction
-                        case 'teaser':
-                            return callbacks.click(feature, map.parent, e);
-                        case 'location':
-                            return clickHandler(feature);
-                    }
-                }
-            }
+            if (err || !g) return;
+            var feature = g.tileFeature(pos.x, pos.y, tile);
+            if (!feature) return;
+            bean.fire(interaction, 'on', {
+                parent: map.parent,
+                data: feature,
+                e: e
+            });
         });
     }
 
@@ -194,17 +178,12 @@ wax.interaction = function() {
         return interaction;
     };
 
-    interaction.trigger = function(pt) {
-        // TODO: trigger an interaction at a screen point.
-    };
-
     interaction.grid = function(x) {
         if (!arguments.length) return grid;
         grid = x;
         return interaction;
     };
 
-    // Remove this control from the map.
     interaction.remove = function() {
         for (var i = 0; i < clearingEvents.length; i++) {
             map.removeCallback(clearingEvents[i], clearTileGrid);
@@ -220,7 +199,17 @@ wax.interaction = function() {
         return interaction;
     };
 
+    interaction.formatter = function() {
+        return gm.formatter();
+    };
 
-    // Ensure chainability
+    interaction.on = function(ev, fn) {
+        bean.add(interaction, ev, fn);
+    };
+
+    interaction.off = function(ev, fn) {
+        bean.remove(interaction, ev, fn);
+    };
+
     return interaction;
 };

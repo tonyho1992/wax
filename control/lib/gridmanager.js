@@ -62,6 +62,7 @@ wax.gm = function() {
     };
 
     manager.tilejson = function(x) {
+        // prefer templates over formatters
         if (x.template) {
             manager.template(x.template);
         } else if (x.formatter) {
