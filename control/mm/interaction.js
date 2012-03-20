@@ -41,5 +41,8 @@ wax.mm.interaction = function() {
 
     return wax.interaction()
         .attach(attach)
+        .parent(function() {
+          return map.parent;
+        })
         .grid(grid);
 };
