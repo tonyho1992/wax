@@ -1,4 +1,4 @@
-/* wax - 5.0.0-alpha2 - 1.0.4-499-g4c793e3 */
+/* wax - 6.0.0 - 1.0.4-506-g0aada05 */
 
 
 !function (name, context, definition) {
@@ -2165,9 +2165,7 @@ wax.gm = function() {
         } else if (x.formatter) {
             manager.formatter(x.formatter);
         }
-        if (x.grids) {
-            manager.gridUrl(x.grids);
-        }
+        if (x.grids) manager.gridUrl(x.grids);
         return manager;
     };
 
@@ -2243,7 +2241,6 @@ wax = wax || {};
 
 wax.interaction = function() {
     var gm = wax.gm(),
-        eventoffset = wax.u.eventoffset,
         interaction = {},
         _downLock = false,
         _clickTimeout = false,
@@ -2254,11 +2251,8 @@ wax.interaction = function() {
         // Touch tolerance
         tol = 4,
         grid,
+        parent,
         tileGrid;
-
-    var clickHandler = function(url) {
-        window.top.location = url;
-    };
 
     var defaultEvents = {
         mousemove: onMove,
@@ -2302,7 +2296,7 @@ wax.interaction = function() {
         // to avoid performance hits.
         if (_downLock) return;
 
-        var pos = eventoffset(e),
+        var pos = wax.u.eventoffset(e),
             tile = getTile(pos),
             feature;
 
@@ -2313,8 +2307,9 @@ wax.interaction = function() {
                 if (feature && _af !== feature) {
                     _af = feature;
                     bean.fire(interaction, 'on', {
-                        parent: map.parent,
+                        parent: parent(),
                         data: feature,
+                        formatter: gm.formatter().format,
                         e: e
                     });
                 } else if (!feature) {
@@ -2330,7 +2325,6 @@ wax.interaction = function() {
 
     // A handler for 'down' events - which means `mousedown` and `touchstart`
     function onDown(e) {
-        if (e.target.className !== 'map-tile-loaded') return;
         // Ignore double-clicks by ignoring clicks within 300ms of
         // each other.
         if (killTimeout()) { return; }
@@ -2341,7 +2335,7 @@ wax.interaction = function() {
         // Store this event so that we can compare it to the
         // up event
         _downLock = true;
-        _d = eventoffset(e);
+        _d = wax.u.eventoffset(e);
         if (e.type === 'mousedown') {
             bean.add(document.body, 'mouseup', onUp);
 
@@ -2351,18 +2345,18 @@ wax.interaction = function() {
             // Don't make the user click close if they hit another tooltip
             bean.fire(interaction, 'off');
             // Touch moves invalidate touches
-            bean.add(map.parent, touchEnds);
+            bean.add(parent(), touchEnds);
         }
     }
 
     function touchCancel() {
-        bean.remove(map.parent, touchEnds);
+        bean.remove(parent(), touchEnds);
         _downLock = false;
     }
 
     function onUp(e) {
         var evt = {},
-            pos = eventoffset(e);
+            pos = wax.u.eventoffset(e);
         _downLock = false;
 
         // TODO: refine
@@ -2371,7 +2365,7 @@ wax.interaction = function() {
         }
 
         bean.remove(document.body, 'mouseup', onUp);
-        bean.remove(map.parent, touchEnds);
+        bean.remove(parent(), touchEnds);
 
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
@@ -2396,13 +2390,16 @@ wax.interaction = function() {
             var feature = g.tileFeature(pos.x, pos.y, tile);
             if (!feature) return;
             bean.fire(interaction, 'on', {
-                parent: map.parent,
+                parent: parent(),
                 data: feature,
+                formatter: gm.formatter().format,
                 e: e
             });
         });
     }
 
+    // set an attach function that should be
+    // called when maps are set
     interaction.attach = function(x) {
         if (!arguments.length) return attach;
         attach = x;
@@ -2413,43 +2410,59 @@ wax.interaction = function() {
     interaction.map = function(x) {
         if (!arguments.length) return map;
         map = x;
-        bean.add(map.parent, defaultEvents);
-        bean.add(map.parent, 'touchstart', onDown);
-        if (attach) attach();
+        bean.add(parent(), defaultEvents);
+        bean.add(parent(), 'touchstart', onDown);
+        if (attach) attach(map);
         return interaction;
     };
 
+    // set a grid getter for this control
     interaction.grid = function(x) {
         if (!arguments.length) return grid;
         grid = x;
         return interaction;
     };
 
+    // detach this and its events from the map cleanly
     interaction.remove = function() {
         for (var i = 0; i < clearingEvents.length; i++) {
             map.removeCallback(clearingEvents[i], clearTileGrid);
         }
-        bean.remove(map.parent, defaultEvents);
+        bean.remove(parent(), defaultEvents);
         bean.fire(interaction, 'remove');
-        return this;
+        return interaction;
     };
 
+    // get or set a tilejson chunk of json
     interaction.tilejson = function(x) {
         if (!arguments.length) return tilejson;
         gm.tilejson(x);
         return interaction;
     };
 
+    // return the formatter, which has an exposed .format
+    // function
     interaction.formatter = function() {
         return gm.formatter();
     };
 
+    // ev can be 'on', 'off', fn is the handler
     interaction.on = function(ev, fn) {
         bean.add(interaction, ev, fn);
+        return interaction;
     };
 
+    // ev can be 'on', 'off', fn is the handler
     interaction.off = function(ev, fn) {
         bean.remove(interaction, ev, fn);
+        return interaction;
+    };
+
+    // parent should be a function that returns
+    // the parent element of the map
+    interaction.parent  = function(x) {
+        parent = x;
+        return interaction;
     };
 
     return interaction;
@@ -2755,12 +2768,11 @@ wax.tilejson = function(url, callback) {
 var wax = wax || {};
 wax.tooltip = {};
 
-wax.tooltip = function(o) {
-    o = o || {};
-
-    var _ct, // current tooltip
-        popped = false,
+wax.tooltip = function() {
+    var popped = false,
+        animate = false,
         t = {},
+        tooltips = [],
         parent;
 
     // Get the active tooltip for a layer or create a new one if no tooltip exists.
@@ -2774,80 +2786,83 @@ wax.tooltip = function(o) {
 
     // Hide a given tooltip.
     function hide() {
-        if (!_ct) return;
         var event;
 
-        if (_ct.style['-webkit-transition'] !== undefined && o.animationOut) {
+        function remove() {
+            if (this.parentNode) this.parentNode.removeChild(this);
+        }
+
+        if (document.body.style['-webkit-transition'] !== undefined) {
             event = 'webkitTransitionEnd';
-        } else if (_ct.style.MozTransition !== undefined && o.animationOut) {
+        } else if (document.body.style.MozTransition !== undefined) {
             event = 'transitionend';
         }
 
-        function remove() {
-            if (parentNode) parentNode.removeChild(this);
-            _ct = null;
+        var _ct;
+        while (_ct = tooltips.pop()) {
+            if (animate && event) {
+                // This code assumes that transform-supporting browsers
+                // also support proper events. IE9 does both.
+                  bean.add(_ct, event, remove);
+                  _ct.className += ' wax-fade';
+            } else {
+                if (_ct.parentNode) _ct.parentNode.removeChild(_ct);
+            }
         }
+    }
 
-        if (event) {
-            // This code assumes that transform-supporting browsers
-            // also support proper events. IE9 does both.
-            bean.add(_ct, event, remove);
-            _ct.className += ' ' + o.animationOut;
+    function on(o) {
+        var content;
+        hide();
+        if ((o.e.type === 'mousemove' || !o.e.type) && !popped) {
+            content = o.formatter({ format: 'teaser' }, o.data);
+            if (!content) return;
+            parent.style.cursor = 'pointer';
+            tooltips.push(parent.appendChild(getTooltip(content)));
         } else {
-            if (_ct.parentNode) _ct.parentNode.removeChild(_ct);
-            _ct = null;
+            content = o.formatter({ format: 'full' }, o.data);
+            if (!content) return;
+            var tt = parent.appendChild(getTooltip(content));
+            tt.className += ' wax-popup';
+
+            var close = tt.appendChild(document.createElement('a'));
+            close.href = '#close';
+            close.className = 'close';
+            close.innerHTML = 'Close';
+            popped = true;
+
+            tooltips.push(tt);
+
+            bean.add(close, 'click touchend', function closeClick(e) {
+                e.stop();
+                hide();
+                popped = false;
+            });
         }
     }
 
-    // Expand a tooltip to be a "popup". Suspends all other tooltips from being
-    // shown until this popup is closed or another popup is opened.
-    function click(feature) {
-        // Hide any current tooltips.
-        if (_currentTooltip) {
-            hide();
-        }
-
-        var tooltip = parent.appendChild(getTooltip(feature));
-        tooltip.className += ' wax-popup';
-        tooltip.innerHTML = feature;
-
-        var close = tooltip.appendChild(document.createElement('a'));
-        close.href = '#close';
-        close.className = 'close';
-        close.innerHTML = 'Close';
-        popped = true;
-
-        bean.add(close, 'click touchend', function closeClick(e) {
-            e.stop();
-            hide();
-            popped = false;
-        });
-
-        _currentTooltip = tooltip;
-    }
-
-    // Show a tooltip.
-    function over(feature) {
-        if (!feature) return;
-        parent.style.cursor = 'pointer';
-
-        if (!popped) {
-            _ct = getTooltip(feature);
-            parent.appendChild(_ct);
-        }
-    }
-
-    // Hide all tooltips on this layer and show the first hidden tooltip on the
-    // highest layer underneath if found.
-    function out(feature) {
-        context.style.cursor = 'default';
-        if (!popped && _ct) hide();
+    function off() {
+        parent.style.cursor = 'default';
+        if (!popped) hide();
     }
 
     t.parent = function(x) {
         if (!arguments.length) return parent;
         parent = x;
         return t;
+    };
+
+    t.animate = function(x) {
+        if (!arguments.length) return animate;
+        animate = x;
+        return t;
+    };
+
+    t.events = function() {
+        return {
+            on: on,
+            off: off
+        };
     };
 
     return t;
@@ -3310,6 +3325,9 @@ wax.mm.interaction = function() {
 
     return wax.interaction()
         .attach(attach)
+        .parent(function() {
+          return map.parent;
+        })
         .grid(grid);
 };
 wax = wax || {};

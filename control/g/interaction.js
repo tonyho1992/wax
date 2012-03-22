@@ -4,8 +4,9 @@ wax.g = wax.g || {};
 wax.g.interaction = function() {
     var dirty = false, _grid;
 
+    function setdirty() { dirty = true; }
+
     function grid() {
-        function setdirty() { dirty = true; }
 
         if (!dirty && _grid) {
             return _grid;
@@ -43,5 +44,8 @@ wax.g.interaction = function() {
 
     return wax.interaction()
         .attach(attach)
+        .parent(function() {
+          return map.getDiv();
+        })
         .grid(grid);
 };
