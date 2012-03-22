@@ -1,5 +1,4 @@
 var wax = wax || {};
-wax.util = wax.util || {};
 
 // Utils are extracted from other libraries or
 // written from scratch to plug holes in browser compatibility.

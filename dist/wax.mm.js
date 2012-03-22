@@ -1,4 +1,4 @@
-/* wax - 6.0.0 - 1.0.4-506-g0aada05 */
+/* wax - 6.0.0 - 1.0.4-507-gbbba4b0 */
 
 
 !function (name, context, definition) {
@@ -2222,7 +2222,7 @@ wax.hash = function(options) {
         }
     }
 
-    var _move = wax.util.throttle(move, 500);
+    var _move = wax.u.throttle(move, 500);
 
     hash.add = function() {
         stateChange(getState());
@@ -2868,7 +2868,6 @@ wax.tooltip = function() {
     return t;
 };
 var wax = wax || {};
-wax.util = wax.util || {};
 
 // Utils are extracted from other libraries or
 // written from scratch to plug holes in browser compatibility.
@@ -3430,7 +3429,7 @@ wax.mm.legend = function(map, tilejson) {
     };
 
     legend.appendTo = function(elem) {
-        wax.util.$(elem).appendChild(l.element());
+        wax.u.$(elem).appendChild(l.element());
         return this;
     };
 
@@ -3463,7 +3462,7 @@ wax.mm.pointselector = function(map, tilejson, opts) {
 
     // Create a `com.modestmaps.Point` from a screen event, like a click.
     function makePoint(e) {
-        var coords = wax.util.eventoffset(e);
+        var coords = wax.u.eventoffset(e);
         var point = new MM.Point(coords.x, coords.y);
         // correct for scrolled document
 

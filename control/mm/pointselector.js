@@ -25,7 +25,7 @@ wax.mm.pointselector = function(map, tilejson, opts) {
 
     // Create a `com.modestmaps.Point` from a screen event, like a click.
     function makePoint(e) {
-        var coords = wax.util.eventoffset(e);
+        var coords = wax.u.eventoffset(e);
         var point = new MM.Point(coords.x, coords.y);
         // correct for scrolled document
 
