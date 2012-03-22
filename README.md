@@ -8,9 +8,9 @@ For full documentation of supported mapping APIs and how to use Wax see http://m
 
 There are three current development branches of Wax:
 
-* `master`, this branch, supports **Modest Maps 1.0.0-alpha2 and later**
+* `master` is 6.x
+* 5.x supports **Modest Maps 1.0.0-alpha2 and later**, but supports the same API as 4.x
 * 4.x supports **Modest Maps 0.x**, older versions of Modest Maps
-* 6.x is **unstable** and will introduce new **event-based interaction APIs**
 
 To find more detail of what has changed in each version, consult `CHANGELOG.md`.
 
