@@ -7,6 +7,10 @@ Wax is your gateway into putting maps on the web. It makes it easier to
 use APIs like [Modest Maps](http://github.com/stamen/modestmaps-js), and
 documents, from the very start, the basics of web maps.
 
+<a class='big-download' href='https://github.com/mapbox/wax/zipball/v6.0.0-beta1'>↓ Download Wax 6.0.0-beta1
+<span>BSD-licensed, ~16KB</span>
+</a>
+
 If you're just starting out, follow along and by the end, you'll be a
 web-mapping pro.
 
