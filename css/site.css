@@ -8,6 +8,12 @@ body {
 
 a { color:#b64c4c; }
 
+a.download {
+  padding:10px;
+  background-color:#b64c4c;
+  color:#fff;
+}
+
 /**
  * Navigation
  */
@@ -179,22 +185,16 @@ h1, h2, h3, h4, h5, h6, p {
 
 h2, h3 { font-size:20px; }
 
-div.highlight pre {
-  margin:10px 0;
+pre {
+  font: normal 13px/20px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
   padding:10px;
-  background:#fcfcfc;
   border:1px solid #dadada;
   }
 
-pre {
-  font: normal 15px/20px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
-  }
-
 p code {
-  font-size:12px;
+  font-size:14px;
   font-family:'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
-  background:#fbe7cc;
-  padding:1px 3px;
+  background:#DFFAFF;
   }
 
 .md p > img {
@@ -233,7 +233,7 @@ a.wax-fullscreen {
   z-index:99999;
   }
 
-#map-div {
+.demo-map {
   width:700px;
   height:300px;
 }

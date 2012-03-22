@@ -4,27 +4,24 @@ tags: OpenLayers
 layout: control-ol
 ---
 
-<div class='live'>
-{% highlight html %}
-<div id='map-div'></div>
-<a class='attribution' href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
-<script>
-wax.tilejson('http://d.tiles.mapbox.com/v2/mapbox.blue-marble-topo-bathy-jan.jsonp',
+<div id='map-div' class='demo-map'></div>
+
+<pre class='prettyprint live'>
+wax.tilejson('http://c.tiles.mapbox.com/v3/mapbox.mapbox-streets.jsonp',
 function(tilejson) {
     var map = new OpenLayers.Map({
         div: 'map-div',
         controls: [
-            new OpenLayers.Control.Navigation()
+            new OpenLayers.Control.Navigation(),
+            new OpenLayers.Control.Attribution()
         ],
         layers: [
             wax.ol.connector(tilejson)
         ]
     });
-    map.zoomTo(2);
+    map.zoomTo(3);
 });
-</script>
-{% endhighlight %}
-</div>
+</pre>
 
 ## API
 

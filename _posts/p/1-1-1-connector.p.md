@@ -1,7 +1,7 @@
 ---
 title: Connector
 tags: Polymaps
-layout: control-p
+layout: control
 ---
 
 The Polymaps connector lets you quickly configure a MapBox map with
@@ -12,19 +12,16 @@ does not configure per-layer min & max zoom levels, you'll need to
 use <code>tilejson.maxzoom</code> and <code>tilejson.minzoom</code>,
 as in the example below, to prevent overzooming.
 
-{% highlight html %}
-<html>
-<head>
-  <script src='wax/ext/polymaps.js' type='text/javascript'></script>
-  <script src='wax/dist/wax.p.js' type='text/javascript'></script>
-{% endhighlight %}
+<pre class='prettyprint'>
+&lt;html&gt;
+&lt;head&gt;
+  &lt;script src='wax/ext/polymaps.js' type='text/javascript'&gt;&lt;/script&gt;
+  &lt;script src='wax/dist/wax.p.js' type='text/javascript'&gt;&lt;/script&gt;
+</pre>
 
-## Example
+<div id='map-div' class='demo-map'></div>
 
-<div class='live'>
-{% highlight html %}
-<div id='map-div'></div>
-<script>
+<pre class='prettyprint live'>
 wax.tilejson('http://a.tiles.mapbox.com/v3/mapbox.blue-marble-topo-jul-bw.jsonp',
   function(tilejson) {
   var po = org.polymaps;
@@ -37,9 +34,7 @@ wax.tilejson('http://a.tiles.mapbox.com/v3/mapbox.blue-marble-topo-jul-bw.jsonp'
     .add(po.interact())
     .add(po.compass().pan('none'));
 });
-</script>
-{% endhighlight %}
-</div>
+</pre>
 
 ## API
 
@@ -49,4 +44,3 @@ wax.tilejson('http://a.tiles.mapbox.com/v3/mapbox.blue-marble-topo-jul-bw.jsonp'
   Creates a new Polymaps layer that's addable with .add() on a map.
   </dd>
 </dl>
-

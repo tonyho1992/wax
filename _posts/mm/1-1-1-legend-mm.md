@@ -9,10 +9,9 @@ and then you can add it to a map by chaining `.appendTo(map.parent)`.
 
 ## Example
 
-<div class='live'>
-{% highlight html %}
 <div id='map-div'></div>
-<script>
+
+<pre class='prettyprint live'>
 var mm = com.modestmaps;
 wax.tilejson(
   'http://api.tiles.mapbox.com/v3/mapbox.geography-class.jsonp',
@@ -20,12 +19,10 @@ wax.tilejson(
     var m = new mm.Map('map-div',
       new wax.mm.connector(tilejson));
     wax.mm.legend(m, tilejson).appendTo(m.parent);
-    m.setCenterZoom(new mm.Location(39, -98), 2);
+    m.setCenterZoom({ lat: 39, lon: -98 }, 2);
   }
 );
-</script>
-{% endhighlight %}
-</div>
+</pre>
 
 ## API
 

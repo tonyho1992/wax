@@ -65,8 +65,6 @@ And then inside of a control it looks like
 
 {% highlight js %}
 wax.mm.zoomer = function(map) {
-    var mm = com.modestmaps;
-
     // Create elements as soon as an instance of this control is made, though
     // they won't be appended to anything until `appendTo(element)` is called.
     var zoomin = document.createElement('a');
@@ -76,10 +74,7 @@ wax.mm.zoomer = function(map) {
     ....
 {% endhighlight %}
 
-So when you're in `wax.mm.zoomer`, feel free to shorten the name
-of `com.modestmaps` to `mm`, but **not outside of that function**, lest
-`mm` stands for `com.modestmaps` for everything else - every other script
-on your page. Never ever declare a variable without `var` inside of this
+Never ever declare a variable without `var` inside of this
 function, because it'll 'leak' to the global space.
 
 ## Packaging

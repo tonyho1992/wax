@@ -14,22 +14,18 @@ and you can replace it with your own.
 
 ## Example
 
-<div class='live'>
-{% highlight html %}
 <div id='map-div'></div>
-<script>
-var mm = com.modestmaps;
+
+<pre class='prettyprint live'>
 wax.tilejson(
 'http://api.tiles.mapbox.com/v3/mapbox.natural-earth-2.jsonp',
   function(tilejson) {
-    var m = new mm.Map('map-div', new wax.mm.connector(tilejson));
+    var m = new MM.Map('map-div', new wax.mm.connector(tilejson));
 
     wax.mm.fullscreen(m, tilejson).appendTo(m.parent);
-    m.setCenterZoom(new mm.Location(39, -98), 2);
+    m.setCenterZoom({ lat: 39, lon: -98 }), 2);
 });
-</script>
-{% endhighlight %}
-</div>
+</pre>
 
 ## API
 

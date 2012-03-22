@@ -1,37 +1,33 @@
 ---
 title: Hash
 tags: Google
-layout: control-g
+layout: control
 ---
 
 Save the map position to the URL so that links hit the map in the same state as
 the initial user.
 
-{% highlight html %}
-<html>
-<head>
-  <script
+<pre class='prettyprint'>
+&lt;html&gt;
+&lt;head&gt;
+  &lt;script
     src='http://maps.google.com/maps/api/js?sensor=false'
-    type='text/javascript'></script>
-  <script
+    type='text/javascript'&gt;&lt;/script&gt;
+  &lt;script
     src='wax/dist/wax.g.min.js'
-    type='text/javascript'></script>
-  <link
+    type='text/javascript'&gt;&lt;/script&gt;
+  &lt;link
     href='wax/theme/controls.css'
     rel='stylesheet'
-    type='text/css' />
-{% endhighlight %}
+    type='text/css' /&gt;
+</pre>
 
 Wax has a custom Google map type that can display tilesets described by
 the TileJSON format at `wax.g.connector`.
 
-<div class='live'>
-{% highlight html %}
-<div id='map-div'></div>
-<a
-  class='attribution'
-  href='http://mapbox.com/tileset/geography-class'>Geography Class</a>
-<script>
+<div id='map-div' class='demo-map'></div>
+
+<pre class='prettyprint live'>
 wax.tilejson('http://api.tiles.mapbox.com/v2/mapbox.geography-class.jsonp',
   function(tilejson) {
   var map = new google.maps.Map(
@@ -44,9 +40,7 @@ wax.tilejson('http://api.tiles.mapbox.com/v2/mapbox.geography-class.jsonp',
   map.setMapTypeId('mb');
   wax.g.hash(map);
 });
-</script>
-{% endhighlight %}
-</div>
+</pre>
 
 ## API
 

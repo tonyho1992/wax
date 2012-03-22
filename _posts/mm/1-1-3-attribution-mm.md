@@ -9,24 +9,18 @@ and then you can add it to a map by chaining `.appendTo(map.parent)`.
 
 ## Example
 
-<div class='live'>
-{% highlight html %}
 <div id='map-div'></div>
-<script type='text/javascript'>
-var mm = com.modestmaps;
-
+<pre class='prettyprint live'>
 wax.tilejson(
   'http://api.tiles.mapbox.com/v3/mapbox.haiti-terrain.jsonp',
   function(tilejson) {
-    var m = new mm.Map('map-div',
+    var m = new MM.Map('map-div',
       new wax.mm.connector(tilejson));
     wax.mm.attribution(m, tilejson).appendTo(m.parent);
-    m.setCenterZoom(new mm.Location(tilejson.center[1], tilejson.center[0]), 10);
+    m.setCenterZoom(new MM.Location(tilejson.center[1], tilejson.center[0]), 10);
   }
 );
-</script>
-{% endhighlight %}
-</div>
+</pre>
 
 ## API
 

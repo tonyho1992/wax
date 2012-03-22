@@ -11,16 +11,12 @@ offline use.
 
 ## Example
 
-<div class='live'>
-{% highlight html %}
 <div id='map-div'></div>
-<script>
-var mm = com.modestmaps;
 
+<pre class='prettyprint live'>
 var url = 'http://api.tiles.mapbox.com/v3/mapbox.blue-marble-topo-bathy-jul.jsonp';
-
 wax.tilejson(url, function(tilejson) {
-    var m = new mm.Map('map-div',
+    var m = new MM.Map('map-div',
       new wax.mm.connector(tilejson));
     wax.mm.boxselector(m, tilejson, {
       callback: function(coords) {
@@ -30,13 +26,9 @@ wax.tilejson(url, function(tilejson) {
           }).join(' - '));
       }
     });
-    m.setCenterZoom(new mm.Location(39, -98), 2);
+    m.setCenterZoom({ lat: 39, lon: -98 }, 2);
 });
-</script>
-<div class='widget'>Selection: <span id='boxselector-text'></span></div>
-</div>
-{% endhighlight %}
-</div>
+</pre>
 
 ## API
 

@@ -18,13 +18,12 @@ names.
 <a href='#' id='trigger-low'>low quality</a>
 <a href='#' id='trigger-high'>high quality</a>
 <script>
-var mm = com.modestmaps;
 var url = 'http://api.tiles.mapbox.com/v3/mapbox.blue-marble-topo-jul.jsonp';
 
 wax.tilejson(url, function(tilejson) {
-    var m = new mm.Map('map-div',
+    var m = new MM.Map('map-div',
       new wax.mm.connector(tilejson), null,
-      [new mm.MouseHandler(), new mm.TouchHandler()]);
+      [new MM.MouseHandler(), new MM.TouchHandler()]);
     var bw = wax.mm.bwdetect(m, {
       png: '.png32'
     });
@@ -34,7 +33,7 @@ wax.tilejson(url, function(tilejson) {
     document.getElementById('trigger-high').onclick = function() {
       bw.bw(1); return false;
     };
-    m.setCenterZoom(new mm.Location(39, -98), 2);
+    m.setCenterZoom({ lat: 39, lon: -98 }), 2);
 });
 </script>
 {% endhighlight %}

@@ -10,10 +10,12 @@ documents, from the very start, the basics of web maps.
 If you're just starting out, follow along and by the end, you'll be a
 web-mapping pro.
 
-<div class='live'>
-{% highlight html %}
-<div id='intro-map'></div>
-<script>
+<div id='intro-map' class='map-demo'></div>
+
+<pre class='prettyprint'>
+&lt;div id='intro-map'&gt;&lt;/div&gt;
+</pre>
+<pre class='prettyprint live'>
 var mm = com.modestmaps;
 var url = 'http://api.tiles.mapbox.com/v3/mapbox.geography-class.jsonp';
 
@@ -29,11 +31,11 @@ wax.tilejson(url, function(tilejson) {
   wax.mm.zoomer(m).appendTo(m.parent);
   wax.mm.interaction(m);
 });
-</script>
-{% endhighlight %}
-</div>
+</pre>
 
 ## Get Wax
+
+<a class='download' href='https://github.com/mapbox/wax/zipball/v5.0.1'>Wax 5.0.1</a>
 
 To follow this quick tutorial, you'll need a copy of Wax: unlike Google Maps,
 it's a Javascript library you copy to your server, so you have control over it.
@@ -85,14 +87,14 @@ make your map work. We'll also include a CSS file to start rolling with style:
 - `wax/theme/controls.css` contains default styles for controls. You can always
   swap in your own later on.
 
-{% highlight html %}
-<html>
-  <head>
-    <script src='wax/ext/modestmaps.min.js' type='text/javascript'></script>
-    <script src='wax/dist/wax.mm.js' type='text/javascript'></script>
-    <link href='wax/theme/controls.css' rel='stylesheet' type='text/css' />
+<pre class='prettyprint'>
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;script src='wax/ext/modestmaps.min.js' type='text/javascript'&gt;&lt;/script&gt;
+    &lt;script src='wax/dist/wax.mm.js' type='text/javascript'&gt;&lt;/script&gt;
+    &lt;link href='wax/theme/controls.css' rel='stylesheet' type='text/css' /&gt;
   ...
-{% endhighlight %}
+</pre>
 
 Here's your first map! If you've downloaded Wax and add the code above into the
 <code>&lt;head&gt;</code> of your page, then you can put the following code into the
@@ -100,43 +102,30 @@ Here's your first map! If you've downloaded Wax and add the code above into the
 drag around the little map below -
 Modest Maps is making the tiles move when you click and drag.
 
-{% highlight html %}
-<div id="modestmaps-setup"></div>
-<script>
-var tilejson = {
-  tilejson: '1.0.0',
-  scheme: 'xyz',
-  tiles: ['http://a.tiles.mapbox.com/v3/mapbox.world-light/{z}/{x}/{y}.png']
-};
-
+<pre class='prettyprint'>
 var url = 'http://api.tiles.mapbox.com/v3/mapbox.world-light.jsonp';
-// Alias com.modestmaps to mm. This isn't necessary -
-// just nice for shorter code.
-var mm = com.modestmaps;
 wax.tilejson(url, function(tilejson) {
     // Set up a map in a div with the id 'modestmaps-setup'
-    var m = new mm.Map('modestmaps-setup',
+    var m = new MM.Map('modestmaps-setup',
       // Use Wax's connector to add a new custom layer
       new wax.mm.connector(tilejson),
       // And it'll be 240px by 120px
-      new mm.Point(240,120));
+      new MM.Point(240,120));
 
     // Center it on the United States, at zoom level 2.
-    m.setCenterZoom(new mm.Location(39, -98), 2);
+    m.setCenterZoom({ lat: 39, lon: -98 }, 2);
 });
-</script>
-{% endhighlight %}
 </pre>
 
 Let's look at how that was done: the only thing on the page besides that
 <code>&lt;script&gt;</code> tag and its code is a <code>&lt;div&gt;</code>
 tag with the id `modestmaps-setup`. And, down below, you see the code
 
-{% highlight js %}
-var m = new mm.Map('modestmaps-setup'...
-{% endhighlight %}
+<pre class='prettify'>
+var m = new MM.Map('modestmaps-setup' //
+</pre>
 
-So, you're telling Modest Maps (`mm`) to create a new map contained by
+So, you're telling Modest Maps, `MM`, to create a new map contained by
 this div element. It then does the work of putting a lot of images on the page
 and lining them up.
 
@@ -159,13 +148,13 @@ so that a tile at any coordinate can be requested.
 The URL of the tile above is `http://a.tiles.mapbox.com/v3/mapbox.world-light/2/2/1.png`.
 By inference we can write the TileJSON needed to use the World Light tileset:
 
-{% highlight js %}
+<pre class='prettyprint'>
 {
   "version": "1.0.0",
   "scheme": "xyz",
   "tiles" ["http://a.tiles.mapbox.com/v3/mapbox.world-light/{z}/{x}/{y}.png"]
 }
-{% endhighlight %}
+</pre>
 
 - The `version` key declares that we are implementing version `1.0.0` of the
   TileJSON spec. Since there's only one version of TileJSON so far, it'll be `1.0.0` for you, too.
@@ -188,16 +177,16 @@ your map.
 Here we're using the url `http://api.tiles.mapbox.com/v3/mapbox.dc-nightvision.jsonp` for
 the TileJSON for dc-nightvision - using the [MapBox Hosting API](http://mapbox.com/hosting/api/).
 
-{% highlight js %}
+<pre class='prettyprint'>
 var url = 'http://api.tiles.mapbox.com/v3/mapbox.dc-nightvision.jsonp';
 wax.tilejson(url, function(tilejson) {
-  var mm = com.modestmaps;
-  var m = new mm.Map('tilejson-url',
+  var m = new MM.Map('tilejson-url',
     new wax.mm.connector(tilejson),
-    new mm.Point(240,120));
-  m.setCenterZoom(new mm.Location(
+    new MM.Point(240,120));
+
+  m.setCenterZoom(new MM.Location(
     tilejson.center[1],  // lon
     tilejson.center[0]), // lat
     tilejson.center[2]); // zoom
 });
-{% endhighlight %}
+</pre>
