@@ -20,15 +20,14 @@ web-mapping pro.
 &lt;div id='intro-map'&gt;&lt;/div&gt;
 </pre>
 <pre class='prettyprint live'>
-var mm = com.modestmaps;
 var url = 'http://api.tiles.mapbox.com/v3/mapbox.geography-class.jsonp';
 
 wax.tilejson(url, function(tilejson) {
-  var m = new mm.Map('intro-map',
+  var m = new MM.Map('intro-map',
     new wax.mm.connector(tilejson),
-    new mm.Point(700,400));
+    new MM.Point(700,400));
 
-  m.setCenterZoom(new mm.Location(tilejson.center[1],
+  m.setCenterZoom(new MM.Location(tilejson.center[1],
     tilejson.center[0]),
     tilejson.center[2] - 3);
 
