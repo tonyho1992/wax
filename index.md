@@ -11,6 +11,8 @@ documents, from the very start, the basics of web maps.
 <span>BSD-licensed, ~16KB</span>
 </a>
 
+Already using Wax, and need to upgrade? [Read the bit about upgrading](/upgrading.html)
+
 If you're just starting out, follow along and by the end, you'll be a
 web-mapping pro.
 
