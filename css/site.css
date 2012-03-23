@@ -56,6 +56,7 @@ a.big-download span {
   }
 
 .navigation:hover a { color:#000; }
+.navigation:hover a:hover { color:#b64c4c; }
 
 .navigation ul li,
 .navigation ul {
