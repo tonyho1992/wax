@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta1 - 1.0.4-523-g3e24313 */
+/* wax - 6.0.0-beta1 - 1.0.4-524-g43d8313 */
 
 
 !function (name, context, definition) {
@@ -2267,7 +2267,6 @@ wax.interaction = function() {
         _downLock = false,
         _clickTimeout = false,
         // Active feature
-        _af,
         // Down event
         _d,
         // Touch tolerance
@@ -2326,20 +2325,13 @@ wax.interaction = function() {
             if (err || !g) return;
             feature = g.tileFeature(pos.x, pos.y, tile);
             if (feature) {
-                if (feature && _af !== feature) {
-                    _af = feature;
-                    bean.fire(interaction, 'on', {
-                        parent: parent(),
-                        data: feature,
-                        formatter: gm.formatter().format,
-                        e: e
-                    });
-                } else if (!feature) {
-                    _af = null;
-                    bean.fire(interaction, 'off');
-                }
+                bean.fire(interaction, 'on', {
+                    parent: parent(),
+                    data: feature,
+                    formatter: gm.formatter().format,
+                    e: e
+                });
             } else {
-                _af = null;
                 bean.fire(interaction, 'off');
             }
         });
@@ -2594,15 +2586,18 @@ wax.movetip = function() {
 
     function on(o) {
         var content;
-        hide();
-        if ((o.e.type === 'mousemove' || !o.e.type) && !popped) {
+        if (popped) return;
+        if ((o.e.type === 'mousemove' || !o.e.type)) {
             content = o.formatter({ format: 'teaser' }, o.data);
             if (!content) return;
+            hide();
             parent.style.cursor = 'pointer';
             tooltip = parent.appendChild(getTooltip(content));
         } else {
-            content = o.formatter({ format: 'full' }, o.data);
+            // content = o.formatter({ format: 'full' }, o.data);
+            content = o.formatter({ format: 'teaser' }, o.data);
             if (!content) return;
+            hide();
             var tt = parent.appendChild(getTooltip(content));
             tt.className += ' wax-popup';
 
@@ -2610,9 +2605,14 @@ wax.movetip = function() {
             close.href = '#close';
             close.className = 'close';
             close.innerHTML = 'Close';
+
             popped = true;
 
             tooltip = tt;
+
+            _tooltipOffset = wax.u.offset(tooltip);
+            _contextOffset = wax.u.offset(parent);
+            moveTooltip(o.e);
 
             bean.add(close, 'click touchend', function closeClick(e) {
                 e.stop();
@@ -2752,7 +2752,15 @@ wax.tooltip = function() {
         animate = false,
         t = {},
         tooltips = [],
+        _currentContent,
+        transitionEvent,
         parent;
+
+    if (document.body.style['-webkit-transition'] !== undefined) {
+        transitionEvent = 'webkitTransitionEnd';
+    } else if (document.body.style.MozTransition !== undefined) {
+        transitionEvent = 'transitionend';
+    }
 
     // Get the active tooltip for a layer or create a new one if no tooltip exists.
     // Hide any tooltips on layers underneath this one.
@@ -2763,26 +2771,19 @@ wax.tooltip = function() {
         return tooltip;
     }
 
+    
+    function remove() {
+        if (this.parentNode) this.parentNode.removeChild(this);
+    }
+
     // Hide a given tooltip.
     function hide() {
-        var event;
-
-        function remove() {
-            if (this.parentNode) this.parentNode.removeChild(this);
-        }
-
-        if (document.body.style['-webkit-transition'] !== undefined) {
-            event = 'webkitTransitionEnd';
-        } else if (document.body.style.MozTransition !== undefined) {
-            event = 'transitionend';
-        }
-
         var _ct;
         while (_ct = tooltips.pop()) {
-            if (animate && event) {
+            if (animate && transitionEvent) {
                 // This code assumes that transform-supporting browsers
                 // also support proper events. IE9 does both.
-                  bean.add(_ct, event, remove);
+                  bean.add(_ct, transitionEvent, remove);
                   _ct.className += ' wax-fade';
             } else {
                 if (_ct.parentNode) _ct.parentNode.removeChild(_ct);
@@ -2792,15 +2793,18 @@ wax.tooltip = function() {
 
     function on(o) {
         var content;
-        hide();
         if ((o.e.type === 'mousemove' || !o.e.type) && !popped) {
             content = o.formatter({ format: 'teaser' }, o.data);
-            if (!content) return;
+            if (!content || content == _currentContent) return;
+            hide();
             parent.style.cursor = 'pointer';
             tooltips.push(parent.appendChild(getTooltip(content)));
+            _currentContent = content;
         } else {
             content = o.formatter({ format: 'full' }, o.data);
             if (!content) return;
+            hide();
+            parent.style.cursor = 'pointer';
             var tt = parent.appendChild(getTooltip(content));
             tt.className += ' wax-popup';
 
@@ -2822,6 +2826,7 @@ wax.tooltip = function() {
 
     function off() {
         parent.style.cursor = 'default';
+        _currentContent = null;
         if (!popped) hide();
     }
 

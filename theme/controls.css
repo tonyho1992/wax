@@ -67,8 +67,8 @@ a.zoomer {
   top:10px;
   max-width:300px;
   opacity:1;
-  -webkit-transition:opacity .5s;
-  -moz-transition:opacity .5s;
+  -webkit-transition:opacity 150ms;
+  -moz-transition:opacity 150ms;
   }
 
 .wax-movetip {
@@ -81,7 +81,7 @@ a.zoomer {
 }
 
 
-.wax-tooltip.hide { opacity:0; }
+.wax-fade { opacity:0; }
 
 .wax-tooltip .close {
   display:block;

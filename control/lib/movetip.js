@@ -49,15 +49,18 @@ wax.movetip = function() {
 
     function on(o) {
         var content;
-        hide();
-        if ((o.e.type === 'mousemove' || !o.e.type) && !popped) {
+        if (popped) return;
+        if ((o.e.type === 'mousemove' || !o.e.type)) {
             content = o.formatter({ format: 'teaser' }, o.data);
             if (!content) return;
+            hide();
             parent.style.cursor = 'pointer';
             tooltip = parent.appendChild(getTooltip(content));
         } else {
-            content = o.formatter({ format: 'full' }, o.data);
+            // content = o.formatter({ format: 'full' }, o.data);
+            content = o.formatter({ format: 'teaser' }, o.data);
             if (!content) return;
+            hide();
             var tt = parent.appendChild(getTooltip(content));
             tt.className += ' wax-popup';
 
@@ -65,9 +68,14 @@ wax.movetip = function() {
             close.href = '#close';
             close.className = 'close';
             close.innerHTML = 'Close';
+
             popped = true;
 
             tooltip = tt;
+
+            _tooltipOffset = wax.u.offset(tooltip);
+            _contextOffset = wax.u.offset(parent);
+            moveTooltip(o.e);
 
             bean.add(close, 'click touchend', function closeClick(e) {
                 e.stop();
