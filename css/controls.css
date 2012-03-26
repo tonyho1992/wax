@@ -62,15 +62,26 @@ a.zoomer {
   background:#333;
   color:#fff;
   padding:10px;
+  -webkit-user-select:auto;
   left:10px;
   top:10px;
   max-width:300px;
   opacity:1;
-  -webkit-transition:opacity .5s;
-  -moz-transition:opacity .5s;
+  -webkit-transition:opacity 150ms;
+  -moz-transition:opacity 150ms;
   }
 
-.wax-tooltip.hide { opacity:0; }
+.wax-movetip {
+  position:absolute;
+  z-index:999999;
+  background:#333;
+  color:#fff;
+  padding:10px;
+  max-width:300px;
+}
+
+
+.wax-fade { opacity:0; }
 
 .wax-tooltip .close {
   display:block;
@@ -137,3 +148,11 @@ div.wax-attribution {
   bottom:4px;
   background:transparent;
   }
+
+.wax-latlngtooltip {
+  position:absolute;
+  background:#caedf4;
+  padding:3px;
+  border:1px solid #75c1d0;
+  border-radius:3px;
+}
