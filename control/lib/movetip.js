@@ -55,13 +55,12 @@ wax.movetip = function() {
             if (!content) return;
             hide();
             parent.style.cursor = 'pointer';
-            tooltip = parent.appendChild(getTooltip(content));
+            tooltip = document.body.appendChild(getTooltip(content));
         } else {
-            // content = o.formatter({ format: 'full' }, o.data);
             content = o.formatter({ format: 'teaser' }, o.data);
             if (!content) return;
             hide();
-            var tt = parent.appendChild(getTooltip(content));
+            var tt = document.body.appendChild(getTooltip(content));
             tt.className += ' wax-popup';
 
             var close = tt.appendChild(document.createElement('a'));

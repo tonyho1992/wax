@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta1 - 1.0.4-524-g43d8313 */
+/* wax - 6.0.0-beta1 - 1.0.4-525-g0a62b1e */
 
 
 !function (name, context, definition) {
@@ -2592,13 +2592,12 @@ wax.movetip = function() {
             if (!content) return;
             hide();
             parent.style.cursor = 'pointer';
-            tooltip = parent.appendChild(getTooltip(content));
+            tooltip = document.body.appendChild(getTooltip(content));
         } else {
-            // content = o.formatter({ format: 'full' }, o.data);
             content = o.formatter({ format: 'teaser' }, o.data);
             if (!content) return;
             hide();
-            var tt = parent.appendChild(getTooltip(content));
+            var tt = document.body.appendChild(getTooltip(content));
             tt.className += ' wax-popup';
 
             var close = tt.appendChild(document.createElement('a'));
