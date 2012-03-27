@@ -1,5 +1,10 @@
 ## Changelog
 
+## 6.0.0-beta2
+
+* Finished movetip.js
+* Pushed to npm
+
 ## 6.0.0
 
 * Event dispatcher for tooltips and other functionality
