@@ -8,7 +8,7 @@ use APIs like [Modest Maps](http://github.com/stamen/modestmaps-js) and
 [Leaflet](http://leaflet.cloudmade.com/), and
 documents, from the very start, the basics of web maps.
 
-<a class='big-download' href='https://github.com/mapbox/wax/zipball/v6.0.0-beta1'>↓ Download Wax 6.0.0-beta1
+<a class='big-download' href='https://github.com/mapbox/wax/zipball/v6.0.0-beta2'>↓ Download Wax 6.0.0-beta2
 <span>BSD-licensed, ~16KB</span>
 </a>
 
@@ -140,7 +140,7 @@ What's this `tilejson` variable?
 describing the basic stuff about a map - where tiles are, how they're
 named, and optionally a lot more, like available zoom levels and legends.
 
-Down the line, [TileJSON](/tilejson.html) will make your life a lot easier by letting you
+Down the line, [TileJSON](/wax/tilejson.html) will make your life a lot easier by letting you
 skip a lot of steps of configuring maps, but we'll explain it in detail first.
 
-[Continue reading about TileJSON](/tilejson.html).
+[Continue reading about TileJSON](/wax/tilejson.html).
