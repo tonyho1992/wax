@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta2 - 1.0.4-526-g3351932 */
+/* wax - 6.0.0-beta2 - 1.0.4-529-g823cf57 */
 
 
 !function (name, context, definition) {
@@ -2252,6 +2252,7 @@ wax.interaction = function() {
         tol = 4,
         grid,
         parent,
+        map,
         tileGrid;
 
     var defaultEvents = {
@@ -2403,9 +2404,9 @@ wax.interaction = function() {
     interaction.map = function(x) {
         if (!arguments.length) return map;
         map = x;
+        if (attach) attach(map);
         bean.add(parent(), defaultEvents);
         bean.add(parent(), 'touchstart', onDown);
-        if (attach) attach(map);
         return interaction;
     };
 
@@ -3247,7 +3248,7 @@ wax = wax || {};
 wax.mm = wax.mm || {};
 
 wax.mm.interaction = function() {
-    var dirty = false, _grid;
+    var dirty = false, _grid, map;
 
     function grid() {
         var zoomLayer = map.getLayerAt(0)
