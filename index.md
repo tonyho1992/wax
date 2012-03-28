@@ -4,7 +4,7 @@ title: Wax
 ---
 
 Wax is your gateway into putting maps on the web. It makes it easier to
-use APIs like [Modest Maps](http://github.com/stamen/modestmaps-js) and
+use APIs like [Modest Maps](https://github.com/stamen/modestmaps-js) and
 [Leaflet](http://leaflet.cloudmade.com/), and
 documents, from the very start, the basics of web maps.
 
@@ -54,7 +54,7 @@ how to include Wax in your project.
 
 ## A Quick Intro
 
-Suppose you're making cool map designs with [TileMill](http://tilemill.com/)
+Suppose you're making cool map designs with [TileMill](http://mapbox.com/tilemill/)
 or you want to use maps from [MapBox Hosting](http://tiles.mapbox.com), and you want to
 get famous by putting them somewhere online - your blog, a big CMS, or anywhere else.
 
@@ -63,10 +63,10 @@ you'll have the power to make super-custom maps with minimal effort.
 
 So your ingredients will be:
 
-* A map server, like [TileStream](http://github.com/mapbox/tilestream) or
+* A map server, like [TileStream](https://github.com/mapbox/tilestream) or
   [MapBox Hosting](http://tiles.mapbox.com). All of the examples you'll see
   here use MapBox Hosting, so you can copy & paste at will and it'll all work.
-* A Javascript API, like [Modest Maps](http://github.com/stamen/modestmaps-js)
+* A Javascript API, like [Modest Maps](https://github.com/stamen/modestmaps-js)
 * Wax
 * Your website
 
@@ -134,11 +134,11 @@ this div element. It then does the work of putting a lot of images on the page
 and lining them up.
 
 What's this `tilejson` variable?
-[TileJSON](http://github.com/mapbox/tilejson) is a way of
+[TileJSON](https://github.com/mapbox/tilejson) is a way of
 describing the basic stuff about a map - where tiles are, how they're
 named, and optionally a lot more, like available zoom levels and legends.
 
-Down the line, [TileJSON](/wax/tilejson.html) will make your life a lot easier by letting you
+Down the line, TileJSON will make your life a lot easier by letting you
 skip a lot of steps of configuring maps, but we'll explain it in detail first.
 
 [Continue reading about TileJSON](/wax/tilejson.html).
