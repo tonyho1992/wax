@@ -41,8 +41,6 @@ wax.tilejson(url, function(tilejson) {
 
 ## Get Wax
 
-<a class='download' href='https://github.com/mapbox/wax/zipball/v5.0.1'>Wax 5.0.1</a>
-
 To follow this quick tutorial, you'll need a copy of Wax: unlike Google Maps,
 it's a Javascript library you copy to your server, so you have control over it.
 
