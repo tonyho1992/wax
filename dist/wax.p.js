@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta2 - 1.0.4-529-g823cf57 */
+/* wax - 6.0.0-beta2 - 1.0.4-532-g1db5f21 */
 
 
 !function (name, context, definition) {
@@ -2152,8 +2152,9 @@ wax.gm = function() {
 
         wax.request.get(gurl, function(err, t) {
             if (err) return callback(err, null);
-            callback(null, wax.gi(t, formatter, {
-                resolution: resolution || 4
+            callback(null, wax.gi(t, {
+                formatter: formatter,
+                resolution: resolution
             }));
         });
         return manager;
@@ -2167,6 +2168,7 @@ wax.gm = function() {
             manager.formatter(x.formatter);
         }
         if (x.grids) manager.gridUrl(x.grids);
+        if (x.resolution) resolution = x.resolution;
         return manager;
     };
 
