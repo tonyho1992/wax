@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta2 - 1.0.4-533-g2601d36 */
+/* wax - 6.0.0-beta2 - 1.0.4-534-g7da860d */
 
 
 !function (name, context, definition) {
@@ -2988,6 +2988,35 @@ wax.u = {
     throttle: function(func, wait) {
         return this.limit(func, wait, false);
     }
+};
+wax = wax || {};
+wax.esri = wax.esri || {};
+
+// Attribution
+// -----------
+// Attribution wrapper for Modest Maps.
+wax.esri.attribution = function(map, tilejson) {
+    tilejson = tilejson || {};
+    var a, // internal attribution control
+        attribution = {};
+
+    attribution.element = function() {
+        return a.element();
+    };
+
+    attribution.appendTo = function(elem) {
+        wax.u.$(elem).appendChild(a.element());
+        return this;
+    };
+
+    attribution.init = function() {
+        a = wax.attribution();
+        a.content(tilejson.attribution);
+        a.element().className = 'wax-attribution wax-mm';
+        return this;
+    };
+
+    return attribution.init();
 };
 dojo.declare('wax.esri.connector', esri.layers.TiledMapServiceLayer, { // create WMTSLayer by extending esri.layers.TiledMapServiceLayer
   constructor: function(options) {

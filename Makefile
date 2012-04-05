@@ -51,6 +51,7 @@ dist/wax.esri.min.js:
 	cat build/header.js \
 		lib/*.js \
 		control/lib/*.js \
+		control/esri/*.js \
 		connectors/esri/*.js > dist/wax.esri.js
 	$(UGLIFYJS) dist/wax.esri.js > dist/wax.esri.min.js
 
