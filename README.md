@@ -16,10 +16,11 @@ To find more detail of what has changed in each version, consult `CHANGELOG.md`.
 
 ## Compatibility
 
-* Google Maps API v3
-* Leaflet 0.x.x
-* Modest Maps 1.x.x
-* OpenLayers 2.11
+* [Google Maps API v3](https://developers.google.com/maps/)
+* [Leaflet 0.x.x](http://leaflet.cloudmade.com/)
+* [Modest Maps 1.x.x](http://modestmaps.com/)
+* [OpenLayers 2.11](http://openlayers.org/)
+* [ESRI ArcGIS API 2.8](http://help.arcgis.com/en/webapi/javascript/arcgis/)
 
 ## Building Wax
 
