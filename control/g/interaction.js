@@ -20,8 +20,8 @@ wax.g.interaction = function() {
                     if (key.split('/')[0] != zoom) continue;
                     var tileOffset = wax.u.offset(mapType.cache[key]);
                     _grid.push([
-                        tileOffset.top - mapOffset.top,
-                        tileOffset.left - mapOffset.left,
+                        tileOffset.top,
+                        tileOffset.left,
                         mapType.cache[key]
                     ]);
                 }

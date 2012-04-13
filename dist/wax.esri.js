@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta2 - 1.0.4-534-g7da860d */
+/* wax - 6.0.0-beta2 - 1.0.4-536-g7ad18fc */
 
 
 !function (name, context, definition) {
@@ -2775,14 +2775,14 @@ wax.tooltip = function() {
     function on(o) {
         var content;
         if ((o.e.type === 'mousemove' || !o.e.type) && !popped) {
-            content = o.formatter({ format: 'teaser' }, o.data);
+            content = o.content || o.formatter({ format: 'teaser' }, o.data);
             if (!content || content == _currentContent) return;
             hide();
             parent.style.cursor = 'pointer';
             tooltips.push(parent.appendChild(getTooltip(content)));
             _currentContent = content;
         } else {
-            content = o.formatter({ format: 'full' }, o.data);
+            content = o.content || o.formatter({ format: 'full' }, o.data);
             if (!content) return;
             hide();
             parent.style.cursor = 'pointer';
