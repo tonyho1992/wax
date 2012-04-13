@@ -35,7 +35,10 @@ wax.tilejson(url, function(tilejson) {
     tilejson.center[2] - 3);
 
   wax.mm.zoomer(m).appendTo(m.parent);
-  wax.mm.interaction(m);
+  wax.mm.interaction()
+    .map(m)
+    .tilejson(tilejson)
+    .on(wax.tooltip().animate(true).parent(m.parent).events());
 });
 </pre>
 
