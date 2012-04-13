@@ -44,6 +44,6 @@ wax.tilejson(url, function(tilejson) {
   wax.g.interaction()
     .map(m)
     .tilejson(tilejson)
-    .on(wax.tooltip().parent(map.getDiv()).events());
+    .on(wax.tooltip().parent(m.getDiv()).events());
 });
 </pre>

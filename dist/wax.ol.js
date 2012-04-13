@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta1 - 1.0.4-525-g0a62b1e */
+/* wax - 6.0.0-beta2 - 1.0.4-536-g7ad18fc */
 
 
 !function (name, context, definition) {
@@ -2173,8 +2173,9 @@ wax.gm = function() {
 
         wax.request.get(gurl, function(err, t) {
             if (err) return callback(err, null);
-            callback(null, wax.gi(t, formatter, {
-                resolution: resolution || 4
+            callback(null, wax.gi(t, {
+                formatter: formatter,
+                resolution: resolution
             }));
         });
         return manager;
@@ -2188,6 +2189,7 @@ wax.gm = function() {
             manager.formatter(x.formatter);
         }
         if (x.grids) manager.gridUrl(x.grids);
+        if (x.resolution) resolution = x.resolution;
         return manager;
     };
 
@@ -2273,6 +2275,7 @@ wax.interaction = function() {
         tol = 4,
         grid,
         parent,
+        map,
         tileGrid;
 
     var defaultEvents = {
@@ -2424,9 +2427,9 @@ wax.interaction = function() {
     interaction.map = function(x) {
         if (!arguments.length) return map;
         map = x;
+        if (attach) attach(map);
         bean.add(parent(), defaultEvents);
         bean.add(parent(), 'touchstart', onDown);
-        if (attach) attach(map);
         return interaction;
     };
 
@@ -2592,15 +2595,12 @@ wax.movetip = function() {
             if (!content) return;
             hide();
             parent.style.cursor = 'pointer';
-            // tooltip = parent.appendChild(getTooltip(content));
             tooltip = document.body.appendChild(getTooltip(content));
         } else {
-            // content = o.formatter({ format: 'full' }, o.data);
             content = o.formatter({ format: 'teaser' }, o.data);
             if (!content) return;
             hide();
             var tt = document.body.appendChild(getTooltip(content));
-            // var tt = parent.appendChild(getTooltip(content));
             tt.className += ' wax-popup';
 
             var close = tt.appendChild(document.createElement('a'));
@@ -2796,14 +2796,14 @@ wax.tooltip = function() {
     function on(o) {
         var content;
         if ((o.e.type === 'mousemove' || !o.e.type) && !popped) {
-            content = o.formatter({ format: 'teaser' }, o.data);
+            content = o.content || o.formatter({ format: 'teaser' }, o.data);
             if (!content || content == _currentContent) return;
             hide();
             parent.style.cursor = 'pointer';
             tooltips.push(parent.appendChild(getTooltip(content)));
             _currentContent = content;
         } else {
-            content = o.formatter({ format: 'full' }, o.data);
+            content = o.content || o.formatter({ format: 'full' }, o.data);
             if (!content) return;
             hide();
             parent.style.cursor = 'pointer';
@@ -3014,7 +3014,7 @@ wax = wax || {};
 wax.ol = wax.ol || {};
 
 wax.ol.interaction = function() {
-    var dirty = false, _grid;
+    var dirty = false, _grid, map;
 
     function setdirty() { dirty = true; }
 

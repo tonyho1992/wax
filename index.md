@@ -8,7 +8,7 @@ use APIs like [Modest Maps](https://github.com/stamen/modestmaps-js) and
 [Leaflet](http://leaflet.cloudmade.com/), and
 documents, from the very start, the basics of web maps.
 
-<a class='big-download' href='https://github.com/mapbox/wax/zipball/v6.0.0-beta2'>↓ Download Wax 6.0.0-beta2
+<a class='big-download' href='https://github.com/mapbox/wax/zipball/v6.0.0-beta3'>↓ Download Wax 6.0.0-beta3
 <span>BSD-licensed, ~16KB</span>
 </a>
 
