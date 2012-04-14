@@ -114,15 +114,6 @@ pre.snippet {
   margin:20px 0;
   }
 
-div.map {
-  position:absolute !important;
-  width:240px;
-  height:120px;
-  right:-1px !important;
-  bottom:-1px !important;
-  border:1px solid #ccc;
-  }
-
 div.wax-fullscreen-map {
   position:fixed !important;
   border:0px;
@@ -287,6 +278,7 @@ span.hattip:before {
   content: '↑';
   margin-right:5px;
 }
+
 
 /* Special sauce */
 ::-webkit-scrollbar {

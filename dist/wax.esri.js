@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta2 - 1.0.4-536-g7ad18fc */
+/* wax - 6.0.0-beta3 - 1.0.4-538-gd6d8f8d */
 
 
 !function (name, context, definition) {
@@ -3017,6 +3017,56 @@ wax.esri.attribution = function(map, tilejson) {
     };
 
     return attribution.init();
+};
+wax = wax || {};
+wax.esri = wax.esri || {};
+
+wax.esri.interaction = function() {
+    var dirty = false, _grid, map;
+
+    function setdirty() { dirty = true; }
+
+    function grid() {
+
+        if (!dirty && _grid) {
+            return _grid;
+        } else {
+            _grid = [];
+            for (var i = 0; i < map.layerIds.length; i++) {
+                var layer = map.getLayer(map.layerIds[i]);
+
+                // This is not in the documented API and may break.
+                // Blame paleogeographers for not considering implementation
+                // to be an important detail of web maps.
+                var div = layer._div;
+                var ims = div.getElementsByTagName('img');
+                for (var j = 0; j < ims.length; j++) {
+                    var tileOffset = wax.u.offset(ims[j]);
+                    _grid.push([
+                        tileOffset.top,
+                        tileOffset.left,
+                        ims[j]
+                    ]);
+                }
+            }
+        }
+        return _grid;
+    }
+
+    function attach(x) {
+        if (!arguments.length) return map;
+        map = x;
+        dojo.connect(map, "onExtentChange", setdirty);
+        dojo.connect(map, "onUpdateEnd", setdirty);
+        dojo.connect(map, "onReposition", setdirty);
+    }
+
+    return wax.interaction()
+        .attach(attach)
+        .parent(function() {
+          return map.root;
+        })
+        .grid(grid);
 };
 dojo.declare('wax.esri.connector', esri.layers.TiledMapServiceLayer, { // create WMTSLayer by extending esri.layers.TiledMapServiceLayer
   constructor: function(options) {

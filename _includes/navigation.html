@@ -26,6 +26,12 @@
       <li>/ <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
     {% endfor %}
   </ul>
+  <h2>ESRI</h2>
+  <ul>
+    {% for post in site.tags.esri %}
+      <li>/ <a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+  </ul>
   <h2>OpenLayers</h2>
   <ul>
     {% for post in site.tags.OpenLayers %}
