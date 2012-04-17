@@ -6,7 +6,7 @@ layout: control
 
 <div class='demo-map claro' id='map-div'></div>
 
-Like Google's API, ESRI's is closed-source and requires you to include it from
+ESRI's API is typically included from
 a remote server. That looks like:
 
 <pre class='prettyprint'>

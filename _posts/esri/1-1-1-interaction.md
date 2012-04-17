@@ -10,7 +10,7 @@ layout: control
 and delivered by [MapBox](http://mapbox.com/), compatible with the
 [ESRI ArcGIS API for Javascript 2.8](http://help.arcgis.com/en/webapi/javascript/arcgis/index.html).
 
-Like Google's API, ESRI's is closed-source and requires you to include it from
+ESRI's API is typically included from
 a remote server. That looks like:
 
 <pre class='prettyprint'>
