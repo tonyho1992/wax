@@ -1,5 +1,10 @@
 ## Changelog
 
+## 6.0.0-beta4
+
+* Add ESRI connector & interaction controls
+* Add beta Bing connector
+
 ## 6.0.0-beta2
 
 * Finished movetip.js

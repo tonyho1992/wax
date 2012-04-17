@@ -1872,28 +1872,7 @@ var Mustache = function() {
   * https://github.com/ded/reqwest
   * license MIT
   */
-!function(context,win){function serial(a){var b=a.name;if(a.disabled||!b)return"";b=enc(b);switch(a.tagName.toLowerCase()){case"input":switch(a.type){case"reset":case"button":case"image":case"file":return"";case"checkbox":case"radio":return a.checked?b+"="+(a.value?enc(a.value):!0)+"&":"";default:return b+"="+(a.value?enc(a.value):"")+"&"}break;case"textarea":return b+"="+enc(a.value)+"&";case"select":return b+"="+enc(a.options[a.selectedIndex].value)+"&"}return""}function enc(a){return encodeURIComponent(a)}function reqwest(a,b){return new Reqwest(a,b)}function init(o,fn){function error(a){o.error&&o.error(a),complete(a)}function success(resp){o.timeout&&clearTimeout(self.timeout)&&(self.timeout=null);var r=resp.responseText;if(r)switch(type){case"json":resp=win.JSON?win.JSON.parse(r):eval("("+r+")");break;case"js":resp=eval(r);break;case"html":resp=r}fn(resp),o.success&&o.success(resp),complete(resp)}function complete(a){o.complete&&o.complete(a)}this.url=typeof o=="string"?o:o.url,this.timeout=null;var type=o.type||setType(this.url),self=this;fn=fn||function(){},o.timeout&&(this.timeout=setTimeout(function(){self.abort(),error()},o.timeout)),this.request=getRequest(o,success,error)}function setType(a){if(/\.json$/.test(a))return"json";if(/\.jsonp$/.test(a))return"jsonp";if(/\.js$/.test(a))return"js";if(/\.html?$/.test(a))return"html";if(/\.xml$/.test(a))return"xml";return"js"}function Reqwest(a,b){this.o=a,this.fn=b,init.apply(this,arguments)}function getRequest(a,b,c){if(a.type!="jsonp"){var f=xhr();f.open(a.method||"GET",typeof a=="string"?a:a.url,!0),setHeaders(f,a),f.onreadystatechange=handleReadyState(f,b,c),a.before&&a.before(f),f.send(a.data||null);return f}var d=doc.createElement("script"),e=0;win[getCallbackName(a)]=generalCallback,d.type="text/javascript",d.src=a.url,d.async=!0,d.onload=d.onreadystatechange=function(){if(d[readyState]&&d[readyState]!=="complete"&&d[readyState]!=="loaded"||e)return!1;d.onload=d.onreadystatechange=null,a.success&&a.success(lastValue),lastValue=undefined,head.removeChild(d),e=1},head.appendChild(d)}function generalCallback(a){lastValue=a}function getCallbackName(a){var b=a.jsonpCallback||"callback";if(a.url.slice(-(b.length+2))==b+"=?"){var c="reqwest_"+uniqid++;a.url=a.url.substr(0,a.url.length-1)+c;return c}var d=new RegExp(b+"=([\\w]+)");return a.url.match(d)[1]}function setHeaders(a,b){var c=b.headers||{};c.Accept=c.Accept||"text/javascript, text/html, application/xml, text/xml, */*",b.crossOrigin||(c["X-Requested-With"]=c["X-Requested-With"]||"XMLHttpRequest"),c[contentType]=c[contentType]||"application/x-www-form-urlencoded";for(var d in c)c.hasOwnProperty(d)&&a.setRequestHeader(d,c[d],!1)}function handleReadyState(a,b,c){return function(){a&&a[readyState]==4&&(twoHundo.test(a.status)?b(a):c(a))}}var twoHundo=/^20\d$/,doc=document,byTag="getElementsByTagName",readyState="readyState",contentType="Content-Type",head=doc[byTag]("head")[0],uniqid=0,lastValue,xhr="XMLHttpRequest"in win?function(){return new XMLHttpRequest}:function(){return new ActiveXObject("Microsoft.XMLHTTP")};Reqwest.prototype={abort:function(){this.request.abort()},retry:function(){init.call(this,this.o,this.fn)}},reqwest.serialize=function(a){var b=[a[byTag]("input"),a[byTag]("select"),a[byTag]("textarea")],c=[],d,e;for(d=0,l=b.length;d<l;++d)for(e=0,l2=b[d].length;e<l2;++e)c.push(serial(b[d][e]));return c.join("").replace(/&$/,"")},reqwest.serializeArray=function(a){for(var b=this.serialize(a).split("&"),c=0,d=b.length,e=[],f;c<d;c++)b[c]&&(f=b[c].split("="))&&e.push({name:f[0],value:f[1]});return e};var old=context.reqwest;reqwest.noConflict=function(){context.reqwest=old;return this},typeof module!="undefined"?module.exports=reqwest:context.reqwest=reqwest}(this,window);var wax = wax || {};
-wax.ol = wax.ol || {};
-
-wax.ol.connector = function(tilejson) {
-    for (var i = 0; i < tilejson.tiles.length; i++) {
-        tilejson.tiles[i] = tilejson.tiles[i]
-            .replace('{z}', '${z}')
-            .replace('{x}', '${x}')
-            .replace('{y}', '${y}');
-    }
-    var l = new OpenLayers.Layer.XYZ(
-        tilejson.name,
-        tilejson.tiles, {
-            sphericalMercator: true,
-            zoomOffset: tilejson.minzoom,
-            numZoomLevels: tilejson.maxzoom - tilejson.minzoom,
-            attribution: tilejson.attribution
-        });
-    l.CLASS_NAME = 'Wax.Layer';
-    return l;
-};
-;wax = wax || {};
+!function(context,win){function serial(a){var b=a.name;if(a.disabled||!b)return"";b=enc(b);switch(a.tagName.toLowerCase()){case"input":switch(a.type){case"reset":case"button":case"image":case"file":return"";case"checkbox":case"radio":return a.checked?b+"="+(a.value?enc(a.value):!0)+"&":"";default:return b+"="+(a.value?enc(a.value):"")+"&"}break;case"textarea":return b+"="+enc(a.value)+"&";case"select":return b+"="+enc(a.options[a.selectedIndex].value)+"&"}return""}function enc(a){return encodeURIComponent(a)}function reqwest(a,b){return new Reqwest(a,b)}function init(o,fn){function error(a){o.error&&o.error(a),complete(a)}function success(resp){o.timeout&&clearTimeout(self.timeout)&&(self.timeout=null);var r=resp.responseText;if(r)switch(type){case"json":resp=win.JSON?win.JSON.parse(r):eval("("+r+")");break;case"js":resp=eval(r);break;case"html":resp=r}fn(resp),o.success&&o.success(resp),complete(resp)}function complete(a){o.complete&&o.complete(a)}this.url=typeof o=="string"?o:o.url,this.timeout=null;var type=o.type||setType(this.url),self=this;fn=fn||function(){},o.timeout&&(this.timeout=setTimeout(function(){self.abort(),error()},o.timeout)),this.request=getRequest(o,success,error)}function setType(a){if(/\.json$/.test(a))return"json";if(/\.jsonp$/.test(a))return"jsonp";if(/\.js$/.test(a))return"js";if(/\.html?$/.test(a))return"html";if(/\.xml$/.test(a))return"xml";return"js"}function Reqwest(a,b){this.o=a,this.fn=b,init.apply(this,arguments)}function getRequest(a,b,c){if(a.type!="jsonp"){var f=xhr();f.open(a.method||"GET",typeof a=="string"?a:a.url,!0),setHeaders(f,a),f.onreadystatechange=handleReadyState(f,b,c),a.before&&a.before(f),f.send(a.data||null);return f}var d=doc.createElement("script"),e=0;win[getCallbackName(a)]=generalCallback,d.type="text/javascript",d.src=a.url,d.async=!0,d.onload=d.onreadystatechange=function(){if(d[readyState]&&d[readyState]!=="complete"&&d[readyState]!=="loaded"||e)return!1;d.onload=d.onreadystatechange=null,a.success&&a.success(lastValue),lastValue=undefined,head.removeChild(d),e=1},head.appendChild(d)}function generalCallback(a){lastValue=a}function getCallbackName(a){var b=a.jsonpCallback||"callback";if(a.url.slice(-(b.length+2))==b+"=?"){var c="reqwest_"+uniqid++;a.url=a.url.substr(0,a.url.length-1)+c;return c}var d=new RegExp(b+"=([\\w]+)");return a.url.match(d)[1]}function setHeaders(a,b){var c=b.headers||{};c.Accept=c.Accept||"text/javascript, text/html, application/xml, text/xml, */*",b.crossOrigin||(c["X-Requested-With"]=c["X-Requested-With"]||"XMLHttpRequest"),c[contentType]=c[contentType]||"application/x-www-form-urlencoded";for(var d in c)c.hasOwnProperty(d)&&a.setRequestHeader(d,c[d],!1)}function handleReadyState(a,b,c){return function(){a&&a[readyState]==4&&(twoHundo.test(a.status)?b(a):c(a))}}var twoHundo=/^20\d$/,doc=document,byTag="getElementsByTagName",readyState="readyState",contentType="Content-Type",head=doc[byTag]("head")[0],uniqid=0,lastValue,xhr="XMLHttpRequest"in win?function(){return new XMLHttpRequest}:function(){return new ActiveXObject("Microsoft.XMLHTTP")};Reqwest.prototype={abort:function(){this.request.abort()},retry:function(){init.call(this,this.o,this.fn)}},reqwest.serialize=function(a){var b=[a[byTag]("input"),a[byTag]("select"),a[byTag]("textarea")],c=[],d,e;for(d=0,l=b.length;d<l;++d)for(e=0,l2=b[d].length;e<l2;++e)c.push(serial(b[d][e]));return c.join("").replace(/&$/,"")},reqwest.serializeArray=function(a){for(var b=this.serialize(a).split("&"),c=0,d=b.length,e=[],f;c<d;c++)b[c]&&(f=b[c].split("="))&&e.push({name:f[0],value:f[1]});return e};var old=context.reqwest;reqwest.noConflict=function(){context.reqwest=old;return this},typeof module!="undefined"?module.exports=reqwest:context.reqwest=reqwest}(this,window);wax = wax || {};
 
 // Attribution
 // -----------
@@ -3010,116 +2989,19 @@ wax.u = {
         return this.limit(func, wait, false);
     }
 };
-wax = wax || {};
-wax.ol = wax.ol || {};
+var wax = wax || {};
+wax.bing = {};
 
-wax.ol.interaction = function() {
-    var dirty = false, _grid, map;
-
-    function setdirty() { dirty = true; }
-
-    function getlayers() {
-        var l = [];
-        for (var i in map.layers) {
-            // TODO: make better indication of whether
-            // this is an interactive layer
-            if ((map.layers[i].visibility === true) &&
-                (map.layers[i].CLASS_NAME === 'Wax.Layer')) {
-              l.push(map.layers[i]);
-            }
-        }
-        return l;
-    }
-
-    function grid() {
-        if (!dirty && _grid) {
-            return _grid;
-        } else {
-            _grid = [];
-            var layers = getlayers();
-            for (var j = 0; j < layers.length; j++) {
-                for (var x = 0; x < layers[j].grid.length; x++) {
-                    for (var y = 0; y < layers[j].grid[x].length; y++) {
-                        var divpos;
-                        if (layers[j].grid[x][y].imgDiv) {
-                            divpos = wax.u.offset(layers[j].grid[x][y].imgDiv);
-                        } else {
-                            divpos = wax.u.offset(layers[j].grid[x][y].frame);
-                        }
-                        if (divpos &&
-                            ((divpos.top < pos.y) &&
-                             ((divpos.top + 256) > pos.y) &&
-                             (divpos.left < pos.x) &&
-                             ((divpos.left + 256) > pos.x))) {
-                            tiles.push(layers[j].grid[x][y]);
-                        }
-                    }
-                }
-            }
-            return tiles;
-        }
-    }
-
-    function attach(x) {
-        if (!arguments.length) return map;
-        map = x;
-        map.events.on({
-            addlayer: setdirty,
-            changelayer: setdirty,
-            removelayer: setdirty,
-            changebaselayer: setdirty
-        });
-    }
-
-    return wax.interaction()
-        .attach(attach)
-        .parent(function() {
-          return map.div;
-        })
-        .grid(grid);
+wax.bing.connector = function(tj) {
+  return new Microsoft.Maps.TileLayer({
+    mercator: new Microsoft.Maps.TileSource({
+      uriConstructor: function getTilePath(tile) {
+        return tj.tiles[parseInt(Math.pow(2, tile.levelOfDetail) * tile.y + tile.x, 10) %
+          tj.tiles.length]
+          .replace('{z}', tile.levelOfDetail)
+          .replace('{x}', tile.x)
+          .replace('{y}', tile.y);
+      }
+    })
+  });
 };
-
-// Wax: Legend Control
-// -------------------
-
-;var wax = wax || {};
-wax.ol = wax.ol || {};
-
-wax.ol.Legend = OpenLayers.Class(OpenLayers.Control, {
-    CLASS_NAME: 'wax.ol.Legend',
-    legend: null,
-    options: null,
-
-    initialize: function(options) {
-        this.options = options || {};
-        OpenLayers.Control.prototype.initialize.apply(this, [options || {}]);
-    },
-
-    activate: function() {
-        this.legend = new wax.legend(this.map.viewPortDiv, this.options.container);
-        return OpenLayers.Control.prototype.activate.apply(this, arguments);
-    },
-
-    setMap: function(map) {
-        OpenLayers.Control.prototype.setMap.apply(this, arguments);
-        this.activate();
-        this.map.events.on({
-            'addlayer': this.setLegend,
-            'changelayer': this.setLegend,
-            'removelayer': this.setLegend,
-            'changebaselayer': this.setLegend,
-            scope: this
-        });
-    },
-
-    setLegend: function() {
-        var urls = [];
-        for (var i = 0; i < this.map.layers.length; i++) {
-            var layer = this.map.layers[i];
-            if (layer && layer.getURL && layer.visibility) {
-                urls.push(layer.getURL(new OpenLayers.Bounds()));
-            }
-        }
-        this.legend.render(urls);
-    }
-});
