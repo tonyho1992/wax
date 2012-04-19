@@ -1,5 +1,9 @@
 ## Changelog
 
+## 6.0.0-beta5
+
+* Re-adds fallback to teaser in touch code
+
 ## 6.0.0-beta4
 
 * Add ESRI connector & interaction controls

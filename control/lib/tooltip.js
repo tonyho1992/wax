@@ -56,7 +56,14 @@ wax.tooltip = function() {
             _currentContent = content;
         } else {
             content = o.content || o.formatter({ format: 'full' }, o.data);
-            if (!content) return;
+            if (!content) {
+              if (o.e.type && o.e.type.match(/touch/)) {
+                // fallback possible
+                content = o.content || o.formatter({ format: 'teaser' }, o.data);
+              }
+              // but if that fails, return just the same.
+              if (!content) return;
+            }
             hide();
             parent.style.cursor = 'pointer';
             var tt = parent.appendChild(getTooltip(content));

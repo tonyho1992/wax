@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta4 - 1.0.4-539-g88004f2 */
+/* wax - 6.0.0-beta5 - 1.0.4-540-gf606c82 */
 
 
 !function (name, context, definition) {
@@ -2386,6 +2386,8 @@ wax.interaction = function() {
 
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
+            // but also wax.u.eventoffset will have failed, since this touch
+            // event doesn't have coordinates
             click(e, _d);
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
             Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
@@ -2804,7 +2806,14 @@ wax.tooltip = function() {
             _currentContent = content;
         } else {
             content = o.content || o.formatter({ format: 'full' }, o.data);
-            if (!content) return;
+            if (!content) {
+              if (o.e.type && o.e.type.match(/touch/)) {
+                // fallback possible
+                content = o.content || o.formatter({ format: 'teaser' }, o.data);
+              }
+              // but if that fails, return just the same.
+              if (!content) return;
+            }
             hide();
             parent.style.cursor = 'pointer';
             var tt = parent.appendChild(getTooltip(content));
