@@ -23,13 +23,6 @@ a remote server. That looks like:
   href='http://serverapi.arcgisonline.com/jsapi/arcgis/2.8/js/dojo/dijit/themes/claro/claro.css'&gt;
 </pre>
 
-ESRI's code is a bit odd: by default mouse wheel scrolling pans north and south
-rather than zooming. Like [OpenLayers](http://mapbox.com/wax/connector-ol.html),
-it has a rather obtuse obsession with projections, but to the point that
-one cannot simply reproject in-browser, as OpenLayers does with its native code
-and [proj4js](http://trac.osgeo.org/proj4js/), but it relies on an
-external server to do this work.
-
 You'll also need to add the class `claro` to div your map will live in,
 so that the 'claro' stylesheet affects it.
 
