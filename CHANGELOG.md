@@ -1,5 +1,9 @@
 ## Changelog
 
+## 6.0.0-beta6
+
+* Re-adds wax.mm.hash. MM.Hash is worse
+
 ## 6.0.0-beta5
 
 * Re-adds fallback to teaser in touch code
