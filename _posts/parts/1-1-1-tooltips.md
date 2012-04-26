@@ -4,6 +4,8 @@ tags: parts
 layout: control
 ---
 
+[There is also full interaction API documentation!](/wax/interactionapi.html)
+
 You'll notice that Wax's tooltips are a bit different than some other
 mapping libraries, and indeed have changed since earlier versions of Wax.
 

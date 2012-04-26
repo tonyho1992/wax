@@ -9,7 +9,7 @@ and then you can add it to a map by chaining `.appendTo(map.parent)`.
 
 ## Example
 
-<div id='map-div'></div>
+<div class='demo-map' id='map-div'></div>
 
 <pre class='prettyprint live'>
 var mm = com.modestmaps;
@@ -26,12 +26,18 @@ wax.tilejson(
 
 ## API
 
-<dl>
-  <dt>{% highlight js %}legend = wax.mm.legend(map, tilejson){% endhighlight %}</dt>
-  <dd>Create a new legend object. This control requires the TileJSON object
-  to be valid and contain a valid legend attribute.</dd>
-  <dt>{% highlight js %}legend.appendTo(element){% endhighlight %}</dt>
-  <dd>Add the legend element - a div of the form
-  {% highlight html %}<div class='wax-legends'><div class='wax-legend'>legend content</div></div>{% endhighlight %}
-  </dd>
-</dl>
+#### `var legend = wax.mm.legend(map, tilejson)`
+
+Create a new legend object. This control requires the TileJSON object
+to be valid and contain a valid legend attribute.
+
+#### `legend.appendTo(element)`
+
+Add the legend element - a div of the form
+
+`<div class='wax-legends'><div class='wax-legend'>legend content</div></div>`
+
+#### `var element = legend.element()`
+
+Get this legend's DOM element. Can be useful to do things with jQuery or
+other DOM code, like moving, hiding, or modifying the element.

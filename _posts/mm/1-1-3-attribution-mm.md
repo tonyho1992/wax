@@ -24,12 +24,20 @@ wax.tilejson(
 
 ## API
 
-<dl>
-  <dt>{% highlight js %}attribution = wax.mm.attribution(map, tilejson){% endhighlight %}</dt>
-  <dd>Create a new legend object. This control requires the TileJSON object
-  to be valid and contain a valid attribution attribute.</dd>
-  <dt>{% highlight js %}attribution.appendTo(element){% endhighlight %}</dt>
-  <dd>Add the attribution element - a div of the form
-  {% highlight html %}<div class='wax-attribution'>legend content</div>{% endhighlight %}
-  </dd>
-</dl>
+#### `var attribution = wax.mm.attribution(map, tilejson)`
+
+Create a new attribution object. This control requires the TileJSON object
+to be valid and contain a valid attribution attribute.
+
+#### `attribution.appendTo(element)`
+
+Add the attribution element - a div of the form
+
+`<div class='wax-attribution'>attribution content</div>`
+
+To another DOM element
+
+#### `var element = attribution.element()`
+
+Get this attribution's DOM element. Can be useful to do things with jQuery or
+other DOM code, like moving, hiding, or modifying the element.

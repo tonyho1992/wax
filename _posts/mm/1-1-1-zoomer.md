@@ -9,10 +9,9 @@ appends them to the map.
 
 ### Example
 
-<div class='live'>
-{% highlight html %}
-<div id='map-div'></div>
-<script>
+<div class='demo-map' id='map-div'></div>
+
+<pre class='prettyprint live'>
 var mm = com.modestmaps;
 
 wax.tilejson('http://api.tiles.mapbox.com/v3/mapbox.world-bright.jsonp',
@@ -22,16 +21,14 @@ wax.tilejson('http://api.tiles.mapbox.com/v3/mapbox.world-bright.jsonp',
     wax.mm.zoomer(m, tilejson).appendTo(m.parent);
     m.setCenterZoom(new mm.Location(39, -98), 2);
 });
-</script>
-{% endhighlight %}
-</div>
+</pre>
 
 ### API
 
-<dl>
-  <dt>{% highlight js %}var zoomer = wax.mm.zoomer(map){% endhighlight %}</dt>
-  <dd>Create your own zoomer that controls a map called 'map'</dd>
+#### `var zoomer = wax.mm.zoomer(map)`
 
-  <dt>{% highlight js %}zoomer.appendTo(element){% endhighlight %}</dt>
-  <dd>Add the zoom in &amp; zoom out div elements to another element.</dd>
-</dl>
+Create your own zoomer that controls a map called 'map'
+
+#### `zoomer.appendTo(element)`
+
+Add the zoom in &amp; zoom out div elements to another element.

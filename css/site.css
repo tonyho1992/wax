@@ -193,6 +193,11 @@ h1, h2, h3, h4, h5, h6, p {
 
 h2, h3 { font-size:20px; }
 
+h4 code {
+  background:#dffaff;
+  border-bottom:1px solid #222;
+}
+
 pre {
   font: normal 13px/20px 'Andale Mono',Monaco,Consolas,'Lucida Console',monospace;
   padding:10px;
