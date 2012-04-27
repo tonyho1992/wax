@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta6 - 1.0.4-542-g5c974a6 */
+/* wax - 6.0.0-beta6 - 1.0.4-545-g1540baf */
 
 
 !function (name, context, definition) {
@@ -2207,7 +2207,8 @@ wax.hash = function(options) {
     }
 
     function pushState(state) {
-        location.hash = '#' + state;
+        var l = window.location;
+        l.replace(l.toString().replace(l.hash, '#' + state));
     }
 
     var s0, // old hash
