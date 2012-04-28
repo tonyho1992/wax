@@ -4,11 +4,12 @@ wax.mm = wax.mm || {};
 // Box Selector
 // ------------
 wax.mm.boxselector = function(map, tilejson, opts) {
-    var mouseDownPoint = null,
+    var corner = null,
         callback = ((typeof opts === 'function') ?
             opts :
             opts.callback),
         boxDiv,
+        style,
         addEvent = MM.addEvent,
         removeEvent = MM.removeEvent,
         box,
@@ -32,10 +33,10 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     function mouseDown(e) {
         if (!e.shiftKey) return;
 
-        mouseDownPoint = getMousePoint(e);
+        corner = getMousePoint(e);
 
-        boxDiv.style.left = mouseDownPoint.x + 'px';
-        boxDiv.style.top = mouseDownPoint.y + 'px';
+        boxDiv.style.left = corner.x + 'px';
+        boxDiv.style.top = corner.y + 'px';
 
         addEvent(map.parent, 'mousemove', mouseMove);
         addEvent(map.parent, 'mouseup', mouseUp);
@@ -44,30 +45,38 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         return MM.cancelEvent(e);
     }
 
-
-    function mouseMove(e) {
-        var point = getMousePoint(e),
-            style = boxDiv.style;
-        style.display = 'block';
-        if (point.x < mouseDownPoint.x) {
+    // Expand boxDiv horizontally to point
+    function adjustH(point) {
+        if (point.x < corner.x) {
             style.left = point.x + 'px';
         } else {
-            style.left = mouseDownPoint.x + 'px';
+            style.left = corner.x + 'px';
         }
-        if (point.y < mouseDownPoint.y) {
+        style.width = Math.abs(point.x - corner.x) + 'px';
+    }
+
+    // Expand boxDiv vertically to point
+    function adjustV(point) {
+        if (point.y < corner.y) {
             style.top = point.y + 'px';
         } else {
-            style.top = mouseDownPoint.y + 'px';
+            style.top = corner.y + 'px';
         }
-        style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
-        style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
+        style.height = Math.abs(point.y - corner.y) + 'px';
+    }
+
+    function mouseMove(e) {
+        var point = getMousePoint(e);
+        style.display = 'block';
+        adjustH(point);
+        adjustV(point);
         return MM.cancelEvent(e);
     }
 
     function mouseUp(e) {
         var point = getMousePoint(e),
             l1 = map.pointLocation(point),
-            l2 = map.pointLocation(mouseDownPoint);
+            l2 = map.pointLocation(corner);
 
         // Format coordinates like mm.map.getExtent().
         boxselector.extent([
@@ -122,6 +131,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         boxDiv.id = map.parent.id + '-boxselector-box';
         boxDiv.className = 'boxselector-box';
         map.parent.appendChild(boxDiv);
+        style = boxDiv.style;
 
         addEvent(map.parent, 'mousedown', mouseDown);
         map.addCallback('drawn', drawbox);
