@@ -5,11 +5,16 @@ wax.mm = wax.mm || {};
 // ------------
 wax.mm.boxselector = function(map, tilejson, opts) {
     var corner = null,
+        nearCorner = null,
         callback = ((typeof opts === 'function') ?
             opts :
             opts.callback),
         boxDiv,
         style,
+        borderWidth = 0,
+        horizontal = false,  // Whether the resize is horizontal
+        vertical = false,
+        edge = 5,  // Distance from border sensitive to resizing
         addEvent = MM.addEvent,
         removeEvent = MM.removeEvent,
         box,
@@ -33,49 +38,85 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     function mouseDown(e) {
         if (!e.shiftKey) return;
 
-        corner = getMousePoint(e);
+        corner = nearCorner = getMousePoint(e);
+        horizontal = vertical = true;
 
-        boxDiv.style.left = corner.x + 'px';
-        boxDiv.style.top = corner.y + 'px';
+        style.left = corner.x + 'px';
+        style.top = corner.y + 'px';
+        style.width = style.height = 0;
 
-        addEvent(map.parent, 'mousemove', mouseMove);
-        addEvent(map.parent, 'mouseup', mouseUp);
+        addEvent(document, 'mousemove', mouseMove);
+        addEvent(document, 'mouseup', mouseUp);
 
         map.parent.style.cursor = 'crosshair';
         return MM.cancelEvent(e);
     }
 
+    // Resize existing box
+    function mouseDownResize(e) {
+        var point = getMousePoint(e),
+            TL = {
+                x: parseInt(boxDiv.offsetLeft),
+                y: parseInt(boxDiv.offsetTop)
+            },
+            BR = {
+                x: TL.x + parseInt(boxDiv.offsetWidth),
+                y: TL.y + parseInt(boxDiv.offsetHeight)
+            };
+
+        // Determine whether resize is horizontal, vertical or both
+        horizontal = point.x - TL.x <= edge || BR.x - point.x <= edge;
+        vertical = point.y - TL.y <= edge || BR.y - point.y <= edge;
+
+        if (vertical || horizontal) {
+            corner = {
+                x: (point.x - TL.x < BR.x - point.x) ? BR.x : TL.x,
+                y: (point.y - TL.y < BR.y - point.y) ? BR.y : TL.y
+            };
+            nearCorner = {
+                x: (point.x - TL.x < BR.x - point.x) ? TL.x : BR.x,
+                y: (point.y - TL.y < BR.y - point.y) ? TL.y : BR.y
+            }
+            addEvent(document, 'mousemove', mouseMove);
+            addEvent(document, 'mouseup', mouseUp);
+            return MM.cancelEvent(e);
+        }
+    }
+
     // Expand boxDiv horizontally to point
-    function adjustH(point) {
+    function horizontalResize(point) {
         if (point.x < corner.x) {
             style.left = point.x + 'px';
         } else {
             style.left = corner.x + 'px';
         }
-        style.width = Math.abs(point.x - corner.x) + 'px';
+        style.width = Math.abs(point.x - corner.x) - 2 * borderWidth + 'px';
     }
 
     // Expand boxDiv vertically to point
-    function adjustV(point) {
+    function verticalResize(point) {
         if (point.y < corner.y) {
             style.top = point.y + 'px';
         } else {
             style.top = corner.y + 'px';
         }
-        style.height = Math.abs(point.y - corner.y) + 'px';
+        style.height = Math.abs(point.y - corner.y) - 2 * borderWidth + 'px';
     }
 
     function mouseMove(e) {
         var point = getMousePoint(e);
         style.display = 'block';
-        adjustH(point);
-        adjustV(point);
+        if (horizontal) horizontalResize(point);
+        if (vertical) verticalResize(point);
         return MM.cancelEvent(e);
     }
 
     function mouseUp(e) {
         var point = getMousePoint(e),
-            l1 = map.pointLocation(point),
+            l1 = map.pointLocation( new MM.Point(
+                horizontal ? point.x : nearCorner.x,
+                vertical? point.y : nearCorner.y
+            ));
             l2 = map.pointLocation(corner);
 
         // Format coordinates like mm.map.getExtent().
@@ -88,8 +129,8 @@ wax.mm.boxselector = function(map, tilejson, opts) {
                 Math.max(l1.lon, l2.lon))
         ]);
 
-        removeEvent(map.parent, 'mousemove', mouseMove);
-        removeEvent(map.parent, 'mouseup', mouseUp);
+        removeEvent(document, 'mousemove', mouseMove);
+        removeEvent(document, 'mouseup', mouseUp);
 
         map.parent.style.cursor = 'auto';
     }
@@ -132,8 +173,10 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         boxDiv.className = 'boxselector-box';
         map.parent.appendChild(boxDiv);
         style = boxDiv.style;
+        borderWidth = parseInt(window.getComputedStyle(boxDiv).borderWidth);
 
         addEvent(map.parent, 'mousedown', mouseDown);
+        addEvent(boxDiv, 'mousedown', mouseDownResize);
         map.addCallback('drawn', drawbox);
         return this;
     };
@@ -141,6 +184,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     boxselector.remove = function() {
         map.parent.removeChild(boxDiv);
         removeEvent(map.parent, 'mousedown', mouseDown);
+        removeEvent(boxDiv, 'mousedown', mouseDownResize);
         map.removeCallback('drawn', drawbox);
     };
 
