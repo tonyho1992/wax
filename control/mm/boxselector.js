@@ -83,31 +83,17 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         }
     }
 
-    // Expand boxDiv horizontally to point
-    function horizontalResize(point) {
-        if (point.x < corner.x) {
-            style.left = point.x + 'px';
-        } else {
-            style.left = corner.x + 'px';
-        }
-        style.width = Math.abs(point.x - corner.x) - 2 * borderWidth + 'px';
-    }
-
-    // Expand boxDiv vertically to point
-    function verticalResize(point) {
-        if (point.y < corner.y) {
-            style.top = point.y + 'px';
-        } else {
-            style.top = corner.y + 'px';
-        }
-        style.height = Math.abs(point.y - corner.y) - 2 * borderWidth + 'px';
-    }
-
     function mouseMove(e) {
         var point = getMousePoint(e);
         style.display = 'block';
-        if (horizontal) horizontalResize(point);
-        if (vertical) verticalResize(point);
+        if (horizontal) {
+            style.left = (point.x < corner.x ? point.x : corner.x) + 'px';
+            style.width = Math.abs(point.x - corner.x) - 2 * borderWidth + 'px';
+        }
+        if (vertical) {
+            style.top = (point.y < corner.y ? point.y : corner.y) + 'px';
+            style.height = Math.abs(point.y - corner.y) - 2 * borderWidth + 'px';
+        }
         changeCursor(point, map.parent);
         return MM.cancelEvent(e);
     }
