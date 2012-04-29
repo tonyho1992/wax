@@ -108,6 +108,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         style.display = 'block';
         if (horizontal) horizontalResize(point);
         if (vertical) verticalResize(point);
+        changeCursor(point, map.parent);
         return MM.cancelEvent(e);
     }
 
@@ -133,6 +134,30 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         removeEvent(document, 'mouseup', mouseUp);
 
         map.parent.style.cursor = 'auto';
+    }
+
+    function mouseMoveCursor(e) {
+        changeCursor(getMousePoint(e), boxDiv);
+    }
+
+    // Set resize cursor if mouse is on edge
+    function changeCursor(point, elem) {
+        var TL = {
+                x: parseInt(boxDiv.offsetLeft),
+                y: parseInt(boxDiv.offsetTop)
+            },
+            BR = {
+                x: TL.x + parseInt(boxDiv.offsetWidth),
+                y: TL.y + parseInt(boxDiv.offsetHeight)
+            };
+        // Build cursor style string
+        var prefix = '';
+        if (point.y - TL.y <= edge) prefix = 'n';
+        else if (BR.y - point.y <= edge) prefix = 's';
+        if (point.x - TL.x <= edge) prefix += 'w';
+        else if (BR.x - point.x <= edge) prefix += 'e';
+        if (prefix != '') prefix += '-resize';
+        elem.style.cursor = prefix;
     }
 
     function drawbox(map, e) {
@@ -177,6 +202,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
 
         addEvent(map.parent, 'mousedown', mouseDown);
         addEvent(boxDiv, 'mousedown', mouseDownResize);
+        addEvent(map.parent, 'mousemove', mouseMoveCursor);
         map.addCallback('drawn', drawbox);
         return this;
     };
@@ -185,6 +211,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         map.parent.removeChild(boxDiv);
         removeEvent(map.parent, 'mousedown', mouseDown);
         removeEvent(boxDiv, 'mousedown', mouseDownResize);
+        removeEvent(map.parent, 'mousemove', mouseMoveCursor);
         map.removeCallback('drawn', drawbox);
     };
 
