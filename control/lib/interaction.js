@@ -191,7 +191,7 @@ wax.interaction = function() {
 
     // get or set a tilejson chunk of json
     interaction.tilejson = function(x) {
-        if (!arguments.length) return tilejson;
+        if (!arguments.length) return gm.tilejson();
         gm.tilejson(x);
         return interaction;
     };

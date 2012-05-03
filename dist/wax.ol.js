@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta6 - 1.0.4-545-g1540baf */
+/* wax - 6.0.0-beta6 - 1.0.4-546-g89b69f5 */
 
 
 !function (name, context, definition) {
@@ -2128,6 +2128,7 @@ wax.gm = function() {
     var resolution = 4,
         grid_tiles = {},
         manager = {},
+        tilejson,
         formatter;
 
     var gridUrl = function(url) {
@@ -2182,6 +2183,7 @@ wax.gm = function() {
     };
 
     manager.tilejson = function(x) {
+        if (!arguments.length) return tilejson;
         // prefer templates over formatters
         if (x.template) {
             manager.template(x.template);
@@ -2190,6 +2192,7 @@ wax.gm = function() {
         }
         if (x.grids) manager.gridUrl(x.grids);
         if (x.resolution) resolution = x.resolution;
+        tilejson = x;
         return manager;
     };
 
@@ -2455,7 +2458,7 @@ wax.interaction = function() {
 
     // get or set a tilejson chunk of json
     interaction.tilejson = function(x) {
-        if (!arguments.length) return tilejson;
+        if (!arguments.length) return gm.tilejson();
         gm.tilejson(x);
         return interaction;
     };

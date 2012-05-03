@@ -3,9 +3,9 @@
 <html>
 <head>
   <title>Jasmine Test Runner</title>
-  <link rel="stylesheet" type="text/css" href="lib/jasmine-1.0.2/jasmine.css">
-  <script type="text/javascript" src="lib/jasmine-1.0.2/jasmine.js"></script>
-  <script type="text/javascript" src="lib/jasmine-1.0.2/jasmine-html.js"></script>
+  <link rel="stylesheet" type="text/css" href="lib/jasmine-1.2.0.rc3/jasmine.css">
+  <script type="text/javascript" src="lib/jasmine-1.2.0.rc3/jasmine.js"></script>
+  <script type="text/javascript" src="lib/jasmine-1.2.0.rc3/jasmine-html.js"></script>
 
   <script type="text/javascript" src="fixtures/geography_class.json"></script>
 
@@ -58,8 +58,32 @@
 <body>
 
 <script type="text/javascript">
-  jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
-  jasmine.getEnv().execute();
+    (function() {
+      var jasmineEnv = jasmine.getEnv();
+      jasmineEnv.updateInterval = 1000;
+
+      var htmlReporter = new jasmine.HtmlReporter();
+
+      jasmineEnv.addReporter(htmlReporter);
+
+      jasmineEnv.specFilter = function(spec) {
+        return htmlReporter.specFilter(spec);
+      };
+
+      var currentWindowOnload = window.onload;
+
+      window.onload = function() {
+        if (currentWindowOnload) {
+          currentWindowOnload();
+        }
+        execJasmine();
+      };
+
+      function execJasmine() {
+        jasmineEnv.execute();
+      }
+
+    })();
 </script>
 
 </body>

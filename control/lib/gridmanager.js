@@ -10,6 +10,7 @@ wax.gm = function() {
     var resolution = 4,
         grid_tiles = {},
         manager = {},
+        tilejson,
         formatter;
 
     var gridUrl = function(url) {
@@ -64,6 +65,7 @@ wax.gm = function() {
     };
 
     manager.tilejson = function(x) {
+        if (!arguments.length) return tilejson;
         // prefer templates over formatters
         if (x.template) {
             manager.template(x.template);
@@ -72,6 +74,7 @@ wax.gm = function() {
         }
         if (x.grids) manager.gridUrl(x.grids);
         if (x.resolution) resolution = x.resolution;
+        tilejson = x;
         return manager;
     };
 
