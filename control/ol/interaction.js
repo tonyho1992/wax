@@ -59,6 +59,15 @@ wax.ol.interaction = function() {
         });
     }
 
+    function detach(x) {
+        map.events.un({
+            addlayer: setdirty,
+            changelayer: setdirty,
+            removelayer: setdirty,
+            changebaselayer: setdirty
+        });
+    }
+
     return wax.interaction()
         .attach(attach)
         .parent(function() {

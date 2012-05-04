@@ -42,8 +42,18 @@ wax.g.interaction = function() {
             setdirty);
     }
 
+    function detach(x) {
+        google.maps.event.removeListener(map, 'tileloaded',
+            setdirty);
+        google.maps.event.removeListener(map, 'idle',
+            setdirty);
+    }
+
+
+
     return wax.interaction()
         .attach(attach)
+        .detach(detach)
         .parent(function() {
           return map.getDiv();
         })

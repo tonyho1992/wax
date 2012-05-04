@@ -2,7 +2,11 @@ wax = wax || {};
 wax.mm = wax.mm || {};
 
 wax.mm.interaction = function() {
-    var dirty = false, _grid, map;
+    var dirty = false,
+        _grid,
+        map,
+        clearingEvents = ['zoomed', 'panned', 'centered',
+            'extentset', 'resized', 'drawn'];
 
     function grid() {
         var zoomLayer = map.getLayerAt(0)
@@ -28,19 +32,25 @@ wax.mm.interaction = function() {
         }
     }
 
+    function setdirty() { dirty = true; }
+
     function attach(x) {
         if (!arguments.length) return map;
         map = x;
-        function setdirty() { dirty = true; }
-        var clearingEvents = ['zoomed', 'panned', 'centered',
-            'extentset', 'resized', 'drawn'];
         for (var i = 0; i < clearingEvents.length; i++) {
             map.addCallback(clearingEvents[i], setdirty);
         }
     }
 
+    function detach(x) {
+        for (var i = 0; i < clearingEvents.length; i++) {
+            map.removeCallback(clearingEvents[i], setdirty);
+        }
+    }
+
     return wax.interaction()
         .attach(attach)
+        .detach(detach)
         .parent(function() {
           return map.parent;
         })

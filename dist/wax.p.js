@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta6 - 1.0.4-546-g89b69f5 */
+/* wax - 6.0.0-beta6 - 1.0.4-553-g3b30428 */
 
 
 !function (name, context, definition) {
@@ -2257,6 +2257,8 @@ wax.interaction = function() {
         // Touch tolerance
         tol = 4,
         grid,
+        attach,
+        detach,
         parent,
         map,
         tileGrid;
@@ -2408,6 +2410,12 @@ wax.interaction = function() {
         return interaction;
     };
 
+    interaction.detach = function(x) {
+        if (!arguments.length) return detach;
+        detach = x;
+        return interaction;
+    };
+
     // Attach listeners to the map
     interaction.map = function(x) {
         if (!arguments.length) return map;
@@ -2426,10 +2434,8 @@ wax.interaction = function() {
     };
 
     // detach this and its events from the map cleanly
-    interaction.remove = function() {
-        for (var i = 0; i < clearingEvents.length; i++) {
-            map.removeCallback(clearingEvents[i], clearTileGrid);
-        }
+    interaction.remove = function(x) {
+        if (detach) detach(map);
         bean.remove(parent(), defaultEvents);
         bean.fire(interaction, 'remove');
         return interaction;

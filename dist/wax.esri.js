@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta6 - 1.0.4-546-g89b69f5 */
+/* wax - 6.0.0-beta6 - 1.0.4-553-g3b30428 */
 
 
 !function (name, context, definition) {
@@ -2257,6 +2257,8 @@ wax.interaction = function() {
         // Touch tolerance
         tol = 4,
         grid,
+        attach,
+        detach,
         parent,
         map,
         tileGrid;
@@ -2408,6 +2410,12 @@ wax.interaction = function() {
         return interaction;
     };
 
+    interaction.detach = function(x) {
+        if (!arguments.length) return detach;
+        detach = x;
+        return interaction;
+    };
+
     // Attach listeners to the map
     interaction.map = function(x) {
         if (!arguments.length) return map;
@@ -2426,10 +2434,8 @@ wax.interaction = function() {
     };
 
     // detach this and its events from the map cleanly
-    interaction.remove = function() {
-        for (var i = 0; i < clearingEvents.length; i++) {
-            map.removeCallback(clearingEvents[i], clearTileGrid);
-        }
+    interaction.remove = function(x) {
+        if (detach) detach(map);
         bean.remove(parent(), defaultEvents);
         bean.fire(interaction, 'remove');
         return interaction;
@@ -3035,7 +3041,7 @@ wax = wax || {};
 wax.esri = wax.esri || {};
 
 wax.esri.interaction = function() {
-    var dirty = false, _grid, map;
+    var dirty = false, _grid, map, dojo_connections;
 
     function setdirty() { dirty = true; }
 
@@ -3069,13 +3075,22 @@ wax.esri.interaction = function() {
     function attach(x) {
         if (!arguments.length) return map;
         map = x;
-        dojo.connect(map, "onExtentChange", setdirty);
-        dojo.connect(map, "onUpdateEnd", setdirty);
-        dojo.connect(map, "onReposition", setdirty);
+        dojo_connections = [
+          dojo.connect(map, 'onExtentChange', setdirty),
+          dojo.connect(map, 'onUpdateEnd', setdirty),
+          dojo.connect(map, "onReposition", setdirty)
+        ];
+    }
+
+    function detach(x) {
+        for (var i = 0; i < dojo_connections.length; i++) {
+            dojo.disconnect(dojo_connections[i]);
+        }
     }
 
     return wax.interaction()
         .attach(attach)
+        .detach(detach)
         .parent(function() {
           return map.root;
         })

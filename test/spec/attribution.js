@@ -16,4 +16,14 @@ describe('attribution', function() {
     it('can have its content set', function() {
         expect($('.wax-attribution', map.parent).text()).toEqual('42');
     });
+
+    it('returns its element', function() {
+        expect(attribution.element()).toEqual($('.wax-attribution', map.parent)[0]);
+    });
+
+    it('can be appended to an element', function() {
+        var newElem = document.createElement('div');
+        attribution.appendTo(newElem);
+        expect(attribution.element().parentNode).toEqual(newElem);
+    });
 });

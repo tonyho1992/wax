@@ -2,7 +2,7 @@ wax = wax || {};
 wax.esri = wax.esri || {};
 
 wax.esri.interaction = function() {
-    var dirty = false, _grid, map;
+    var dirty = false, _grid, map, dojo_connections;
 
     function setdirty() { dirty = true; }
 
@@ -36,13 +36,22 @@ wax.esri.interaction = function() {
     function attach(x) {
         if (!arguments.length) return map;
         map = x;
-        dojo.connect(map, "onExtentChange", setdirty);
-        dojo.connect(map, "onUpdateEnd", setdirty);
-        dojo.connect(map, "onReposition", setdirty);
+        dojo_connections = [
+          dojo.connect(map, 'onExtentChange', setdirty),
+          dojo.connect(map, 'onUpdateEnd', setdirty),
+          dojo.connect(map, "onReposition", setdirty)
+        ];
+    }
+
+    function detach(x) {
+        for (var i = 0; i < dojo_connections.length; i++) {
+            dojo.disconnect(dojo_connections[i]);
+        }
     }
 
     return wax.interaction()
         .attach(attach)
+        .detach(detach)
         .parent(function() {
           return map.root;
         })

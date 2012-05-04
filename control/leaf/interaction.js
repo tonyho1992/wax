@@ -40,8 +40,18 @@ wax.leaf.interaction = function() {
         }
     }
 
+    function detach(x) {
+        if (!arguments.length) return map;
+        map = x;
+        var l = ['moveend'];
+        for (var i = 0; i < l.length; i++) {
+            map.off(l[i], setdirty);
+        }
+    }
+
     return wax.interaction()
         .attach(attach)
+        .detach(detach)
         .parent(function() {
           return map._container;
         })
