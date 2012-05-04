@@ -56,12 +56,12 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     function mouseDownResize(e) {
         var point = getMousePoint(e),
             TL = {
-                x: parseInt(boxDiv.offsetLeft),
-                y: parseInt(boxDiv.offsetTop)
+                x: parseInt(boxDiv.offsetLeft, 10),
+                y: parseInt(boxDiv.offsetTop, 10)
             },
             BR = {
-                x: TL.x + parseInt(boxDiv.offsetWidth),
-                y: TL.y + parseInt(boxDiv.offsetHeight)
+                x: TL.x + parseInt(boxDiv.offsetWidth, 10),
+                y: TL.y + parseInt(boxDiv.offsetHeight, 10)
             };
 
         // Determine whether resize is horizontal, vertical or both
@@ -76,7 +76,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
             nearCorner = {
                 x: (point.x - TL.x < BR.x - point.x) ? TL.x : BR.x,
                 y: (point.y - TL.y < BR.y - point.y) ? TL.y : BR.y
-            }
+            };
             addEvent(document, 'mousemove', mouseMove);
             addEvent(document, 'mouseup', mouseUp);
             return MM.cancelEvent(e);
@@ -129,12 +129,12 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     // Set resize cursor if mouse is on edge
     function changeCursor(point, elem) {
         var TL = {
-                x: parseInt(boxDiv.offsetLeft),
-                y: parseInt(boxDiv.offsetTop)
+                x: parseInt(boxDiv.offsetLeft, 10),
+                y: parseInt(boxDiv.offsetTop, 10)
             },
             BR = {
-                x: TL.x + parseInt(boxDiv.offsetWidth),
-                y: TL.y + parseInt(boxDiv.offsetHeight)
+                x: TL.x + parseInt(boxDiv.offsetWidth, 10),
+                y: TL.y + parseInt(boxDiv.offsetHeight, 10)
             };
         // Build cursor style string
         var prefix = '';
@@ -142,7 +142,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         else if (BR.y - point.y <= edge) prefix = 's';
         if (point.x - TL.x <= edge) prefix += 'w';
         else if (BR.x - point.x <= edge) prefix += 'e';
-        if (prefix != '') prefix += '-resize';
+        if (prefix !== '') prefix += '-resize';
         elem.style.cursor = prefix;
     }
 
@@ -184,7 +184,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         boxDiv.className = 'boxselector-box';
         map.parent.appendChild(boxDiv);
         style = boxDiv.style;
-        borderWidth = parseInt(window.getComputedStyle(boxDiv).borderWidth);
+        borderWidth = parseInt(window.getComputedStyle(boxDiv).borderWidth, 10);
 
         addEvent(map.parent, 'mousedown', mouseDown);
         addEvent(boxDiv, 'mousedown', mouseDownResize);

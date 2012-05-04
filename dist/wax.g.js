@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta6 - 1.0.4-553-g3b30428 */
+/* wax - 6.0.0-beta6 - 1.0.4-555-gd4627ab */
 
 
 !function (name, context, definition) {
