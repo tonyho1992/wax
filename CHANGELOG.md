@@ -1,5 +1,11 @@
 ## Changelog
 
+## 6.0.1
+
+* Fixes `.remove()` in interaction controls
+* Resizable boxselector
+* Improved tests
+
 ## 6.0.0-beta6
 
 * Re-adds wax.mm.hash. MM.Hash is worse
