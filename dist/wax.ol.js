@@ -1,4 +1,4 @@
-/* wax - 6.0.1 - 1.0.4-557-g1eb9e9e */
+/* wax - 6.0.1 - 1.0.4-558-g3fd9d86 */
 
 
 !function (name, context, definition) {
@@ -1887,7 +1887,7 @@ wax.ol.connector = function(tilejson) {
         tilejson.tiles, {
             sphericalMercator: true,
             zoomOffset: tilejson.minzoom,
-            numZoomLevels: tilejson.maxzoom - tilejson.minzoom,
+            numZoomLevels: 1 + tilejson.maxzoom - tilejson.minzoom,
             attribution: tilejson.attribution
         });
     l.CLASS_NAME = 'Wax.Layer';
