@@ -1,5 +1,10 @@
 ## Changelog
 
+## 6.0.2
+
+* Fixes off-by-one error that limited OpenLayers
+  users to one less zoom level.
+
 ## 6.0.1
 
 * Fixes `.remove()` in interaction controls
