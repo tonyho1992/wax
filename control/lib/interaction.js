@@ -220,6 +220,13 @@ wax.interaction = function() {
         return interaction;
     };
 
+    // Return or set the gridmanager implementation
+    interaction.gridmanager = function(x) {
+        if (!arguments.length) return gm;
+        gm = x;
+        return interaction;
+    };
+
     // parent should be a function that returns
     // the parent element of the map
     interaction.parent  = function(x) {

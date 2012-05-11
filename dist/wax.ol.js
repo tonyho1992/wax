@@ -1,4 +1,4 @@
-/* wax - 6.0.2 - 1.0.4-559-g19712f8 */
+/* wax - 6.0.2 - 1.0.4-560-gba6a1c0 */
 
 
 !function (name, context, definition) {
@@ -2484,6 +2484,13 @@ wax.interaction = function() {
     // ev can be 'on', 'off', fn is the handler
     interaction.off = function(ev, fn) {
         bean.remove(interaction, ev, fn);
+        return interaction;
+    };
+
+    // Return or set the gridmanager implementation
+    interaction.gridmanager = function(x) {
+        if (!arguments.length) return gm;
+        gm = x;
         return interaction;
     };
 
