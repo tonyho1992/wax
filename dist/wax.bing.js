@@ -1,4 +1,4 @@
-/* wax - 6.0.2 - 1.0.4-563-gf71faff */
+/* wax - 6.0.2 - 1.0.4-564-gff7fc26 */
 
 
 !function (name, context, definition) {
@@ -1469,6 +1469,7 @@ if (typeof window !== 'undefined') {
 // Loosen restrictions of Caja's
 // html-sanitizer to allow for styling
 html4.ATTRIBS['*::style'] = 0;
+html4.ATTRIBS['a::target'] = 0;
 html4.ELEMENTS['style'] = 0;
 /*
   mustache.js — Logic-less templates in JavaScript
