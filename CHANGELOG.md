@@ -1,5 +1,11 @@
 ## Changelog
 
+## 6.0.3
+
+* The template HTML sanitizer now permits the use of
+  `_target` in link elements
+* Fix for tooltips updating on hover
+
 ## 6.0.2
 
 * Fixes off-by-one error that limited OpenLayers
