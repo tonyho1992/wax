@@ -64,3 +64,17 @@ is 'attached' - when a map is assigned to this interaction control.
 In generally, the function you provide will look for move,
 zoom, pan events and will tell any kind of caching in the
 `grid` function to flush or invalidate the cache.
+
+#### `interaction.screen_feature(pos, callback)`
+
+In which `pos` is a position like `{ x: 100, y: 100 }`,
+this grabs a screen feature and calls the `callback` function
+with either the feature grabbed or `null` if no feature was
+there.
+
+#### `interaction.click(e, pos)`
+
+In which `pos` is a position like in `interaction.screen_feature`
+and `e` is an event object, which you should make `{}` or add
+as much object data as you want. Allows you to trigger any
+`.on()` handlers you've attached to this interaction control.
