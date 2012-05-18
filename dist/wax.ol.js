@@ -1,4 +1,4 @@
-/* wax - 6.0.3 - 1.0.4-568-g8e2edfc */
+/* wax - 6.0.3 - 1.0.4-571-g6dcc55f */
 
 
 !function (name, context, definition) {
@@ -2144,9 +2144,9 @@ wax.gm = function() {
             var xyz = rx.exec(url);
             if (!xyz) return;
             return template[parseInt(xyz[2], 10) % template.length]
-                .replace('{z}', xyz[1])
-                .replace('{x}', xyz[2])
-                .replace('{y}', xyz[3]);
+                .replace(/\{z\}/g, xyz[1])
+                .replace(/\{x\}/g, xyz[2])
+                .replace(/\{y\}/g, xyz[3]);
         };
     }
 
