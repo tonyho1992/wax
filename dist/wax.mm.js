@@ -1,4 +1,4 @@
-/* wax - 6.0.3 - 1.0.4-565-gb47a22a */
+/* wax - 6.0.3 - 1.0.4-567-gf115c6e */
 
 
 !function (name, context, definition) {
@@ -2947,6 +2947,7 @@ wax.u = {
             document.getElementById(x) :
             x;
     },
+
     // IE doesn't have indexOf
     indexOf: function(array, item) {
         var nativeIndexOf = Array.prototype.indexOf;
@@ -2956,14 +2957,7 @@ wax.u = {
         for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
         return -1;
     },
-    // From underscore: reimplement the ECMA5 `Object.keys()` method
-    keys: Object.keys || function(obj) {
-        var ho = Object.prototype.hasOwnProperty;
-        if (obj !== Object(obj)) throw new TypeError('Invalid object');
-        var keys = [];
-        for (var key in obj) if (ho.call(obj, key)) keys[keys.length] = key;
-        return keys;
-    },
+
     // From quirksmode: normalize the offset of an event from the top-left
     // of the page.
     eventoffset: function(e) {
