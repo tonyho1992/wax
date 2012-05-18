@@ -59,13 +59,9 @@ wax.interaction = function() {
         // to avoid performance hits.
         if (_downLock) return;
 
-        var pos = wax.u.eventoffset(e),
-            tile = getTile(pos),
-            feature;
+        var pos = wax.u.eventoffset(e);
 
-        if (tile) gm.getGrid(tile.src, function(err, g) {
-            if (err || !g) return;
-            feature = g.tileFeature(pos.x, pos.y, tile);
+        interaction.screen_feature(pos, function(feature) {
             if (feature) {
                 bean.fire(interaction, 'on', {
                     parent: parent(),
@@ -127,34 +123,40 @@ wax.interaction = function() {
             // If this was a touch and it survived, there's no need to avoid a double-tap
             // but also wax.u.eventoffset will have failed, since this touch
             // event doesn't have coordinates
-            click(e, _d);
+            interaction.click(e, _d);
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
             Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
             // Contain the event data in a closure.
             _clickTimeout = window.setTimeout(
                 function() {
                     _clickTimeout = null;
-                    click(evt, pos);
+                    interaction.click(evt, pos);
                 }, 300);
         }
         return onUp;
     }
 
     // Handle a click event. Takes a second
-    function click(e, pos) {
-        var tile = getTile(pos);
-        if (tile) gm.getGrid(tile.src, function(err, g) {
-            if (err || !g) return;
-            var feature = g.tileFeature(pos.x, pos.y, tile);
-            if (!feature) return;
-            bean.fire(interaction, 'on', {
+    interaction.click = function(e, pos) {
+        interaction.screen_feature(pos, function(feature) {
+            if (feature) bean.fire(interaction, 'on', {
                 parent: parent(),
                 data: feature,
                 formatter: gm.formatter().format,
                 e: e
             });
         });
-    }
+    };
+
+    interaction.screen_feature = function(pos, callback) {
+        var tile = getTile(pos);
+        if (!tile) callback(null);
+        gm.getGrid(tile.src, function(err, g) {
+            if (err || !g) return callback(null);
+            var feature = g.tileFeature(pos.x, pos.y, tile);
+            callback(feature);
+        });
+    };
 
     // set an attach function that should be
     // called when maps are set
