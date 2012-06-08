@@ -1,5 +1,9 @@
 ## Changelog
 
+## 6.0.5
+
+* Fix tooltip close button firing interaction events.
+
 ## 6.0.4
 
 * Use `.content()` instead of `.set()` for wax.g.attribution control
