@@ -13,6 +13,11 @@ describe('attribution', function() {
         }).appendTo(map.parent);
     });
 
+    afterEach(function() {
+        div = null;
+        map.destroy();
+    });
+
     it('can have its content set', function() {
         expect($('.wax-attribution', map.parent).text()).toEqual('42');
     });

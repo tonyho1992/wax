@@ -16,6 +16,7 @@ var superfundjson = {"center":[-104.26714999999999,32.0361,5],"id":"tmcw.superfu
         if (leaked.length > 0) {
             throw new Error('Leaked global variables: [' + leaked.join(', ') + ']');
         }
+        if (mm_map) mm_map.destroy();
     });
 
     beforeEach(function() {

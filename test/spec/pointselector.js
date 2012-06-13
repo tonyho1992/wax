@@ -17,6 +17,11 @@ describe('pointselector', function() {
         });
     });
 
+    afterEach(function() {
+        div = null;
+        map.destroy();
+    });
+
     it('can add locations', function() {
         runs(function() {
             pointselector.addLocation(

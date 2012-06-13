@@ -13,6 +13,11 @@ describe('hash', function() {
         wax.mm.hash(map);
     });
 
+    afterEach(function() {
+        div = null;
+        map.destroy();
+    });
+
     it('should not mess with map movement', function() {
         runs(function() {
           map.setCenterZoom(new mm.Location(25, 25), 2);
