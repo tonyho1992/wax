@@ -1,4 +1,4 @@
-/* wax - 6.0.6 - 1.0.4-582-g4fa7f9b */
+/* wax - 6.0.6 - 1.0.4-585-g4c6a7fe */
 
 
 !function (name, context, definition) {
@@ -3087,6 +3087,39 @@ wax.leaf.interaction = function() {
           return map._container;
         })
         .grid(grid);
+};
+wax = wax || {};
+wax.leaf = wax.leaf || {};
+
+// Legend Control
+// --------------
+// The Leaflet version of this control is a very, very
+// light wrapper around the `/lib` code for legends.
+wax.leaf.legend = function(map, tilejson) {
+    tilejson = tilejson || {};
+    var l, // parent legend
+        legend = {};
+
+    legend.add = function() {
+        l = wax.legend()
+            .content(tilejson.legend || '');
+        return this;
+    };
+
+    legend.content = function(x) {
+        if (x) l.content(x.legend || '');
+    };
+
+    legend.element = function() {
+        return l.element();
+    };
+
+    legend.appendTo = function(elem) {
+        wax.u.$(elem).appendChild(l.element());
+        return this;
+    };
+
+    return legend.add();
 };
 wax = wax || {};
 wax.leaf = wax.leaf || {};
