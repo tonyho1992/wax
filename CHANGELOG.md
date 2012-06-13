@@ -1,5 +1,10 @@
 ## Changelog
 
+## 6.2.0
+
+* Add `wax.location()` - a `wax.tooltip()` API function that lets
+  you use the `__location__` formatter in interaction.
+
 ## 6.1.0
 
 * Add Leaflet legend - currently the same API as Modest Maps.
