@@ -1,4 +1,4 @@
-/* wax - 6.0.5 - 1.0.4-578-g34450e6 */
+/* wax - 6.0.6 - 1.0.4-582-g4fa7f9b */
 
 
 !function (name, context, definition) {
@@ -1469,8 +1469,19 @@ if (typeof window !== 'undefined') {
 // Loosen restrictions of Caja's
 // html-sanitizer to allow for styling
 html4.ATTRIBS['*::style'] = 0;
-html4.ATTRIBS['a::target'] = 0;
 html4.ELEMENTS['style'] = 0;
+
+html4.ATTRIBS['a::target'] = 0;
+
+html4.ELEMENTS['video'] = 0;
+html4.ATTRIBS['video::src'] = 0;
+html4.ATTRIBS['video::poster'] = 0;
+html4.ATTRIBS['video::controls'] = 0;
+
+html4.ELEMENTS['audio'] = 0;
+html4.ATTRIBS['audio::src'] = 0;
+html4.ATTRIBS['video::autoplay'] = 0;
+html4.ATTRIBS['video::controls'] = 0;
 /*
   mustache.js — Logic-less templates in JavaScript
 
@@ -2848,6 +2859,10 @@ wax.tooltip = function() {
             popped = true;
 
             tooltips.push(tt);
+
+            bean.add(close, 'touchstart mousedown', function(e) {
+                e.stop();
+            });
 
             bean.add(close, 'click touchend', function closeClick(e) {
                 e.stop();

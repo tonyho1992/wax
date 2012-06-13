@@ -1,5 +1,9 @@
 ## Changelog
 
+## 6.0.6
+
+* Loosen restrictions - allow HTML5 video and audio elements.
+
 ## 6.0.5
 
 * Fix tooltip close button firing interaction events.
