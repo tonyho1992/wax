@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta3 - 1.0.4-538-gd6d8f8d */
+/* wax - 6.1.0 - 1.0.4-586-gb6bb974 */
 
 
 !function (name, context, definition) {
@@ -1470,6 +1470,18 @@ if (typeof window !== 'undefined') {
 // html-sanitizer to allow for styling
 html4.ATTRIBS['*::style'] = 0;
 html4.ELEMENTS['style'] = 0;
+
+html4.ATTRIBS['a::target'] = 0;
+
+html4.ELEMENTS['video'] = 0;
+html4.ATTRIBS['video::src'] = 0;
+html4.ATTRIBS['video::poster'] = 0;
+html4.ATTRIBS['video::controls'] = 0;
+
+html4.ELEMENTS['audio'] = 0;
+html4.ATTRIBS['audio::src'] = 0;
+html4.ATTRIBS['video::autoplay'] = 0;
+html4.ATTRIBS['video::controls'] = 0;
 /*
   mustache.js — Logic-less templates in JavaScript
 
@@ -2107,6 +2119,7 @@ wax.gm = function() {
     var resolution = 4,
         grid_tiles = {},
         manager = {},
+        tilejson,
         formatter;
 
     var gridUrl = function(url) {
@@ -2121,9 +2134,9 @@ wax.gm = function() {
             var xyz = rx.exec(url);
             if (!xyz) return;
             return template[parseInt(xyz[2], 10) % template.length]
-                .replace('{z}', xyz[1])
-                .replace('{x}', xyz[2])
-                .replace('{y}', xyz[3]);
+                .replace(/\{z\}/g, xyz[1])
+                .replace(/\{x\}/g, xyz[2])
+                .replace(/\{y\}/g, xyz[3]);
         };
     }
 
@@ -2161,6 +2174,7 @@ wax.gm = function() {
     };
 
     manager.tilejson = function(x) {
+        if (!arguments.length) return tilejson;
         // prefer templates over formatters
         if (x.template) {
             manager.template(x.template);
@@ -2169,6 +2183,7 @@ wax.gm = function() {
         }
         if (x.grids) manager.gridUrl(x.grids);
         if (x.resolution) resolution = x.resolution;
+        tilejson = x;
         return manager;
     };
 
@@ -2186,7 +2201,8 @@ wax.hash = function(options) {
     }
 
     function pushState(state) {
-        location.hash = '#' + state;
+        var l = window.location;
+        l.replace(l.toString().replace(l.hash, '#' + state));
     }
 
     var s0, // old hash
@@ -2253,6 +2269,8 @@ wax.interaction = function() {
         // Touch tolerance
         tol = 4,
         grid,
+        attach,
+        detach,
         parent,
         map,
         tileGrid;
@@ -2299,13 +2317,9 @@ wax.interaction = function() {
         // to avoid performance hits.
         if (_downLock) return;
 
-        var pos = wax.u.eventoffset(e),
-            tile = getTile(pos),
-            feature;
+        var pos = wax.u.eventoffset(e);
 
-        if (tile) gm.getGrid(tile.src, function(err, g) {
-            if (err || !g) return;
-            feature = g.tileFeature(pos.x, pos.y, tile);
+        interaction.screen_feature(pos, function(feature) {
             if (feature) {
                 bean.fire(interaction, 'on', {
                     parent: parent(),
@@ -2333,7 +2347,7 @@ wax.interaction = function() {
         _downLock = true;
         _d = wax.u.eventoffset(e);
         if (e.type === 'mousedown') {
-            bean.add(document.body, 'mouseup', onUp);
+            bean.add(document.body, 'click', onUp);
 
         // Only track single-touches. Double-touches will not affect this
         // control
@@ -2365,40 +2379,54 @@ wax.interaction = function() {
 
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
-            click(e, _d);
+            // but also wax.u.eventoffset will have failed, since this touch
+            // event doesn't have coordinates
+            interaction.click(e, _d);
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
             Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
             // Contain the event data in a closure.
             _clickTimeout = window.setTimeout(
                 function() {
                     _clickTimeout = null;
-                    click(evt, pos);
+                    interaction.click(evt, pos);
                 }, 300);
         }
         return onUp;
     }
 
     // Handle a click event. Takes a second
-    function click(e, pos) {
-        var tile = getTile(pos);
-        if (tile) gm.getGrid(tile.src, function(err, g) {
-            if (err || !g) return;
-            var feature = g.tileFeature(pos.x, pos.y, tile);
-            if (!feature) return;
-            bean.fire(interaction, 'on', {
+    interaction.click = function(e, pos) {
+        interaction.screen_feature(pos, function(feature) {
+            if (feature) bean.fire(interaction, 'on', {
                 parent: parent(),
                 data: feature,
                 formatter: gm.formatter().format,
                 e: e
             });
         });
-    }
+    };
+
+    interaction.screen_feature = function(pos, callback) {
+        var tile = getTile(pos);
+        if (!tile) callback(null);
+        gm.getGrid(tile.src, function(err, g) {
+            if (err || !g) return callback(null);
+            var feature = g.tileFeature(pos.x, pos.y, tile);
+            callback(feature);
+        });
+    };
 
     // set an attach function that should be
     // called when maps are set
     interaction.attach = function(x) {
         if (!arguments.length) return attach;
         attach = x;
+        return interaction;
+    };
+
+    interaction.detach = function(x) {
+        if (!arguments.length) return detach;
+        detach = x;
         return interaction;
     };
 
@@ -2420,10 +2448,8 @@ wax.interaction = function() {
     };
 
     // detach this and its events from the map cleanly
-    interaction.remove = function() {
-        for (var i = 0; i < clearingEvents.length; i++) {
-            map.removeCallback(clearingEvents[i], clearTileGrid);
-        }
+    interaction.remove = function(x) {
+        if (detach) detach(map);
         bean.remove(parent(), defaultEvents);
         bean.fire(interaction, 'remove');
         return interaction;
@@ -2431,7 +2457,7 @@ wax.interaction = function() {
 
     // get or set a tilejson chunk of json
     interaction.tilejson = function(x) {
-        if (!arguments.length) return tilejson;
+        if (!arguments.length) return gm.tilejson();
         gm.tilejson(x);
         return interaction;
     };
@@ -2451,6 +2477,13 @@ wax.interaction = function() {
     // ev can be 'on', 'off', fn is the handler
     interaction.off = function(ev, fn) {
         bean.remove(interaction, ev, fn);
+        return interaction;
+    };
+
+    // Return or set the gridmanager implementation
+    interaction.gridmanager = function(x) {
+        if (!arguments.length) return gm;
+        gm = x;
         return interaction;
     };
 
@@ -2774,16 +2807,25 @@ wax.tooltip = function() {
 
     function on(o) {
         var content;
-        if ((o.e.type === 'mousemove' || !o.e.type) && !popped) {
-            content = o.content || o.formatter({ format: 'teaser' }, o.data);
-            if (!content || content == _currentContent) return;
-            hide();
-            parent.style.cursor = 'pointer';
-            tooltips.push(parent.appendChild(getTooltip(content)));
-            _currentContent = content;
+        if (o.e.type === 'mousemove' || !o.e.type) {
+            if (!popped) {
+                content = o.content || o.formatter({ format: 'teaser' }, o.data);
+                if (!content || content == _currentContent) return;
+                hide();
+                parent.style.cursor = 'pointer';
+                tooltips.push(parent.appendChild(getTooltip(content)));
+                _currentContent = content;
+            }
         } else {
             content = o.content || o.formatter({ format: 'full' }, o.data);
-            if (!content) return;
+            if (!content) {
+              if (o.e.type && o.e.type.match(/touch/)) {
+                // fallback possible
+                content = o.content || o.formatter({ format: 'teaser' }, o.data);
+              }
+              // but if that fails, return just the same.
+              if (!content) return;
+            }
             hide();
             parent.style.cursor = 'pointer';
             var tt = parent.appendChild(getTooltip(content));
@@ -2796,6 +2838,10 @@ wax.tooltip = function() {
             popped = true;
 
             tooltips.push(tt);
+
+            bean.add(close, 'touchstart mousedown', function(e) {
+                e.stop();
+            });
 
             bean.add(close, 'click touchend', function closeClick(e) {
                 e.stop();
@@ -2918,6 +2964,7 @@ wax.u = {
             document.getElementById(x) :
             x;
     },
+
     // IE doesn't have indexOf
     indexOf: function(array, item) {
         var nativeIndexOf = Array.prototype.indexOf;
@@ -2927,14 +2974,7 @@ wax.u = {
         for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
         return -1;
     },
-    // From underscore: reimplement the ECMA5 `Object.keys()` method
-    keys: Object.keys || function(obj) {
-        var ho = Object.prototype.hasOwnProperty;
-        if (obj !== Object(obj)) throw new TypeError('Invalid object');
-        var keys = [];
-        for (var key in obj) if (ho.call(obj, key)) keys[keys.length] = key;
-        return keys;
-    },
+
     // From quirksmode: normalize the offset of an event from the top-left
     // of the page.
     eventoffset: function(e) {
@@ -3024,11 +3064,17 @@ wax.mm = wax.mm || {};
 // Box Selector
 // ------------
 wax.mm.boxselector = function(map, tilejson, opts) {
-    var mouseDownPoint = null,
+    var corner = null,
+        nearCorner = null,
         callback = ((typeof opts === 'function') ?
             opts :
             opts.callback),
         boxDiv,
+        style,
+        borderWidth = 0,
+        horizontal = false,  // Whether the resize is horizontal
+        vertical = false,
+        edge = 5,  // Distance from border sensitive to resizing
         addEvent = MM.addEvent,
         removeEvent = MM.removeEvent,
         box,
@@ -3052,42 +3098,73 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     function mouseDown(e) {
         if (!e.shiftKey) return;
 
-        mouseDownPoint = getMousePoint(e);
+        corner = nearCorner = getMousePoint(e);
+        horizontal = vertical = true;
 
-        boxDiv.style.left = mouseDownPoint.x + 'px';
-        boxDiv.style.top = mouseDownPoint.y + 'px';
+        style.left = corner.x + 'px';
+        style.top = corner.y + 'px';
+        style.width = style.height = 0;
 
-        addEvent(map.parent, 'mousemove', mouseMove);
-        addEvent(map.parent, 'mouseup', mouseUp);
+        addEvent(document, 'mousemove', mouseMove);
+        addEvent(document, 'mouseup', mouseUp);
 
         map.parent.style.cursor = 'crosshair';
         return MM.cancelEvent(e);
     }
 
+    // Resize existing box
+    function mouseDownResize(e) {
+        var point = getMousePoint(e),
+            TL = {
+                x: parseInt(boxDiv.offsetLeft, 10),
+                y: parseInt(boxDiv.offsetTop, 10)
+            },
+            BR = {
+                x: TL.x + parseInt(boxDiv.offsetWidth, 10),
+                y: TL.y + parseInt(boxDiv.offsetHeight, 10)
+            };
+
+        // Determine whether resize is horizontal, vertical or both
+        horizontal = point.x - TL.x <= edge || BR.x - point.x <= edge;
+        vertical = point.y - TL.y <= edge || BR.y - point.y <= edge;
+
+        if (vertical || horizontal) {
+            corner = {
+                x: (point.x - TL.x < BR.x - point.x) ? BR.x : TL.x,
+                y: (point.y - TL.y < BR.y - point.y) ? BR.y : TL.y
+            };
+            nearCorner = {
+                x: (point.x - TL.x < BR.x - point.x) ? TL.x : BR.x,
+                y: (point.y - TL.y < BR.y - point.y) ? TL.y : BR.y
+            };
+            addEvent(document, 'mousemove', mouseMove);
+            addEvent(document, 'mouseup', mouseUp);
+            return MM.cancelEvent(e);
+        }
+    }
 
     function mouseMove(e) {
-        var point = getMousePoint(e),
-            style = boxDiv.style;
+        var point = getMousePoint(e);
         style.display = 'block';
-        if (point.x < mouseDownPoint.x) {
-            style.left = point.x + 'px';
-        } else {
-            style.left = mouseDownPoint.x + 'px';
+        if (horizontal) {
+            style.left = (point.x < corner.x ? point.x : corner.x) + 'px';
+            style.width = Math.abs(point.x - corner.x) - 2 * borderWidth + 'px';
         }
-        if (point.y < mouseDownPoint.y) {
-            style.top = point.y + 'px';
-        } else {
-            style.top = mouseDownPoint.y + 'px';
+        if (vertical) {
+            style.top = (point.y < corner.y ? point.y : corner.y) + 'px';
+            style.height = Math.abs(point.y - corner.y) - 2 * borderWidth + 'px';
         }
-        style.width = Math.abs(point.x - mouseDownPoint.x) + 'px';
-        style.height = Math.abs(point.y - mouseDownPoint.y) + 'px';
+        changeCursor(point, map.parent);
         return MM.cancelEvent(e);
     }
 
     function mouseUp(e) {
         var point = getMousePoint(e),
-            l1 = map.pointLocation(point),
-            l2 = map.pointLocation(mouseDownPoint);
+            l1 = map.pointLocation( new MM.Point(
+                horizontal ? point.x : nearCorner.x,
+                vertical? point.y : nearCorner.y
+            ));
+            l2 = map.pointLocation(corner);
 
         // Format coordinates like mm.map.getExtent().
         boxselector.extent([
@@ -3099,10 +3176,34 @@ wax.mm.boxselector = function(map, tilejson, opts) {
                 Math.max(l1.lon, l2.lon))
         ]);
 
-        removeEvent(map.parent, 'mousemove', mouseMove);
-        removeEvent(map.parent, 'mouseup', mouseUp);
+        removeEvent(document, 'mousemove', mouseMove);
+        removeEvent(document, 'mouseup', mouseUp);
 
         map.parent.style.cursor = 'auto';
+    }
+
+    function mouseMoveCursor(e) {
+        changeCursor(getMousePoint(e), boxDiv);
+    }
+
+    // Set resize cursor if mouse is on edge
+    function changeCursor(point, elem) {
+        var TL = {
+                x: parseInt(boxDiv.offsetLeft, 10),
+                y: parseInt(boxDiv.offsetTop, 10)
+            },
+            BR = {
+                x: TL.x + parseInt(boxDiv.offsetWidth, 10),
+                y: TL.y + parseInt(boxDiv.offsetHeight, 10)
+            };
+        // Build cursor style string
+        var prefix = '';
+        if (point.y - TL.y <= edge) prefix = 'n';
+        else if (BR.y - point.y <= edge) prefix = 's';
+        if (point.x - TL.x <= edge) prefix += 'w';
+        else if (BR.x - point.x <= edge) prefix += 'e';
+        if (prefix !== '') prefix += '-resize';
+        elem.style.cursor = prefix;
     }
 
     function drawbox(map, e) {
@@ -3142,8 +3243,12 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         boxDiv.id = map.parent.id + '-boxselector-box';
         boxDiv.className = 'boxselector-box';
         map.parent.appendChild(boxDiv);
+        style = boxDiv.style;
+        borderWidth = parseInt(window.getComputedStyle(boxDiv).borderWidth, 10);
 
         addEvent(map.parent, 'mousedown', mouseDown);
+        addEvent(boxDiv, 'mousedown', mouseDownResize);
+        addEvent(map.parent, 'mousemove', mouseMoveCursor);
         map.addCallback('drawn', drawbox);
         return this;
     };
@@ -3151,6 +3256,8 @@ wax.mm.boxselector = function(map, tilejson, opts) {
     boxselector.remove = function() {
         map.parent.removeChild(boxDiv);
         removeEvent(map.parent, 'mousedown', mouseDown);
+        removeEvent(boxDiv, 'mousedown', mouseDownResize);
+        removeEvent(map.parent, 'mousemove', mouseMoveCursor);
         map.removeCallback('drawn', drawbox);
     };
 
@@ -3249,8 +3356,42 @@ wax.mm.fullscreen = function(map) {
 wax = wax || {};
 wax.mm = wax.mm || {};
 
+wax.mm.hash = function(map) {
+    return wax.hash({
+        getCenterZoom: function() {
+            var center = map.getCenter(),
+                zoom = map.getZoom(),
+                precision = Math.max(
+                    0,
+                    Math.ceil(Math.log(zoom) / Math.LN2));
+
+            return [zoom.toFixed(2),
+                center.lat.toFixed(precision),
+                center.lon.toFixed(precision)
+            ].join('/');
+        },
+        setCenterZoom: function setCenterZoom(args) {
+            map.setCenterZoom(
+                new MM.Location(args[1], args[2]),
+                args[0]);
+        },
+        bindChange: function(fn) {
+            map.addCallback('drawn', fn);
+        },
+        unbindChange: function(fn) {
+            map.removeCallback('drawn', fn);
+        }
+    });
+};
+wax = wax || {};
+wax.mm = wax.mm || {};
+
 wax.mm.interaction = function() {
-    var dirty = false, _grid, map;
+    var dirty = false,
+        _grid,
+        map,
+        clearingEvents = ['zoomed', 'panned', 'centered',
+            'extentset', 'resized', 'drawn'];
 
     function grid() {
         var zoomLayer = map.getLayerAt(0)
@@ -3276,19 +3417,25 @@ wax.mm.interaction = function() {
         }
     }
 
+    function setdirty() { dirty = true; }
+
     function attach(x) {
         if (!arguments.length) return map;
         map = x;
-        function setdirty() { dirty = true; }
-        var clearingEvents = ['zoomed', 'panned', 'centered',
-            'extentset', 'resized', 'drawn'];
         for (var i = 0; i < clearingEvents.length; i++) {
             map.addCallback(clearingEvents[i], setdirty);
         }
     }
 
+    function detach(x) {
+        for (var i = 0; i < clearingEvents.length; i++) {
+            map.removeCallback(clearingEvents[i], setdirty);
+        }
+    }
+
     return wax.interaction()
         .attach(attach)
+        .detach(detach)
         .parent(function() {
           return map.parent;
         })

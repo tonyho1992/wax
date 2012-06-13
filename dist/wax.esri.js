@@ -1,4 +1,4 @@
-/* wax - 6.0.0-beta3 - 1.0.4-538-gd6d8f8d */
+/* wax - 6.1.0 - 1.0.4-586-gb6bb974 */
 
 
 !function (name, context, definition) {
@@ -1470,6 +1470,18 @@ if (typeof window !== 'undefined') {
 // html-sanitizer to allow for styling
 html4.ATTRIBS['*::style'] = 0;
 html4.ELEMENTS['style'] = 0;
+
+html4.ATTRIBS['a::target'] = 0;
+
+html4.ELEMENTS['video'] = 0;
+html4.ATTRIBS['video::src'] = 0;
+html4.ATTRIBS['video::poster'] = 0;
+html4.ATTRIBS['video::controls'] = 0;
+
+html4.ELEMENTS['audio'] = 0;
+html4.ATTRIBS['audio::src'] = 0;
+html4.ATTRIBS['video::autoplay'] = 0;
+html4.ATTRIBS['video::controls'] = 0;
 /*
   mustache.js — Logic-less templates in JavaScript
 
@@ -2107,6 +2119,7 @@ wax.gm = function() {
     var resolution = 4,
         grid_tiles = {},
         manager = {},
+        tilejson,
         formatter;
 
     var gridUrl = function(url) {
@@ -2121,9 +2134,9 @@ wax.gm = function() {
             var xyz = rx.exec(url);
             if (!xyz) return;
             return template[parseInt(xyz[2], 10) % template.length]
-                .replace('{z}', xyz[1])
-                .replace('{x}', xyz[2])
-                .replace('{y}', xyz[3]);
+                .replace(/\{z\}/g, xyz[1])
+                .replace(/\{x\}/g, xyz[2])
+                .replace(/\{y\}/g, xyz[3]);
         };
     }
 
@@ -2161,6 +2174,7 @@ wax.gm = function() {
     };
 
     manager.tilejson = function(x) {
+        if (!arguments.length) return tilejson;
         // prefer templates over formatters
         if (x.template) {
             manager.template(x.template);
@@ -2169,6 +2183,7 @@ wax.gm = function() {
         }
         if (x.grids) manager.gridUrl(x.grids);
         if (x.resolution) resolution = x.resolution;
+        tilejson = x;
         return manager;
     };
 
@@ -2186,7 +2201,8 @@ wax.hash = function(options) {
     }
 
     function pushState(state) {
-        location.hash = '#' + state;
+        var l = window.location;
+        l.replace(l.toString().replace(l.hash, '#' + state));
     }
 
     var s0, // old hash
@@ -2253,6 +2269,8 @@ wax.interaction = function() {
         // Touch tolerance
         tol = 4,
         grid,
+        attach,
+        detach,
         parent,
         map,
         tileGrid;
@@ -2299,13 +2317,9 @@ wax.interaction = function() {
         // to avoid performance hits.
         if (_downLock) return;
 
-        var pos = wax.u.eventoffset(e),
-            tile = getTile(pos),
-            feature;
+        var pos = wax.u.eventoffset(e);
 
-        if (tile) gm.getGrid(tile.src, function(err, g) {
-            if (err || !g) return;
-            feature = g.tileFeature(pos.x, pos.y, tile);
+        interaction.screen_feature(pos, function(feature) {
             if (feature) {
                 bean.fire(interaction, 'on', {
                     parent: parent(),
@@ -2333,7 +2347,7 @@ wax.interaction = function() {
         _downLock = true;
         _d = wax.u.eventoffset(e);
         if (e.type === 'mousedown') {
-            bean.add(document.body, 'mouseup', onUp);
+            bean.add(document.body, 'click', onUp);
 
         // Only track single-touches. Double-touches will not affect this
         // control
@@ -2365,40 +2379,54 @@ wax.interaction = function() {
 
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
-            click(e, _d);
+            // but also wax.u.eventoffset will have failed, since this touch
+            // event doesn't have coordinates
+            interaction.click(e, _d);
         } else if (Math.round(pos.y / tol) === Math.round(_d.y / tol) &&
             Math.round(pos.x / tol) === Math.round(_d.x / tol)) {
             // Contain the event data in a closure.
             _clickTimeout = window.setTimeout(
                 function() {
                     _clickTimeout = null;
-                    click(evt, pos);
+                    interaction.click(evt, pos);
                 }, 300);
         }
         return onUp;
     }
 
     // Handle a click event. Takes a second
-    function click(e, pos) {
-        var tile = getTile(pos);
-        if (tile) gm.getGrid(tile.src, function(err, g) {
-            if (err || !g) return;
-            var feature = g.tileFeature(pos.x, pos.y, tile);
-            if (!feature) return;
-            bean.fire(interaction, 'on', {
+    interaction.click = function(e, pos) {
+        interaction.screen_feature(pos, function(feature) {
+            if (feature) bean.fire(interaction, 'on', {
                 parent: parent(),
                 data: feature,
                 formatter: gm.formatter().format,
                 e: e
             });
         });
-    }
+    };
+
+    interaction.screen_feature = function(pos, callback) {
+        var tile = getTile(pos);
+        if (!tile) callback(null);
+        gm.getGrid(tile.src, function(err, g) {
+            if (err || !g) return callback(null);
+            var feature = g.tileFeature(pos.x, pos.y, tile);
+            callback(feature);
+        });
+    };
 
     // set an attach function that should be
     // called when maps are set
     interaction.attach = function(x) {
         if (!arguments.length) return attach;
         attach = x;
+        return interaction;
+    };
+
+    interaction.detach = function(x) {
+        if (!arguments.length) return detach;
+        detach = x;
         return interaction;
     };
 
@@ -2420,10 +2448,8 @@ wax.interaction = function() {
     };
 
     // detach this and its events from the map cleanly
-    interaction.remove = function() {
-        for (var i = 0; i < clearingEvents.length; i++) {
-            map.removeCallback(clearingEvents[i], clearTileGrid);
-        }
+    interaction.remove = function(x) {
+        if (detach) detach(map);
         bean.remove(parent(), defaultEvents);
         bean.fire(interaction, 'remove');
         return interaction;
@@ -2431,7 +2457,7 @@ wax.interaction = function() {
 
     // get or set a tilejson chunk of json
     interaction.tilejson = function(x) {
-        if (!arguments.length) return tilejson;
+        if (!arguments.length) return gm.tilejson();
         gm.tilejson(x);
         return interaction;
     };
@@ -2451,6 +2477,13 @@ wax.interaction = function() {
     // ev can be 'on', 'off', fn is the handler
     interaction.off = function(ev, fn) {
         bean.remove(interaction, ev, fn);
+        return interaction;
+    };
+
+    // Return or set the gridmanager implementation
+    interaction.gridmanager = function(x) {
+        if (!arguments.length) return gm;
+        gm = x;
         return interaction;
     };
 
@@ -2774,16 +2807,25 @@ wax.tooltip = function() {
 
     function on(o) {
         var content;
-        if ((o.e.type === 'mousemove' || !o.e.type) && !popped) {
-            content = o.content || o.formatter({ format: 'teaser' }, o.data);
-            if (!content || content == _currentContent) return;
-            hide();
-            parent.style.cursor = 'pointer';
-            tooltips.push(parent.appendChild(getTooltip(content)));
-            _currentContent = content;
+        if (o.e.type === 'mousemove' || !o.e.type) {
+            if (!popped) {
+                content = o.content || o.formatter({ format: 'teaser' }, o.data);
+                if (!content || content == _currentContent) return;
+                hide();
+                parent.style.cursor = 'pointer';
+                tooltips.push(parent.appendChild(getTooltip(content)));
+                _currentContent = content;
+            }
         } else {
             content = o.content || o.formatter({ format: 'full' }, o.data);
-            if (!content) return;
+            if (!content) {
+              if (o.e.type && o.e.type.match(/touch/)) {
+                // fallback possible
+                content = o.content || o.formatter({ format: 'teaser' }, o.data);
+              }
+              // but if that fails, return just the same.
+              if (!content) return;
+            }
             hide();
             parent.style.cursor = 'pointer';
             var tt = parent.appendChild(getTooltip(content));
@@ -2796,6 +2838,10 @@ wax.tooltip = function() {
             popped = true;
 
             tooltips.push(tt);
+
+            bean.add(close, 'touchstart mousedown', function(e) {
+                e.stop();
+            });
 
             bean.add(close, 'click touchend', function closeClick(e) {
                 e.stop();
@@ -2918,6 +2964,7 @@ wax.u = {
             document.getElementById(x) :
             x;
     },
+
     // IE doesn't have indexOf
     indexOf: function(array, item) {
         var nativeIndexOf = Array.prototype.indexOf;
@@ -2927,14 +2974,7 @@ wax.u = {
         for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
         return -1;
     },
-    // From underscore: reimplement the ECMA5 `Object.keys()` method
-    keys: Object.keys || function(obj) {
-        var ho = Object.prototype.hasOwnProperty;
-        if (obj !== Object(obj)) throw new TypeError('Invalid object');
-        var keys = [];
-        for (var key in obj) if (ho.call(obj, key)) keys[keys.length] = key;
-        return keys;
-    },
+
     // From quirksmode: normalize the offset of an event from the top-left
     // of the page.
     eventoffset: function(e) {
@@ -3022,7 +3062,7 @@ wax = wax || {};
 wax.esri = wax.esri || {};
 
 wax.esri.interaction = function() {
-    var dirty = false, _grid, map;
+    var dirty = false, _grid, map, dojo_connections;
 
     function setdirty() { dirty = true; }
 
@@ -3056,13 +3096,22 @@ wax.esri.interaction = function() {
     function attach(x) {
         if (!arguments.length) return map;
         map = x;
-        dojo.connect(map, "onExtentChange", setdirty);
-        dojo.connect(map, "onUpdateEnd", setdirty);
-        dojo.connect(map, "onReposition", setdirty);
+        dojo_connections = [
+          dojo.connect(map, 'onExtentChange', setdirty),
+          dojo.connect(map, 'onUpdateEnd', setdirty),
+          dojo.connect(map, "onReposition", setdirty)
+        ];
+    }
+
+    function detach(x) {
+        for (var i = 0; i < dojo_connections.length; i++) {
+            dojo.disconnect(dojo_connections[i]);
+        }
     }
 
     return wax.interaction()
         .attach(attach)
+        .detach(detach)
         .parent(function() {
           return map.root;
         })
