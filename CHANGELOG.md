@@ -1,5 +1,9 @@
 ## Changelog
 
+## 6.1.0
+
+* Add Leaflet legend - currently the same API as Modest Maps.
+
 ## 6.0.6
 
 * Loosen restrictions - allow HTML5 video and audio elements.
