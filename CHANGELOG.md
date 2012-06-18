@@ -1,5 +1,9 @@
 ## Changelog
 
+## 6.2.1
+
+* Update reqwest dependency to 0.4.5
+
 ## 6.2.0
 
 * Add `wax.location()` - a `wax.tooltip()` API function that lets
