@@ -1,5 +1,9 @@
 ## Changelog
 
+## 6.2.2
+
+* Update mustache dependency to 0.5.0-dev to fix issue #213
+
 ## 6.2.1
 
 * Update reqwest dependency to 0.4.5
