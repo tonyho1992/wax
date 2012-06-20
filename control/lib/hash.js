@@ -11,7 +11,7 @@ wax.hash = function(options) {
 
     function pushState(state) {
         var l = window.location;
-        l.replace(l.toString().replace(l.hash, '#' + state));
+        l.replace(l.toString().replace((l.hash || /$/), '#' + state));
     }
 
     var s0, // old hash

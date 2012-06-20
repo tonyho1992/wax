@@ -1,5 +1,10 @@
 ## Changelog
 
+## 6.2.3
+
+* Fix bug in Hash control that doubled URLs when the page
+  started without a hash.
+
 ## 6.2.2
 
 * Update mustache dependency to 0.5.0-dev to fix issue #213

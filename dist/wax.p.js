@@ -1,4 +1,4 @@
-/* wax - 6.2.2 - 1.0.4-589-g9db2119 */
+/* wax - 6.2.3 - 1.0.4-590-gcd05aa2 */
 
 
 !function (name, context, definition) {
@@ -2343,7 +2343,7 @@ wax.hash = function(options) {
 
     function pushState(state) {
         var l = window.location;
-        l.replace(l.toString().replace(l.hash, '#' + state));
+        l.replace(l.toString().replace((l.hash || /$/), '#' + state));
     }
 
     var s0, // old hash
