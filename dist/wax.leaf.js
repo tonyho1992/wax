@@ -1,4 +1,4 @@
-/* wax - 6.2.3 - 1.0.4-590-gcd05aa2 */
+/* wax - 6.3.0 - 1.0.4-593-g285abac */
 
 
 !function (name, context, definition) {
@@ -3196,6 +3196,38 @@ wax.u = {
     throttle: function(func, wait) {
         return this.limit(func, wait, false);
     }
+};
+wax = wax || {};
+wax.leaf = wax.leaf || {};
+
+wax.leaf.hash = function(map) {
+    return wax.hash({
+        getCenterZoom: function () {
+            var center = map.getCenter(),
+                zoom = map.getZoom(),
+                precision = Math.max(
+                    0,
+                    Math.ceil(Math.log(zoom) / Math.LN2));
+
+            return [
+                zoom,
+                center.lat.toFixed(precision),
+                center.lng.toFixed(precision)
+            ].join('/');
+        },
+
+        setCenterZoom: function (args) {
+            map.setView(new L.LatLng(args[1], args[2]), args[0]);
+        },
+
+        bindChange: function (fn) {
+            map.on('moveend', fn);
+        },
+
+        unbindChange: function (fn) {
+            map.off('moveend', fn);
+        }
+    });
 };
 wax = wax || {};
 wax.leaf = wax.leaf || {};

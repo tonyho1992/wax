@@ -1,5 +1,9 @@
 ## Changelog
 
+## 6.3.0
+
+* Adds Hash control for Leaflet by @thegreat
+
 ## 6.2.3
 
 * Fix bug in Hash control that doubled URLs when the page
