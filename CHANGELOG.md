@@ -1,5 +1,11 @@
 ## Changelog
 
+## 6.3.1
+
+* Fix bug where an interaction template does not get removed
+  if the interaction object is set to use a new tilejson without
+  a template.
+
 ## 6.3.0
 
 * Adds Hash control for Leaflet by @thegreat
