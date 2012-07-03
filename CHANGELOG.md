@@ -1,5 +1,10 @@
 ## Changelog
 
+## 6.4.0
+
+* Improve the style of zoom controls, matching that of MapBox
+  Hosting and adding `map-controls.png`
+
 ## 6.3.1
 
 * Fix bug where an interaction template does not get removed
