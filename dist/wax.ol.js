@@ -1,4 +1,4 @@
-/* wax - 6.3.0 - 1.0.4-593-g285abac */
+/* wax - 6.3.0 - v6.0.4-23-gdcc8490 */
 
 
 !function (name, context, definition) {
@@ -2342,6 +2342,8 @@ wax.gm = function() {
             manager.template(x.template);
         } else if (x.formatter) {
             manager.formatter(x.formatter);
+        } else {
+            formatter = undefined;
         }
         if (x.grids) manager.gridUrl(x.grids);
         if (x.resolution) resolution = x.resolution;
