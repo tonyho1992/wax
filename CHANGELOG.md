@@ -1,5 +1,10 @@
 ## Changelog
 
+## 6.4.2
+
+* Binds `wax.mm.zoomer()` controls to `touchstart` events to make
+  them more responsive on mobile devices.
+
 ## 6.4.1
 
 * The `wax.gridmanager()` code now sets the `gridUrl` getter
