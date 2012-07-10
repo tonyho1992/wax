@@ -1,8 +1,6 @@
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-// Box Selector
-// ------------
 wax.mm.boxselector = function(map, tilejson, opts) {
     var corner = null,
         nearCorner = null,

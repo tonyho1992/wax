@@ -1,13 +1,10 @@
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-// Zoomer
-// ------
-// Add zoom links, which can be styled as buttons, to a `modestmaps.Map`
-// control. This function can be used chaining-style with other
-// chaining-style controls.
 wax.mm.zoomer = function(map) {
-    var zoomin = document.createElement('a');
+    var zoomer = {},
+        zoomin = document.createElement('a');
+
     zoomin.innerHTML = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
@@ -31,25 +28,25 @@ wax.mm.zoomer = function(map) {
         map.zoomOut();
     });
 
-    var zoomer = {
-        add: function(map) {
-            map.addCallback('drawn', function(map, e) {
-                if (map.coordinate.zoom === map.coordLimits[0].zoom) {
-                    zoomout.className = 'zoomer zoomout zoomdisabled';
-                } else if (map.coordinate.zoom === map.coordLimits[1].zoom) {
-                    zoomin.className = 'zoomer zoomin zoomdisabled';
-                } else {
-                    zoomin.className = 'zoomer zoomin';
-                    zoomout.className = 'zoomer zoomout';
-                }
-            });
-            return this;
-        },
-        appendTo: function(elem) {
-            wax.u.$(elem).appendChild(zoomin);
-            wax.u.$(elem).appendChild(zoomout);
-            return this;
-        }
+    zoomer.add = function(map) {
+        map.addCallback('drawn', function(map, e) {
+            if (map.coordinate.zoom === map.coordLimits[0].zoom) {
+                zoomout.className = 'zoomer zoomout zoomdisabled';
+            } else if (map.coordinate.zoom === map.coordLimits[1].zoom) {
+                zoomin.className = 'zoomer zoomin zoomdisabled';
+            } else {
+                zoomin.className = 'zoomer zoomin';
+                zoomout.className = 'zoomer zoomout';
+            }
+        });
+        return zoomer;
     };
+
+    zoomer.appendTo = function(elem) {
+        wax.u.$(elem).appendChild(zoomin);
+        wax.u.$(elem).appendChild(zoomout);
+        return zoomer;
+    };
+
     return zoomer.add(map);
 };

@@ -12,7 +12,7 @@ wax.g.legend = function(map, tilejson) {
     legend.add = function() {
         l = wax.legend()
             .content(tilejson.legend || '');
-        return this;
+        return legend;
     };
 
     legend.element = function() {
@@ -21,7 +21,7 @@ wax.g.legend = function(map, tilejson) {
 
     legend.appendTo = function(elem) {
         wax.u.$(elem).appendChild(l.element());
-        return this;
+        return legend;
     };
 
     return legend.add();

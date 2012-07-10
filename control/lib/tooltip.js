@@ -25,7 +25,6 @@ wax.tooltip = function() {
         return tooltip;
     }
 
-    
     function remove() {
         if (this.parentNode) this.parentNode.removeChild(this);
     }

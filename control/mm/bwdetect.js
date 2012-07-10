@@ -2,8 +2,6 @@ wax = wax || {};
 wax.mm = wax.mm || {};
 wax._ = {};
 
-// Bandwidth Detection
-// ------------------
 wax.mm.bwdetect = function(map, options) {
     options = options || {};
     var lowpng = options.png || '.png128',

@@ -1,9 +1,6 @@
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-// ZoomBox
-// -------
-// An OL-style ZoomBox control, from the Modest Maps example.
 wax.mm.zoombox = function(map) {
     // TODO: respond to resize
     var zoombox = {},

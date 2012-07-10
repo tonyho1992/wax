@@ -1,9 +1,6 @@
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-// Point Selector
-// --------------
-//
 // This takes an object of options:
 //
 // * `callback`: a function called with an array of `com.modestmaps.Location`

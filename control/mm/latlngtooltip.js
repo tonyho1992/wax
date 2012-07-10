@@ -1,10 +1,6 @@
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-// LatLng
-// ------
-// Show the current cursor position in
-// lat/long
 wax.mm.latlngtooltip = function(map) {
     var tt, // tooltip
         _down = false,

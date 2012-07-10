@@ -1,10 +1,6 @@
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-// Legend Control
-// --------------
-// The Modest Maps version of this control is a very, very
-// light wrapper around the `/lib` code for legends.
 wax.mm.legend = function(map, tilejson) {
     tilejson = tilejson || {};
     var l, // parent legend
@@ -12,12 +8,14 @@ wax.mm.legend = function(map, tilejson) {
 
     legend.add = function() {
         l = wax.legend()
-            .content(tilejson.legend || '');
-        return this;
+            .content(tilejson.legend);
+        return legend;
     };
 
     legend.content = function(x) {
-        if (x) l.content(x.legend || '');
+        if (!arguments.length) return l.content();
+        l.content(legend);
+        return legend;
     };
 
     legend.element = function() {
@@ -26,7 +24,7 @@ wax.mm.legend = function(map, tilejson) {
 
     legend.appendTo = function(elem) {
         wax.u.$(elem).appendChild(l.element());
-        return this;
+        return legend;
     };
 
     return legend.add();

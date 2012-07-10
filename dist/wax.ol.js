@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev - v6.0.4-36-g34d007e */
+/* wax - 7.0.0dev - v6.0.4-37-gbaf9ab1 */
 
 
 !function (name, context, definition) {
@@ -2054,24 +2054,9 @@ wax.attribution = function() {
     var container,
         a = {};
 
-    function urlX(url) {
-        // Data URIs are subject to a bug in Firefox
-        // https://bugzilla.mozilla.org/show_bug.cgi?id=255107
-        // which let them be a vector. But WebKit does 'the right thing'
-        // or at least 'something' about this situation, so we'll tolerate
-        // them.
-        if (/^(https?:\/\/|data:image)/.test(url)) {
-            return url;
-        }
-    }
-
-    function idX(id) {
-        return id;
-    }
-
     a.content = function(x) {
         if (typeof x === 'undefined') return container.innerHTML;
-        container.innerHTML = html_sanitize(x, urlX, idX);
+        container.innerHTML = wax.u.sanitize(x);
         return this;
     };
 
@@ -2176,21 +2161,11 @@ wax.formatter = function(x) {
         f = function() {};
     }
 
-    function urlX(url) {
-        if (/^(https?:\/\/|data:image)/.test(url)) {
-            return url;
-        }
-    }
-
-    function idX(id) {
-        return id;
-    }
-
     // Wrap the given formatter function in order to
     // catch exceptions that it may throw.
     formatter.format = function(options, data) {
         try {
-            return html_sanitize(f(options, data), urlX, idX);
+            return wax.u.sanitize(f(options, data));
         } catch (e) {
             if (console) console.log(e);
         }
@@ -2681,34 +2656,19 @@ wax.legend = function() {
         legend = {},
         container;
 
-    function urlX(url) {
-        // Data URIs are subject to a bug in Firefox
-        // https://bugzilla.mozilla.org/show_bug.cgi?id=255107
-        // which let them be a vector. But WebKit does 'the right thing'
-        // or at least 'something' about this situation, so we'll tolerate
-        // them.
-        if (/^(https?:\/\/|data:image)/.test(url)) {
-            return url;
-        }
-    }
-
-    function idX(id) {
-        return id;
-    }
-
     legend.element = function() {
         return container;
     };
 
     legend.content = function(content) {
         if (!arguments.length) return element.innerHTML;
-        if (content) {
-            element.innerHTML = html_sanitize(content, urlX, idX);
-            element.style.display = 'block';
-        } else {
-            element.innerHTML = '';
+
+        element.innerHTML = wax.u.sanitize(content);
+        element.style.display = 'block';
+        if (element.innerHTML === '') {
             element.style.display = 'none';
         }
+
         return legend;
     };
 
@@ -2917,21 +2877,6 @@ wax.request = {
 wax.template = function(x) {
     var template = {};
 
-    function urlX(url) {
-        // Data URIs are subject to a bug in Firefox
-        // https://bugzilla.mozilla.org/show_bug.cgi?id=255107
-        // which let them be a vector. But WebKit does 'the right thing'
-        // or at least 'something' about this situation, so we'll tolerate
-        // them.
-        if (/^(https?:\/\/|data:image)/.test(url)) {
-            return url;
-        }
-    }
-
-    function idX(id) {
-        return id;
-    }
-
     // Clone the data object such that the '__[format]__' key is only
     // set for this instance of templating.
     template.format = function(options, data) {
@@ -2942,7 +2887,7 @@ wax.template = function(x) {
         if (options.format) {
             clone['__' + options.format + '__'] = true;
         }
-        return html_sanitize(Mustache.to_html(x, clone), urlX, idX);
+        return wax.u.sanitize(Mustache.to_html(x, clone));
     };
 
     return template;
@@ -2986,7 +2931,6 @@ wax.tooltip = function() {
         return tooltip;
     }
 
-    
     function remove() {
         if (this.parentNode) this.parentNode.removeChild(this);
     }
@@ -3228,6 +3172,25 @@ wax.u = {
     // during a given window of time.
     throttle: function(func, wait) {
         return this.limit(func, wait, false);
+    },
+
+    sanitize: function(content) {
+        if (!content) return '';
+
+        function urlX(url) {
+            // Data URIs are subject to a bug in Firefox
+            // https://bugzilla.mozilla.org/show_bug.cgi?id=255107
+            // which let them be a vector. But WebKit does 'the right thing'
+            // or at least 'something' about this situation, so we'll tolerate
+            // them.
+            if (/^(https?:\/\/|data:image)/.test(url)) {
+                return url;
+            }
+        }
+
+        function idX(id) { return id; }
+
+        return html_sanitize(content, urlX, idX);
     }
 };
 wax = wax || {};
