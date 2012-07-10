@@ -1,5 +1,10 @@
 ## Changelog
 
+## UNRELEASED 7.0.0
+
+* Removes the `wax.mm.latlngtooltip()`
+* Renames styles from `.wax-` as their prefix to `.map-`
+
 ## 6.4.2
 
 * Binds `wax.mm.zoomer()` controls to `touchstart` events to make
