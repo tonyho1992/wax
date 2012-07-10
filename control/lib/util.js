@@ -27,6 +27,7 @@ wax.u = {
                 el.style.msTransform;
 
             if (style) {
+                var match;
                 if (match = style.match(/translate\((.+)px, (.+)px\)/)) {
                     top += parseInt(match[2], 10);
                     left += parseInt(match[1], 10);
