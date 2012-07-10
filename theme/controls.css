@@ -1,4 +1,4 @@
-a.map-fullscreen {
+.map-fullscreen {
   /* TODO: sprite-based fullscreen button */
   position:absolute;
   top:5px;
@@ -20,19 +20,19 @@ a.map-fullscreen {
   -moz-box-shadow:rgba(0,0,0,0.1) 0 1px 3px;
   -webkit-box-shadow:rgba(0,0,0,0.1) 0 1px 3px;
   }
-  
+
 /* ### Zoomer, close buttons, share ### */
- .close,
- .zoomer {
-  text-indent:-9999px;
+.close,
+.zoomer {
+  text-indent:-999em;
   background-image:url(map-controls.png);
   background-position:60px 60px;
   background-repeat:no-repeat;
   overflow:hidden;
   }
 
- .close:active,
- .zoomer:active {
+.close:active,
+.zoomer:active {
   border-color:#bbb;
   background-color:#ddd;
   box-shadow:inset rgba(0,0,0,0.1) 0 1px 3px;
@@ -40,7 +40,7 @@ a.map-fullscreen {
   -webkit-box-shadow:inset rgba(0,0,0,0.1) 0 1px 3px;
   }
 
- .close {
+.close {
   top:4px;
   right:4px;
   width:18px;
@@ -48,7 +48,7 @@ a.map-fullscreen {
   background-position:-6px -6px;
   }
 
- .zoomer {
+.zoomer {
   width:28px;
   height:28px;
   top:10px;
@@ -56,7 +56,7 @@ a.map-fullscreen {
   z-index:2;
   }
 
- .zoomin {
+.zoomin {
   background-position:-31px -1px;
   left:39px;
   border-radius:0 3px 3px 0;
@@ -64,7 +64,7 @@ a.map-fullscreen {
   -webkit-border-radius:0 3px 3px 0;
   }
 
- .zoomout {
+.zoomout {
   background-position:-61px -1px;
   border-radius:3px 0 0 3px;
   -moz-border-radius:3px 0 0 3px;
