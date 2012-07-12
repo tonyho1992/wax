@@ -57,8 +57,8 @@
 .zoomout {
   background-position:-61px -1px;
   left:39px;
-  -webkit-border-radius:0;
-          border-radius:0;
+  -webkit-border-radius:0 3px 3px 0;
+          border-radius:0 3px 3px 0;
   }
 
 .map-fullscreen {
@@ -67,10 +67,8 @@
   background-position: -90px 0;
   position:absolute;
   top:10px;
-  left:68px;
+  left:74px;
   z-index:99999;
-  -webkit-border-radius:0 3px 3px 0;
-          border-radius:0 3px 3px 0;
   }
 .map-fullscreen-map {
   position:fixed!important;
