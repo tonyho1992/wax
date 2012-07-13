@@ -71,6 +71,10 @@
   -webkit-border-radius:3px 0 0 3px;
   }
 
+.zoomdisabled {
+  background-color:#333;
+}
+
 .map-fullscreen-map {
   position:fixed!important;
   width:auto!important;
