@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev - v6.0.4-41-ga031612 */
+/* wax - 7.0.0dev1 - v6.0.4-55-g5f73b7c */
 
 
 !function (name, context, definition) {
@@ -2711,94 +2711,6 @@ wax.location = function() {
     return t;
 
 };
-// Override movetips positioning
-
-var wax = wax || {};
-wax.movetip = wax.movetip  || {};
-
-wax.movetip = function() {
-    var popped = false,
-        t = {},
-        _tooltipOffset,
-        _contextOffset,
-        tooltip,
-        parent;
-
-    function moveTooltip(e) {
-       var eo = wax.u.eventoffset(e);
-       // faux-positioning
-       if ((eo.y - _contextOffset.top) <
-           (_tooltipOffset.height + 5) &&
-           (_contextOffset.height > _tooltipOffset.height)) {
-           eo.y += _tooltipOffset.height;
-           tooltip.className += ' flip-y';
-       }
-
-       tooltip.style.left = eo.x + 'px';
-       tooltip.style.top = eo.y - _tooltipOffset.height - 5 + 'px';
-    }
-
-    // Get the active tooltip for a layer or create a new one if no tooltip exists.
-    // Hide any tooltips on layers underneath this one.
-    function getTooltip(feature) {
-        var tooltip = document.createElement('div'),
-            inner = document.createElement('div'),
-            tip = document.createElement('div');
-        inner.innerHTML = feature;
-        inner.className = 'inner';
-        tip.className = 'tip';
-        tooltip.className = 'wax-tooltip wax-tooltip-0';
-        tooltip.appendChild(inner);
-        tooltip.appendChild(tip);
-        return tooltip;
-    }
-
-    // Hide a given tooltip.
-    function hide() {
-        if (tooltip) {
-          tooltip.parentNode.removeChild(tooltip);
-          tooltip = null;
-        }
-    }
-
-    function on(o) {
-        var content;
-        if (popped) return;
-        if ((o.e.type === 'mousemove' || o.e.type === 'touchend' || !o.e.type)) {
-            content = o.formatter({ format: 'teaser' }, o.data);
-            if (!content) return;
-            hide();
-            parent.style.cursor = 'pointer';
-            tooltip = document.body.appendChild(getTooltip(content));
-        }
-        if (tooltip) {
-          _tooltipOffset = wax.u.offset(tooltip);
-          _contextOffset = wax.u.offset(parent);
-          moveTooltip(o.e);
-        }
-    }
-
-    function off() {
-        parent.style.cursor = 'default';
-        if (!popped) hide();
-    }
-
-    t.parent = function(x) {
-        if (!arguments.length) return parent;
-        parent = x;
-        return t;
-    };
-
-    t.events = function() {
-        return {
-            on: on,
-            off: off
-        };
-    };
-
-    return t;
-};
-
 var wax = wax || {};
 wax.movetip = {};
 
