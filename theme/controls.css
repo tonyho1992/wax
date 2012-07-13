@@ -152,17 +152,6 @@
   display:none;
   }
 
-.zoombox-box-container,
-.boxselector-box-container,
-.pointselector-box-container {
-  margin:0;
-  padding:0;
-  position:absolute;
-  background:url(blank.gif);
-  top:0;
-  left:0;
-  }
-
 .map-point-div {
   width:10px;
   height:10px;
