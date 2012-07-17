@@ -9,11 +9,22 @@ wax.mm.interaction = function() {
             'extentset', 'resized', 'drawn'];
 
     function grid() {
-        var zoomLayer = map.getLayerAt(0)
-            .levels[Math.round(map.getZoom())];
         if (!dirty && _grid !== undefined && _grid.length) {
             return _grid;
         } else {
+            var tiles, notempty;
+            for (var i = 0; i < map.getLayers().length; i++) {
+                tiles = map.getLayerAt(i).tiles;
+                for (var p in tiles) {
+                    notempty = true;
+                    break;
+                }
+                if (notempty) {
+                    var zoomLayer = map.getLayerAt(i)
+                        .levels[Math.round(map.getZoom())];
+                   break;
+               }
+            }
             _grid = (function(t) {
                 var o = [];
                 for (var key in t) {
@@ -27,7 +38,7 @@ wax.mm.interaction = function() {
                     }
                 }
                 return o;
-            })(map.getLayerAt(0).tiles);
+            })(tiles);
             return _grid;
         }
     }
