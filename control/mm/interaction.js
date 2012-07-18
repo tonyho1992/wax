@@ -12,18 +12,13 @@ wax.mm.interaction = function() {
         if (!dirty && _grid !== undefined && _grid.length) {
             return _grid;
         } else {
-            var tiles, notempty;
+            var tiles;
             for (var i = 0; i < map.getLayers().length; i++) {
-                tiles = map.getLayerAt(i).tiles;
-                for (var p in tiles) {
-                    notempty = true;
-                    break;
+                var zoomLayer = map.getLayerAt(i).levels[Math.round(map.zoom())];
+                if (zoomLayer !== undefined) {
+                    tiles = map.getLayerAt(i).tileElementsInLevel(zoomLayer);
+                    if (tiles.length) break;
                 }
-                if (notempty) {
-                    var zoomLayer = map.getLayerAt(i)
-                        .levels[Math.round(map.getZoom())];
-                   break;
-               }
             }
             _grid = (function(t) {
                 var o = [];
