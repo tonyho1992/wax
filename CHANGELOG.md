@@ -5,6 +5,7 @@
 * Removes the `wax.mm.latlngtooltip()`
 * Renames styles from `.wax-` as their prefix to `.map-`
 * Fixes IE issues in events, event interaction with Leaflet
+* Fix global variable leak of `coord` in wax.mm._provider
 
 ## 6.4.2
 
