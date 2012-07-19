@@ -8,19 +8,17 @@ wax.mm = wax.mm || {};
 //
 // It also exposes a public API function: `addLocation`, which adds a point
 // to the map as if added by the user.
-wax.mm.pointselector = function(map, tilejson, opts) {
+wax.mm.pointselector = function() {
     var mouseDownPoint = null,
         mouseUpPoint = null,
+        callback = null,
         tolerance = 5,
         overlayDiv,
         pointselector = {},
+        callbackManager = new MM.CallbackManager(pointselector, ['change']),
         locations = [];
 
-    var callback = (typeof opts === 'function') ?
-        opts :
-        opts.callback;
-
-    // Create a `com.modestmaps.Point` from a screen event, like a click.
+    // Create a `MM.Point` from a screen event, like a click.
     function makePoint(e) {
         var coords = wax.u.eventoffset(e);
         var point = new MM.Point(coords.x, coords.y);
@@ -99,7 +97,7 @@ wax.mm.pointselector = function(map, tilejson, opts) {
         mouseUpPoint = makePoint(e);
         if (MM.Point.distance(mouseDownPoint, mouseUpPoint) < tolerance) {
             pointselector.addLocation(map.pointLocation(mouseDownPoint));
-            callback(cleanLocations(locations));
+            callbackManager.dispatchCallback('change', cleanLocations(locations));
         }
         mouseDownPoint = null;
     }
@@ -110,17 +108,28 @@ wax.mm.pointselector = function(map, tilejson, opts) {
     pointselector.addLocation = function(location) {
         locations.push(location);
         drawPoints();
-        callback(cleanLocations(locations));
+        callbackManager.dispatchCallback('change', cleanLocations(locations));
     };
 
     pointselector.locations = function(x) {
         return locations;
     };
 
-    pointselector.add = function(map) {
+    pointselector.addCallback = function(event, callback) {
+        callbackManager.addCallback(event, callback);
+        return pointselector;
+    };
+
+    pointselector.removeCallback = function(event, callback) {
+        callbackManager.removeCallback(event, callback);
+        return pointselector;
+    };
+
+    pointselector.add = function(x) {
+        map = x;
         bean.add(map.parent, 'mousedown', mouseDown);
         map.addCallback('drawn', drawPoints);
-        return this;
+        return pointselector;
     };
 
     pointselector.remove = function(map) {
@@ -129,16 +138,17 @@ wax.mm.pointselector = function(map, tilejson, opts) {
         for (var i = locations.length - 1; i > -1; i--) {
             pointselector.deleteLocation(locations[i]);
         }
-        return this;
+        return pointselector;
     };
 
     pointselector.deleteLocation = function(location, e) {
         if (!e || confirm('Delete this point?')) {
             location.pointDiv.parentNode.removeChild(location.pointDiv);
             locations.splice(wax.u.indexOf(locations, location), 1);
-            callback(cleanLocations(locations));
+            callbackManager.dispatchCallback('change', cleanLocations(locations));
+
         }
     };
 
-    return pointselector.add(map);
+    return pointselector;
 };

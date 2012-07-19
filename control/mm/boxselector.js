@@ -1,12 +1,9 @@
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-wax.mm.boxselector = function(map, tilejson, opts) {
-    var corner = null,
-        nearCorner = null,
-        callback = ((typeof opts === 'function') ?
-            opts :
-            opts.callback),
+wax.mm.boxselector = function() {
+    var corner,
+        nearCorner,
         boxDiv,
         style,
         borderWidth = 0,
@@ -16,14 +13,17 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         addEvent = MM.addEvent,
         removeEvent = MM.removeEvent,
         box,
-        boxselector = {};
+        boxselector = {},
+        callbackManger = new MM.CallbackManager(boxselector, ['change']);
 
     function getMousePoint(e) {
         // start with just the mouse (x, y)
         var point = new MM.Point(e.clientX, e.clientY);
         // correct for scrolled document
-        point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
-        point.y += document.body.scrollTop + document.documentElement.scrollTop;
+        point.x += document.body.scrollLeft +
+            document.documentElement.scrollLeft;
+        point.y += document.body.scrollTop +
+            document.documentElement.scrollTop;
 
         // correct for nested offsets in DOM
         for (var node = map.parent; node; node = node.offsetParent) {
@@ -159,6 +159,16 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
     }
 
+    boxselector.addCallback = function(event, callback) {
+        callbackManager.addCallback(event, callback);
+        return boxselector;
+    };
+
+    boxselector.removeCallback = function(event, callback) {
+        callbackManager.removeCallback(event, callback);
+        return boxselector;
+    };
+
     boxselector.extent = function(x, silent) {
         if (!x) return box;
 
@@ -173,7 +183,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
 
         drawbox(map);
 
-        if (!silent) callback(box);
+        if (!silent) callbackManager.dispatchCallback('change', box);
     };
 
     boxselector.add = function(map) {
@@ -188,7 +198,7 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         addEvent(boxDiv, 'mousedown', mouseDownResize);
         addEvent(map.parent, 'mousemove', mouseMoveCursor);
         map.addCallback('drawn', drawbox);
-        return this;
+        return boxselector;
     };
 
     boxselector.remove = function() {
@@ -197,7 +207,8 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         removeEvent(boxDiv, 'mousedown', mouseDownResize);
         removeEvent(map.parent, 'mousemove', mouseMoveCursor);
         map.removeCallback('drawn', drawbox);
+        return boxselector;
     };
 
-    return boxselector.add(map);
+    return boxselector;
 };

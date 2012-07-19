@@ -10,10 +10,9 @@ describe('pointselector', function() {
         map = new MM.Map(div, new MM.TemplatedMapProvider(
             'http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', ['a.']));
         map.setCenterZoom(new MM.Location(37.811530, -122.2666097), 10);
-        pointselector = wax.mm.pointselector(map, {}, {
-            callback: function() {
-                callbackResult = arguments;
-            }
+        pointselector = wax.mm.pointselector().add(map);
+        pointselector.addCallback('change', function() {
+            callbackResult = arguments;
         });
     });
 
@@ -23,29 +22,31 @@ describe('pointselector', function() {
     });
 
     it('can add locations', function() {
-        runs(function() {
-            pointselector.addLocation(
-                new MM.Location(37.811530, -122.2666097));
-        });
-        waits(100);
-        runs(function() {
-            expect(callbackResult.length).toEqual(1);
-            expect(callbackResult[0][0].lat).toEqual(37.811530);
-            expect(callbackResult[0][0].lon).toEqual(-122.2666097);
-        });
+        pointselector.addLocation(
+            new MM.Location(37.811530, -122.2666097));
+        expect(callbackResult.length).toEqual(2);
+        expect(callbackResult[1][0].lat).toEqual(37.811530);
+        expect(callbackResult[1][0].lon).toEqual(-122.2666097);
+    });
+
+    it('add a new callback to itself', function() {
+        var new_called = false;
+        function newcallback() {
+            new_called = true;
+        }
+        pointselector.addLocation({
+            lat: 37.811530,
+            lon: -122.2666097
+        }));
+        expect(new_called).toEqual(true);
     });
 
     it('can add and remove locations', function() {
-        runs(function() {
-            var l = new com.modestmaps.Location(37.811530, -122.2666097);
-            pointselector.addLocation(l);
-            pointselector.deleteLocation(l);
-        });
-        waits(100);
-        runs(function() {
-            expect(callbackResult.length).toEqual(1);
-            expect(callbackResult[0].length).toEqual(0);
-        });
+        var l = new com.modestmaps.Location(37.811530, -122.2666097);
+        pointselector.addLocation(l);
+        pointselector.deleteLocation(l);
+        expect(callbackResult.length).toEqual(2);
+        expect(callbackResult[1].length).toEqual(0);
     });
 
     it('can be removed', function() {
