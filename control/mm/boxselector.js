@@ -185,13 +185,13 @@ wax.mm.boxselector = function() {
 
         if (!silent) callbackManager.dispatchCallback('change', box);
     };
+    boxDiv = document.createElement('div');
+    boxDiv.className = 'boxselector-box';
+    style = boxDiv.style;
 
-    boxselector.add = function(map) {
-        boxDiv = boxDiv || document.createElement('div');
+    boxselector.add = function() {
         boxDiv.id = map.parent.id + '-boxselector-box';
-        boxDiv.className = 'boxselector-box';
         map.parent.appendChild(boxDiv);
-        style = boxDiv.style;
         borderWidth = parseInt(window.getComputedStyle(boxDiv).borderWidth, 10);
 
         addEvent(map.parent, 'mousedown', mouseDown);
@@ -201,11 +201,19 @@ wax.mm.boxselector = function() {
         return boxselector;
     };
 
+    boxselector.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        return boxselector;
+    };
+
     boxselector.remove = function() {
         map.parent.removeChild(boxDiv);
+
         removeEvent(map.parent, 'mousedown', mouseDown);
         removeEvent(boxDiv, 'mousedown', mouseDownResize);
         removeEvent(map.parent, 'mousemove', mouseMoveCursor);
+
         map.removeCallback('drawn', drawbox);
         return boxselector;
     };

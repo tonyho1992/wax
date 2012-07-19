@@ -1,10 +1,11 @@
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-wax.mm.zoomer = function(map) {
+wax.mm.zoomer = function() {
     var zoomer = {},
-        zoomin = document.createElement('a');
+        map;
 
+    var zoomin = document.createElement('a');
     zoomin.innerHTML = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
@@ -28,17 +29,30 @@ wax.mm.zoomer = function(map) {
         map.zoomOut();
     });
 
-    zoomer.add = function(map) {
-        map.addCallback('drawn', function(map, e) {
-            if (map.coordinate.zoom === map.coordLimits[0].zoom) {
-                zoomout.className = 'zoomer zoomout zoomdisabled';
-            } else if (map.coordinate.zoom === map.coordLimits[1].zoom) {
-                zoomin.className = 'zoomer zoomin zoomdisabled';
-            } else {
-                zoomin.className = 'zoomer zoomin';
-                zoomout.className = 'zoomer zoomout';
-            }
-        });
+    function updateButtons(map, e) {
+        if (map.coordinate.zoom === map.coordLimits[0].zoom) {
+            zoomout.className = 'zoomer zoomout zoomdisabled';
+        } else if (map.coordinate.zoom === map.coordLimits[1].zoom) {
+            zoomin.className = 'zoomer zoomin zoomdisabled';
+        } else {
+            zoomin.className = 'zoomer zoomin';
+            zoomout.className = 'zoomer zoomout';
+        }
+    }
+
+    zoomer.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        return zoomer;
+    };
+
+    zoomer.add = function() {
+        map.addCallback('drawn', updateButtons);
+        return zoomer;
+    };
+
+    zoomer.remove = function() {
+        map.removeCallback('drawn', updateButtons);
         return zoomer;
     };
 
@@ -48,5 +62,5 @@ wax.mm.zoomer = function(map) {
         return zoomer;
     };
 
-    return zoomer.add(map);
+    return zoomer;
 };

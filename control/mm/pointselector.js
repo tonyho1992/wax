@@ -125,14 +125,19 @@ wax.mm.pointselector = function() {
         return pointselector;
     };
 
-    pointselector.add = function(x) {
+    pointselector.map = function(x) {
+        if (!arguments.length) return map;
         map = x;
+        return pointselector;
+    };
+
+    pointselector.add = function() {
         bean.add(map.parent, 'mousedown', mouseDown);
         map.addCallback('drawn', drawPoints);
         return pointselector;
     };
 
-    pointselector.remove = function(map) {
+    pointselector.remove = function() {
         bean.remove(map.parent, 'mousedown', mouseDown);
         map.removeCallback('drawn', drawPoints);
         for (var i = locations.length - 1; i > -1; i--) {

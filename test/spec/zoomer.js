@@ -7,7 +7,7 @@ describe('zoomer', function() {
         map = new MM.Map(div, new com.modestmaps.TemplatedMapProvider(
             'http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', ['a.']), new MM.Point(600, 400));
         map.setCenterZoom(new MM.Location(37.811530, -122.2666097), 10);
-        wax.mm.zoomer(map).appendTo(map.parent);
+        wax.mm.zoomer().map(map).add().appendTo(map.parent);
     });
 
     it('should be able to zoom in', function() {

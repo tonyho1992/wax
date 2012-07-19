@@ -1,16 +1,9 @@
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-wax.mm.legend = function(map, tilejson) {
-    tilejson = tilejson || {};
-    var l, // parent legend
+wax.mm.legend = function() {
+    var l = wax.legend(), // parent legend
         legend = {};
-
-    legend.add = function() {
-        l = wax.legend()
-            .content(tilejson.legend);
-        return legend;
-    };
 
     legend.content = function(x) {
         if (!arguments.length) return l.content();
@@ -27,5 +20,5 @@ wax.mm.legend = function(map, tilejson) {
         return legend;
     };
 
-    return legend.add();
+    return legend;
 };

@@ -10,7 +10,7 @@ describe('pointselector', function() {
         map = new MM.Map(div, new MM.TemplatedMapProvider(
             'http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', ['a.']));
         map.setCenterZoom(new MM.Location(37.811530, -122.2666097), 10);
-        pointselector = wax.mm.pointselector().add(map);
+        pointselector = wax.mm.pointselector().map(map).add();
         pointselector.addCallback('change', function() {
             callbackResult = arguments;
         });
@@ -34,10 +34,11 @@ describe('pointselector', function() {
         function newcallback() {
             new_called = true;
         }
+        pointselector.addCallback('change', newcallback);
         pointselector.addLocation({
             lat: 37.811530,
             lon: -122.2666097
-        }));
+        });
         expect(new_called).toEqual(true);
     });
 
