@@ -109,10 +109,12 @@ wax.mm.pointselector = function() {
         locations.push(location);
         drawPoints();
         callbackManager.dispatchCallback('change', cleanLocations(locations));
+        return pointselector;
     };
 
-    pointselector.locations = function(x) {
-        return locations;
+    // TODO set locations
+    pointselector.locations = function() {
+        if (!arguments.length) return locations;
     };
 
     pointselector.addCallback = function(event, callback) {
@@ -149,9 +151,13 @@ wax.mm.pointselector = function() {
     pointselector.deleteLocation = function(location, e) {
         if (!e || confirm('Delete this point?')) {
             location.pointDiv.parentNode.removeChild(location.pointDiv);
-            locations.splice(wax.u.indexOf(locations, location), 1);
+            for (var i = 0; i < locations.length; i++) {
+                if (locations[i] === location) {
+                    locations.splice(i, 1);
+                    break;
+                }
+            }
             callbackManager.dispatchCallback('change', cleanLocations(locations));
-
         }
     };
 
