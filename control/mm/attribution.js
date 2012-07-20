@@ -11,6 +11,24 @@ wax.mm.attribution = function(map, tilejson) {
         return a.element();
     };
 
+    attribution.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        return attribution;
+    };
+
+    attribution.add = function() {
+        if (!map) return false;
+        map.parent.appendChild(a.element());
+        return attribution;
+    };
+
+    attribution.remove = function() {
+        if (!map) return false;
+        if (a.element().parentNode) a.element().parentNode.removeChild(a.element());
+        return attribution;
+    };
+
     attribution.appendTo = function(elem) {
         wax.u.$(elem).appendChild(a.element());
         return attribution;
