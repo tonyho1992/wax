@@ -11,6 +11,8 @@
 * pointselector and boxselector can have multiple callbacks - they
   now use a callbackManager and support `addCallback` and `removeCallback`
 * `wax.mm.boxselector` and `wax.mm.pointselector` no longer call `.add()` automatically
+* `wax.mm.zoomer` no longer calls `.add` automatically
+* `wax.mm.zoomer` supports easing
 
 
 ## 6.4.2
