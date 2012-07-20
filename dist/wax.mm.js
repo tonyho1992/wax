@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev4 - v6.0.4-74-g72d1b2f */
+/* wax - 7.0.0dev4 - v6.0.4-77-ga67c084 */
 
 
 !function (name, context, definition) {
@@ -2030,8 +2030,10 @@ var Mustache = (typeof module !== "undefined" && module.exports) || {};
 // Attribution
 // -----------
 wax.attribution = function() {
-    var container,
-        a = {};
+    var a = {};
+
+    var container = document.createElement('div');
+    container.className = 'map-attribution';
 
     a.content = function(x) {
         if (typeof x === 'undefined') return container.innerHTML;
@@ -2044,12 +2046,10 @@ wax.attribution = function() {
     };
 
     a.init = function() {
-        container = document.createElement('div');
-        container.className = 'map-attribution';
         return this;
     };
 
-    return a.init();
+    return a;
 };
 wax = wax || {};
 
@@ -3161,29 +3161,52 @@ wax.u = {
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-wax.mm.attribution = function(map, tilejson) {
-    tilejson = tilejson || {};
+wax.mm.attribution = function() {
+    var map,
+        a = {},
+        container = document.createElement('div');
 
-    var a, // internal attribution control
-        attribution = {};
+    container.className = 'map-attribution map-mm';
 
-    attribution.element = function() {
-        return a.element();
+    a.content = function(x) {
+        if (typeof x === 'undefined') return container.innerHTML;
+        container.innerHTML = wax.u.sanitize(x);
+        return a;
     };
 
-    attribution.appendTo = function(elem) {
-        wax.u.$(elem).appendChild(a.element());
-        return attribution;
+    a.element = function() {
+        return container;
     };
 
-    attribution.init = function() {
-        a = wax.attribution();
+    a.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        return a;
+    };
+
+    a.add = function() {
+        if (!map) return false;
+        map.parent.appendChild(container);
+        return a;
+    };
+
+    a.remove = function() {
+        if (!map) return false;
+        if (container.parentNode) container.parentNode.removeChild(container);
+        return a;
+    };
+
+    a.appendTo = function(elem) {
+        wax.u.$(elem).appendChild(container);
+        return a;
+    };
+
+    a.init = function() {
         a.content(tilejson.attribution);
-        a.element().className = 'map-attribution map-mm';
-        return attribution;
+        return a;
     };
 
-    return attribution.init();
+    return a;
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
@@ -3201,6 +3224,7 @@ wax.mm.boxselector = function() {
         removeEvent = MM.removeEvent,
         box,
         boxselector = {},
+        map,
         callbackManger = new MM.CallbackManager(boxselector, ['change']);
 
     function getMousePoint(e) {
@@ -3435,12 +3459,13 @@ wax.mm = wax.mm || {};
 // Add zoom links, which can be styled as buttons, to a `modestmaps.Map`
 // control. This function can be used chaining-style with other
 // chaining-style controls.
-wax.mm.fullscreen = function(map) {
+wax.mm.fullscreen = function() {
     // true: fullscreen
     // false: minimized
     var fullscreened = false,
         fullscreen = {},
         a,
+        map,
         body = document.body,
         smallSize;
 
@@ -3500,12 +3525,13 @@ wax.mm.fullscreen = function(map) {
         return fullscreen;
     };
 
-    return fullscreen.add(map);
+    return fullscreen;
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
 
 wax.mm.hash = function() {
+    var map;
     var hash = wax.hash({
         getCenterZoom: function() {
             var center = map.getCenter(),
@@ -3609,44 +3635,56 @@ wax = wax || {};
 wax.mm = wax.mm || {};
 
 wax.mm.legend = function() {
-    var l = wax.legend(), // parent legend
-        legend = {};
+    var map,
+        l = {};
 
-    legend.content = function(x) {
-        if (!arguments.length) return l.content();
-        l.content(legend);
-        return legend;
+    var container = document.createElement('div');
+    container.className = 'map-legends';
+
+    var element = container.appendChild(document.createElement('div'));
+    element.className = 'map-legend';
+    element.style.display = 'none';
+
+    l.content = function(x) {
+        if (!arguments.length) return element.innerHTML;
+
+        element.innerHTML = wax.u.sanitize(content);
+        element.style.display = 'block';
+        if (element.innerHTML === '') {
+            element.style.display = 'none';
+        }
+        return l;
     };
 
-    legend.element = function() {
-        return l.element();
+    l.element = function() {
+        return container;
     };
 
-    legend.map = function(x) {
+    l.map = function(x) {
         if (!arguments.length) return map;
         map = x;
-        return legend;
+        return l;
     };
 
-    legend.add = function() {
+    l.add = function() {
         if (!map) return false;
-        legend.appendTo(map.parent);
-        return legend;
+        l.appendTo(map.parent);
+        return l;
     };
 
-    legend.remove = function() {
-        if (legend.element().parentNode) {
-            legend.element().parentNode.removeChild(legend.element());
+    l.remove = function() {
+        if (container.parentNode) {
+            container.parentNode.removeChild(container);
         }
-        return legend;
+        return l;
     };
         
-    legend.appendTo = function(elem) {
-        wax.u.$(elem).appendChild(l.element());
-        return legend;
+    l.appendTo = function(elem) {
+        wax.u.$(elem).appendChild(container);
+        return l;
     };
 
-    return legend;
+    return l;
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
@@ -3659,7 +3697,8 @@ wax.mm = wax.mm || {};
 // It also exposes a public API function: `addLocation`, which adds a point
 // to the map as if added by the user.
 wax.mm.pointselector = function() {
-    var mouseDownPoint = null,
+    var map,
+        mouseDownPoint = null,
         mouseUpPoint = null,
         callback = null,
         tolerance = 5,
@@ -3819,6 +3858,7 @@ wax.mm = wax.mm || {};
 wax.mm.zoombox = function() {
     // TODO: respond to resize
     var zoombox = {},
+        map,
         drawing = false,
         box = document.createElement('div'),
         mouseDownPoint = null;

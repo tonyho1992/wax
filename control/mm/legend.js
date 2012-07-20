@@ -2,42 +2,54 @@ wax = wax || {};
 wax.mm = wax.mm || {};
 
 wax.mm.legend = function() {
-    var l = wax.legend(), // parent legend
-        legend = {};
+    var map,
+        l = {};
 
-    legend.content = function(x) {
-        if (!arguments.length) return l.content();
-        l.content(legend);
-        return legend;
+    var container = document.createElement('div');
+    container.className = 'map-legends';
+
+    var element = container.appendChild(document.createElement('div'));
+    element.className = 'map-legend';
+    element.style.display = 'none';
+
+    l.content = function(x) {
+        if (!arguments.length) return element.innerHTML;
+
+        element.innerHTML = wax.u.sanitize(content);
+        element.style.display = 'block';
+        if (element.innerHTML === '') {
+            element.style.display = 'none';
+        }
+        return l;
     };
 
-    legend.element = function() {
-        return l.element();
+    l.element = function() {
+        return container;
     };
 
-    legend.map = function(x) {
+    l.map = function(x) {
         if (!arguments.length) return map;
         map = x;
-        return legend;
+        return l;
     };
 
-    legend.add = function() {
+    l.add = function() {
         if (!map) return false;
-        legend.appendTo(map.parent);
-        return legend;
+        l.appendTo(map.parent);
+        return l;
     };
 
-    legend.remove = function() {
-        if (legend.element().parentNode) {
-            legend.element().parentNode.removeChild(legend.element());
+    l.remove = function() {
+        if (container.parentNode) {
+            container.parentNode.removeChild(container);
         }
-        return legend;
+        return l;
     };
         
-    legend.appendTo = function(elem) {
-        wax.u.$(elem).appendChild(l.element());
-        return legend;
+    l.appendTo = function(elem) {
+        wax.u.$(elem).appendChild(container);
+        return l;
     };
 
-    return legend;
+    return l;
 };

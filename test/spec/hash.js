@@ -1,11 +1,10 @@
 describe('hash', function() {
-    var mm = com.modestmaps;
     var map, initial_zoom = 10;
 
     beforeEach(function() {
         var div = document.createElement('div');
         window.location.hash = '';
-        map = new mm.Map(div, new mm.TemplatedMapProvider(
+        map = new MM.Map(div, new MM.TemplatedMapProvider(
             'http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', ['a.']), new com.modestmaps.Point(10, 10));
         wax.mm.hash(map);
     });
@@ -17,7 +16,7 @@ describe('hash', function() {
 
     it('should not mess with map movement', function() {
         runs(function() {
-          map.setCenterZoom(new mm.Location(25, 25), 2);
+          map.setCenterZoom(new MM.Location(25, 25), 2);
         });
         waits(600);
         runs(function() {
@@ -30,7 +29,7 @@ describe('hash', function() {
 
     it('sets the right location hash', function() {
         runs(function() {
-          map.setCenterZoom(new mm.Location(25, 25), 2);
+          map.setCenterZoom(new MM.Location(25, 25), 2);
         });
         waits(1000);
         runs(function() {

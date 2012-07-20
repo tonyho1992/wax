@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev4 - v6.0.4-74-g72d1b2f */
+/* wax - 7.0.0dev4 - v6.0.4-77-ga67c084 */
 
 
 !function (name, context, definition) {
@@ -2051,8 +2051,10 @@ wax.ol.connector = function(tilejson) {
 // Attribution
 // -----------
 wax.attribution = function() {
-    var container,
-        a = {};
+    var a = {};
+
+    var container = document.createElement('div');
+    container.className = 'map-attribution';
 
     a.content = function(x) {
         if (typeof x === 'undefined') return container.innerHTML;
@@ -2065,12 +2067,10 @@ wax.attribution = function() {
     };
 
     a.init = function() {
-        container = document.createElement('div');
-        container.className = 'map-attribution';
         return this;
     };
 
-    return a.init();
+    return a;
 };
 wax = wax || {};
 

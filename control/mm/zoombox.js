@@ -4,6 +4,7 @@ wax.mm = wax.mm || {};
 wax.mm.zoombox = function() {
     // TODO: respond to resize
     var zoombox = {},
+        map,
         drawing = false,
         box = document.createElement('div'),
         mouseDownPoint = null;

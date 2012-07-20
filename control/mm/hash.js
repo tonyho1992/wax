@@ -2,6 +2,7 @@ wax = wax || {};
 wax.mm = wax.mm || {};
 
 wax.mm.hash = function() {
+    var map;
     var hash = wax.hash({
         getCenterZoom: function() {
             var center = map.getCenter(),

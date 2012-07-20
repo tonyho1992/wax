@@ -3,8 +3,10 @@
 // Attribution
 // -----------
 wax.attribution = function() {
-    var container,
-        a = {};
+    var a = {};
+
+    var container = document.createElement('div');
+    container.className = 'map-attribution';
 
     a.content = function(x) {
         if (typeof x === 'undefined') return container.innerHTML;
@@ -17,10 +19,8 @@ wax.attribution = function() {
     };
 
     a.init = function() {
-        container = document.createElement('div');
-        container.className = 'map-attribution';
         return this;
     };
 
-    return a.init();
+    return a;
 };

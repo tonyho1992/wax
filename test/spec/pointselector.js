@@ -55,7 +55,7 @@ describe('pointselector', function() {
             var l = new com.modestmaps.Location(i, i);
             pointselector.addLocation(l);
         }
-        pointselector.remove(map);
+        pointselector.remove();
         expect(pointselector.locations().length).toEqual(0);
     });
 });

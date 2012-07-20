@@ -1,45 +1,50 @@
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-wax.mm.attribution = function(map, tilejson) {
-    tilejson = tilejson || {};
+wax.mm.attribution = function() {
+    var map,
+        a = {},
+        container = document.createElement('div');
 
-    var a, // internal attribution control
-        attribution = {};
+    container.className = 'map-attribution map-mm';
 
-    attribution.element = function() {
-        return a.element();
+    a.content = function(x) {
+        if (typeof x === 'undefined') return container.innerHTML;
+        container.innerHTML = wax.u.sanitize(x);
+        return a;
     };
 
-    attribution.map = function(x) {
+    a.element = function() {
+        return container;
+    };
+
+    a.map = function(x) {
         if (!arguments.length) return map;
         map = x;
-        return attribution;
+        return a;
     };
 
-    attribution.add = function() {
+    a.add = function() {
         if (!map) return false;
-        map.parent.appendChild(a.element());
-        return attribution;
+        map.parent.appendChild(container);
+        return a;
     };
 
-    attribution.remove = function() {
+    a.remove = function() {
         if (!map) return false;
-        if (a.element().parentNode) a.element().parentNode.removeChild(a.element());
-        return attribution;
+        if (container.parentNode) container.parentNode.removeChild(container);
+        return a;
     };
 
-    attribution.appendTo = function(elem) {
-        wax.u.$(elem).appendChild(a.element());
-        return attribution;
+    a.appendTo = function(elem) {
+        wax.u.$(elem).appendChild(container);
+        return a;
     };
 
-    attribution.init = function() {
-        a = wax.attribution();
+    a.init = function() {
         a.content(tilejson.attribution);
-        a.element().className = 'map-attribution map-mm';
-        return attribution;
+        return a;
     };
 
-    return attribution.init();
+    return a;
 };
