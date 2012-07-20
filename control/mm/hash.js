@@ -1,8 +1,8 @@
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-wax.mm.hash = function(map) {
-    return wax.hash({
+wax.mm.hash = function() {
+    var hash = wax.hash({
         getCenterZoom: function() {
             var center = map.getCenter(),
                 zoom = map.getZoom(),
@@ -27,4 +27,13 @@ wax.mm.hash = function(map) {
             map.removeCallback('drawn', fn);
         }
     });
+
+    hash.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        hash.add();
+        return hash;
+    };
+
+    return hash;
 };

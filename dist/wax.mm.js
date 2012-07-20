@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev4 - v6.0.4-62-ga2b3f2b */
+/* wax - 7.0.0dev4 - v6.0.4-74-g72d1b2f */
 
 
 !function (name, context, definition) {
@@ -2324,6 +2324,10 @@ wax = wax || {};
 wax.hash = function(options) {
     options = options || {};
 
+    var s0, // old hash
+        hash = {},
+        lat = 90 - 1e-8;  // allowable latitude range
+
     function getState() {
         return location.hash.substring(1);
     }
@@ -2332,10 +2336,6 @@ wax.hash = function(options) {
         var l = window.location;
         l.replace(l.toString().replace((l.hash || /$/), '#' + state));
     }
-
-    var s0, // old hash
-        hash = {},
-        lat = 90 - 1e-8;  // allowable latitude range
 
     function parseHash(s) {
         var args = s.split('/');
@@ -2374,15 +2374,15 @@ wax.hash = function(options) {
     hash.add = function() {
         stateChange(getState());
         options.bindChange(_move);
-        return this;
+        return hash;
     };
 
     hash.remove = function() {
         options.unbindChange(_move);
-        return this;
+        return hash;
     };
 
-    return hash.add();
+    return hash;
 };
 wax = wax || {};
 
@@ -3091,16 +3091,6 @@ wax.u = {
             x;
     },
 
-    // IE doesn't have indexOf
-    indexOf: function(array, item) {
-        var nativeIndexOf = Array.prototype.indexOf;
-        if (array === null) return -1;
-        var i, l;
-        if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item);
-        for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
-        return -1;
-    },
-
     // From quirksmode: normalize the offset of an event from the top-left
     // of the page.
     eventoffset: function(e) {
@@ -3198,12 +3188,9 @@ wax.mm.attribution = function(map, tilejson) {
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-wax.mm.boxselector = function(map, tilejson, opts) {
-    var corner = null,
-        nearCorner = null,
-        callback = ((typeof opts === 'function') ?
-            opts :
-            opts.callback),
+wax.mm.boxselector = function() {
+    var corner,
+        nearCorner,
         boxDiv,
         style,
         borderWidth = 0,
@@ -3213,14 +3200,17 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         addEvent = MM.addEvent,
         removeEvent = MM.removeEvent,
         box,
-        boxselector = {};
+        boxselector = {},
+        callbackManger = new MM.CallbackManager(boxselector, ['change']);
 
     function getMousePoint(e) {
         // start with just the mouse (x, y)
         var point = new MM.Point(e.clientX, e.clientY);
         // correct for scrolled document
-        point.x += document.body.scrollLeft + document.documentElement.scrollLeft;
-        point.y += document.body.scrollTop + document.documentElement.scrollTop;
+        point.x += document.body.scrollLeft +
+            document.documentElement.scrollLeft;
+        point.y += document.body.scrollTop +
+            document.documentElement.scrollTop;
 
         // correct for nested offsets in DOM
         for (var node = map.parent; node; node = node.offsetParent) {
@@ -3356,6 +3346,16 @@ wax.mm.boxselector = function(map, tilejson, opts) {
         style.bottom = Math.max(0, map.dimensions.y - br.y) + 'px';
     }
 
+    boxselector.addCallback = function(event, callback) {
+        callbackManager.addCallback(event, callback);
+        return boxselector;
+    };
+
+    boxselector.removeCallback = function(event, callback) {
+        callbackManager.removeCallback(event, callback);
+        return boxselector;
+    };
+
     boxselector.extent = function(x, silent) {
         if (!x) return box;
 
@@ -3370,33 +3370,42 @@ wax.mm.boxselector = function(map, tilejson, opts) {
 
         drawbox(map);
 
-        if (!silent) callback(box);
+        if (!silent) callbackManager.dispatchCallback('change', box);
     };
+    boxDiv = document.createElement('div');
+    boxDiv.className = 'boxselector-box';
+    style = boxDiv.style;
 
-    boxselector.add = function(map) {
-        boxDiv = boxDiv || document.createElement('div');
+    boxselector.add = function() {
         boxDiv.id = map.parent.id + '-boxselector-box';
-        boxDiv.className = 'boxselector-box';
         map.parent.appendChild(boxDiv);
-        style = boxDiv.style;
         borderWidth = parseInt(window.getComputedStyle(boxDiv).borderWidth, 10);
 
         addEvent(map.parent, 'mousedown', mouseDown);
         addEvent(boxDiv, 'mousedown', mouseDownResize);
         addEvent(map.parent, 'mousemove', mouseMoveCursor);
         map.addCallback('drawn', drawbox);
-        return this;
+        return boxselector;
+    };
+
+    boxselector.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        return boxselector;
     };
 
     boxselector.remove = function() {
         map.parent.removeChild(boxDiv);
+
         removeEvent(map.parent, 'mousedown', mouseDown);
         removeEvent(boxDiv, 'mousedown', mouseDownResize);
         removeEvent(map.parent, 'mousemove', mouseMoveCursor);
+
         map.removeCallback('drawn', drawbox);
+        return boxselector;
     };
 
-    return boxselector.add(map);
+    return boxselector;
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
@@ -3451,33 +3460,44 @@ wax.mm.fullscreen = function(map) {
         map.dispatchCallback('resized', map.dimensions);
     }
 
+    fullscreen.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        return fullscreen;
+    };
+
     // Modest Maps demands an absolute height & width, and doesn't auto-correct
     // for changes, so here we save the original size of the element and
     // restore to that size on exit from fullscreen.
-    fullscreen.add = function(map) {
+    fullscreen.add = function() {
         a = document.createElement('a');
         a.className = 'map-fullscreen';
         a.href = '#fullscreen';
         a.innerHTML = 'fullscreen';
         bean.add(a, 'click', click);
-        return this;
+        return fullscreen;
     };
+
     fullscreen.full = function() {
         if (fullscreened) { return; } else { fullscreened = true; }
         smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
         map.parent.className += ' map-fullscreen-map';
         body.className += ' map-fullscreen-view';
         ss(map.parent.offsetWidth, map.parent.offsetHeight);
+        return fullscreen;
     };
+
     fullscreen.original = function() {
         if (!fullscreened) { return; } else { fullscreened = false; }
         map.parent.className = map.parent.className.replace(' map-fullscreen-map', '');
         body.className = body.className.replace(' map-fullscreen-view', '');
         ss(smallSize[0], smallSize[1]);
+        return fullscreen;
     };
+
     fullscreen.appendTo = function(elem) {
         wax.u.$(elem).appendChild(a);
-        return this;
+        return fullscreen;
     };
 
     return fullscreen.add(map);
@@ -3485,8 +3505,8 @@ wax.mm.fullscreen = function(map) {
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-wax.mm.hash = function(map) {
-    return wax.hash({
+wax.mm.hash = function() {
+    var hash = wax.hash({
         getCenterZoom: function() {
             var center = map.getCenter(),
                 zoom = map.getZoom(),
@@ -3511,6 +3531,15 @@ wax.mm.hash = function(map) {
             map.removeCallback('drawn', fn);
         }
     });
+
+    hash.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        hash.add();
+        return hash;
+    };
+
+    return hash;
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
@@ -3523,11 +3552,17 @@ wax.mm.interaction = function() {
             'extentset', 'resized', 'drawn'];
 
     function grid() {
-        var zoomLayer = map.getLayerAt(0)
-            .levels[Math.round(map.getZoom())];
         if (!dirty && _grid !== undefined && _grid.length) {
             return _grid;
         } else {
+            var tiles;
+            for (var i = 0; i < map.getLayers().length; i++) {
+                var zoomLayer = map.getLayerAt(i).levels[Math.round(map.zoom())];
+                if (zoomLayer !== undefined) {
+                    tiles = map.getLayerAt(i).tileElementsInLevel(zoomLayer);
+                    if (tiles.length) break;
+                }
+            }
             _grid = (function(t) {
                 var o = [];
                 for (var key in t) {
@@ -3541,7 +3576,7 @@ wax.mm.interaction = function() {
                     }
                 }
                 return o;
-            })(map.getLayerAt(0).tiles);
+            })(tiles);
             return _grid;
         }
     }
@@ -3573,16 +3608,9 @@ wax.mm.interaction = function() {
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-wax.mm.legend = function(map, tilejson) {
-    tilejson = tilejson || {};
-    var l, // parent legend
+wax.mm.legend = function() {
+    var l = wax.legend(), // parent legend
         legend = {};
-
-    legend.add = function() {
-        l = wax.legend()
-            .content(tilejson.legend);
-        return legend;
-    };
 
     legend.content = function(x) {
         if (!arguments.length) return l.content();
@@ -3594,12 +3622,31 @@ wax.mm.legend = function(map, tilejson) {
         return l.element();
     };
 
+    legend.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        return legend;
+    };
+
+    legend.add = function() {
+        if (!map) return false;
+        legend.appendTo(map.parent);
+        return legend;
+    };
+
+    legend.remove = function() {
+        if (legend.element().parentNode) {
+            legend.element().parentNode.removeChild(legend.element());
+        }
+        return legend;
+    };
+        
     legend.appendTo = function(elem) {
         wax.u.$(elem).appendChild(l.element());
         return legend;
     };
 
-    return legend.add();
+    return legend;
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
@@ -3611,19 +3658,17 @@ wax.mm = wax.mm || {};
 //
 // It also exposes a public API function: `addLocation`, which adds a point
 // to the map as if added by the user.
-wax.mm.pointselector = function(map, tilejson, opts) {
+wax.mm.pointselector = function() {
     var mouseDownPoint = null,
         mouseUpPoint = null,
+        callback = null,
         tolerance = 5,
         overlayDiv,
         pointselector = {},
+        callbackManager = new MM.CallbackManager(pointselector, ['change']),
         locations = [];
 
-    var callback = (typeof opts === 'function') ?
-        opts :
-        opts.callback;
-
-    // Create a `com.modestmaps.Point` from a screen event, like a click.
+    // Create a `MM.Point` from a screen event, like a click.
     function makePoint(e) {
         var coords = wax.u.eventoffset(e);
         var point = new MM.Point(coords.x, coords.y);
@@ -3702,7 +3747,7 @@ wax.mm.pointselector = function(map, tilejson, opts) {
         mouseUpPoint = makePoint(e);
         if (MM.Point.distance(mouseDownPoint, mouseUpPoint) < tolerance) {
             pointselector.addLocation(map.pointLocation(mouseDownPoint));
-            callback(cleanLocations(locations));
+            callbackManager.dispatchCallback('change', cleanLocations(locations));
         }
         mouseDownPoint = null;
     }
@@ -3713,46 +3758,69 @@ wax.mm.pointselector = function(map, tilejson, opts) {
     pointselector.addLocation = function(location) {
         locations.push(location);
         drawPoints();
-        callback(cleanLocations(locations));
+        callbackManager.dispatchCallback('change', cleanLocations(locations));
+        return pointselector;
     };
 
-    pointselector.locations = function(x) {
-        return locations;
+    // TODO set locations
+    pointselector.locations = function() {
+        if (!arguments.length) return locations;
     };
 
-    pointselector.add = function(map) {
+    pointselector.addCallback = function(event, callback) {
+        callbackManager.addCallback(event, callback);
+        return pointselector;
+    };
+
+    pointselector.removeCallback = function(event, callback) {
+        callbackManager.removeCallback(event, callback);
+        return pointselector;
+    };
+
+    pointselector.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        return pointselector;
+    };
+
+    pointselector.add = function() {
         bean.add(map.parent, 'mousedown', mouseDown);
         map.addCallback('drawn', drawPoints);
-        return this;
+        return pointselector;
     };
 
-    pointselector.remove = function(map) {
+    pointselector.remove = function() {
         bean.remove(map.parent, 'mousedown', mouseDown);
         map.removeCallback('drawn', drawPoints);
         for (var i = locations.length - 1; i > -1; i--) {
             pointselector.deleteLocation(locations[i]);
         }
-        return this;
+        return pointselector;
     };
 
     pointselector.deleteLocation = function(location, e) {
         if (!e || confirm('Delete this point?')) {
             location.pointDiv.parentNode.removeChild(location.pointDiv);
-            locations.splice(wax.u.indexOf(locations, location), 1);
-            callback(cleanLocations(locations));
+            for (var i = 0; i < locations.length; i++) {
+                if (locations[i] === location) {
+                    locations.splice(i, 1);
+                    break;
+                }
+            }
+            callbackManager.dispatchCallback('change', cleanLocations(locations));
         }
     };
 
-    return pointselector.add(map);
+    return pointselector;
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-wax.mm.zoombox = function(map) {
+wax.mm.zoombox = function() {
     // TODO: respond to resize
     var zoombox = {},
         drawing = false,
-        box,
+        box = document.createElement('div'),
         mouseDownPoint = null;
 
     function getMousePoint(e) {
@@ -3824,11 +3892,17 @@ wax.mm.zoombox = function(map) {
         return MM.cancelEvent(e);
     }
 
-    zoombox.add = function(map) {
+    zoombox.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        return zoombox;
+    };
+
+    zoombox.add = function() {
+        if (!map) return false;
         // Use a flag to determine whether the zoombox is currently being
         // drawn. Necessary only for IE because `mousedown` is triggered
         // twice.
-        box = box || document.createElement('div');
         box.id = map.parent.id + '-zoombox-box';
         box.className = 'zoombox-box';
         map.parent.appendChild(box);
@@ -3837,18 +3911,23 @@ wax.mm.zoombox = function(map) {
     };
 
     zoombox.remove = function() {
-        map.parent.removeChild(box);
+        if (!map) return false;
+        if (box.parentNode) box.parentNode.removeChild(box);
         MM.removeEvent(map.parent, 'mousedown', mouseDown);
+        return zoombox;
     };
 
-    return zoombox.add(map);
+    return zoombox;
 };
 wax = wax || {};
 wax.mm = wax.mm || {};
 
-wax.mm.zoomer = function(map) {
+wax.mm.zoomer = function() {
     var zoomer = {},
-        zoomin = document.createElement('a');
+        map;
+
+    var zoomin = document.createElement('a'),
+        zoomout = document.createElement('a');
 
     zoomin.innerHTML = '+';
     zoomin.href = '#';
@@ -3861,7 +3940,6 @@ wax.mm.zoomer = function(map) {
         map.zoomIn();
     }, false);
 
-    var zoomout = document.createElement('a');
     zoomout.innerHTML = '-';
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
@@ -3873,17 +3951,35 @@ wax.mm.zoomer = function(map) {
         map.zoomOut();
     });
 
-    zoomer.add = function(map) {
-        map.addCallback('drawn', function(map, e) {
-            if (map.coordinate.zoom === map.coordLimits[0].zoom) {
-                zoomout.className = 'zoomer zoomout zoomdisabled';
-            } else if (map.coordinate.zoom === map.coordLimits[1].zoom) {
-                zoomin.className = 'zoomer zoomin zoomdisabled';
-            } else {
-                zoomin.className = 'zoomer zoomin';
-                zoomout.className = 'zoomer zoomout';
-            }
-        });
+    function updateButtons(map, e) {
+        if (map.coordinate.zoom === map.coordLimits[0].zoom) {
+            zoomout.className = 'zoomer zoomout zoomdisabled';
+        } else if (map.coordinate.zoom === map.coordLimits[1].zoom) {
+            zoomin.className = 'zoomer zoomin zoomdisabled';
+        } else {
+            zoomin.className = 'zoomer zoomin';
+            zoomout.className = 'zoomer zoomout';
+        }
+    }
+
+    zoomer.map = function(x) {
+        if (!arguments.length) return map;
+        map = x;
+        return zoomer;
+    };
+
+    zoomer.add = function() {
+        if (!map) return false;
+        map.addCallback('drawn', updateButtons);
+        zoomer.appendTo(map.parent);
+        return zoomer;
+    };
+
+    zoomer.remove = function() {
+        if (!map) return false;
+        map.removeCallback('drawn', updateButtons);
+        if (zoomin.parentNode) zoomin.parentNode.removeChild(zoomin);
+        if (zoomout.parentNode) zoomout.parentNode.removeChild(zoomout);
         return zoomer;
     };
 
@@ -3893,7 +3989,7 @@ wax.mm.zoomer = function(map) {
         return zoomer;
     };
 
-    return zoomer.add(map);
+    return zoomer;
 };
 var wax = wax || {};
 wax.mm = wax.mm || {};

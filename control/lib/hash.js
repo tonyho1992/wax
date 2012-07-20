@@ -5,6 +5,10 @@ wax = wax || {};
 wax.hash = function(options) {
     options = options || {};
 
+    var s0, // old hash
+        hash = {},
+        lat = 90 - 1e-8;  // allowable latitude range
+
     function getState() {
         return location.hash.substring(1);
     }
@@ -13,10 +17,6 @@ wax.hash = function(options) {
         var l = window.location;
         l.replace(l.toString().replace((l.hash || /$/), '#' + state));
     }
-
-    var s0, // old hash
-        hash = {},
-        lat = 90 - 1e-8;  // allowable latitude range
 
     function parseHash(s) {
         var args = s.split('/');

@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev4 - v6.0.4-62-ga2b3f2b */
+/* wax - 7.0.0dev4 - v6.0.4-74-g72d1b2f */
 
 
 !function (name, context, definition) {
@@ -2345,6 +2345,10 @@ wax = wax || {};
 wax.hash = function(options) {
     options = options || {};
 
+    var s0, // old hash
+        hash = {},
+        lat = 90 - 1e-8;  // allowable latitude range
+
     function getState() {
         return location.hash.substring(1);
     }
@@ -2353,10 +2357,6 @@ wax.hash = function(options) {
         var l = window.location;
         l.replace(l.toString().replace((l.hash || /$/), '#' + state));
     }
-
-    var s0, // old hash
-        hash = {},
-        lat = 90 - 1e-8;  // allowable latitude range
 
     function parseHash(s) {
         var args = s.split('/');
@@ -2395,15 +2395,15 @@ wax.hash = function(options) {
     hash.add = function() {
         stateChange(getState());
         options.bindChange(_move);
-        return this;
+        return hash;
     };
 
     hash.remove = function() {
         options.unbindChange(_move);
-        return this;
+        return hash;
     };
 
-    return hash.add();
+    return hash;
 };
 wax = wax || {};
 
@@ -3110,16 +3110,6 @@ wax.u = {
         return (typeof x === 'string') ?
             document.getElementById(x) :
             x;
-    },
-
-    // IE doesn't have indexOf
-    indexOf: function(array, item) {
-        var nativeIndexOf = Array.prototype.indexOf;
-        if (array === null) return -1;
-        var i, l;
-        if (nativeIndexOf && array.indexOf === nativeIndexOf) return array.indexOf(item);
-        for (i = 0, l = array.length; i < l; i++) if (array[i] === item) return i;
-        return -1;
     },
 
     // From quirksmode: normalize the offset of an event from the top-left

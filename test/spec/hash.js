@@ -4,12 +4,9 @@ describe('hash', function() {
 
     beforeEach(function() {
         var div = document.createElement('div');
-
         window.location.hash = '';
-
         map = new mm.Map(div, new mm.TemplatedMapProvider(
             'http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', ['a.']), new com.modestmaps.Point(10, 10));
-
         wax.mm.hash(map);
     });
 

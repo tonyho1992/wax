@@ -5,7 +5,9 @@ wax.mm.zoomer = function() {
     var zoomer = {},
         map;
 
-    var zoomin = document.createElement('a');
+    var zoomin = document.createElement('a'),
+        zoomout = document.createElement('a');
+
     zoomin.innerHTML = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
@@ -17,7 +19,6 @@ wax.mm.zoomer = function() {
         map.zoomIn();
     }, false);
 
-    var zoomout = document.createElement('a');
     zoomout.innerHTML = '-';
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
@@ -47,12 +48,17 @@ wax.mm.zoomer = function() {
     };
 
     zoomer.add = function() {
+        if (!map) return false;
         map.addCallback('drawn', updateButtons);
+        zoomer.appendTo(map.parent);
         return zoomer;
     };
 
     zoomer.remove = function() {
+        if (!map) return false;
         map.removeCallback('drawn', updateButtons);
+        if (zoomin.parentNode) zoomin.parentNode.removeChild(zoomin);
+        if (zoomout.parentNode) zoomout.parentNode.removeChild(zoomout);
         return zoomer;
     };
 

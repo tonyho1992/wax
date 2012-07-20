@@ -5,7 +5,7 @@ wax.mm.zoombox = function() {
     // TODO: respond to resize
     var zoombox = {},
         drawing = false,
-        box,
+        box = document.createElement('div'),
         mouseDownPoint = null;
 
     function getMousePoint(e) {
@@ -84,10 +84,10 @@ wax.mm.zoombox = function() {
     };
 
     zoombox.add = function() {
+        if (!map) return false;
         // Use a flag to determine whether the zoombox is currently being
         // drawn. Necessary only for IE because `mousedown` is triggered
         // twice.
-        box = box || document.createElement('div');
         box.id = map.parent.id + '-zoombox-box';
         box.className = 'zoombox-box';
         map.parent.appendChild(box);
@@ -96,8 +96,10 @@ wax.mm.zoombox = function() {
     };
 
     zoombox.remove = function() {
-        map.parent.removeChild(box);
+        if (!map) return false;
+        if (box.parentNode) box.parentNode.removeChild(box);
         MM.removeEvent(map.parent, 'mousedown', mouseDown);
+        return zoombox;
     };
 
     return zoombox;
