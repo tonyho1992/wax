@@ -4,6 +4,7 @@ describe('control spec', function() {
     controls = {
         pointselector: wax.mm.pointselector(),
         attribution: wax.mm.attribution(),
+        fullscreen: wax.mm.fullscreen(),
         boxselector: wax.mm.boxselector(),
         zoomer: wax.mm.zoomer(),
         legend: wax.mm.legend(),

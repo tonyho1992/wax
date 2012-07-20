@@ -10,7 +10,7 @@ describe('fullscreen', function() {
         map = new MM.Map(div, new MM.TemplatedMapProvider(
             'http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', ['a.']));
         map.setCenterZoom(new MM.Location(37.811530, -122.2666097), 10);
-        wax.mm.fullscreen(map).appendTo(map.parent);
+        wax.mm.fullscreen().map(map).add();
     });
 
     it('makes the map fullscreen', function() {

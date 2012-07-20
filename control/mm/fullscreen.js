@@ -9,10 +9,14 @@ wax.mm.fullscreen = function() {
     // false: minimized
     var fullscreened = false,
         fullscreen = {},
-        a,
+        a = document.createElement('a'),
         map,
         body = document.body,
         smallSize;
+
+    a.className = 'map-fullscreen';
+    a.href = '#fullscreen';
+    // a.innerHTML = 'fullscreen';
 
     function click(e) {
         if (e) e.stop();
@@ -23,7 +27,7 @@ wax.mm.fullscreen = function() {
         }
     }
 
-    function ss(w, h) {
+    function setSize(w, h) {
         map.dimensions = new MM.Point(w, h);
         map.parent.style.width = Math.round(map.dimensions.x) + 'px';
         map.parent.style.height = Math.round(map.dimensions.y) + 'px';
@@ -40,11 +44,14 @@ wax.mm.fullscreen = function() {
     // for changes, so here we save the original size of the element and
     // restore to that size on exit from fullscreen.
     fullscreen.add = function() {
-        a = document.createElement('a');
-        a.className = 'map-fullscreen';
-        a.href = '#fullscreen';
-        a.innerHTML = 'fullscreen';
         bean.add(a, 'click', click);
+        map.parent.appendChild(a);
+        return fullscreen;
+    };
+
+    fullscreen.remove = function() {
+        bean.remove(a, 'click', click);
+        if (a.parentNode) a.parentNode.removeChild(a);
         return fullscreen;
     };
 
@@ -53,7 +60,7 @@ wax.mm.fullscreen = function() {
         smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
         map.parent.className += ' map-fullscreen-map';
         body.className += ' map-fullscreen-view';
-        ss(map.parent.offsetWidth, map.parent.offsetHeight);
+        setSize(map.parent.offsetWidth, map.parent.offsetHeight);
         return fullscreen;
     };
 
@@ -61,7 +68,7 @@ wax.mm.fullscreen = function() {
         if (!fullscreened) { return; } else { fullscreened = false; }
         map.parent.className = map.parent.className.replace(' map-fullscreen-map', '');
         body.className = body.className.replace(' map-fullscreen-view', '');
-        ss(smallSize[0], smallSize[1]);
+        setSize(smallSize[0], smallSize[1]);
         return fullscreen;
     };
 
