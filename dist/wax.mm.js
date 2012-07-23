@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev4 - v6.0.4-77-ga67c084 */
+/* wax - 7.0.0dev6 - v6.0.4-82-g0f0556f */
 
 
 !function (name, context, definition) {
@@ -3464,10 +3464,14 @@ wax.mm.fullscreen = function() {
     // false: minimized
     var fullscreened = false,
         fullscreen = {},
-        a,
+        a = document.createElement('a'),
         map,
         body = document.body,
         smallSize;
+
+    a.className = 'map-fullscreen';
+    a.href = '#fullscreen';
+    // a.innerHTML = 'fullscreen';
 
     function click(e) {
         if (e) e.stop();
@@ -3478,7 +3482,7 @@ wax.mm.fullscreen = function() {
         }
     }
 
-    function ss(w, h) {
+    function setSize(w, h) {
         map.dimensions = new MM.Point(w, h);
         map.parent.style.width = Math.round(map.dimensions.x) + 'px';
         map.parent.style.height = Math.round(map.dimensions.y) + 'px';
@@ -3495,11 +3499,14 @@ wax.mm.fullscreen = function() {
     // for changes, so here we save the original size of the element and
     // restore to that size on exit from fullscreen.
     fullscreen.add = function() {
-        a = document.createElement('a');
-        a.className = 'map-fullscreen';
-        a.href = '#fullscreen';
-        a.innerHTML = 'fullscreen';
         bean.add(a, 'click', click);
+        map.parent.appendChild(a);
+        return fullscreen;
+    };
+
+    fullscreen.remove = function() {
+        bean.remove(a, 'click', click);
+        if (a.parentNode) a.parentNode.removeChild(a);
         return fullscreen;
     };
 
@@ -3508,7 +3515,7 @@ wax.mm.fullscreen = function() {
         smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
         map.parent.className += ' map-fullscreen-map';
         body.className += ' map-fullscreen-view';
-        ss(map.parent.offsetWidth, map.parent.offsetHeight);
+        setSize(map.parent.offsetWidth, map.parent.offsetHeight);
         return fullscreen;
     };
 
@@ -3516,7 +3523,7 @@ wax.mm.fullscreen = function() {
         if (!fullscreened) { return; } else { fullscreened = false; }
         map.parent.className = map.parent.className.replace(' map-fullscreen-map', '');
         body.className = body.className.replace(' map-fullscreen-view', '');
-        ss(smallSize[0], smallSize[1]);
+        setSize(smallSize[0], smallSize[1]);
         return fullscreen;
     };
 
@@ -3964,32 +3971,40 @@ wax.mm = wax.mm || {};
 
 wax.mm.zoomer = function() {
     var zoomer = {},
+        smooth = true,
         map;
 
     var zoomin = document.createElement('a'),
         zoomout = document.createElement('a');
 
+    function stopEvents(e) {
+        e.stop();
+    }
+
+    function zIn(e) {
+        e.stop();
+        if (smooth && map.ease) {
+            map.ease.zoom(map.zoom() + 1).run(50);
+        } else {
+            map.zoomIn();
+        }
+    }
+
+    function zOut(e) {
+        e.stop();
+        if (smooth && map.ease) {
+            map.ease.zoom(map.zoom() - 1).run(50);
+        } else {
+            map.zoomOut();
+        }
+    }
+
     zoomin.innerHTML = '+';
     zoomin.href = '#';
     zoomin.className = 'zoomer zoomin';
-    bean.add(zoomin, 'mousedown dblclick', function(e) {
-        e.stop();
-    });
-    bean.add(zoomin, 'touchstart click', function(e) {
-        e.stop();
-        map.zoomIn();
-    }, false);
-
     zoomout.innerHTML = '-';
     zoomout.href = '#';
     zoomout.className = 'zoomer zoomout';
-    bean.add(zoomout, 'mousedown dblclick', function(e) {
-        e.stop();
-    });
-    bean.add(zoomout, 'touchstart click', function(e) {
-        e.stop();
-        map.zoomOut();
-    });
 
     function updateButtons(map, e) {
         if (map.coordinate.zoom === map.coordLimits[0].zoom) {
@@ -4012,6 +4027,10 @@ wax.mm.zoomer = function() {
         if (!map) return false;
         map.addCallback('drawn', updateButtons);
         zoomer.appendTo(map.parent);
+        bean.add(zoomin, 'mousedown dblclick', stopEvents);
+        bean.add(zoomout, 'mousedown dblclick', stopEvents);
+        bean.add(zoomout, 'touchstart click', zOut);
+        bean.add(zoomin, 'touchstart click', zIn);
         return zoomer;
     };
 
@@ -4020,12 +4039,22 @@ wax.mm.zoomer = function() {
         map.removeCallback('drawn', updateButtons);
         if (zoomin.parentNode) zoomin.parentNode.removeChild(zoomin);
         if (zoomout.parentNode) zoomout.parentNode.removeChild(zoomout);
+        bean.remove(zoomin, 'mousedown dblclick', stopEvents);
+        bean.remove(zoomout, 'mousedown dblclick', stopEvents);
+        bean.remove(zoomout, 'touchstart click', zOut);
+        bean.remove(zoomin, 'touchstart click', zIn);
         return zoomer;
     };
 
     zoomer.appendTo = function(elem) {
         wax.u.$(elem).appendChild(zoomin);
         wax.u.$(elem).appendChild(zoomout);
+        return zoomer;
+    };
+
+    zoomer.smooth = function(x) {
+        if (!arguments.length) return smooth;
+        smooth = x;
         return zoomer;
     };
 
