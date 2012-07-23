@@ -4,14 +4,15 @@
 .map-fullscreen {
   position:absolute;
   border:1px solid #bbb;
+  box-sizing:border-box;
   background:#fff;
   -webkit-border-radius:3px;
           border-radius:3px;
   }
 .map-legends,
 .map-tooltip {
-  -webkit-box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-          box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+  -webkit-box-shadow:0 1px 2px rgba(0,0,0,0.15);
+          box-shadow:0 1px 2px rgba(0,0,0,0.15);
   }
 
 .zoomer,
@@ -34,14 +35,14 @@
 .map-tooltip .close {
   top:4px;
   right:4px;
-  width:18px;
-  height:18px;
+  width:20px;
+  height:20px;
   background-position:-6px -6px;
   }
 
 .zoomer {
-  width:28px;
-  height:28px;
+  width:30px;
+  height:30px;
   top:10px;
   left:10px;
   z-index:2;
@@ -65,9 +66,9 @@
   }
 
 .map-fullscreen {
-  width: 28px;
-  height: 28px;
-  background-position: -90px 0;
+  width:30px;
+  height:30px;
+  background-position:-90px 0;
   position:absolute;
   top:10px;
   left:74px;
@@ -85,7 +86,7 @@
   z-index:99999999999;
   }
   .map-fullscreen-map .map-fullscreen {
-    background-position: -120px 0;
+    background-position:-120px 0;
     }
 
 .map-legends {
