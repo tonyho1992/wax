@@ -32,7 +32,6 @@ wax.mm.hash = function() {
     hash.map = function(x) {
         if (!arguments.length) return map;
         map = x;
-        hash.add();
         return hash;
     };
 
