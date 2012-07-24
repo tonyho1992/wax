@@ -13,6 +13,7 @@
 * `wax.mm.boxselector` and `wax.mm.pointselector` no longer call `.add()` automatically
 * `wax.mm.zoomer` no longer calls `.add` automatically
 * `wax.mm.zoomer` supports easing
+* `wax.mm.legend` now permits access to its element with .element
 * Style updates
 
 ## 6.4.2

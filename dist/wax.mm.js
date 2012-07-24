@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev6 - v6.0.4-85-g3fab586 */
+/* wax - 7.0.0dev7 - v6.0.4-90-g95f6f9c */
 
 
 !function (name, context, definition) {
@@ -3520,6 +3520,10 @@ wax.mm.fullscreen = function() {
         body.className = body.className.replace(' map-fullscreen-view', '');
         setSize(smallSize[0], smallSize[1]);
         return fullscreen;
+    };
+
+    fullscreen.element = function() {
+        return a;
     };
 
     fullscreen.appendTo = function(elem) {
