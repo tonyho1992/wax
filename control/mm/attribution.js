@@ -41,10 +41,5 @@ wax.mm.attribution = function() {
         return a;
     };
 
-    a.init = function() {
-        a.content(tilejson.attribution);
-        return a;
-    };
-
     return a;
 };

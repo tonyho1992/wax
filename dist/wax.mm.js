@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev6 - v6.0.4-82-g0f0556f */
+/* wax - 7.0.0dev6 - v6.0.4-85-g3fab586 */
 
 
 !function (name, context, definition) {
@@ -3201,11 +3201,6 @@ wax.mm.attribution = function() {
         return a;
     };
 
-    a.init = function() {
-        a.content(tilejson.attribution);
-        return a;
-    };
-
     return a;
 };
 wax = wax || {};
@@ -3568,7 +3563,6 @@ wax.mm.hash = function() {
     hash.map = function(x) {
         if (!arguments.length) return map;
         map = x;
-        hash.add();
         return hash;
     };
 
@@ -3655,7 +3649,7 @@ wax.mm.legend = function() {
     l.content = function(x) {
         if (!arguments.length) return element.innerHTML;
 
-        element.innerHTML = wax.u.sanitize(content);
+        element.innerHTML = wax.u.sanitize(x);
         element.style.display = 'block';
         if (element.innerHTML === '') {
             element.style.display = 'none';
@@ -3685,7 +3679,7 @@ wax.mm.legend = function() {
         }
         return l;
     };
-        
+
     l.appendTo = function(elem) {
         wax.u.$(elem).appendChild(container);
         return l;

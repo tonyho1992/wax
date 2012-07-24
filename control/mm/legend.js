@@ -15,7 +15,7 @@ wax.mm.legend = function() {
     l.content = function(x) {
         if (!arguments.length) return element.innerHTML;
 
-        element.innerHTML = wax.u.sanitize(content);
+        element.innerHTML = wax.u.sanitize(x);
         element.style.display = 'block';
         if (element.innerHTML === '') {
             element.style.display = 'none';
@@ -45,7 +45,7 @@ wax.mm.legend = function() {
         }
         return l;
     };
-        
+
     l.appendTo = function(elem) {
         wax.u.$(elem).appendChild(container);
         return l;

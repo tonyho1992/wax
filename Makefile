@@ -4,7 +4,7 @@ BANNER = ./node_modules/.bin/banner
 dist: dist_setup dist/wax.ol.min.js \
 	dist/wax.g.min.js dist/wax.mm.min.js \
 	dist/wax.esri.min.js \
-	dist/wax.leaf.min.js dist/wax.p.min.js lint
+	dist/wax.leaf.min.js lint
 
 # mindist: dist_setup dist/wax.g.min.js dist/wax.mm.min.js dist/wax.leaf.min.js lint
 
@@ -39,13 +39,6 @@ dist/wax.leaf.min.js:
 		control/leaf/*.js \
 		connectors/leaf/*.js > dist/wax.leaf.js
 	$(UGLIFYJS) dist/wax.leaf.js > dist/wax.leaf.min.js
-
-dist/wax.p.min.js:
-	cat build/header.js \
-		lib/*.js \
-		control/lib/*.js \
-		connectors/p/*.js > dist/wax.p.js
-	$(UGLIFYJS) dist/wax.p.js > dist/wax.p.min.js
 
 dist/wax.esri.min.js:
 	cat build/header.js \
