@@ -6,7 +6,7 @@ describe('hash', function() {
         window.location.hash = '';
         map = new MM.Map(div, new MM.TemplatedMapProvider(
             'http://{S}tile.openstreetmap.org/{Z}/{X}/{Y}.png', ['a.']), new com.modestmaps.Point(10, 10));
-        wax.mm.hash(map);
+        wax.mm.hash().map(map).add();
     });
 
     afterEach(function() {

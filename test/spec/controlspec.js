@@ -37,6 +37,7 @@ describe('control spec', function() {
                 });
 
                 it(i + ' can be added', function() {
+                    expect(controls[i].map(map)).toEqual(controls[i]);
                     expect(controls[i].add()).toEqual(controls[i]);
                 });
 
