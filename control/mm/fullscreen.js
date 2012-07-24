@@ -72,6 +72,10 @@ wax.mm.fullscreen = function() {
         return fullscreen;
     };
 
+    fullscreen.element = function() {
+        return a;
+    };
+
     fullscreen.appendTo = function(elem) {
         wax.u.$(elem).appendChild(a);
         return fullscreen;
