@@ -1,4 +1,4 @@
-/* wax - 6.2.3 - v6.0.4-20-g72fdb15 */
+/* wax - 6.2.3 - v6.0.4-22-gd4e3127 */
 
 
 !function (name, context, definition) {
@@ -2602,7 +2602,7 @@ wax.location = function() {
         } else {
             var loc = o.formatter({ format: 'location' }, o.data);
             if (loc) {
-                window.location.href = loc;
+                window.top.location.href = loc;
             }
         }
     }
