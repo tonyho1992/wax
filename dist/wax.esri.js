@@ -1,4 +1,4 @@
-/* wax - 6.2.3 - v6.0.4-19-g61448de */
+/* wax - 6.2.3 - v6.0.4-20-g72fdb15 */
 
 
 !function (name, context, definition) {
@@ -2597,7 +2597,6 @@ wax.location = function() {
     var t = {};
 
     function on(o) {
-        console.log(o);
         if ((o.e.type === 'mousemove' || !o.e.type)) {
             return;
         } else {
