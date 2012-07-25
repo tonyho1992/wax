@@ -1,4 +1,4 @@
-/* wax - 6.2.3 - v6.0.4-17-g4215d6b */
+/* wax - 6.2.3 - v6.0.4-19-g61448de */
 
 
 !function (name, context, definition) {
@@ -2589,6 +2589,33 @@ wax.legend = function() {
     };
 
     return legend.add();
+};
+var wax = wax || {};
+
+wax.location = function() {
+
+    var t = {};
+
+    function on(o) {
+        console.log(o);
+        if ((o.e.type === 'mousemove' || !o.e.type)) {
+            return;
+        } else {
+            var loc = o.formatter({ format: 'location' }, o.data);
+            if (loc) {
+                window.location.href = loc;
+            }
+        }
+    }
+
+    t.events = function() {
+        return {
+            on: on
+        };
+    };
+
+    return t;
+
 };
 var wax = wax || {};
 wax.movetip = {};
