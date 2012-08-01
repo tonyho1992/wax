@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev7 - v6.0.4-90-g95f6f9c */
+/* wax - 7.0.0dev8 - v6.0.4-94-ge44cbbe */
 
 
 !function (name, context, definition) {
@@ -2671,7 +2671,6 @@ wax.location = function() {
     var t = {};
 
     function on(o) {
-        console.log(o);
         if ((o.e.type === 'mousemove' || !o.e.type)) {
             return;
         } else {
@@ -3588,7 +3587,8 @@ wax.mm.interaction = function() {
         } else {
             var tiles;
             for (var i = 0; i < map.getLayers().length; i++) {
-                var zoomLayer = map.getLayerAt(i).levels[Math.round(map.zoom())];
+                var levels = map.getLayerAt(i).levels;
+                var zoomLayer = levels && levels[Math.round(map.zoom())];
                 if (zoomLayer !== undefined) {
                     tiles = map.getLayerAt(i).tileElementsInLevel(zoomLayer);
                     if (tiles.length) break;
