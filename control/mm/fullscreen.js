@@ -27,13 +27,6 @@ wax.mm.fullscreen = function() {
         }
     }
 
-    function setSize(w, h) {
-        map.dimensions = new MM.Point(w, h);
-        map.parent.style.width = Math.round(map.dimensions.x) + 'px';
-        map.parent.style.height = Math.round(map.dimensions.y) + 'px';
-        map.dispatchCallback('resized', map.dimensions);
-    }
-
     fullscreen.map = function(x) {
         if (!arguments.length) return map;
         map = x;
@@ -60,7 +53,7 @@ wax.mm.fullscreen = function() {
         smallSize = [map.parent.offsetWidth, map.parent.offsetHeight];
         map.parent.className += ' map-fullscreen-map';
         body.className += ' map-fullscreen-view';
-        setSize(map.parent.offsetWidth, map.parent.offsetHeight);
+        map.setSize({ x: map.parent.offsetWidth, y: map.parent.offsetHeight });
         return fullscreen;
     };
 
@@ -68,7 +61,7 @@ wax.mm.fullscreen = function() {
         if (!fullscreened) { return; } else { fullscreened = false; }
         map.parent.className = map.parent.className.replace(' map-fullscreen-map', '');
         body.className = body.className.replace(' map-fullscreen-view', '');
-        setSize(smallSize[0], smallSize[1]);
+        map.setSize({ x: smallSize[0], y: smallSize[1] });
         return fullscreen;
     };
 
