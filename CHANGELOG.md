@@ -6,6 +6,7 @@
 * Renames styles from `.wax-` as their prefix to `.map-`
 * Fixes IE issues in events, event interaction with Leaflet
 * Fix global variable leak of `coord` in wax.mm._provider
+* Fix fullscreen control problems with relative sizes
 * `wax.mm.pointselector` no longer takes a tilejson argument
 * `wax.mm.boxselector` no longer takes a tilejson argument
 * pointselector and boxselector can have multiple callbacks - they
