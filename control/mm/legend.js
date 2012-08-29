@@ -6,10 +6,10 @@ wax.mm.legend = function() {
         l = {};
 
     var container = document.createElement('div');
-    container.className = 'map-legends';
+    container.className = 'wax-legends map-legends';
 
     var element = container.appendChild(document.createElement('div'));
-    element.className = 'map-legend';
+    element.className = 'wax-legend map-legend';
     element.style.display = 'none';
 
     l.content = function(x) {

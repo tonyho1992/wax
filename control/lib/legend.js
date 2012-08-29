@@ -27,10 +27,10 @@ wax.legend = function() {
 
     legend.add = function() {
         container = document.createElement('div');
-        container.className = 'map-legends';
+        container.className = 'map-legends wax-legends';
 
         element = container.appendChild(document.createElement('div'));
-        element.className = 'map-legend';
+        element.className = 'map-legend wax-legend';
         element.style.display = 'none';
         return legend;
     };

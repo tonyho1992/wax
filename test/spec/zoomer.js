@@ -33,10 +33,11 @@ describe('zoomer', function() {
     });
 
     it('marks as unzoomable when zoom is eighteen', function() {
+        map.setZoomRange(0, 18);
         runs(function() {
             map.setZoom(18);
         });
-        waits(100);
+        waits(200);
         runs(function() {
             expect($('.zoomin', map.parent).hasClass('zoomdisabled')).toEqual(true);
         });

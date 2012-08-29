@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev9 - v6.0.4-98-ga4cc6d6 */
+/* wax - 7.0.0dev10 - v6.0.4-99-gbe8ba88 */
 
 
 !function (name, context, definition) {
@@ -2654,10 +2654,10 @@ wax.legend = function() {
 
     legend.add = function() {
         container = document.createElement('div');
-        container.className = 'map-legends';
+        container.className = 'map-legends wax-legends';
 
         element = container.appendChild(document.createElement('div'));
-        element.className = 'map-legend';
+        element.className = 'map-legend wax-legend';
         element.style.display = 'none';
         return legend;
     };
@@ -2905,7 +2905,7 @@ wax.tooltip = function() {
     // Hide any tooltips on layers underneath this one.
     function getTooltip(feature) {
         var tooltip = document.createElement('div');
-        tooltip.className = 'map-tooltip map-tooltip-0';
+        tooltip.className = 'map-tooltip map-tooltip-0 wax-tooltip';
         tooltip.innerHTML = feature;
         return tooltip;
     }
@@ -2953,7 +2953,7 @@ wax.tooltip = function() {
             hide();
             parent.style.cursor = 'pointer';
             var tt = parent.appendChild(getTooltip(content));
-            tt.className += ' map-popup';
+            tt.className += ' map-popup wax-popup';
 
             var close = tt.appendChild(document.createElement('a'));
             close.href = '#close';
@@ -3639,10 +3639,10 @@ wax.mm.legend = function() {
         l = {};
 
     var container = document.createElement('div');
-    container.className = 'map-legends';
+    container.className = 'wax-legends map-legends';
 
     var element = container.appendChild(document.createElement('div'));
-    element.className = 'map-legend';
+    element.className = 'wax-legend map-legend';
     element.style.display = 'none';
 
     l.content = function(x) {
