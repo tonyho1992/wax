@@ -67,6 +67,19 @@ wax.mm.fullscreen = function() {
         return fullscreen;
     };
 
+    fullscreen.fullscreen = function(x) {
+        if (!arguments.length) {
+            return fullscreened;
+        } else {
+            if (x && !fullscreened) {
+                fullscreen.full();
+            } else if (!x && fullscreened) {
+                fullscreen.original();
+            }
+            return fullscreen;
+        }
+    };
+
     fullscreen.element = function() {
         return a;
     };

@@ -18,6 +18,25 @@ describe('fullscreen', function() {
         expect($(map.parent).hasClass('map-fullscreen-map')).toEqual(true);
     });
 
+    it('the fullscreen api tells that the map is fullscreen', function() {
+        $('.map-fullscreen', map.parent).click();
+        expect(fullscreen.fullscreen()).toEqual(true);
+        $('.map-fullscreen', map.parent).click();
+        expect(fullscreen.fullscreen()).toEqual(false);
+    });
+
+    it('the fullscreen api can be used programmatically to change the fullscreenness', function() {
+        expect($(map.parent).hasClass('map-fullscreen-map')).toEqual(false);
+
+        expect(fullscreen.fullscreen(true)).toEqual(fullscreen);
+        expect($(map.parent).hasClass('map-fullscreen-map')).toEqual(true);
+        expect(fullscreen.fullscreen()).toEqual(true);
+
+        expect(fullscreen.fullscreen(false)).toEqual(fullscreen);
+        expect($(map.parent).hasClass('map-fullscreen-map')).toEqual(false);
+        expect(fullscreen.fullscreen()).toEqual(false);
+    });
+
     it('can toggle fullscreen', function() {
         $('.map-fullscreen', map.parent).click();
         expect($(map.parent).hasClass('map-fullscreen-map')).toEqual(true);
