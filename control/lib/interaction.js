@@ -98,12 +98,12 @@ wax.interaction = function() {
             // Don't make the user click close if they hit another tooltip
             bean.fire(interaction, 'off');
             // Touch moves invalidate touches
-            bean.add(parent(), touchEnds);
+            bean.add(e.srcElement, touchEnds);
         }
     }
 
-    function touchCancel() {
-        bean.remove(parent(), touchEnds);
+    function touchCancel(e) {
+        bean.remove(e.srcElement, touchEnds);
         _downLock = false;
     }
 
@@ -118,7 +118,7 @@ wax.interaction = function() {
         }
 
         bean.remove(document.body, 'mouseup', onUp);
-        bean.remove(parent(), touchEnds);
+        bean.remove(e.srcElement, touchEnds);
 
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
