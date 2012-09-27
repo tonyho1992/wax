@@ -16,6 +16,8 @@
 * `wax.mm.zoomer` supports easing
 * `wax.mm.legend` now permits access to its element with .element
 * Style updates
+* Add api for checking if map is fullscreen
+* Fix touch interaction
 
 ## 6.4.2
 
