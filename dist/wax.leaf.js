@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev10 - v6.0.4-99-gbe8ba88 */
+/* wax - 7.0.0dev11 - v6.0.4-113-g6b1c56c */
 
 
 !function (name, context, definition) {
@@ -2484,12 +2484,12 @@ wax.interaction = function() {
             // Don't make the user click close if they hit another tooltip
             bean.fire(interaction, 'off');
             // Touch moves invalidate touches
-            bean.add(parent(), touchEnds);
+            bean.add(e.srcElement, touchEnds);
         }
     }
 
-    function touchCancel() {
-        bean.remove(parent(), touchEnds);
+    function touchCancel(e) {
+        bean.remove(e.srcElement, touchEnds);
         _downLock = false;
     }
 
@@ -2504,7 +2504,7 @@ wax.interaction = function() {
         }
 
         bean.remove(document.body, 'mouseup', onUp);
-        bean.remove(parent(), touchEnds);
+        bean.remove(e.srcElement, touchEnds);
 
         if (e.type === 'touchend') {
             // If this was a touch and it survived, there's no need to avoid a double-tap
@@ -2676,7 +2676,7 @@ wax.location = function() {
         } else {
             var loc = o.formatter({ format: 'location' }, o.data);
             if (loc) {
-                window.location.href = loc;
+                window.top.location.href = loc;
             }
         }
     }
@@ -3049,12 +3049,26 @@ wax.u = {
             }
         };
 
-        calculateOffset(el);
+        // from jquery, offset.js
+        if ( typeof el.getBoundingClientRect !== "undefined" ) {
+          var body = document.body;
+          var doc = el.ownerDocument.documentElement;
+          var clientTop  = document.clientTop  || body.clientTop  || 0;
+          var clientLeft = document.clientLeft || body.clientLeft || 0;
+          var scrollTop  = window.pageYOffset || doc.scrollTop;
+          var scrollLeft = window.pageXOffset || doc.scrollLeft;
 
-        try {
-            while (el = el.offsetParent) { calculateOffset(el); }
-        } catch(e) {
-            // Hello, internet explorer.
+          var box = el.getBoundingClientRect();
+          top = box.top + scrollTop  - clientTop;
+          left = box.left + scrollLeft - clientLeft;
+
+        } else {
+          calculateOffset(el);
+          try {
+              while (el = el.offsetParent) { calculateOffset(el); }
+          } catch(e) {
+              // Hello, internet explorer.
+          }
         }
 
         // Offsets from the body
