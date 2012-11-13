@@ -25,9 +25,8 @@ wax.request = {
             var that = this;
             this.locks[url] = true;
             reqwest({
-                url: url + (~url.indexOf('?') ? '&' : '?') + 'callback=grid',
+                url: url + (~url.indexOf('?') ? '&' : '?') + 'callback=?',
                 type: 'jsonp',
-                jsonpCallback: 'callback',
                 success: function(data) {
                     that.locks[url] = false;
                     that.cache[url] = [null, data];
