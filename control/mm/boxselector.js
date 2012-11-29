@@ -3,6 +3,7 @@ wax.mm = wax.mm || {};
 
 wax.mm.boxselector = function() {
     var corner,
+        enabled = false,
         nearCorner,
         boxDiv,
         style,
@@ -35,7 +36,7 @@ wax.mm.boxselector = function() {
     }
 
     function mouseDown(e) {
-        if (!e.shiftKey) return;
+        if (!enabled) return;
 
         corner = nearCorner = getMousePoint(e);
         horizontal = vertical = true;
@@ -98,6 +99,7 @@ wax.mm.boxselector = function() {
     }
 
     function mouseUp(e) {
+        boxselector.disable();
         var point = getMousePoint(e),
             l1 = map.pointLocation( new MM.Point(
                 horizontal ? point.x : nearCorner.x,
@@ -191,7 +193,7 @@ wax.mm.boxselector = function() {
     style = boxDiv.style;
 
     boxselector.add = function() {
-        boxDiv.id = map.parent.id + '-boxselector-box';
+        boxDiv.id = map.parent.id + '-boxselector-box' + Math.random().toString(36);
         map.parent.appendChild(boxDiv);
         borderWidth = parseInt(window.getComputedStyle(boxDiv).borderWidth, 10);
 
@@ -201,6 +203,22 @@ wax.mm.boxselector = function() {
         map.addCallback('drawn', drawbox);
         return boxselector;
     };
+
+    boxselector.enable = function() {
+        enabled = true;
+        map.disableScrolling();
+    };
+
+    boxselector.disable = function () {
+        enabled = false;
+        map.enableScrolling();
+    }
+
+    boxselector.toggleEnabled = function () {
+        enabled = !enabled;
+        map.toggleScrolling();
+    }
+
 
     boxselector.map = function(x) {
         if (!arguments.length) return map;
