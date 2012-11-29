@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev12 - v6.0.4-130-gff5d83c */
+/* wax - 7.0.0dev12 - v6.0.4-136-g1f3d552 */
 
 
 !function (name, context, definition) {
@@ -3297,6 +3297,7 @@ wax.mm = wax.mm || {};
 
 wax.mm.boxselector = function() {
     var corner,
+        enabled = false,
         nearCorner,
         boxDiv,
         style,
@@ -3309,7 +3310,7 @@ wax.mm.boxselector = function() {
         box,
         boxselector = {},
         map,
-        callbackManger = new MM.CallbackManager(boxselector, ['change']);
+        callbackManager = new MM.CallbackManager(boxselector, ['change']);
 
     function getMousePoint(e) {
         // start with just the mouse (x, y)
@@ -3329,7 +3330,7 @@ wax.mm.boxselector = function() {
     }
 
     function mouseDown(e) {
-        if (!e.shiftKey) return;
+        if (!enabled) return;
 
         corner = nearCorner = getMousePoint(e);
         horizontal = vertical = true;
@@ -3392,6 +3393,7 @@ wax.mm.boxselector = function() {
     }
 
     function mouseUp(e) {
+        boxselector.disable();
         var point = getMousePoint(e),
             l1 = map.pointLocation( new MM.Point(
                 horizontal ? point.x : nearCorner.x,
@@ -3485,7 +3487,7 @@ wax.mm.boxselector = function() {
     style = boxDiv.style;
 
     boxselector.add = function() {
-        boxDiv.id = map.parent.id + '-boxselector-box';
+        boxDiv.id = map.parent.id + '-boxselector-box' + Math.random().toString(36);
         map.parent.appendChild(boxDiv);
         borderWidth = parseInt(window.getComputedStyle(boxDiv).borderWidth, 10);
 
@@ -3494,6 +3496,21 @@ wax.mm.boxselector = function() {
         addEvent(map.parent, 'mousemove', mouseMoveCursor);
         map.addCallback('drawn', drawbox);
         return boxselector;
+    };
+
+    boxselector.enable = function() {
+        enabled = true;
+        map.disableScrolling();
+    };
+
+    boxselector.disable = function () {
+        enabled = false;
+        map.enableScrolling();
+    };
+
+    boxselector.toggleEnabled = function () {
+        enabled = !enabled;
+        map.toggleScrolling();
     };
 
     boxselector.map = function(x) {

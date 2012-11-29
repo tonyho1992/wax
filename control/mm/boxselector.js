@@ -212,13 +212,12 @@ wax.mm.boxselector = function() {
     boxselector.disable = function () {
         enabled = false;
         map.enableScrolling();
-    }
+    };
 
     boxselector.toggleEnabled = function () {
         enabled = !enabled;
         map.toggleScrolling();
-    }
-
+    };
 
     boxselector.map = function(x) {
         if (!arguments.length) return map;
