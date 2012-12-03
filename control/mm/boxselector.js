@@ -209,12 +209,20 @@ wax.mm.boxselector = function() {
         map.disableScrolling();
     };
 
-    boxselector.disable = function () {
+    boxselector.disable = function() {
         enabled = false;
         map.enableScrolling();
     };
 
-    boxselector.toggleEnabled = function () {
+    boxselector.enableResize = function() {
+        addEvent(boxDiv, 'mousedown', mouseDownResize);
+    };
+
+    boxselector.disableResize = function() {
+        removeEvent(boxDiv, 'mousedown', mouseDownResize);
+    };
+
+    boxselector.toggleEnabled = function() {
         enabled = !enabled;
         map.toggleScrolling();
     };
