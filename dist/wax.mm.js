@@ -1,4 +1,4 @@
-/* wax - 7.0.0dev12 - v6.0.4-137-g58d055e */
+/* wax - 7.0.0dev12 - v6.0.4-140-g021f1e9 */
 
 
 !function (name, context, definition) {
@@ -3507,12 +3507,20 @@ wax.mm.boxselector = function() {
         map.disableScrolling();
     };
 
-    boxselector.disable = function () {
+    boxselector.disable = function() {
         enabled = false;
         map.enableScrolling();
     };
 
-    boxselector.toggleEnabled = function () {
+    boxselector.enableResize = function() {
+        addEvent(boxDiv, 'mousedown', mouseDownResize);
+    };
+
+    boxselector.disableResize = function() {
+        removeEvent(boxDiv, 'mousedown', mouseDownResize);
+    };
+
+    boxselector.toggleEnabled = function() {
         enabled = !enabled;
         map.toggleScrolling();
     };
