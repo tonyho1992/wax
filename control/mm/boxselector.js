@@ -1,6 +1,8 @@
 wax = wax || {};
 wax.mm = wax.mm || {};
 
+var numBoxes = 0;
+
 wax.mm.boxselector = function() {
     var corner,
         enabled = false,
@@ -14,6 +16,7 @@ wax.mm.boxselector = function() {
         addEvent = MM.addEvent,
         removeEvent = MM.removeEvent,
         box,
+        boxId,
         boxselector = {},
         map,
         callbackManager = new MM.CallbackManager(boxselector, ['change']);
@@ -193,7 +196,8 @@ wax.mm.boxselector = function() {
     style = boxDiv.style;
 
     boxselector.add = function() {
-        boxDiv.id = map.parent.id + '-boxselector-box' + Math.random().toString(36);
+        boxId = numBoxes++;
+        boxDiv.id = map.parent.id + '-boxselector-box' + boxId;
         map.parent.appendChild(boxDiv);
         borderWidth = parseInt(window.getComputedStyle(boxDiv).borderWidth, 10);
 
@@ -242,6 +246,10 @@ wax.mm.boxselector = function() {
 
         map.removeCallback('drawn', drawbox);
         return boxselector;
+    };
+
+    boxselector.getId = function() {
+        return boxId;
     };
 
     return boxselector;
